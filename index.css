@@ -1,24 +1,66 @@
 head {
     font-family: 'Inter', sans-serif;
     font-weight: 700;
+    font-size: large;
 }
 
 body {
+    font-size: large;
     font-family: 'Inter', sans-serif;
     font-weight: 400;
 
-    align-items: center;
-    justify-content: center;
-    width: 80%;
-    height: 80%;
+    display: grid;
+    place-items: center;
+
+    text-align: center;
 }
 
+
 .main-photo {
-    width: 200px;
-    height: 200px;
+    width: 300px;
+    height: 300px;
+    margin-top: 20px;
+    margin-bottom: 20px;
 }
+
+.name {
+    margin-top: 5px;
+    margin-bottom: 5px;
+}
+
+.headline {
+    margin-top: 4px;
+    margin-bottom: 4px;
+}
+
+.website {
+    margin-top: 3px;
+    margin-bottom: 3px;
+}
+
+.button-contact {
+    padding-top: 20px;
+    padding-bottom: 20px;
+}
+
+
+.main-content {
+    padding-bottom: 50px;
+}
+
+.main-content > h2 {
+    margin-top: 5px;
+    margin-bottom: 5px;
+}
+
+.footer {
+    background-color: beige;
+    
+}
+
 
 .socials {
     width: 40px;
     height: 40px;
+    padding: 0 10px;
 }
