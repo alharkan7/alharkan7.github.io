@@ -19,7 +19,7 @@
     text-align: center;
     width: 100%;
     padding: 20px;
-    max-width: 600px;
+    max-width: 1000px;
   }
   
   header h1 {
@@ -37,7 +37,7 @@
   /* Twitter embed container */
   .twitter-container {
     width: 100%;
-    height: 400px; /* Adjust the height as needed */
+    height: 600px; /* Adjust the height as needed */
     margin-top: 20px;
     overflow-y: scroll;
     border: 1px solid #444;
