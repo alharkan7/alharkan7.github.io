@@ -1,8 +1,9 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 
 <head>
   <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Al Harkan</title>
   <link rel="icon" type="image/x-icon" href="main-photo.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -10,11 +11,44 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Open+Sans&display=swap"
     rel="stylesheet">
   <link rel="stylesheet" type="text/css" href="index.css">
+  <style>
+    body {
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+      margin: 0;
+      padding: 0;
+    }
+    header, footer {
+      padding: 1rem;
+    }
+    main {
+      flex: 1;
+      padding: 1rem;
+    }
+    #twitter-feed {
+      height: 80vh;
+      overflow-y: auto;
+    }
+  </style>
 </head>
 
 <body>
-  <a class="twitter-timeline" href="https://twitter.com/alhrkn?ref_src=twsrc%5Etfw">Tweets by alhrkn</a>
-  <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+  <header>
+    <h1>Al Harkan</h1>
+  </header>
+
+  <main>
+    <section id="twitter-feed">
+      <h2>My Twitter Timeline</h2>
+      <a class="twitter-timeline" href="https://twitter.com/alhrkn?ref_src=twsrc%5Etfw" data-height="100%">Tweets by @alhrkn</a>
+      <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+    </section>
+  </main>
+
+  <footer>
+    <p>&copy; 2024 Al Harkan</p>
+  </footer>
 </body>
 
 </html>
