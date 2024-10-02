@@ -2,51 +2,43 @@
 <html lang="en">
 
 <head>
-  <meta charset="UTF-8" />
+  <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Al Harkan</title>
+  <title>Al Harkan - Twitter Timeline</title>
   <link rel="icon" type="image/x-icon" href="main-photo.png">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Open+Sans&display=swap"
-    rel="stylesheet">
   <style>
-    body {
-      display: flex;
-      flex-direction: column;
-      min-height: 100vh;
+    body,
+    html {
       margin: 0;
       padding: 0;
+      height: 100%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background-color: #f5f8fa;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
     }
-    header, footer {
-      padding: 1rem;
+
+    #twitter-container {
+      width: 100%;
+      max-width: 600px;
+      height: 100vh;
+      padding: 20px;
+      box-sizing: border-box;
     }
-    main {
-      flex: 1;
-      padding: 1rem;
-    }
-    #twitter-feed {
-      height: 80vh;
-      overflow-y: auto;
+
+    .twitter-timeline {
+      height: 100% !important;
     }
   </style>
 </head>
 
 <body>
-  <header>
-    <h1>Al Harkan</h1>
-  </header>
-
-  <main>
-    <section id="twitter-feed">
-      <a class="twitter-timeline" href="https://twitter.com/alhrkn?ref_src=twsrc%5Etfw" data-height="100%">Tweets by @alhrkn</a>
-      <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
-    </section>
-  </main>
-
-  <footer>
-    <p>&copy; 2024 Al Harkan</p>
-  </footer>
+  <div id="twitter-container">
+    <a class="twitter-timeline" href="https://twitter.com/alhrkn?ref_src=twsrc%5Etfw"
+      data-chrome="noheader nofooter noborders transparent">Tweets by @alhrkn</a>
+    <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+  </div>
 </body>
 
 </html>
