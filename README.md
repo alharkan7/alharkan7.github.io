@@ -99,7 +99,7 @@ This project is open source and available under the [MIT License](LICENSE).
 ## 🙏 Acknowledgments
 
 - Built with [Astro](https://astro.build)
-- Deployed on [Netlify](https://netlify.com)
+- Deployed on [GitHub Pages](https://pages.github.com)
 - Icons from [Heroicons](https://heroicons.com)
 
 ## 📬 Contact

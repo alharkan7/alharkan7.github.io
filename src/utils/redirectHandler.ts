@@ -28,7 +28,6 @@ export function findRedirect(slug: string | undefined): Redirect | undefined {
     return vercelRedirect;
   }
 
-  // For Netlify, we don't need to check here since redirects are handled by Netlify's _redirects file
   return undefined;
 }
 

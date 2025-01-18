@@ -31,7 +31,6 @@
     "packageJson": {
       "dependencies": [
         "npm:@astrojs/mdx@^2.3.1",
-        "npm:@astrojs/netlify@^5.5.4",
         "npm:@astrojs/svelte@5",
         "npm:@astrojs/vercel@^7.8.2",
         "npm:astro@^4.16.13",
