@@ -1,0 +1,45 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+
+const title = "404: Not Found";
+const description = "The page you're looking for doesn't exist.";
+const permalink = Astro?.site?.href;
+
+---
+
+<BaseLayout
+  title={title}
+  description={description}
+  permalink={permalink ?? "/"}
+  current=""
+>
+  <div class="container">
+    <p><b>{title}</b></p>
+    <h1>Oops, wrong way!</h1>
+    <p>{description}</p>
+    <p>
+      <a href="/">← Back to home</a>
+    </p>
+  </div>
+</BaseLayout>
+
+<style>
+  .container {
+    text-align: center;
+    padding: 4em 0;
+  }
+
+  h1 {
+    margin-bottom: 1em;
+  }
+
+  a {
+    text-decoration: none;
+    color: var(--theme-text);
+    border-bottom: 1px solid;
+  }
+
+  a:hover {
+    border-bottom-width: 2px;
+  }
+</style>

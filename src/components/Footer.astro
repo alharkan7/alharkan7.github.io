@@ -1,0 +1,25 @@
+---
+const { current = '' } = Astro.props;
+---
+
+<footer>
+  <span>
+    &copy; {new Date().getFullYear()} Al Harkan | 
+    <a href="mailto:alharkan7@gmail.com" target="_blank" rel="noopener">Contact</a>
+    <!-- | 
+    <a href="/about">About</a> -->
+
+  </span>
+</footer>
+
+<style>
+  footer {
+    color: var(--text-secondary);
+    font-size: .8em;
+    margin: 1em auto;
+    max-width: 1400px;
+    padding: 1em 2em;
+    text-align: center;
+    width: 100%;
+  }
+</style>

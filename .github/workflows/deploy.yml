@@ -1,0 +1,53 @@
+name: Deploy to GitHub Pages
+
+on:
+  # Trigger the workflow every time you push to the `master` branch
+  push:
+    branches: [ master ]
+  # Allow you to run this workflow manually from the Actions tab on GitHub.
+  workflow_dispatch:
+
+# Allow this job to clone the repo and create a page deployment
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# Ensure only one deployment happens at a time
+concurrency:
+  group: "pages"
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    env:
+      FIREBASE_PROJECT_ID: ${{ secrets.FIREBASE_PROJECT_ID }}
+      FIREBASE_CLIENT_EMAIL: ${{ secrets.FIREBASE_CLIENT_EMAIL }}
+      FIREBASE_PRIVATE_KEY: ${{ secrets.FIREBASE_PRIVATE_KEY }}
+      PUBLIC_FIREBASE_API_KEY: 'AIzaSyCOwY_EFWMJnB5GCfp6q3l1JdPEWc4S43U'
+      PUBLIC_FIREBASE_AUTH_DOMAIN: 'raihankalla-id.firebaseapp.com'
+      PUBLIC_FIREBASE_PROJECT_ID: 'raihankalla-id'
+      PUBLIC_FIREBASE_STORAGE_BUCKET: 'raihankalla-id.firebasestorage.app'
+      PUBLIC_FIREBASE_MESSAGING_SENDER_ID: '1024694618383'
+      PUBLIC_FIREBASE_APP_ID: '1:1024694618383:web:949f815a6cdc4ed586167a'
+      PUBLIC_USERNAME: ${{ secrets.PUBLIC_USERNAME }}
+      PUBLIC_PASSWORD: ${{ secrets.PUBLIC_PASSWORD }}
+    steps:
+      - name: Checkout your repository using git
+        uses: actions/checkout@v4
+      - name: Install, build, and upload your site
+        uses: withastro/action@v1
+        with:
+          node-version: 20 # The specific version of Node that should be used to build your site. Defaults to 18. (optional)
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v2

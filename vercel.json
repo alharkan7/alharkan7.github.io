@@ -1,0 +1,55 @@
+{
+    "redirects": [
+        {
+            "permanent": true,
+            "destination": "https://twitter.com/alhrkn/status/1526933166597935105",
+            "source": "/menara-gading"
+        },
+        {
+            "permanent": true,
+            "destination": "https://twitter.com/alhrkn/status/1494865215191588868",
+            "source": "/pandemic-face"
+        },
+        {
+            "permanent": true,
+            "destination": "https://twitter.com/alhrkn/status/1461501420008394754",
+            "source": "/ai-scicomm"
+        },
+        {
+            "permanent": true,
+            "destination": "https://twitter.com/alhrkn/status/1450779651580698629",
+            "source": "/learning-cone"
+        },
+        {
+            "permanent": true,
+            "destination": "https://twitter.com/alhrkn/status/1435078828259373063",
+            "source": "/apple-presence"
+        },
+        {
+            "permanent": true,
+            "destination": "https://twitter.com/alhrkn/status/1418209085791510535",
+            "source": "/gratitude"
+        },
+        {
+            "permanent": true,
+            "destination": "https://twitter.com/alhrkn/status/1356493528356900864",
+            "source": "/future"
+        },
+        {
+            "permanent": true,
+            "destination": "https://twitter.com/alhrkn/status/1327205937271115777",
+            "source": "/ideas"
+        },
+        
+        {
+            "permanent": true,
+            "destination": "https://twitter.com/alhrkn/status/1308629643264626688",
+            "source": "/trivia"
+        },
+        {
+            "permanent": true,
+            "destination": "https://twitter.com/alhrkn/status/1430491571519057927",
+            "source": "/legendary-math"
+        }
+    ]
+}

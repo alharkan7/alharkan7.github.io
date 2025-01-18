@@ -1,0 +1,113 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import { tweetEmbeds } from "../../data/tweet-shorts.ts";
+
+const tweetsPerPage = 5;
+const currentPage = 1;
+const totalPages = Math.ceil(tweetEmbeds.length / tweetsPerPage);
+const tweets = tweetEmbeds.slice(0, tweetsPerPage);
+
+const title = "Short Threads - Al Harkan";
+const description = "Collection of Short Threads by Al Harkan";
+const permalink = `${Astro?.site?.href}short`;
+---
+
+<BaseLayout
+  title={title}
+  description={description}
+  permalink={permalink}
+  current="shorts"
+>
+  <div class="container">
+    <h1>Collection of Short Threads</h1>
+    <hr />
+    <p>
+      <b
+        >Go to my <a
+          href="https://x.com/alhrkn"
+          target="_blank"
+          rel="noopener noreferrer">Highlights</a
+        > for more updated list.</b
+      >
+    </p>
+    <small>Open any tweet to read the full threads.</small>
+
+    <div class="tweets-container">
+      {tweets.map((embed) => <Fragment set:html={embed} />)}
+    </div>
+
+    <div class="pagination">
+      <!-- <span class="page-info">Page {currentPage} of {totalPages}</span> -->
+      {
+        totalPages > 1 && (
+          <a href="/shorts/2" class="next-button">
+            Next →
+          </a>
+        )
+      }
+    </div>
+  </div>
+</BaseLayout>
+
+<script>
+  // Load Twitter widgets on initial page load and page updates
+  function loadTwitterWidgets() {
+    if (window.twttr && window.twttr.widgets) {
+      window.twttr.widgets.load();
+    }
+  }
+
+  document.addEventListener("DOMContentLoaded", loadTwitterWidgets);
+  document.addEventListener("astro:page-load", loadTwitterWidgets);
+</script>
+
+<style>
+  .tweets-container {
+    display: grid;
+    gap: 1rem;
+    margin-bottom: 2rem;
+  }
+
+  .pagination {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 0;
+  }
+
+  .page-info {
+    color: var(--text-secondary);
+  }
+
+  .prev-button,
+  .next-button {
+    color: var(--text-secondary);
+    transition: all 0.2s ease;
+    font-family: var(--font-family-sans);
+    font-size: 1.8em;
+    font-weight: 700;
+    text-decoration: none;
+    box-shadow: inset 0 -0.12em 0 var(--primary-color);
+    -webkit-transition:
+      box-shadow 0.2s ease-in-out,
+      color 0.2s ease-in-out;
+    transition:
+      box-shadow 0.2s ease-in-out,
+      color 0.2s ease-in-out;
+  }
+
+  .prev-button:hover,
+  .next-button:hover {
+    color: var(--primary-color);
+    box-shadow: inset 0 -1.5em 0 var(--primary-color);
+    color: #fff;
+  }
+
+  .next-button {
+    margin-left: auto;
+  }
+
+  .prev-button {
+    margin-right: auto;
+  }
+</style>

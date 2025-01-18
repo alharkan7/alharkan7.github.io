@@ -1,0 +1,125 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+
+const title = "Works - Al Harkan";
+const description = "Works by Al Harkan";
+const permalink = Astro.site?.href ? `${Astro.site.href}works` : "/works";
+
+const postsPerPage = 10;
+const allPosts = await Astro.glob("../../data/blog-posts/works/*.{md,mdx}");
+
+const sortedPosts = allPosts.sort(
+  (a, b) =>
+    new Date(b.frontmatter.publishDate).valueOf() -
+    new Date(a.frontmatter.publishDate).valueOf(),
+);
+
+// Calculate pagination
+const totalPosts = sortedPosts.length;
+const totalPages = Math.ceil(totalPosts / postsPerPage);
+const paginatedPosts = sortedPosts.slice(0, postsPerPage);
+---
+
+<BaseLayout
+  title={title}
+  description={description}
+  permalink={permalink ?? "/"}
+  current="works"
+>
+  <div class="container">
+    <h1>Works</h1>
+    <hr />
+    {
+      paginatedPosts.map((post, index) => {
+        const href = `/${post.file.split("/works/").pop().split(".").shift()}`;
+        return (
+          <div>
+            {index !== 0 && <hr />}
+            <div class="post-item">
+              <h2>
+                <a href={href}>{post.frontmatter.title}</a>
+              </h2>
+              <p>{post.frontmatter.description}</p>
+              <div class="post-item-footer">
+                <span class="post-item-date">
+                  — {post.frontmatter.publishDate}
+                </span>
+              </div>
+            </div>
+          </div>
+        );
+      })
+    }
+
+    <div class="pagination">
+      {
+        totalPages > 1 && (
+          <a href="/works/2" class="pagination-next">
+            Next →
+          </a>
+        )
+      }
+    </div>
+  </div>
+
+  <style>
+    h1 {
+      margin-bottom: 0.5rem;
+    }
+
+    h2,
+    .post-item-footer {
+      font-family: var(--font-family-sans);
+      font-weight: 700;
+    }
+
+    .post-item-date {
+      color: var(--text-secondary);
+      text-align: left;
+      text-transform: uppercase;
+      margin-right: 16px;
+    }
+
+    hr {
+      margin: 60px auto;
+    }
+
+    .pagination {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 60px;
+      /* padding: 1rem 0; */
+    }
+
+    .pagination-prev,
+    .pagination-next {
+      /* padding: 0.5rem 1rem; */
+      /* border: 1px solid var(--text-secondary); */
+      /* border-radius: 4px; */
+      /* text-decoration: none; */
+      color: var(--text-secondary);
+      transition: all 0.2s ease;
+      font-family: var(--font-family-sans);
+      font-size: 1.8em;
+      font-weight: 700;
+      text-decoration: none;
+      box-shadow: inset 0 -0.12em 0 var(--primary-color);
+      -webkit-transition: box-shadow 0.2s ease-in-out, color 0.2s ease-in-out;
+      transition: box-shadow 0.2s ease-in-out, color 0.2s ease-in-out;
+    }
+
+    .pagination-prev:hover,
+    .pagination-next:hover {
+      /* border-color: var(--text-primary); */
+      /* background-color: var(--text-primary); */
+      /* color: var(--background); */
+      color: var(--primary-color);
+      box-shadow: inset 0 -1.5em 0 var(--primary-color);
+      color: #fff;
+    }
+
+    .pagination-next {
+      margin-left: auto;
+    }
+  </style>
+</BaseLayout>

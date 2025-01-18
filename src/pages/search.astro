@@ -1,0 +1,200 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+
+const title = "Search - Al Harkan";
+const description = "Search Al Harkan's Blog Archives";
+const permalink = Astro?.site?.href;
+
+const allPosts = await Astro.glob("../data/blog-posts/*/*.{md,mdx}");
+
+const sortedPosts = allPosts.sort(
+  (a, b) =>
+    new Date(b.frontmatter.publishDate).valueOf() -
+    new Date(a.frontmatter.publishDate).valueOf(),
+);
+
+// Prepare posts data for client-side use
+const posts = sortedPosts.map(post => ({
+  title: post.frontmatter.title,
+  description: post.frontmatter.description,
+  publishDate: post.frontmatter.publishDate,
+  slug: post.file.split("/").pop()?.split(".").shift() || '',
+  content: post.rawContent?.() || ''
+}));
+---
+
+<BaseLayout
+  title={title}
+  description={description}
+  permalink={permalink ?? "/"}
+  current="search"
+>
+  <div class="container">
+    <h1>Search</h1>
+   
+    <div class="search-container">
+      <div class="search-wrapper">
+        <input 
+          type="text" 
+          id="searchInput" 
+          placeholder="Search posts..."
+          class="search-input"
+        />
+        <button id="searchButton" class="search-button" aria-label="Search">
+          <span class="search-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="11" cy="11" r="8"></circle>
+              <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+            </svg>
+          </span>
+        </button>
+      </div>
+    </div>
+
+    <div id="searchResults" class="search-results">
+      <!-- Results will be populated here -->
+    </div>
+  </div>
+</BaseLayout>
+
+<script define:vars={{ posts }}>
+  const searchInput = document.getElementById('searchInput');
+  const searchButton = document.getElementById('searchButton');
+  const searchResults = document.getElementById('searchResults');
+  
+  if (!searchInput || !searchButton || !searchResults) {
+    console.error('Required DOM elements not found');
+    throw new Error('Required DOM elements not found');
+  }
+
+  function performSearch() {
+    const query = searchInput.value.toLowerCase();
+    if (!query) {
+      searchResults.innerHTML = '';
+      return;
+    }
+
+    const filteredPosts = posts.filter(post => 
+      post.title.toLowerCase().includes(query) ||
+      post.description.toLowerCase().includes(query) ||
+      post.content.toLowerCase().includes(query)
+    );
+
+    searchResults.innerHTML = filteredPosts.map(post => `
+      <div class="post-item">
+        <h2>
+          <a href="/${post.slug}">${post.title}</a>
+        </h2>
+        <p>${post.description}</p>
+        <div class="post-item-footer">
+          <span class="post-item-date">— ${post.publishDate}</span>
+        </div>
+      </div>
+      <hr />
+    `).join('');
+
+    if (filteredPosts.length === 0) {
+      searchResults.innerHTML = '<p>No results found.</p>';
+    }
+  }
+
+  // Event listeners
+  searchButton.addEventListener('click', performSearch);
+  searchInput.addEventListener('keypress', (e) => {
+    if (e.key === 'Enter') {
+      performSearch();
+    }
+  });
+</script>
+
+<style>
+  h1 {
+    margin-bottom: 0.5rem;
+    text-align: center;
+  }
+
+  h2,
+  .post-item-footer {
+    font-family: var(--font-family-sans);
+    font-weight: 700;
+  }
+
+  .post-item-date {
+    color: var(--text-secondary);
+    text-align: left;
+    text-transform: uppercase;
+    margin-right: 16px;
+  }
+
+  hr {
+    margin: 60px auto;
+  }
+
+  .search-container {
+    margin-top: 2rem;
+    margin-bottom: 4rem;
+    margin-left: auto;
+    margin-right: auto;
+    width: 100%;
+    max-width: 600px;
+  }
+
+  .search-wrapper {
+    position: relative;
+    width: 100%;
+  }
+
+  .search-input {
+    width: 100%;
+    padding: 0.75rem 3rem 0.75rem 1rem;
+    font-size: 1rem;
+    border: 2px solid var(--text-secondary);
+    border-radius: 24px;
+    background: transparent;
+    color: var(--text-main);
+  }
+
+  .search-button {
+    position: absolute;
+    right: 8px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    padding: 8px;
+    cursor: pointer;
+    color: var(--text-secondary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 0;
+  }
+
+  .search-button:hover {
+    color: var(--text-main);
+  }
+
+  .search-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: currentColor;
+    width: 20px;
+    height: 20px;
+  }
+
+  .search-icon :global(svg) {
+    width: 100%;
+    height: 100%;
+    stroke: currentColor;
+    stroke-width: 2;
+  }
+
+  .search-results {
+    margin-top: 2rem;
+  }
+
+  .post-item {
+    margin: 2rem 0;
+  }
+</style>

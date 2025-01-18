@@ -1,0 +1,105 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+
+const title = "About - Al Harkan";
+const description = "Al Harkan's Bio, Contact, and Intro";
+const permalink = `${Astro?.site?.href}about`;
+---
+
+<BaseLayout
+  title={title}
+  description={description}
+  permalink={permalink}
+  current="about"
+>
+  <div class="container">
+    <h1>Hi, I'm Al</h1>
+    <hr />
+    <!-- <figure class="about-image">
+      <img
+        src="/assets/profile-pic.webp"
+        alt="Headshot Photo of Al Harkan"
+        width="330"
+      /> -->
+      <!-- <figcaption>
+        Headshot Photo of Al Harkan
+      </figcaption> -->
+    </figure>
+    <p>
+      I'm a Data Analyst & Media Intelligence Specialist. 
+    </p>
+    <p>
+      My professional experience spans across technology (SuperApp.id, IYKRA), media (Telkom Indonesia, SEA Today), research (University of Indonesia), and education (Indonesia Mengajar). I'm currently on my way studying AI &amp; Media at Nanyang Technological University.
+    </p>
+    <p>
+      I graduated from the University of Indonesia (M.Si.), and completed several trainings and certifications in Data Science, Advanced Data Analytics, and Project Management, to name a few.
+    </p>
+    <p>
+      Here's my <b><a href="https://linkedin.com/in/alharkan" target="_blank">LinkedIn</a></b> profile for a more complete résumé.
+    </p>
+    <hr />
+    <p>
+      I watch explanatory &amp; documentary videos a lot —on science,
+      technology, data science, web development, digital marketing, finance,
+      startups; and I curate those videos in this library of <b><a
+        target="_blank"
+        rel="noopener noreferrer"
+        href="https://www.youtube.com/c/RaihanKalla/playlists"
+        >YouTube playlists</a
+      ></b>.
+    </p>
+    <p>
+      I tweet about all <b><a
+        target="_blank"
+        rel="noopener noreferrer"
+        href="https://x.com/alhrkn/highlights"
+        >the topics above</a
+      ></b>, doing my little part in science communication. I also make short videos
+      on Instagram —check my <b><a
+        target="_blank"
+        rel="noopener noreferrer"
+        href="https://instagram.com/alhrkn">Stories Highlights</a
+      ></b>.
+    </p>
+    <p>With that being said, I can help you with:</p>
+    <ul>
+      <li>Data Analytics &amp; Visualization</li>
+      <li>Digital Content Production</li>
+      <li>Mobile Videography &amp; Journalism</li>
+      <li>
+        <p>Media Studies Research</p>
+      </li>
+    </ul>
+    <p>
+      Just <b><a href="mailto:alharkan7@gmail.com">hit me up</a></b> or <b><a
+        target="_blank"
+        rel="noopener noreferrer"
+        href="https://calendar.app.google/QK3gqdsExy8rm3VX6"
+        >schedule a call.</a></b>
+    </p>
+  <hr/>
+  <p>
+    <b>P.S.</b> The domain of this blog is just an anagram of my full name.
+  </p>
+  </div>
+</BaseLayout>
+
+<style>
+  .about-image {
+    float: right;
+    margin: -3em -7em 2em 2em;
+    max-width: 300px;
+  }
+
+  .about-image img {
+    border-radius: 8px;
+    margin-bottom: 1.5em;
+  }
+
+  @media (max-width: 1020px) {
+    .about-image {
+      float: none;
+      margin: 0 auto 2em;
+    }
+  }
+</style>

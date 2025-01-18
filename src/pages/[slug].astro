@@ -1,0 +1,229 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import Bio from "../components/Bio.astro";
+import getPostData from "../utils/getPostData";
+import { findRedirect } from "../utils/redirectHandler";
+
+export const prerender = true;
+
+export async function getStaticPaths() {
+  const blogPosts: any = await Astro.glob("../data/blog-posts/blog/*.{md,mdx}");
+  const storyPosts: any = await Astro.glob(
+    "../data/blog-posts/stories/*.{md,mdx}",
+  );
+  const threadPosts: any = await Astro.glob(
+    "../data/blog-posts/threads/*.{md,mdx}",
+  );
+  const workPosts: any = await Astro.glob(
+    "../data/blog-posts/works/*.{md,mdx}",
+  );
+  const uncategorizedPosts: any = await Astro.glob(
+    "../data/blog-posts/uncategorized/*.{md,mdx}",
+  );
+  const allPosts = [
+    ...blogPosts,
+    ...storyPosts,
+    ...threadPosts,
+    ...workPosts,
+    ...uncategorizedPosts,
+  ];
+
+  // Add debug logging
+  // console.log(
+  //   "Generated paths:",
+  //   allPosts.map((p) => ({
+  //     slug: p.file.split("/").pop().split(".").shift(),
+  //     file: p.file,
+  //   })),
+  // );
+
+  return allPosts.map((p) => ({
+    params: { slug: p.file.split("/").pop().split(".").shift() },
+    props: { post: p },
+  }));
+}
+
+const { slug } = Astro.params;
+
+// Check if post exists in props
+if (!Astro.props.post) {
+  console.error(`Post not found for slug: ${slug}`);
+  return Astro.redirect('/404');
+}
+
+const { Content, frontmatter } = Astro.props.post;
+
+// Check for redirection
+const redirectMatch = findRedirect(slug);
+
+// If a redirect is found, use Astro's redirect method
+if (redirectMatch) {
+  return Astro.redirect(redirectMatch.destination);
+}
+
+const { title, description, publishDate } = frontmatter;
+const { slug: postSlug, readingTime } = getPostData(Astro.props.post);
+const permalink = `${Astro?.site?.href}${postSlug}`;
+
+// Check if this is a blog post or other category
+const possiblePaths = ["blog", "stories", "threads", "uncategorized", "works"];
+const isBlogPost = possiblePaths.some((path) =>
+  Astro.props.post.file.includes(`blog-posts/${path}`),
+);
+
+const category = isBlogPost
+  ? Astro.props.post.file.split("blog-posts/")[1].split("/")[0]
+  : "";
+
+// Check authentication for uncategorized posts
+if (category === "uncategorized") {
+  const isLoggedIn = Astro.cookies.get('isLoggedIn')?.value === 'true';
+  if (!isLoggedIn) {
+    return Astro.redirect('/login');
+  }
+}
+
+// Get recommended posts from the same category
+const getRecommendedPosts = async () => {
+  let categoryPosts;
+  if (category === "blog") {
+    categoryPosts = await Astro.glob("../data/blog-posts/blog/*.{md,mdx}");
+  } else if (category === "stories") {
+    categoryPosts = await Astro.glob("../data/blog-posts/stories/*.{md,mdx}");
+  } else if (category === "threads") {
+    categoryPosts = await Astro.glob("../data/blog-posts/threads/*.{md,mdx}");
+  } else if (category === "works") {
+    categoryPosts = await Astro.glob("../data/blog-posts/works/*.{md,mdx}");
+  } else {
+    categoryPosts = await Astro.glob(
+      "../data/blog-posts/uncategorized/*.{md,mdx}",
+    );
+  }
+
+  // Filter out current post and get 2 random posts
+  return categoryPosts
+    .filter((post) => post.file !== Astro.props.post.file)
+    .sort(() => Math.random() - 0.5)
+    .slice(0, 2)
+    .map((post) => ({
+      title: post.frontmatter.title,
+      slug: post.file.split("/").pop().split(".").shift(),
+    }));
+};
+
+const recommendedPosts = await getRecommendedPosts();
+---
+
+<BaseLayout
+  title={title}
+  description={description}
+  permalink={permalink}
+  current={isBlogPost ? "blog" : ""}
+>
+  <header>
+    <!-- <p>{publishDate} ~ {readingTime}</p> -->
+    <p>
+      <a href={category === "blog" ? "/" : `/${category}`}>
+        {category === "blog" ? "#featured" : `#${category}`}
+      </a>
+      ~ {publishDate}
+    </p>
+    <h1>{title}</h1>
+    <hr />
+  </header>
+  <div class="container">
+    <article class="content">
+      <Content />
+    </article>
+
+    {
+      recommendedPosts.length > 0 && (
+        <div class="recommended-posts">
+          <h3>
+            Read more posts in <a href={category === "blog" ? "/" : `/${category}`}>
+              {category === "blog" ? "#featured" : `#${category}`}
+            </a>
+          </h3>
+          <div class="recommended-grid">
+            {recommendedPosts.map((post) => (
+              <a href={`/${post.slug}`} class="recommended-post">
+                {post.title}
+              </a>
+            ))}
+          </div>
+        </div>
+      )
+    }
+
+    <hr />
+    <Bio />
+  </div>
+</BaseLayout>
+
+<style>
+  header {
+    text-align: center;
+  }
+
+  header h1 {
+    margin-bottom: 0.7em;
+  }
+
+  header p {
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    font-family: var(--font-family-sans);
+    font-weight: 600;
+  }
+
+  header hr {
+    min-width: 100px;
+    width: 30%;
+  }
+
+  .recommended-posts {
+    margin-top: 2rem;
+    padding-top: 2rem;
+    border-top: 1px solid var(--text-secondary);
+  }
+
+  .recommended-posts h3 {
+    text-align: center;
+    margin-bottom: 1.5rem;
+    color: var(--text-secondary);
+    font-size: 1.2rem;
+  }
+
+  .recommended-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1rem;
+  }
+
+  .recommended-post {
+    padding: 1rem;
+    border: 1px solid var(--text-secondary);
+    border-radius: 0.5rem;
+    text-decoration: none;
+    color: var(--text-regular);
+    transition: all 0.2s ease;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    font-weight: 700;
+  }
+
+  .recommended-post:hover {
+    /* background: var(--text-secondary);*/
+    text-decoration: none;
+    color: var(--primary-color);
+    box-shadow: inset 0 -0.12em 0 var(--primary-color);
+    -webkit-transition:
+      box-shadow 0.2s ease-in-out,
+      color 0.2s ease-in-out;
+    transition:
+      box-shadow 0.2s ease-in-out,
+      color 0.2s ease-in-out;
+  }
+</style>

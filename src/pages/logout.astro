@@ -1,0 +1,71 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+
+// Clear the session cookie
+Astro.cookies.delete('session', {
+  path: '/',
+});
+---
+
+<BaseLayout
+  title="Logging Out - Al Harkan"
+  description="Logging out from Al Harkan's Blog"
+  permalink={`${Astro.site}logout`}
+>
+  <div class="container">
+    <div class="min-h-[80vh] flex flex-col items-center justify-center">
+      <div class="text-center">
+        <h1 class="text-2xl font-bold mb-4">Logging Out...</h1>
+        <div class="loading-spinner mb-4"></div>
+        <p>Please wait while we sign you out.</p>
+      </div>
+    </div>
+  </div>
+</BaseLayout>
+
+<style>
+  .loading-spinner {
+    width: 40px;
+    height: 40px;
+    margin: 0 auto;
+    border: 3px solid #f3f3f3;
+    border-top: 3px solid var(--primary-color);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+  }
+
+  @keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
+</style>
+
+<script>
+  import { auth } from "../lib/firebase";
+  
+  const performLogout = async () => {
+    try {
+      // Sign out from Firebase
+      await auth.signOut();
+      
+      // Clear any remaining session data
+      const response = await fetch('/api/auth/google', {
+        method: 'DELETE',
+        credentials: 'include'
+      });
+      
+      // Add a small delay to show the loading state
+      await new Promise(resolve => setTimeout(resolve, 500));
+      
+      // Redirect to home page
+      window.location.replace('/');
+    } catch (error) {
+      console.error('Logout error:', error);
+      // Redirect anyway
+      window.location.replace('/');
+    }
+  };
+
+  // Execute logout when the page loads
+  performLogout();
+</script>
