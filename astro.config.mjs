@@ -6,7 +6,7 @@ import remarkSmartypants from 'remark-smartypants'
 import rehypeExternalLinks from 'rehype-external-links'
 
 export default defineConfig({
-  site: 'https://alharkan7.github.io',
+  site: 'https://raihankalla.id',
   security: {
     directives: {
       'script-src': [
