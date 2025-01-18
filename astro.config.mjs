@@ -4,10 +4,10 @@ import mdx from '@astrojs/mdx'
 import remarkGfm from 'remark-gfm'
 import remarkSmartypants from 'remark-smartypants'
 import rehypeExternalLinks from 'rehype-external-links'
-import netlify from '@astrojs/netlify'
 
 export default defineConfig({
-  site: import.meta.env.PROD ? 'https://raihankalla.id' : 'http://localhost:4321', // Or your dev port
+  site: 'https://alhankan7.github.io',
+  base: '/raihankala-id',
   security: {
     directives: {
       'script-src': [
@@ -43,7 +43,7 @@ export default defineConfig({
       'cross-origin-resource-policy': ['cross-origin']
     }
   },
-  output: 'server',
+  output: 'static',
   integrations: [
     svelte(),
     mdx(
@@ -63,8 +63,7 @@ export default defineConfig({
       // }
     ),
   ],
-  // adapter: vercel(),
-  adapter: netlify(),
+  adapter: githubPages(),
   markdown: {
     shikiConfig: {
       theme: 'nord',
@@ -80,4 +79,3 @@ export default defineConfig({
     ],
   },
 })
-
