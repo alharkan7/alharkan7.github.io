@@ -6,7 +6,7 @@ import remarkSmartypants from 'remark-smartypants'
 import rehypeExternalLinks from 'rehype-external-links'
 
 export default defineConfig({
-  site: 'https://alhankan7.github.io',
+  site: 'https://alharkan7.github.io',
   base: '/raihankalla-id',
   security: {
     directives: {
@@ -63,7 +63,6 @@ export default defineConfig({
       // }
     ),
   ],
-  adapter: githubPages(),
   markdown: {
     shikiConfig: {
       theme: 'nord',

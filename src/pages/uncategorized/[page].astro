@@ -2,15 +2,7 @@
 import type { GetStaticPaths, Page } from "astro";
 import BaseLayout from "../../layouts/BaseLayout.astro";
 
-// export const prerender = true;
-
-// Check if user is logged in
-const session = Astro.cookies.get('session')?.value;
-
-// If not logged in, redirect to login page
-if (!session) {
-  return Astro.redirect('/login');
-}
+export const prerender = true;
 
 interface BlogPost {
     file: string;
@@ -25,46 +17,24 @@ interface Props {
     page: Page<BlogPost>;
 }
 
-const allPosts = await Astro.glob("../../data/blog-posts/uncategorized/*.{md,mdx}");
-const sortedPosts = allPosts.sort(
-    (a, b) =>
-        new Date(b.frontmatter.publishDate).valueOf() -
-        new Date(a.frontmatter.publishDate).valueOf(),
-);
+export const getStaticPaths: GetStaticPaths = async ({ paginate }) => {
+    const allPosts: BlogPost[] = await Astro.glob(
+        "../../data/blog-posts/uncategorized/*.{md,mdx}",
+    );
+    const sortedPosts = allPosts.sort(
+        (a: BlogPost, b: BlogPost) =>
+            new Date(b.frontmatter.publishDate).valueOf() -
+            new Date(a.frontmatter.publishDate).valueOf(),
+    );
 
-// Get the current page from URL params
-const currentPage = parseInt(Astro.params.page || "1");
-const postsPerPage = 10;
-const start = (currentPage - 1) * postsPerPage;
-const end = start + postsPerPage;
-const paginatedPosts = sortedPosts.slice(start, end);
-
-// Calculate total pages
-const totalPages = Math.ceil(sortedPosts.length / postsPerPage);
-
-// Create page object
-const page = {
-    data: paginatedPosts,
-    start,
-    end,
-    size: postsPerPage,
-    total: sortedPosts.length,
-    currentPage,
-    lastPage: totalPages,
-    url: {
-        prev: currentPage > 1 ? `/uncategorized/${currentPage - 1}` : undefined,
-        next: currentPage < totalPages ? `/uncategorized/${currentPage + 1}` : undefined
-    }
+    return paginate(sortedPosts, { pageSize: 10 });
 };
 
-// Ensure page exists before proceeding
-if (currentPage > totalPages) {
-    return Astro.redirect('/404');
-}
-
+const { page } = Astro.props as Props;
 const title = "Uncategorized - Al Harkan";
 const description = "Uncategorized Posts by Al Harkan";
 const permalink = Astro.site?.href ? `${Astro.site.href}uncategorized` : "/uncategorized";
+
 ---
 
 <BaseLayout
