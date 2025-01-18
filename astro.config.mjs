@@ -7,7 +7,6 @@ import rehypeExternalLinks from 'rehype-external-links'
 
 export default defineConfig({
   site: 'https://alharkan7.github.io',
-  base: '/raihankalla-id',
   security: {
     directives: {
       'script-src': [
