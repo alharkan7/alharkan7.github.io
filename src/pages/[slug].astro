@@ -75,14 +75,6 @@ const category = isBlogPost
   ? Astro.props.post.file.split("blog-posts/")[1].split("/")[0]
   : "";
 
-// Check authentication for uncategorized posts
-if (category === "uncategorized") {
-  const isLoggedIn = Astro.cookies.get('isLoggedIn')?.value === 'true';
-  if (!isLoggedIn) {
-    return Astro.redirect('/login');
-  }
-}
-
 // Get recommended posts from the same category
 const getRecommendedPosts = async () => {
   let categoryPosts;
