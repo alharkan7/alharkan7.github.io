@@ -7,7 +7,7 @@ import rehypeExternalLinks from 'rehype-external-links'
 
 export default defineConfig({
   site: 'https://raihankalla.id',
-  output: 'server',
+  output: 'static',
   security: {
     directives: {
       'script-src': [
