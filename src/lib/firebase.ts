@@ -16,6 +16,13 @@ const firebaseConfig: FirebaseOptions = {
   appId: import.meta.env.PUBLIC_FIREBASE_APP_ID
 };
 
+// Debug: Log the config (excluding sensitive values)
+console.log('Firebase Config:', {
+  ...firebaseConfig,
+  apiKey: firebaseConfig.apiKey ? '[PRESENT]' : '[MISSING]',
+  appId: firebaseConfig.appId ? '[PRESENT]' : '[MISSING]'
+});
+
 // Check if all required config values are present
 const requiredKeys = ['apiKey', 'authDomain', 'projectId', 'appId'] as const;
 const missingKeys = requiredKeys.filter(key => !firebaseConfig[key]);
