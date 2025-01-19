@@ -40,8 +40,8 @@ let error = "";
           <div class="input-group">
             <input
               type="email"
-              id="email"
-              name="email"
+              id="username"
+              name="username"
               placeholder="Email"
               required
               class="login-input"
@@ -87,77 +87,25 @@ let error = "";
 
 <script>
   import { auth } from "../lib/firebase";
-  import { signInWithEmailAndPassword, getRedirectResult } from "firebase/auth";
-
-  // Check for redirect result when page loads
-  window.addEventListener("load", async () => {
-    try {
-      console.log("Checking for Google Sign-In redirect result...");
-      const result = await getRedirectResult(auth);
-      console.log("Redirect result:", result ? "Found" : "None");
-
-      if (result && result.user) {
-        console.log("Got user from redirect result");
-        const idToken = await result.user.getIdToken(true);
-
-        console.log("Sending token to backend...");
-        const response = await fetch("/api/auth/google", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            token: idToken,
-            email: result.user.email,
-            uid: result.user.uid,
-          }),
-          credentials: "include",
-        });
-
-        const data = await response.json();
-        console.log("Backend response:", data);
-
-        if (!response.ok) {
-          throw new Error(
-            `Backend auth failed: ${data.error || response.statusText}`,
-          );
-        }
-
-        console.log("Authentication successful, redirecting...");
-        window.location.href = "/uncategorized";
-        return;
-      }
-    } catch (error) {
-      console.error("Google sign-in error:", error);
-      const errorMessage =
-        error instanceof Error ? error.message : "Unknown error occurred";
-
-      const errorDiv = document.createElement("div");
-      errorDiv.className = "error-message";
-      errorDiv.textContent = `Google Sign-In failed: ${errorMessage}`;
-      document
-        .querySelector(".login-form")
-        ?.insertAdjacentElement("beforebegin", errorDiv);
-    }
-  });
+  import { signInWithEmailAndPassword, AuthErrorCodes } from "firebase/auth";
 
   // Handle email/password login
   const loginForm = document.getElementById("login-form");
   loginForm?.addEventListener("submit", async (e) => {
     e.preventDefault();
-    const email = (document.getElementById("email") as HTMLInputElement).value;
-    const password = (document.getElementById("password") as HTMLInputElement)
-      .value;
+    const email = (document.getElementById("username") as HTMLInputElement).value;
+    const password = (document.getElementById("password") as HTMLInputElement).value;
 
     try {
-      const userCredential = await signInWithEmailAndPassword(
-        auth,
-        email,
-        password,
-      );
+      // console.log("Attempting login with email:", email);
+      const userCredential = await signInWithEmailAndPassword(auth, email, password);
+      // console.log("Login successful, getting token...");
 
-      // Force token refresh to ensure we have the latest token
-      const token = await userCredential.user.getIdToken(true);
+      // Get the ID token
+      const token = await userCredential.user.getIdToken();
+      // console.log("Got token, sending to backend...");
 
-      // Send the token to your backend - note the correct format matching Google sign-in
+      // Send token to backend
       const response = await fetch("/api/auth/google", {
         method: "POST",
         headers: {
@@ -168,26 +116,51 @@ let error = "";
           email: userCredential.user.email,
           uid: userCredential.user.uid,
         }),
-        credentials: "include",
       });
 
+      const data = await response.json().catch(() => ({}));
+      
       if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || "Failed to create session");
+        throw new Error(data.error || "Authentication failed");
       }
 
-      console.log("Login successful, redirecting...");
+      // console.log("Authentication successful, redirecting...");
       window.location.href = "/uncategorized";
-    } catch (error) {
+    } catch (error: any) {
       console.error("Login error:", error);
-      const errorMessage =
-        error instanceof Error ? error.message : "Login failed";
+      let errorMessage = "Authentication failed";
+
+      // Handle Firebase Auth specific errors
+      if (error.code) {
+        switch (error.code) {
+          case 'auth/user-not-found':
+            errorMessage = "No account exists with this email. Please check your email or sign up.";
+            break;
+          case 'auth/wrong-password':
+            errorMessage = "Incorrect password. Please try again.";
+            break;
+          case 'auth/invalid-email':
+            errorMessage = "Invalid email format. Please enter a valid email address.";
+            break;
+          case 'auth/too-many-requests':
+            errorMessage = "Too many failed login attempts. Please try again later.";
+            break;
+          default:
+            errorMessage = error.message || "Authentication failed";
+        }
+      }
+      
+      // Remove any existing error messages
+      const existingError = document.querySelector(".error-message");
+      if (existingError) {
+        existingError.remove();
+      }
+
+      // Add new error message
       const errorDiv = document.createElement("div");
       errorDiv.className = "error-message";
       errorDiv.textContent = errorMessage;
-      document
-        .querySelector(".login-form")
-        ?.insertAdjacentElement("beforebegin", errorDiv);
+      document.querySelector(".login-form")?.insertAdjacentElement("beforebegin", errorDiv);
     }
   });
 </script>

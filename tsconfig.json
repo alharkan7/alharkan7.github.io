@@ -1,5 +1,5 @@
 {
-  "extends": "./node_modules/astro/tsconfigs/strict",
+  "extends": "astro/tsconfigs/strict",
   "include": ["src/**/*", "types"],
   "exclude": ["node_modules"],
   "compilerOptions": {
@@ -22,6 +22,11 @@
       "@/*": [
         "src/*"
       ]
-    }
+    },
+    "plugins": [
+      {
+        "name": "@astrojs/ts-plugin"
+      }
+    ]
   }
 }

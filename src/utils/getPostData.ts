@@ -23,8 +23,8 @@ export default function getPostData(post: Post) {
   }
 
   // Add debug logging
-  // console.log('Post file:', post.file);
-  // console.log('Content available:', {
+  // // console.log('Post file:', post.file);
+  // // console.log('Content available:', {
   //   hasRawContent: !!post.rawContent,
   //   hasBodyRaw: !!post.body?.raw,
   //   hasContent: !!post.content

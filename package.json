@@ -1,6 +1,6 @@
 {
-  "name": "astro-blog-template",
-  "version": "0.0.1",
+  "name": "raihankalla.id",
+  "version": "1.0.0",
   "private": true,
   "scripts": {
     "dev": "astro dev",
@@ -14,14 +14,15 @@
     "@astrojs/svelte": "^5.0.0",
     "@astrojs/vercel": "^7.8.2",
     "astro": "^4.16.13",
-    "firebase": "^11.0.2",
-    "firebase-admin": "^13.0.1",
+    "firebase": "^11.2.0",
+    "firebase-admin": "^13.0.2",
     "reading-time": "^1.5.0",
     "rehype-external-links": "^3.0.0",
     "remark-gfm": "^4.0.0",
     "remark-smartypants": "^2.0.0"
   },
   "devDependencies": {
+    "@astrojs/ts-plugin": "^1.10.4",
     "@types/node": "^22.10.7",
     "typescript": "^5.7.3"
   }

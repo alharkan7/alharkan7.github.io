@@ -14,8 +14,8 @@ export function findRedirect(slug: string | undefined): Redirect | undefined {
   if (!slug) return undefined;
 
   // Debug logging
-  // console.log('All Redirects:', redirectData.redirects);
-  // console.log('Current Slug:', slug);
+  // // console.log('All Redirects:', redirectData.redirects);
+  // // console.log('Current Slug:', slug);
 
   const normalizedSlug = normalizePath(slug);
 

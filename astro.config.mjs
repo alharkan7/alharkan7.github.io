@@ -7,6 +7,7 @@ import rehypeExternalLinks from 'rehype-external-links'
 
 export default defineConfig({
   site: 'https://raihankalla.id',
+  output: 'server',
   security: {
     directives: {
       'script-src': [
@@ -42,7 +43,6 @@ export default defineConfig({
       'cross-origin-resource-policy': ['cross-origin']
     }
   },
-  output: 'static',
   integrations: [
     svelte(),
     mdx(

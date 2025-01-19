@@ -1,6 +1,7 @@
 ---
 import type { GetStaticPaths, Page } from "astro";
 import BaseLayout from "../../layouts/BaseLayout.astro";
+import LoadingScreen from "../../components/LoadingScreen.astro";
 
 export const prerender = true;
 
@@ -34,6 +35,37 @@ const { page } = Astro.props as Props;
 const title = "Uncategorized - Al Harkan";
 const description = "Uncategorized Posts by Al Harkan";
 const permalink = Astro.site?.href ? `${Astro.site.href}uncategorized` : "/uncategorized";
+
+// Check if user is logged in
+const session = Astro.cookies.get('session')?.value;
+
+// If not logged in, show loading screen briefly before redirect
+if (!session) {
+  return new Response(`
+    <!DOCTYPE html>
+    <html>
+      <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Redirecting... - Al Harkan</title>
+        <link rel="stylesheet" href="/styles/global.css">
+        <script>
+          setTimeout(() => {
+            window.location.href = '/login';
+          }, 500);
+        </script>
+      </head>
+      <body>
+        ${LoadingScreen}
+      </body>
+    </html>
+  `, {
+    status: 200,
+    headers: {
+      'Content-Type': 'text/html',
+    },
+  });
+}
 
 ---
 
