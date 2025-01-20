@@ -8,12 +8,30 @@ export interface Props {
   description: string;
   permalink: string;
   current?: string;
+  image?: string;
+  type?: 'website' | 'article';
+  publishDate?: string;
 }
-const { title, description, permalink, current } = Astro.props;
+const { 
+  title, 
+  description, 
+  permalink, 
+  current,
+  image,
+  type = 'website',
+  publishDate
+} = Astro.props;
 ---
 <html lang="en">
 <head>
-  <BaseHead title={title} description={description} permalink={permalink} />
+  <BaseHead 
+    title={title} 
+    description={description} 
+    permalink={permalink}
+    image={image}
+    type={type}
+    publishDate={publishDate}
+  />
 </head>
 <body>
   <div class="layout">

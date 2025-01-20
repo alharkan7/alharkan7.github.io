@@ -61,7 +61,7 @@ if (redirectMatch) {
   return Astro.redirect(redirectMatch.destination);
 }
 
-const { title, description, publishDate } = frontmatter;
+const { title, description, publishDate, image } = frontmatter;
 const { slug: postSlug, readingTime } = getPostData(Astro.props.post);
 const permalink = `${Astro?.site?.href}${postSlug}`;
 
@@ -110,7 +110,10 @@ const recommendedPosts = await getRecommendedPosts();
   title={title}
   description={description}
   permalink={permalink}
-  current={isBlogPost ? "blog" : ""}
+  current={category}
+  type="article"
+  publishDate={publishDate}
+  image={image}
 >
   <header>
     <!-- <p>{publishDate} ~ {readingTime}</p> -->

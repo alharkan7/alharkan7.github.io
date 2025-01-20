@@ -7,35 +7,54 @@ export interface Props {
   title: string
   description: string
   permalink: string
+  image?: string
+  type?: 'website' | 'article'
+  publishDate?: string
 }
 
-const { title, description, permalink } = Astro.props
-const socialUrl = Astro?.site?.href + 'assets/social.png'
+const { 
+  title, 
+  description, 
+  permalink,
+  image,
+  type = 'website',
+  publishDate
+} = Astro.props
+
+// Ensure the permalink is absolute
+const canonicalURL = new URL(permalink, Astro.site).href
+// Use provided image or fallback to default social image
+const socialImageURL = image 
+  ? new URL(image, Astro.site).href 
+  : new URL('assets/social.png', Astro.site).href
 ---
 
 <!-- Global Metadata -->
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width" />
 <link rel="icon" type="image/x-icon" href="/favicon.ico" />
+<link rel="canonical" href={canonicalURL} />
 
 <!-- Primary Meta Tags -->
 <title>{title}</title>
 <meta name="title" content={title} />
 <meta name="description" content={description} />
+{publishDate && <meta name="date" content={publishDate} />}
 
 <!-- Open Graph / Facebook -->
-<meta property="og:type" content="website" />
-<meta property="og:url" content={permalink} />
+<meta property="og:type" content={type} />
+<meta property="og:url" content={canonicalURL} />
 <meta property="og:title" content={title} />
 <meta property="og:description" content={description} />
-<meta property="og:image" content={socialUrl} />
+<meta property="og:image" content={socialImageURL} />
+{publishDate && <meta property="article:published_time" content={new Date(publishDate).toISOString()} />}
 
 <!-- Twitter -->
 <meta property="twitter:card" content="summary_large_image" />
-<meta property="twitter:url" content={permalink} />
+<meta property="twitter:url" content={canonicalURL} />
 <meta property="twitter:title" content={title} />
 <meta property="twitter:description" content={description} />
-<meta property="twitter:image" content={socialUrl} />
+<meta property="twitter:image" content={socialImageURL} />
 
 <ViewTransitions />
 
