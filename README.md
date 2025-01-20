@@ -106,7 +106,7 @@ This project is open source and available under the [MIT License](LICENSE).
 
 - Website: [raihankalla.id](https://www.raihankalla.id)
 - GitHub: [@alharkan7](https://github.com/alharkan7)
-- Twitter: [@yalhrkn](https://twitter.com/alhrkn)
+- Twitter: [@alhrkn](https://twitter.com/alhrkn)
 
 ## 🤝 Contributing
 
