@@ -1,4 +1,6 @@
 import redirectData from '../../vercel.json';
+import { defineConfig } from 'astro/config';
+import astroConfig from '../../astro.config.mjs';
 
 interface Redirect {
   source: string;
@@ -6,10 +8,15 @@ interface Redirect {
   permanent: boolean;
 }
 
+interface AstroRedirect {
+  [key: string]: string;
+}
+
 // Function to normalize paths
 function normalizePath(path: string): string {
   return path.startsWith('/') ? path : `/${path}`;
 }
+
 export function findRedirect(slug: string | undefined): Redirect | undefined {
   if (!slug) return undefined;
 
@@ -28,15 +35,34 @@ export function findRedirect(slug: string | undefined): Redirect | undefined {
     return vercelRedirect;
   }
 
+  // Check Astro config redirects
+  const astroRedirects = astroConfig.redirects as AstroRedirect;
+  if (astroRedirects && astroRedirects[normalizedSlug]) {
+    return {
+      source: normalizedSlug,
+      destination: astroRedirects[normalizedSlug],
+      permanent: true
+    };
+  }
+
   return undefined;
 }
 
 export function getAllRedirects(): Record<string, string> {
   const redirectMap: Record<string, string> = {};
 
+  // Add Vercel redirects
   redirectData.redirects.forEach(redirect => {
     redirectMap[redirect.source] = redirect.destination;
   });
+
+  // Add Astro config redirects
+  const astroRedirects = astroConfig.redirects as AstroRedirect;
+  if (astroRedirects) {
+    Object.entries(astroRedirects).forEach(([source, destination]) => {
+      redirectMap[source] = destination;
+    });
+  }
 
   return redirectMap;
 }
