@@ -8,7 +8,7 @@
     "dev": "astro dev",
     "start": "astro dev",
     "build": "astro build",
-    "postbuild": "node scripts/generate-redirects.js",
+    "postbuild": "node scripts/replace-redirect-pages.js",
     "preview": "astro preview",
     "astro": "astro"
   },
@@ -27,6 +27,7 @@
   "devDependencies": {
     "@astrojs/ts-plugin": "^1.10.4",
     "@types/node": "^22.10.7",
+    "glob": "^10.3.10",
     "typescript": "^5.7.3"
   }
 }

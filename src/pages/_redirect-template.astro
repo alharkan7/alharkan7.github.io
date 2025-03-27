@@ -1,0 +1,94 @@
+---
+export const prerender = true;
+---
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Redirecting...</title>
+    <style>
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        background-color: #f9f9f9;
+        color: #333;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        margin: 0;
+        flex-direction: column;
+        text-align: center;
+        padding: 0 20px;
+      }
+      .redirect-container {
+        background-color: white;
+        border-radius: 8px;
+        padding: 40px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        max-width: 600px;
+        width: 100%;
+      }
+      h1 {
+        margin: 0 0 10px 0;
+        color: #222;
+        font-size: 24px;
+        font-weight: 600;
+      }
+      p {
+        margin: 0 0 20px 0;
+        color: #666;
+        font-size: 16px;
+      }
+      .destination {
+        background-color: #f2f2f2;
+        padding: 15px;
+        border-radius: 6px;
+        word-break: break-all;
+        font-size: 18px;
+        margin-bottom: 25px;
+        color: #0066cc;
+      }
+      .spinner {
+        display: inline-block;
+        width: 30px;
+        height: 30px;
+        border: 3px solid rgba(0, 102, 204, 0.2);
+        border-radius: 50%;
+        border-top-color: #0066cc;
+        animation: spin 1s ease-in-out infinite;
+      }
+      @keyframes spin {
+        to { transform: rotate(360deg); }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="redirect-container">
+      <p>Redirecting to</p>
+      <h1 class="destination" id="destination-url"></h1>
+      <div class="spinner"></div>
+    </div>
+    <script>
+      // Find the destination URL
+      const urlParams = new URLSearchParams(window.location.search);
+      const destination = urlParams.get('to') || '/';
+      
+      // Update the page
+      const destinationEl = document.getElementById('destination-url');
+      if (destinationEl) {
+        destinationEl.textContent = destination;
+      }
+      
+      // Add meta refresh tag
+      const meta = document.createElement('meta');
+      meta.httpEquiv = 'refresh';
+      meta.content = `0;url=${destination}`;
+      document.head.appendChild(meta);
+      
+      // Redirect immediately
+      window.location.href = destination;
+    </script>
+  </body>
+</html> 
