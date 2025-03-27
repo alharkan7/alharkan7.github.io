@@ -3,10 +3,12 @@
   "version": "1.0.0",
   "private": true,
   "packageManager": "pnpm@8.15.1",
+  "type": "module",
   "scripts": {
     "dev": "astro dev",
     "start": "astro dev",
     "build": "astro build",
+    "postbuild": "node scripts/generate-redirects.js",
     "preview": "astro preview",
     "astro": "astro"
   },
