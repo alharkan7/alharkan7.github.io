@@ -9,6 +9,7 @@ export default defineConfig({
   site: 'https://raihankalla.id',
   output: 'static',
   redirects: {
+    '/apps': 'https://alhrkn.vercel.app/',
     '/papermap': 'https://alhrkn.vercel.app/papermap',
     '/menara-gading': 'https://twitter.com/alhrkn/status/1526933166597935105',
     '/pandemic-face': 'https://twitter.com/alhrkn/status/1494865215191588868',
