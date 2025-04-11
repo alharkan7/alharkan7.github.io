@@ -155,8 +155,8 @@ const { current = "" } = Astro.props;
     cursor: pointer;
   }
 
-  .enaiblr-link {
-    color: #2563eb !important; /* blue-600 hex color */
+  .highlight-link {
+    color: var(--primary-color) !important;
   }
 </style>
 
@@ -199,11 +199,16 @@ const { current = "" } = Astro.props;
         class="dropdown-button">Links</a
       >
       <div class="dropdown-content">
-        <a href="https://x.com/alhrkn" target="_blank" rel="noopener noreferrer"
+        <a href="https://x.com/alhrkn" 
+        target="_blank" 
+        rel="noopener noreferrer"
           >Twitter</a
         >
-        <a href="https://alhrkn.vercel.app" target="_blank" rel="noopener noreferrer"
-          >Apps Lab</a
+        <a href="https://alhrkn.vercel.app" 
+        target="_blank" 
+        class="highlight-link"
+        rel="noopener noreferrer"
+          >Apps</a
         >
         <!-- <a
           href="https://instagram.com/alhrkn"
@@ -213,8 +218,8 @@ const { current = "" } = Astro.props;
         <a
           href="https://enaiblr.org"
           target="_blank"
-          class="enaiblr-link"
-          rel="noopener noreferrer">Enaiblr</a
+          rel="noopener noreferrer"
+          >Enaiblr</a
         >
         <!-- <a
           href="https://linkedin.com/in/alharkan"
