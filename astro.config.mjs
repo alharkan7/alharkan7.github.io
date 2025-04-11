@@ -11,6 +11,7 @@ export default defineConfig({
   redirects: {
     '/apps': 'https://alhrkn.vercel.app/',
     '/papermap': 'https://alhrkn.vercel.app/papermap',
+    '/enaiblr': 'https://enaiblr.org/apps',
     '/menara-gading': 'https://twitter.com/alhrkn/status/1526933166597935105',
     '/pandemic-face': 'https://twitter.com/alhrkn/status/1494865215191588868',
     '/ai-scicomm': 'https://twitter.com/alhrkn/status/1461501420008394754',
