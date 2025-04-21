@@ -114,24 +114,17 @@ if (node.type === 'folder') {
     padding-left: 0.5em; /* Add space to the left of the marker+text */
   }
   details.bookmark-folder[open] > summary {
-      list-style-type: disclosure-open;
+    list-style-type: disclosure-open;
   }
 
   ul {
-    /* Animation setup */
-    overflow: hidden;
-    max-height: 0;
-    opacity: 0;
-    transition: max-height 0.5s ease-in-out, opacity 0.3s ease-in-out 0.1s; /* Animate height and opacity */
     /* Existing styles */
     padding-left: 1.5em;
     margin-top: 0; /* Remove potential default top margin */
   }
 
   details[open] > ul {
-    /* State when details is open */
-    max-height: 10000px; /* Or a sufficiently large value to accommodate content */
-    opacity: 1;
+    /* No animation properties needed */
   }
 
   li {
@@ -145,18 +138,18 @@ if (node.type === 'folder') {
   }
   /* Ensure nested summaries have styles */
   details.bookmark-folder details > summary {
-      font-size: inherit;
-      cursor: pointer;
-      list-style-type: disclosure-closed;
-      margin-bottom: 0.5em;
+    font-size: inherit;
+    cursor: pointer;
+    list-style-type: disclosure-closed;
+    margin-bottom: 0.5em;
   }
   details.bookmark-folder details[open] > summary {
-      list-style-type: disclosure-open;
+    list-style-type: disclosure-open;
   }
   /* Remove list style from li containing nested details */
   li > details {
-      /* list-style-type: none; // Handled by parent li */
-      margin-left: 0; /* Reset potential inherited margin */
+    /* list-style-type: none; // Handled by parent li */
+    margin-left: 0; /* Reset potential inherited margin */
   }
 
   /* TOC Styles */
