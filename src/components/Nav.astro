@@ -179,7 +179,7 @@ const { current = "" } = Astro.props;
         data-dropdown-toggle
         role="button"
         tabindex="0"
-        class="dropdown-button">Archive</a
+        class="dropdown-button">Others</a
       >
       <div class="dropdown-content">
         <a href="/shorts">Shorts</a>
@@ -237,6 +237,8 @@ const { current = "" } = Astro.props;
         > -->
       </div>
     </div>
+
+    <a class={current === "bookmarks" ? "selected" : ""} href="/bookmarks">bookmarks</a>
   </nav>
 
   <div class="theme-toggle-container">

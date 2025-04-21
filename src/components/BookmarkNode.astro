@@ -1,0 +1,213 @@
+---
+// src/components/BookmarkNode.astro
+// import type { BookmarkNode, BookmarkURL, BookmarkFolder } from '../types'; // Assume types are moved to src/types.ts <-- REMOVE THIS LINE
+
+// Define TypeScript interfaces for bookmarks (or import from shared location)
+export interface BookmarkNodeBase {
+  id: string;
+  name: string;
+  date_added: string;
+  date_modified?: string;
+  guid: string;
+}
+
+export interface BookmarkURL extends BookmarkNodeBase {
+  type: 'url';
+  url: string;
+  meta_info?: { [key: string]: string };
+}
+
+export interface BookmarkFolder extends BookmarkNodeBase {
+  type: 'folder';
+  children: BookmarkNode[];
+}
+
+export type BookmarkNode = BookmarkURL | BookmarkFolder;
+// End type definitions
+
+export interface Props {
+  node: BookmarkNode;
+  allowedFolderNames?: string[]; // Accept optional list
+}
+
+const { node, allowedFolderNames } = Astro.props;
+
+// Helper function to format Chrome timestamp
+const formatDate = (chromeTimestampStr: string): string => {
+  try {
+    const chromeTimestamp = parseInt(chromeTimestampStr, 10);
+    if (isNaN(chromeTimestamp)) return ''; // Handle invalid input
+    // Convert Chrome timestamp (microseconds since 1601-01-01) to JS timestamp (ms since 1970-01-01)
+    const jsTimestamp = (chromeTimestamp / 1000) - 11644473600000;
+    const date = new Date(jsTimestamp);
+    return date.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
+  } catch (error) {
+    console.error('Error formatting date:', error);
+    return ''; // Return empty string on error
+  }
+};
+
+// Calculate count for folders
+let childrenCount = 0;
+if (node.type === 'folder') {
+  const urlChildrenCount = node.children.filter((child: BookmarkNode) => child.type === 'url').length;
+  const allowedFolderChildrenCount = node.children.filter((child: BookmarkNode) => 
+    child.type === 'folder' && 
+    (!allowedFolderNames || allowedFolderNames.includes(child.name))
+  ).length;
+  childrenCount = urlChildrenCount + allowedFolderChildrenCount;
+}
+---
+
+{/* Render a Folder */}
+{node.type === 'folder' && (
+  <details class="bookmark-folder">
+    <summary>
+      {node.name}
+      {childrenCount > 0 && <span class="folder-count"> ({childrenCount})</span>}
+    </summary>
+    <ul>
+      {/* Render immediate URL children */}
+      {node.children
+        .filter((child: BookmarkNode) => child.type === 'url')
+        .map((child: BookmarkURL) => (
+          <li>
+            <div class="toc-item">
+              <a href={child.url} target="_blank" rel="noopener noreferrer" class="bookmark-link toc-title">
+                {child.name}
+              </a>
+              <span class="toc-date">{formatDate(child.date_added)}</span>
+            </div>
+          </li>
+        ))}
+      
+      {/* Render immediate Folder children ONLY if their name is in the allowed list (if list is provided) */}
+      {node.children
+        .filter((child: BookmarkNode) => 
+          child.type === 'folder' && 
+          (!allowedFolderNames || allowedFolderNames.includes(child.name)) // Check if allowed
+        )
+        .map((child: BookmarkFolder) => (
+          <li>
+            {/* Recurse, passing down the allowed list */}
+            <Astro.self node={child} allowedFolderNames={allowedFolderNames} />
+          </li>
+        ))}
+    </ul>
+  </details>
+)}
+
+{/* Render a URL (only happens if called directly on a URL node, not typical here) */}
+{node.type === 'url' && (
+  <a href={node.url} target="_blank" rel="noopener noreferrer" class="bookmark-link">
+    {node.name}
+  </a>
+)}
+
+<style>
+  details.bookmark-folder > summary {
+    font-size: 1.5em; /* Increase font size */
+    font-weight: bold; /* Make text bold */
+    cursor: pointer; /* Add pointer cursor for better UX */
+    list-style-type: disclosure-closed; /* Default list style for folders */
+    margin-bottom: 0.5em; /* Space below folder summary */
+    padding-left: 0.5em; /* Add space to the left of the marker+text */
+  }
+  details.bookmark-folder[open] > summary {
+      list-style-type: disclosure-open;
+  }
+
+  ul {
+    /* Animation setup */
+    overflow: hidden;
+    max-height: 0;
+    opacity: 0;
+    transition: max-height 0.5s ease-in-out, opacity 0.3s ease-in-out 0.1s; /* Animate height and opacity */
+    /* Existing styles */
+    padding-left: 1.5em;
+    margin-top: 0; /* Remove potential default top margin */
+  }
+
+  details[open] > ul {
+    /* State when details is open */
+    max-height: 100vh; /* Or a sufficiently large value to accommodate content */
+    opacity: 1;
+  }
+
+  li {
+    list-style-type: none; /* Remove default bullets */
+    margin-bottom: 0.5em; /* Space between list items */
+  }
+
+  /* Style nested details */
+  details details {
+    margin-left: 1em; /* Indent nested folders */
+  }
+  /* Ensure nested summaries have styles */
+  details.bookmark-folder details > summary {
+      font-size: inherit;
+      cursor: pointer;
+      list-style-type: disclosure-closed;
+      margin-bottom: 0.5em;
+  }
+  details.bookmark-folder details[open] > summary {
+      list-style-type: disclosure-open;
+  }
+  /* Remove list style from li containing nested details */
+  li > details {
+      /* list-style-type: none; // Handled by parent li */
+      margin-left: 0; /* Reset potential inherited margin */
+  }
+
+  /* TOC Styles */
+  .toc-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 1em;
+    overflow: hidden;
+  }
+
+  .toc-title {
+    text-decoration: none; /* Remove underline */
+    /* Let the link take natural width initially */
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis; /* Add ellipsis for truncated text */
+    position: relative;
+    margin-right: 0.5em; /* Space before dots start */
+    /* Don't let title shrink below its content */
+    flex: 1 1 auto; /* Allow title to grow and shrink */
+    min-width: 0; /* Important for allowing shrinkage in flexbox */
+  }
+
+  /* Make link bold on hover */
+  .toc-title:hover {
+    font-weight: bold;
+  }
+
+  .toc-title::after {
+    content: '';
+    position: absolute;
+    bottom: 0.3em;
+    left: 100%;
+    width: 500%; /* Make wide enough */
+    border-bottom: 1px dotted var(--text-secondary, grey); /* Dots */
+  }
+
+  .toc-date {
+    flex-shrink: 0;
+    font-size: 0.8em;
+    color: var(--text-secondary, grey); /* Muted color for date */
+    white-space: nowrap; /* Prevent date from wrapping */
+    padding-left: 0.5em; /* Add some space between dots and date */
+  }
+
+  /* Style for the folder item count */
+  .folder-count {
+    font-weight: 300; /* Lighter font weight */
+    font-size: 0.9em; /* Slightly smaller font size */
+    margin-left: 0.3em; /* Space between name and count */
+    color: var(--text-secondary, grey); /* Use secondary text color */
+  }
+</style> 
