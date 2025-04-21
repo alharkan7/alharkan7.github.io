@@ -54,6 +54,18 @@ const {
     min-height: 100vh;
   }
 
+  /* Style the header to be sticky */
+  .layout > :global(header) { /* Target header rendered by Header component */
+    position: sticky;
+    top: 0;
+    z-index: 10; /* Ensure it stays on top */
+    /* Add a background color to prevent content showing through */
+    /* You might want to adjust this color to match your theme */
+    background-color: var(--background-body); 
+    /* Optional: Add a border or shadow for visual separation */
+    /* border-bottom: 1px solid var(--color-border, #e0e0e0); */
+  }
+
   main {
     flex: 1;
     position: relative;
