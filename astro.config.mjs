@@ -4,6 +4,7 @@ import mdx from '@astrojs/mdx'
 import remarkGfm from 'remark-gfm'
 import remarkSmartypants from 'remark-smartypants'
 import rehypeExternalLinks from 'rehype-external-links'
+import react from "@astrojs/react"
 
 export default defineConfig({
   site: 'https://raihankalla.id',
@@ -76,6 +77,7 @@ export default defineConfig({
       //   },
       // }
     ),
+    react(),
   ],
   markdown: {
     shikiConfig: {

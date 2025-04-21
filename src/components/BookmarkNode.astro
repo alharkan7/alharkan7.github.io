@@ -1,6 +1,7 @@
 ---
 // src/components/BookmarkNode.astro
 // import type { BookmarkNode, BookmarkURL, BookmarkFolder } from '../types'; // Assume types are moved to src/types.ts <-- REMOVE THIS LINE
+import { ChevronRight, ChevronDown } from 'lucide-react';
 
 // Define TypeScript interfaces for bookmarks (or import from shared location)
 export interface BookmarkNodeBase {
@@ -40,7 +41,14 @@ const formatDate = (chromeTimestampStr: string): string => {
     // Convert Chrome timestamp (microseconds since 1601-01-01) to JS timestamp (ms since 1970-01-01)
     const jsTimestamp = (chromeTimestamp / 1000) - 11644473600000;
     const date = new Date(jsTimestamp);
-    return date.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
+    
+    // Get parts for D/M/YY format
+    const day = date.getDate(); // No leading zero
+    const month = date.getMonth() + 1; // getMonth() is 0-indexed, add 1
+    const year = date.getFullYear().toString().slice(-2); // Get last two digits of year
+
+    // return date.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }); // Old format
+    return `${day}/${month}/${year}`; // New format: D/M/'YY
   } catch (error) {
     console.error('Error formatting date:', error);
     return ''; // Return empty string on error
@@ -63,11 +71,32 @@ if (node.type === 'folder') {
 {node.type === 'folder' && (
   <details class="bookmark-folder">
     <summary>
-      {node.name}
-      {childrenCount > 0 && <span class="folder-count"> ({childrenCount})</span>}
+      <span>
+        {node.name}
+        {childrenCount > 0 && <span class="folder-count"> ({childrenCount})</span>}
+      </span>
+      <span class="chevron-icon closed">
+        <ChevronRight size={20} strokeWidth={2.5} />
+      </span>
+      <span class="chevron-icon open">
+        <ChevronDown size={20} strokeWidth={2.5} />
+      </span>
     </summary>
     <ul>
-      {/* Render immediate URL children */}
+      {/* Render immediate Folder children FIRST if their name is in the allowed list (if list is provided) */}
+      {node.children
+        .filter((child: BookmarkNode) => 
+          child.type === 'folder' && 
+          (!allowedFolderNames || allowedFolderNames.includes(child.name)) // Check if allowed
+        )
+        .map((child: BookmarkFolder) => (
+          <li>
+            {/* Recurse, passing down the allowed list */}
+            <Astro.self node={child} allowedFolderNames={allowedFolderNames} />
+          </li>
+        ))}
+
+      {/* Render immediate URL children AFTER folders */}
       {node.children
         .filter((child: BookmarkNode) => child.type === 'url')
         .map((child: BookmarkURL) => (
@@ -82,17 +111,17 @@ if (node.type === 'folder') {
         ))}
       
       {/* Render immediate Folder children ONLY if their name is in the allowed list (if list is provided) */}
-      {node.children
+      {/* {node.children
         .filter((child: BookmarkNode) => 
           child.type === 'folder' && 
           (!allowedFolderNames || allowedFolderNames.includes(child.name)) // Check if allowed
         )
         .map((child: BookmarkFolder) => (
           <li>
-            {/* Recurse, passing down the allowed list */}
+            {* Recurse, passing down the allowed list *}
             <Astro.self node={child} allowedFolderNames={allowedFolderNames} />
           </li>
-        ))}
+        ))} */}
     </ul>
   </details>
 )}
@@ -109,18 +138,76 @@ if (node.type === 'folder') {
     font-size: 1.5em; /* Increase font size */
     font-weight: bold; /* Make text bold */
     cursor: pointer; /* Add pointer cursor for better UX */
-    list-style-type: disclosure-closed; /* Default list style for folders */
+    /* list-style-type: disclosure-closed; /* Remove default marker */
+    list-style: none; /* Hide default marker */
     margin-bottom: 0.5em; /* Space below folder summary */
-    padding-left: 0.5em; /* Add space to the left of the marker+text */
+    /* padding-left: 1.5em; /* Remove left padding for marker */
+    padding-left: 0; /* Restore original left padding */
+    /* padding-right: 1.5em; /* Remove right padding for marker */
+    padding-right: 0; /* Restore original right padding */
+    position: relative; /* Needed for positioning the pseudo-element */
+    display: flex; /* Use flexbox for alignment */
+    justify-content: space-between; /* Push marker to the right */
+    align-items: center; /* Vertically align items */
+    gap: 0.5em; /* Add gap between title span and icon span */
+    /* --- Sticky styles REMOVED --- */
+    /* position: sticky; */
+    /* top: 0; */
+    /* background-color: var(--bg-color, white); */
+    /* z-index: 1; */
+    /* --- End Sticky styles REMOVED --- */
   }
-  details.bookmark-folder[open] > summary {
+  /* Remove the specific style for the open state marker */
+  /* details.bookmark-folder[open] > summary {
     list-style-type: disclosure-open;
+  } */
+
+  /* Remove custom text marker styling */
+  /*
+  details.bookmark-folder > summary::before {
+    content: '❯'; 
+    position: absolute;
+    right: 0.5em; 
+    font-weight: normal; 
+    display: inline-block;
+    width: 1em; 
+    text-align: center;
+  }
+
+  details.bookmark-folder[open] > summary::before {
+    content: '⌄'; 
+  }
+  */
+
+  /* Style the icon container */
+  .chevron-icon {
+    display: inline-flex; /* Align icon nicely */
+    align-items: center;
+    line-height: 1; /* Prevent extra space */
+    flex-shrink: 0; /* Prevent icon from shrinking */
+  }
+
+  /* Hide the open icon by default */
+  details.bookmark-folder > summary .chevron-icon.open {
+    display: none;
+  }
+
+  /* Hide the closed icon and show the open icon when details is open */
+  details.bookmark-folder[open] > summary .chevron-icon.closed {
+    display: none;
+  }
+  details.bookmark-folder[open] > summary .chevron-icon.open {
+    display: inline-flex; /* Show the open icon */
   }
 
   ul {
     /* Existing styles */
-    padding-left: 1.5em;
+    /* padding-left: 0em; */ /* REMOVED - will be set in specific rules below */
+    padding-right: 0; /* Override global padding-end */
     margin-top: 0; /* Remove potential default top margin */
+    /* Optional: Add border/background for visual grouping */
+    /* border-left: 1px solid #ccc; */
+    /* margin-left: 0.5em; /* Align with summary text, not marker */
   }
 
   details[open] > ul {
@@ -138,14 +225,59 @@ if (node.type === 'folder') {
   }
   /* Ensure nested summaries have styles */
   details.bookmark-folder details > summary {
-    font-size: inherit;
+    font-size: 1em; /* Slightly smaller font size for nested */
+    font-weight: semibold; /* Normal weight for nested */
     cursor: pointer;
-    list-style-type: disclosure-closed;
-    margin-bottom: 0.5em;
+    /* list-style-type: disclosure-closed; /* Remove default marker */
+    list-style: none; /* Hide default marker */
+    margin-bottom: 0;
+    /* padding-left: 1.5em; /* Remove left padding for marker */
+    padding-left: 0; /* Restore original left padding */
+    padding-right: 0; /* Add space for the custom marker on the right */
+    position: relative; /* Needed for positioning the pseudo-element */
+    display: flex; /* Use flexbox for alignment */
+    justify-content: space-between; /* Push marker to the right */
+    align-items: center; /* Vertically align items */
+    /* --- Sticky styles REMOVED --- */
+    /* position: sticky; */
+    /* top: 0; */
+    /* background-color: var(--bg-color, white); */
+    /* z-index: 1; */
+    /* --- End Sticky styles REMOVED --- */
   }
-  details.bookmark-folder details[open] > summary {
+  /* Remove the specific style for the open state marker */
+  /* details.bookmark-folder details[open] > summary {
     list-style-type: disclosure-open;
+  } */
+
+  /* Remove custom text marker for nested summaries */
+  /*
+  details.bookmark-folder details > summary::before {
+    content: '❯'; 
+    position: absolute;
+    right: 0.5em; 
+    font-weight: normal; 
+    display: inline-block;
+    width: 1em; 
+    text-align: center;
   }
+
+  details.bookmark-folder details[open] > summary::before {
+    content: '⌄'; 
+  }
+  */
+
+  /* Apply icon styles to nested summaries */
+  details.bookmark-folder details > summary .chevron-icon.open {
+    color: var(--text-secondary, grey); /* Use secondary text color */
+    /* Adjust positioning if needed with flexbox */
+    /* margin-right: 0.5em; /* Remove space before the chevron */
+    /* Ensure folder count stays with the name */
+    /* flex-grow: 1; */ /* REMOVED - This caused the icon to shift left */
+    /* text-align: left; */ /* REMOVED - Unnecessary */
+    margin-right: 0; /* Remove right margin */
+  }
+
   /* Remove list style from li containing nested details */
   li > details {
     /* list-style-type: none; // Handled by parent li */
@@ -202,5 +334,95 @@ if (node.type === 'folder') {
     font-size: 0.9em; /* Slightly smaller font size */
     margin-left: 0.3em; /* Space between name and count */
     color: var(--text-secondary, grey); /* Use secondary text color */
+    /* Adjust positioning if needed with flexbox */
+    margin-right: 0.5em; /* Add some space before the chevron */
+  }
+
+  /* Add scroll behavior to the direct UL child of a folder */
+  details.bookmark-folder > ul {
+    max-height: 50vh; /* Example: Limit height to 50% of viewport height */
+    /* max-height: 400px; /* Or a fixed pixel height */
+    overflow-y: auto; /* Enable vertical scrollbar if content exceeds max-height */
+    padding-right: 0.5em; /* Add padding to prevent scrollbar overlap */
+    padding-left: 1em; /* ADDED: Indent top-level list items */
+
+    /* Minimalist Scrollbar Styles (Firefox) */
+    scrollbar-width: thin; /* "auto" or "thin" */
+    scrollbar-color: var(--text-secondary, grey) transparent; /* thumb track */
+  }
+
+  /* Minimalist Scrollbar Styles (WebKit/Blink - Chrome, Edge, Safari) */
+  details.bookmark-folder > ul::-webkit-scrollbar {
+    width: 6px; /* Width of the scrollbar */
+  }
+
+  details.bookmark-folder > ul::-webkit-scrollbar-track {
+    background: transparent; /* Make track invisible */
+    margin-block: 4px; /* Optional: Add margin to top/bottom of track */
+  }
+
+  details.bookmark-folder > ul::-webkit-scrollbar-thumb {
+    background-color: var(--text-secondary, grey); /* Color of the scroll thumb */
+    border-radius: 6px; /* Round the scroll thumb */
+    border: none; /* Remove border */
+  }
+
+  /* Hide scrollbar buttons (Webkit/Blink) */
+  details.bookmark-folder > ul::-webkit-scrollbar-button {
+    display: none;
+  }
+
+  details[open] > ul {
+    /* No animation properties needed */
+    align-items: center; /* Vertically align items */
+    /* --- Sticky styles REMOVED --- */
+    /* position: sticky; */
+    /* top: 0; */ 
+    /* background-color: var(--bg-color, white); */
+    /* z-index: 1; */
+    /* --- End Sticky styles REMOVED --- */
+  }
+  /* Remove the specific style for the open state marker */
+  /* details.bookmark-folder details[open] > summary {
+    list-style-type: disclosure-open;
+  } */
+
+  /* Apply scroll behavior to nested ULs as well */
+  details.bookmark-folder details > ul {
+    max-height: 40vh; /* Slightly less height for nested lists? */
+    overflow-y: auto;
+    padding-right: 0.5em; /* Add padding */
+    padding-left: 1.5em; /* ADDED: Indent nested list items */
+
+    /* Minimalist Scrollbar Styles (Firefox) */
+    scrollbar-width: thin;
+    scrollbar-color: var(--text-secondary, grey) transparent;
+  }
+
+  /* Minimalist Scrollbar Styles (WebKit/Blink - Chrome, Edge, Safari) - Nested */
+  details.bookmark-folder details > ul::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  details.bookmark-folder details > ul::-webkit-scrollbar-track {
+    background: transparent;
+    margin-block: 4px;
+  }
+
+  details.bookmark-folder details > ul::-webkit-scrollbar-thumb {
+    background-color: var(--text-secondary, grey);
+    border-radius: 6px;
+    border: none;
+  }
+
+  /* Hide scrollbar buttons (Webkit/Blink) - Nested */
+  details.bookmark-folder details > ul::-webkit-scrollbar-button {
+    display: none;
+  }
+
+  /* Remove list style from li containing nested details */
+  li > details {
+    /* list-style-type: none; // Handled by parent li */
+    margin-left: 0; /* Reset potential inherited margin */
   }
 </style> 

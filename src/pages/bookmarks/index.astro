@@ -30,8 +30,8 @@ interface BookmarkData {
 // Cast the imported data
 const bookmarkRoots = bookmarksDataUntyped as unknown as BookmarkData["roots"];
 
-const title = "My Bookmarks";
-const description = "Al Harkan's Bookmarks";
+const title = "Bookmarks - Al Harkan";
+const description = "Bookmarks on AI Research, Business, Software, and Digital Media";
 const permalink = Astro.site?.href
     ? `${Astro.site.href}bookmarks`
     : "/bookmarks";
@@ -128,16 +128,41 @@ rootsToRender.forEach((root: BookmarkFolderType) => {
     </div>
 </BaseLayout>
 
+<script>
+    // Select the container holding the top-level bookmark folders
+    const bookmarkContainer = document.querySelector('.container > div');
+
+    if (bookmarkContainer) {
+        bookmarkContainer.addEventListener('toggle', (event) => {
+            const target = event.target as HTMLElement; // Cast to HTMLElement first
+
+            // Check if the event target is a <details> element and if it was opened
+            // AND ensure the target is a DIRECT CHILD of the container
+            if (target && target.tagName === 'DETAILS' && target.parentElement === bookmarkContainer && (target as HTMLDetailsElement).open) {
+                // Cast target specifically to HTMLDetailsElement for accessing .open
+                const openedDetails = target as HTMLDetailsElement;
+
+                // Get all direct children <details> elements within the container
+                // Cast the NodeListOf<Element> to HTMLDetailsElement[]
+                const allDetails = Array.from(bookmarkContainer.querySelectorAll<HTMLDetailsElement>(':scope > details'));
+
+                // Close all other <details> elements
+                allDetails.forEach(details => {
+                    // Now 'details' is correctly typed as HTMLDetailsElement
+                    if (details !== openedDetails) {
+                        details.open = false;
+                    }
+                });
+            }
+        }, true); // Use capture phase to potentially handle nested toggles if needed later
+    }
+</script>
+
 <style>
     .container h1 {
         margin-block-start: 1em; /* Keep some top margin */
         margin-block-end: 0.5em; /* Reduce bottom margin */
         /* You could use padding-top/padding-bottom instead if needed */
-        padding-left: 0.25em;
-    }
-
-    .container p {
-        padding-left: 0.5em;
     }
 
     /* Add margin to the div containing the bookmark list */
