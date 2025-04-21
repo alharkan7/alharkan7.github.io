@@ -173,6 +173,7 @@ const { current = "" } = Astro.props;
         current === "stories" ||
         current === "works" ||
         current === "search" ||
+        current === "bookmarks" ||
         current === "uncategorized"
           ? "selected"
           : ""}
@@ -193,7 +194,9 @@ const { current = "" } = Astro.props;
 
     <div class="dropdown-container">
       <a
-        class={current === "Links" ? "selected" : ""}
+        class={current === "links" ||
+        current === "profile"
+? "selected" : ""}
         data-dropdown-toggle
         role="button"
         tabindex="0"
