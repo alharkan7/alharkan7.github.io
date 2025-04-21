@@ -1,11 +1,11 @@
 ---
-import BaseLayout from "../../layouts/BaseLayout.astro";
-import bookmarksDataUntyped from "../../../public/os-bookmarks/chrome_bookmarks.json" assert { type: "json" };
-import BookmarkNodeComponent from "../../components/BookmarkNode.astro"; // Import the new component
+import BaseLayout from "../layouts/BaseLayout.astro";
+import bookmarksDataUntyped from "../../public/os-bookmarks/chrome_bookmarks.json" assert { type: "json" };
+import BookmarkNodeComponent from "../components/BookmarkNode.astro"; // Import the new component
 import type {
     BookmarkNode,
     BookmarkFolder as BookmarkFolderType,
-} from "../../components/BookmarkNode.astro"; // Import types
+} from "../components/BookmarkNode.astro"; // Import types
 
 // Define ONLY the top-level BookmarkData type here
 interface BookmarkFolder {

@@ -18,3 +18,7 @@ pnpm-debug.log*
 
 # macOS-specific files
 .DS_Store
+
+# YouTube API credentials
+client_secrets.json
+token.pickle
