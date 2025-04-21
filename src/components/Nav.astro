@@ -195,7 +195,7 @@ const { current = "" } = Astro.props;
     <div class="dropdown-container">
       <a
         class={current === "links" ||
-        current === "profile"
+        current === "about"
 ? "selected" : ""}
         data-dropdown-toggle
         role="button"
@@ -203,11 +203,7 @@ const { current = "" } = Astro.props;
         class="dropdown-button">Links</a
       >
       <div class="dropdown-content">
-        <a href="https://x.com/alhrkn" 
-        target="_blank" 
-        rel="noopener noreferrer"
-          >Twitter</a
-        >
+
         <a href="https://alhrkn.vercel.app" 
         target="_blank" 
         class="highlight-link"
@@ -225,11 +221,16 @@ const { current = "" } = Astro.props;
           rel="noopener noreferrer"
           >Enaiblr</a
         >
-        <!-- <a
+        <a href="https://x.com/alhrkn" 
+        target="_blank" 
+        rel="noopener noreferrer"
+          >Twitter</a
+        >
+        <a
           href="https://linkedin.com/in/alharkan"
           target="_blank"
           rel="noopener noreferrer">LinkedIn</a
-        > -->
+        >
         <a href="/about">Profile</a>
         <!-- <a
         href="/logout">Logout</a
