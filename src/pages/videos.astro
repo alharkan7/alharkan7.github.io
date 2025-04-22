@@ -20,13 +20,17 @@ const description =
 const permalink = Astro.site?.href ? `${Astro.site.href}videos` : "/videos";
 
 // --- Filter Data Extraction ---
-const uniqueYears = [...new Set(videosData.map(v => v.published_at.substring(0, 4)))]
-    .sort((a, b) => parseInt(b) - parseInt(a)); // Sort descending
+const uniqueYears = [
+    ...new Set(videosData.map((v) => v.published_at.substring(0, 4))),
+].sort((a, b) => parseInt(b) - parseInt(a)); // Sort descending
 
 const uniqueChannelsMap = new Map<string, string>();
-videosData.forEach(v => {
+videosData.forEach((v) => {
     if (!uniqueChannelsMap.has(v.video_owner_channel_id)) {
-        uniqueChannelsMap.set(v.video_owner_channel_id, v.video_owner_channel_title);
+        uniqueChannelsMap.set(
+            v.video_owner_channel_id,
+            v.video_owner_channel_title,
+        );
     }
 });
 const uniqueChannels = Array.from(uniqueChannelsMap.entries())
@@ -77,40 +81,70 @@ const nextPageUrl = hasNextPage
     current="bookmarks"
 >
     <div class="container">
-        <h1>My {totalItems} Liked Videos</h1>
-        <p>On AI Research, Software, and Digital Media</p>
+        <h1 class="!mb-4">My {totalItems} Liked Videos</h1>
+        <p class="!m-0">On AI Research, Software, and Digital Media</p>
         <hr />
 
         <!-- Filter Controls -->
-        <div class="filter-controls flex justify-center items-center gap-4 my-4">
-            <div class="flex items-center">
-                 <label for="year-select" class="mr-2 whitespace-nowrap text-sm">Year:</label>
-                 <select id="year-select" class="border rounded px-2 py-1 text-sm bg-[var(--background-body)]">
+        <div
+            class="filter-controls flex flex-row flex-wrap justify-center gap-x-4 gap-y-2 my-4 sm:justify-center sm:items-center"
+        >
+            <div class="flex items-center gap-x-2 justify-between">
+                <select
+                    id="year-select"
+                    class="border rounded px-2 py-1 text-sm bg-[var(--background-body)] text-[var(--text-main)] border-gray-300 dark:border-gray-600 w-full"
+                >
                     <option value="all">All Years</option>
-                    {uniqueYears.map(year => (
-                        <option value={year}>{year}</option>
-                    ))}
-                 </select>
+                    {
+                        uniqueYears.map((year) => (
+                            <option value={year}>{year}</option>
+                        ))
+                    }
+                </select>
             </div>
-            <div class="flex items-center">
-                <label for="channel-select" class="mr-2 whitespace-nowrap text-sm">Channel:</label>
-                <select id="channel-select" class="border rounded px-2 py-1 text-sm bg-[var(--background-body)]">
+            <div class="flex items-center gap-x-2 justify-between">
+                <select
+                    id="channel-select"
+                    class="border rounded px-2 py-1 text-sm bg-[var(--background-body)] text-[var(--text-main)] border-gray-300 dark:border-gray-600 w-full"
+                >
                     <option value="all">All Channels</option>
-                    {uniqueChannels.map(channel => {
-                        const maxLen = 15;
-                        const displayTitle = channel.title.length > maxLen
-                            ? channel.title.substring(0, maxLen) + '…'
-                            : channel.title;
-                        return (
-                            <option value={channel.id} title={channel.title}>{displayTitle}</option>
-                        );
-                    })}
+                    {
+                        uniqueChannels.map((channel) => {
+                            const maxLen = 15;
+                            const displayTitle =
+                                channel.title.length > maxLen
+                                    ? channel.title.substring(0, maxLen) + "…"
+                                    : channel.title;
+                            return (
+                                <option
+                                    value={channel.id}
+                                    title={channel.title}
+                                >
+                                    {displayTitle}
+                                </option>
+                            );
+                        })
+                    }
                 </select>
             </div>
             <!-- Remove Filter Button (hidden by default) -->
-            <button id="remove-filters-button" class="hidden text-sm hover:underline focus:outline-none flex justify-start">
-                <span>Remove Filters</span>
+            <button
+                id="remove-filters-button"
+                class="hidden text-sm hover:underline focus:outline-none flex justify-start items-center"
+            >
+                <p class="text-sm">Clear Filters</p>
             </button>
+
+            {/* Items per page selector */}
+            <div class="pagination-limit flex items-center">
+                <select
+                    id="limit-select"
+                    class="border rounded px-2 py-1 text-sm bg-[var(--background-body)]"
+                >
+                    {validLimits.map((l) => <option value={l}>{l}</option>)}
+                </select>
+                <p class="ml-2 text-sm whitespace-nowrap">per Page</p>
+            </div>
         </div>
 
         <!-- Video Grid -->
@@ -119,7 +153,9 @@ const nextPageUrl = hasNextPage
             class="grid grid-cols-[repeat(auto-fill,minmax(200px,1fr))] gap-6 mt-8 mb-8 min-h-[200px]"
         >
             {/* Centered loading indicator */}
-            <div class="col-span-full flex flex-col items-center justify-center min-h-[200px]">
+            <div
+                class="col-span-full flex flex-col items-center justify-center min-h-[200px]"
+            >
                 <div
                     class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2"
                 >
@@ -131,22 +167,8 @@ const nextPageUrl = hasNextPage
         <!-- Pagination Controls -->
         {
             totalItems > 0 && (
-                <div class="pagination-controls flex flex-col sm:flex-row justify-between items-center gap-4 my-6">
-                    {/* Items per page selector (appears first visually on larger screens due to flex order) */}
-                    <div class="pagination-limit flex items-center order-1 sm:order-1">
-                        <label for="limit-select" class="mr-2 whitespace-nowrap">Items:</label>
-                        <select id="limit-select" class="border rounded px-2 py-1 text-sm bg-[var(--background-body)]">
-                            {validLimits.map((l) => (
-                                <option value={l}>{l}</option>
-                            ))}
-                        </select>
-                        <span id="total-items-info" class="total-items ml-2 text-sm whitespace-nowrap">
-                            ({totalItems} videos)
-                        </span>
-                    </div>
-
+                <div class="pagination-controls flex flex-col sm:flex-row justify-center items-center gap-4 my-6">
                     {/* Navigation buttons and page info (appears second visually on larger screens) */}
-                    <div class="pagination-nav flex items-center gap-4 order-2 sm:order-2">
                         <a
                             id="prev-button"
                             href="#"
@@ -155,7 +177,12 @@ const nextPageUrl = hasNextPage
                         >
                             &laquo; Prev
                         </a>
-                        <span id="page-info" class="text-sm px-2 whitespace-nowrap">Page loading...</span>
+                        <span
+                            id="page-info"
+                            class="text-sm px-2 whitespace-nowrap"
+                        >
+                            Page loading...
+                        </span>
                         <a
                             id="next-button"
                             href="#"
@@ -164,99 +191,135 @@ const nextPageUrl = hasNextPage
                         >
                             Next &raquo;
                         </a>
-                    </div>
                 </div>
             )
         }
         <hr />
         <p class="footnote text-sm">
             This video playlist is automatically updated daily and synced with
-            my YouTube account.
+            my YouTube account —<a href="https://www.youtube.com/@alhrkn/playlists" target="_blank" rel="noopener noreferrer">check it out</a> for more playlists!
         </p>
     </div>
 </BaseLayout>
 
-<script define:vars={{ allVideos: videosData, validLimits, uniqueYears, uniqueChannels }}>
+<script
+    define:vars={{
+        allVideos: videosData,
+        validLimits,
+        uniqueYears,
+        uniqueChannels,
+    }}
+>
     // Get elements
-    const gridContainer = document.getElementById('video-grid-container');
-    const prevButton = document.getElementById('prev-button');
-    const nextButton = document.getElementById('next-button');
-    const pageInfo = document.getElementById('page-info');
-    const limitSelect = document.getElementById('limit-select');
-    const totalItemsInfo = document.getElementById('total-items-info'); // Added for consistency
-    const yearSelect = document.getElementById('year-select'); // New filter element
-    const channelSelect = document.getElementById('channel-select'); // New filter element
-    const removeFiltersButton = document.getElementById('remove-filters-button'); // New button
+    const gridContainer = document.getElementById("video-grid-container");
+    const prevButton = document.getElementById("prev-button");
+    const nextButton = document.getElementById("next-button");
+    const pageInfo = document.getElementById("page-info");
+    const limitSelect = document.getElementById("limit-select");
+    const yearSelect = document.getElementById("year-select"); // New filter element
+    const channelSelect = document.getElementById("channel-select"); // New filter element
+    const removeFiltersButton = document.getElementById(
+        "remove-filters-button",
+    ); // New button
 
     // State variables
     let currentPage = 1;
     let itemsPerPage = validLimits[0];
     const globalTotalItems = allVideos.length; // Keep track of the original total
     let totalPages = 1;
-    let selectedYear = 'all'; // New filter state
-    let selectedChannelId = 'all'; // New filter state
+    let selectedYear = "all"; // New filter state
+    let selectedChannelId = "all"; // New filter state
 
     function updateUrl() {
         const url = new URL(window.location.href);
-        url.searchParams.set('page', currentPage.toString());
-        url.searchParams.set('limit', itemsPerPage.toString());
-        url.searchParams.set('year', selectedYear); // Add year param
-        url.searchParams.set('channel', selectedChannelId); // Add channel param
+        url.searchParams.set("page", currentPage.toString());
+        url.searchParams.set("limit", itemsPerPage.toString());
+        url.searchParams.set("year", selectedYear); // Add year param
+        url.searchParams.set("channel", selectedChannelId); // Add channel param
         // Use pushState to change URL without reloading
-        history.pushState({}, '', url.toString());
+        history.pushState({}, "", url.toString());
     }
 
     function renderPage() {
-        if (!gridContainer || !pageInfo || !prevButton || !nextButton || !limitSelect || !yearSelect || !channelSelect) return;
+        if (
+            !gridContainer ||
+            !pageInfo ||
+            !prevButton ||
+            !nextButton ||
+            !limitSelect ||
+            !yearSelect ||
+            !channelSelect
+        )
+            return;
 
         // --- Apply Filters ---
         let filteredVideos = allVideos;
-        if (selectedYear !== 'all') {
-            filteredVideos = filteredVideos.filter(video => video.published_at.startsWith(selectedYear));
+        if (selectedYear !== "all") {
+            filteredVideos = filteredVideos.filter((video) =>
+                video.published_at.startsWith(selectedYear),
+            );
         }
-        if (selectedChannelId !== 'all') {
-            filteredVideos = filteredVideos.filter(video => video.video_owner_channel_id === selectedChannelId);
+        if (selectedChannelId !== "all") {
+            filteredVideos = filteredVideos.filter(
+                (video) => video.video_owner_channel_id === selectedChannelId,
+            );
         }
         // --- End Apply Filters ---
 
         const currentTotalItems = filteredVideos.length;
         totalPages = Math.ceil(currentTotalItems / itemsPerPage);
         // Clamp currentPage based on filtered results
-        currentPage = Math.max(1, Math.min(currentPage, totalPages > 0 ? totalPages : 1)); // Ensure currentPage is at least 1
+        currentPage = Math.max(
+            1,
+            Math.min(currentPage, totalPages > 0 ? totalPages : 1),
+        ); // Ensure currentPage is at least 1
 
         const offset = (currentPage - 1) * itemsPerPage;
-        const videosToShow = filteredVideos.slice(offset, offset + itemsPerPage);
+        const videosToShow = filteredVideos.slice(
+            offset,
+            offset + itemsPerPage,
+        );
 
         const maxLength = 40; // Max characters for title
 
         // Generate grid HTML or "No results" message
         if (videosToShow.length > 0) {
-            gridContainer.innerHTML = videosToShow.map(video => {
-                let displayTitle = video.title;
-                if (displayTitle.length > maxLength) {
-                    // Find the last space before maxLength to avoid cutting words
-                    const lastSpace = displayTitle.lastIndexOf(' ', maxLength - 1);
-                    if (lastSpace > maxLength / 2) { // Only truncate at space if it's reasonably far in
-                         displayTitle = displayTitle.substring(0, lastSpace) + '…';
-                    } else {
-                         displayTitle = displayTitle.substring(0, maxLength - 1) + '…'; // Hard cut if no good space
+            gridContainer.innerHTML = videosToShow
+                .map((video) => {
+                    let displayTitle = video.title;
+                    if (displayTitle.length > maxLength) {
+                        // Find the last space before maxLength to avoid cutting words
+                        const lastSpace = displayTitle.lastIndexOf(
+                            " ",
+                            maxLength - 1,
+                        );
+                        if (lastSpace > maxLength / 2) {
+                            // Only truncate at space if it's reasonably far in
+                            displayTitle =
+                                displayTitle.substring(0, lastSpace) + "…";
+                        } else {
+                            displayTitle =
+                                displayTitle.substring(0, maxLength - 1) + "…"; // Hard cut if no good space
+                        }
                     }
-                }
 
-                // Check for valid thumbnail URL
-                const imageUrl = video.thumbnail_url;
-                const imageHtml = imageUrl && typeof imageUrl === 'string' && imageUrl.trim() !== ''
-                    ? `<img
+                    // Check for valid thumbnail URL
+                    const imageUrl = video.thumbnail_url;
+                    const imageHtml =
+                        imageUrl &&
+                        typeof imageUrl === "string" &&
+                        imageUrl.trim() !== ""
+                            ? `<img
                             src="${imageUrl}"
                             alt="${video.title}" // Keep full title for alt text
                             loading="lazy"
                             class="w-full aspect-video object-cover block"
                         />`
-                    : `<div class="w-full aspect-video bg-gray-200 dark:bg-gray-600 flex items-center justify-center">
+                            : `<div class="w-full aspect-video bg-gray-200 dark:bg-gray-600 flex items-center justify-center">
                             <span class="text-xs text-gray-500 dark:text-gray-400">No Thumbnail</span>
                         </div>`;
 
-                return `
+                    return `
                 <a
                     href="${video.url}"
                     target="_blank"
@@ -269,126 +332,136 @@ const nextPageUrl = hasNextPage
                         ${displayTitle}
                     </p>
                 </a>
-            `}).join('');
+            `;
+                })
+                .join("");
         } else {
-             gridContainer.innerHTML = `
+            gridContainer.innerHTML = `
                 <div class="col-span-full text-center py-10">
                     <p class="text-lg text-[color:var(--text-secondary)]">No videos match your filters.<br>Try removing a filter.</p>
                 </div>
              `;
         }
 
-
         // Update pagination info
         pageInfo.textContent = `Page ${currentPage} of ${totalPages > 0 ? totalPages : 1}`; // Show Page 1 of 1 if no results
 
         // --- Show/Hide Remove Filters Button ---
         if (removeFiltersButton) {
-            const filtersActive = selectedYear !== 'all' || selectedChannelId !== 'all';
-            removeFiltersButton.classList.toggle('hidden', !filtersActive);
+            const filtersActive =
+                selectedYear !== "all" || selectedChannelId !== "all";
+            removeFiltersButton.classList.toggle("hidden", !filtersActive);
         }
-        // --- End Show/Hide --- 
+        // --- End Show/Hide ---
 
         // Update button states and links (disable if no pages or only one page)
         const hasPrev = currentPage > 1 && totalPages > 0;
         const hasNext = currentPage < totalPages && totalPages > 0;
 
-        prevButton.classList.toggle('disabled', !hasPrev);
-        prevButton.setAttribute('aria-disabled', (!hasPrev).toString());
-        prevButton.href = hasPrev ? '#' : '#'; // Href updated in handler, just control state here
+        prevButton.classList.toggle("disabled", !hasPrev);
+        prevButton.setAttribute("aria-disabled", (!hasPrev).toString());
+        prevButton.href = hasPrev ? "#" : "#"; // Href updated in handler, just control state here
 
-        nextButton.classList.toggle('disabled', !hasNext);
-        nextButton.setAttribute('aria-disabled', (!hasNext).toString());
-        nextButton.href = hasNext ? '#' : '#'; // Href updated in handler, just control state here
-
+        nextButton.classList.toggle("disabled", !hasNext);
+        nextButton.setAttribute("aria-disabled", (!hasNext).toString());
+        nextButton.href = hasNext ? "#" : "#"; // Href updated in handler, just control state here
 
         // Update selected limit, year, and channel in dropdowns
         limitSelect.value = itemsPerPage.toString();
         yearSelect.value = selectedYear;
         channelSelect.value = selectedChannelId;
-
-        // Update total items info
-        if (currentTotalItems === globalTotalItems) {
-            totalItemsInfo.textContent = `(${globalTotalItems} videos)`;
-        } else {
-            totalItemsInfo.textContent = `(${currentTotalItems} of ${globalTotalItems} videos)`;
-        }
     }
 
     function handleNavClick(event, newPage) {
-         event.preventDefault(); // Prevent default link navigation
-         // Calculate totalPages based on current filters and itemsPerPage *before* checking bounds
-         let currentFilteredVideos = allVideos;
-         if (selectedYear !== 'all') {
-             currentFilteredVideos = currentFilteredVideos.filter(video => video.published_at.startsWith(selectedYear));
-         }
-         if (selectedChannelId !== 'all') {
-             currentFilteredVideos = currentFilteredVideos.filter(video => video.video_owner_channel_id === selectedChannelId);
-         }
-         const currentTotalItems = currentFilteredVideos.length;
-         const currentTotalPages = Math.ceil(currentTotalItems / itemsPerPage);
+        event.preventDefault(); // Prevent default link navigation
+        // Calculate totalPages based on current filters and itemsPerPage *before* checking bounds
+        let currentFilteredVideos = allVideos;
+        if (selectedYear !== "all") {
+            currentFilteredVideos = currentFilteredVideos.filter((video) =>
+                video.published_at.startsWith(selectedYear),
+            );
+        }
+        if (selectedChannelId !== "all") {
+            currentFilteredVideos = currentFilteredVideos.filter(
+                (video) => video.video_owner_channel_id === selectedChannelId,
+            );
+        }
+        const currentTotalItems = currentFilteredVideos.length;
+        const currentTotalPages = Math.ceil(currentTotalItems / itemsPerPage);
 
-         if (newPage < 1 || newPage > (currentTotalPages > 0 ? currentTotalPages : 1)) return; // Check bounds against current filtered total pages
+        if (
+            newPage < 1 ||
+            newPage > (currentTotalPages > 0 ? currentTotalPages : 1)
+        )
+            return; // Check bounds against current filtered total pages
 
-         currentPage = newPage;
-         updateUrl();
-         renderPage();
+        currentPage = newPage;
+        updateUrl();
+        renderPage();
     }
 
     function initPagination() {
         if (!limitSelect || !yearSelect || !channelSelect) return; // Ensure elements exist
 
         const urlParams = new URLSearchParams(window.location.search);
-        const initialPage = parseInt(urlParams.get('page') || '1');
-        const initialLimit = parseInt(urlParams.get('limit') || validLimits[0].toString());
-        const initialYear = urlParams.get('year') || 'all';
-        const initialChannel = urlParams.get('channel') || 'all';
-
+        const initialPage = parseInt(urlParams.get("page") || "1");
+        const initialLimit = parseInt(
+            urlParams.get("limit") || validLimits[0].toString(),
+        );
+        const initialYear = urlParams.get("year") || "all";
+        const initialChannel = urlParams.get("channel") || "all";
 
         // Set Limit
         if (!isNaN(initialLimit) && validLimits.includes(initialLimit)) {
-             itemsPerPage = initialLimit;
+            itemsPerPage = initialLimit;
         } else {
-             itemsPerPage = validLimits[0]; // Default if invalid limit in URL
+            itemsPerPage = validLimits[0]; // Default if invalid limit in URL
         }
         limitSelect.value = itemsPerPage.toString(); // Set initial dropdown value
 
         // Set Year Filter
         // Validate initialYear against uniqueYears (passed from server)
-        if (initialYear === 'all' || uniqueYears.includes(initialYear)) {
+        if (initialYear === "all" || uniqueYears.includes(initialYear)) {
             selectedYear = initialYear;
         } else {
-            selectedYear = 'all'; // Default if invalid
+            selectedYear = "all"; // Default if invalid
         }
         yearSelect.value = selectedYear;
 
         // Set Channel Filter
         // Validate initialChannel against uniqueChannels (passed from server)
-        const validChannelIds = ['all', ...uniqueChannels.map(c => c.id)];
+        const validChannelIds = ["all", ...uniqueChannels.map((c) => c.id)];
         if (validChannelIds.includes(initialChannel)) {
             selectedChannelId = initialChannel;
         } else {
-            selectedChannelId = 'all'; // Default if invalid
+            selectedChannelId = "all"; // Default if invalid
         }
         channelSelect.value = selectedChannelId;
 
-
         // Apply filters to determine initial total pages before setting current page
         let initialFilteredVideos = allVideos;
-        if (selectedYear !== 'all') {
-            initialFilteredVideos = initialFilteredVideos.filter(video => video.published_at.startsWith(selectedYear));
+        if (selectedYear !== "all") {
+            initialFilteredVideos = initialFilteredVideos.filter((video) =>
+                video.published_at.startsWith(selectedYear),
+            );
         }
-        if (selectedChannelId !== 'all') {
-            initialFilteredVideos = initialFilteredVideos.filter(video => video.video_owner_channel_id === selectedChannelId);
+        if (selectedChannelId !== "all") {
+            initialFilteredVideos = initialFilteredVideos.filter(
+                (video) => video.video_owner_channel_id === selectedChannelId,
+            );
         }
         const initialTotalItems = initialFilteredVideos.length;
         totalPages = Math.ceil(initialTotalItems / itemsPerPage); // Set initial totalPages based on filters
 
         // Set Current Page
-        if (!isNaN(initialPage) && initialPage >= 1 && initialPage <= (totalPages > 0 ? totalPages : 1)) {
-             currentPage = initialPage;
+        if (
+            !isNaN(initialPage) &&
+            initialPage >= 1 &&
+            initialPage <= (totalPages > 0 ? totalPages : 1)
+        ) {
+            currentPage = initialPage;
         } else {
-             currentPage = 1; // Default if invalid page in URL or no pages
+            currentPage = 1; // Default if invalid page in URL or no pages
         }
 
         // Initial render
@@ -401,7 +474,8 @@ const nextPageUrl = hasNextPage
         // --- Remove existing listeners first to avoid duplicates on popstate/HMR ---
         // Helper to remove/add listener
         const replaceListener = (element, eventType, newHandler) => {
-            if (element._handler) { // Remove previous handler if stored
+            if (element._handler) {
+                // Remove previous handler if stored
                 element.removeEventListener(eventType, element._handler);
             }
             element.addEventListener(eventType, newHandler);
@@ -411,32 +485,30 @@ const nextPageUrl = hasNextPage
         // --- Filter Listeners ---
         const handleYearChange = (event) => {
             const target = event.target;
-            if (target && 'value' in target) {
+            if (target && "value" in target) {
                 selectedYear = target.value;
                 currentPage = 1; // Reset to first page on filter change
                 updateUrl();
                 renderPage();
             }
         };
-        replaceListener(yearSelect, 'change', handleYearChange);
-
+        replaceListener(yearSelect, "change", handleYearChange);
 
         const handleChannelChange = (event) => {
             const target = event.target;
-             if (target && 'value' in target) {
+            if (target && "value" in target) {
                 selectedChannelId = target.value;
                 currentPage = 1; // Reset to first page on filter change
                 updateUrl();
                 renderPage();
-             }
+            }
         };
-        replaceListener(channelSelect, 'change', handleChannelChange);
-
+        replaceListener(channelSelect, "change", handleChannelChange);
 
         // --- Pagination Listeners ---
         const handleLimitChange = (event) => {
             const target = event.target;
-            if (target && 'value' in target) {
+            if (target && "value" in target) {
                 const newLimit = parseInt(target.value);
                 if (!isNaN(newLimit) && validLimits.includes(newLimit)) {
                     itemsPerPage = newLimit;
@@ -446,49 +518,46 @@ const nextPageUrl = hasNextPage
                 }
             }
         };
-        replaceListener(limitSelect, 'change', handleLimitChange);
-
+        replaceListener(limitSelect, "change", handleLimitChange);
 
         const handlePrevClick = (event) => {
             handleNavClick(event, currentPage - 1);
         };
-        replaceListener(prevButton, 'click', handlePrevClick);
-
+        replaceListener(prevButton, "click", handlePrevClick);
 
         const handleNextClick = (event) => {
-             handleNavClick(event, currentPage + 1);
+            handleNavClick(event, currentPage + 1);
         };
-        replaceListener(nextButton, 'click', handleNextClick);
-
+        replaceListener(nextButton, "click", handleNextClick);
 
         // --- Remove Filters Listener ---
         const handleRemoveFilters = (event) => {
             event.preventDefault();
-            selectedYear = 'all';
-            selectedChannelId = 'all';
+            selectedYear = "all";
+            selectedChannelId = "all";
             currentPage = 1;
             updateUrl();
             renderPage(); // This will also hide the button again
         };
         if (removeFiltersButton) {
-             replaceListener(removeFiltersButton, 'click', handleRemoveFilters);
+            replaceListener(removeFiltersButton, "click", handleRemoveFilters);
         }
 
         // Handle browser back/forward buttons
         // Avoid adding multiple popstate listeners
         if (!window._popstateHandled) {
-             window.addEventListener('popstate', () => {
+            window.addEventListener("popstate", () => {
                 // console.log("Popstate triggered, re-initializing pagination.");
                 initPagination(); // Re-initialize based on the new URL state
-             });
-             window._popstateHandled = true;
+            });
+            window._popstateHandled = true;
         }
     }
 
     // Run initialization when the DOM is ready
     // Use standard DOMContentLoaded listener
-    if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', initPagination);
+    if (document.readyState === "loading") {
+        document.addEventListener("DOMContentLoaded", initPagination);
     } else {
         // DOM is already loaded, but Astro might still be initializing islands/scripts.
         // A small timeout can sometimes help ensure dependent elements are ready,
@@ -496,5 +565,4 @@ const nextPageUrl = hasNextPage
         // Alternatively, if issues persist, consider Astro's client:visible or client:idle directives.
         setTimeout(initPagination, 0); // Use setTimeout 0 to queue after current JS execution
     }
-
 </script>
