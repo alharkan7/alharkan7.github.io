@@ -1,0 +1,48 @@
+name: Update Liked Videos JSON
+
+on:
+  schedule:
+    # Runs every day at 4:05 AM UTC (adjust as needed)
+    - cron: '5 4 * * *'
+  workflow_dispatch: # Allows manual triggering from the Actions tab
+
+jobs:
+  update-json:
+    runs-on: ubuntu-latest
+    permissions:
+        contents: write # Allow workflow to commit to the repo
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.x' # Specify your Python version
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r public/os-bookmarks/requirements.txt # Adjust path if needed
+
+      - name: Run script to fetch liked videos
+        env:
+          GOOGLE_CLIENT_ID: ${{ secrets.GOOGLE_CLIENT_ID }}
+          GOOGLE_CLIENT_SECRET: ${{ secrets.GOOGLE_CLIENT_SECRET }}
+          GOOGLE_REFRESH_TOKEN: ${{ secrets.GOOGLE_REFRESH_TOKEN }}
+        run: python public/os-bookmarks/get_liked_videos.py # Adjust path if needed
+
+      - name: Commit and push if changed
+        run: |
+          git config --global user.name 'github-actions[bot]'
+          git config --global user.email 'github-actions[bot]@users.noreply.github.com'
+          # Check if the file exists and has changes
+          if [[ -f "public/os-bookmarks/liked_videos.json" ]] && git diff --quiet -- "public/os-bookmarks/liked_videos.json"; then
+            echo "No changes to liked_videos.json"
+          else
+            echo "Changes detected in liked_videos.json. Committing..."
+            git add public/os-bookmarks/liked_videos.json # Adjust path if needed
+            git commit -m "Automated update of liked_videos.json"
+            # Retry push on failure (e.g., temporary network issue or race condition)
+            for i in 1 2 3; do git push && break || sleep 15; done
+          fi
