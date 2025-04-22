@@ -30,25 +30,31 @@ try {
     const jsonPath = path.resolve('public/os-bookmarks/liked_videos.json');
     // console.log(`Reading JSON from: ${jsonPath}`); // Debug path
     const jsonData = await readFile(jsonPath, 'utf-8');
-    buildTimeVideosData = JSON.parse(jsonData);
+    let allParsedVideos = JSON.parse(jsonData);
+
+    // Filter out "Private video" entries *before* counting or processing
+    buildTimeVideosData = allParsedVideos.filter((video: Video) => video.title !== "Private video");
+
+    // Calculate total items based on the *filtered* data
     totalItems = buildTimeVideosData.length;
 
+    // Now extract unique years and channels from the filtered data
     uniqueYears = [
         ...new Set(buildTimeVideosData.map((v) => v.published_at.substring(0, 4))),
-    ].sort((a, b) => parseInt(b) - parseInt(a)); // Sort descending
+].sort((a, b) => parseInt(b) - parseInt(a)); // Sort descending
 
-    const uniqueChannelsMap = new Map<string, string>();
+const uniqueChannelsMap = new Map<string, string>();
     buildTimeVideosData.forEach((v) => {
         if (v.video_owner_channel_id && !uniqueChannelsMap.has(v.video_owner_channel_id)) {
-            uniqueChannelsMap.set(
-                v.video_owner_channel_id,
+        uniqueChannelsMap.set(
+            v.video_owner_channel_id,
                 v.video_owner_channel_title || 'Unknown Channel', // Provide fallback
-            );
-        }
-    });
+        );
+    }
+});
     uniqueChannels = Array.from(uniqueChannelsMap.entries())
-        .map(([id, title]) => ({ id, title }))
-        .sort((a, b) => a.title.localeCompare(b.title)); // Sort alphabetically by title
+    .map(([id, title]) => ({ id, title }))
+    .sort((a, b) => a.title.localeCompare(b.title)); // Sort alphabetically by title
 
     // Clear the large data structure after extracting info to prevent accidental bundling
     buildTimeVideosData = [];
@@ -181,31 +187,38 @@ if (!validLimits.includes(initialLimit)) {
 
         <!-- Pagination Controls -->
         { totalItems > 0 ? ( // Only show pagination structure if items exist (based on build count)
-            <div class="pagination-controls flex flex-row flex-nowrap justify-center items-center gap-2 sm:gap-4 my-6">
-                {/* Navigation buttons and page info */}
-                    <a
-                        id="prev-button"
-                        href="#"
-                        class="nav-button disabled text-[color:var(--text-secondary)] font-sans text-sm font-bold no-underline transition-all duration-200 ease-in-out shadow-[inset_0_-0.12em_0_var(--primary-color)] hover:shadow-[inset_0_-1.5em_0_var(--primary-color)] hover:text-white aria-disabled:opacity-50 aria-disabled:cursor-not-allowed aria-disabled:pointer-events-none aria-disabled:shadow-[inset_0_-0.12em_0_var(--text-secondary)] aria-disabled:hover:text-[color:var(--text-secondary)]"
-                        aria-disabled="true"
-                    >
-                        &laquo; Prev
-                    </a>
-                    <span
-                        id="page-info"
-                        class="text-sm px-2 whitespace-nowrap"
-                    >
-                        Page loading...
-                    </span>
-                    <a
-                        id="next-button"
-                        href="#"
-                        class="nav-button disabled text-[color:var(--text-secondary)] font-sans text-sm font-bold no-underline transition-all duration-200 ease-in-out shadow-[inset_0_-0.12em_0_var(--primary-color)] hover:shadow-[inset_0_-1.5em_0_var(--primary-color)] hover:text-white aria-disabled:opacity-50 aria-disabled:cursor-not-allowed aria-disabled:pointer-events-none aria-disabled:shadow-[inset_0_-0.12em_0_var(--text-secondary)] aria-disabled:hover:text-[color:var(--text-secondary)]"
-                        aria-disabled="true"
-                    >
-                        Next &raquo;
-                    </a>
-            </div>
+                <div class="pagination-controls flex flex-row flex-nowrap justify-center items-center gap-2 sm:gap-4 my-6">
+                    {/* Navigation buttons and page info */}
+                        <a
+                            id="prev-button"
+                            href="#"
+                            class="mr-2 nav-button disabled text-[color:var(--text-secondary)] font-sans text-sm font-bold no-underline transition-all duration-200 ease-in-out shadow-[inset_0_-0.12em_0_var(--primary-color)] hover:shadow-[inset_0_-1.5em_0_var(--primary-color)] hover:text-white aria-disabled:opacity-50 aria-disabled:cursor-not-allowed aria-disabled:pointer-events-none aria-disabled:shadow-[inset_0_-0.12em_0_var(--text-secondary)] aria-disabled:hover:text-[color:var(--text-secondary)]"
+                            aria-disabled="true"
+                        >
+                            &laquo; Prev
+                        </a>
+                        <!-- New Page Select Dropdown -->
+                        <div class="page-select-container flex items-center text-sm px-1 whitespace-nowrap">
+                             <span class="mr-1">Page</span>
+                             <select
+                                id="page-select"
+                                class="p-1 text-sm bg-[var(--background-body)] text-[var(--text-main)] text-center"
+                                disabled
+                                aria-label="Select page number"
+                            >
+                                <option value="1">1</option> {/* Placeholder */}
+                            </select>
+                            <span id="page-total-span" class="ml-2">of ?</span>
+                        </div>
+                        <a
+                            id="next-button"
+                            href="#"
+                            class="ml-2 nav-button disabled text-[color:var(--text-secondary)] font-sans text-sm font-bold no-underline transition-all duration-200 ease-in-out shadow-[inset_0_-0.12em_0_var(--primary-color)] hover:shadow-[inset_0_-1.5em_0_var(--primary-color)] hover:text-white aria-disabled:opacity-50 aria-disabled:cursor-not-allowed aria-disabled:pointer-events-none aria-disabled:shadow-[inset_0_-0.12em_0_var(--text-secondary)] aria-disabled:hover:text-[color:var(--text-secondary)]"
+                            aria-disabled="true"
+                        >
+                            Next &raquo;
+                        </a>
+                </div>
             ) : errorMessage ? null : (
                  <div class="text-center text-gray-500 my-6">No videos found.</div>
             )
@@ -232,7 +245,8 @@ if (!validLimits.includes(initialLimit)) {
     const gridContainer = document.getElementById("video-grid-container");
     const prevButton = document.getElementById("prev-button");
     const nextButton = document.getElementById("next-button");
-    const pageInfo = document.getElementById("page-info");
+    const pageSelect = document.getElementById("page-select"); // New page dropdown
+    const pageTotalSpan = document.getElementById("page-total-span"); // Span for \"of Y\"
     const limitSelect = document.getElementById("limit-select");
     const yearSelect = document.getElementById("year-select");
     const channelSelect = document.getElementById("channel-select");
@@ -267,7 +281,7 @@ if (!validLimits.includes(initialLimit)) {
          // console.log("Render page called. Loading:", isDataLoading, "Data length:", allVideos.length);
 
         if (
-            !gridContainer || !pageInfo || !prevButton || !nextButton ||
+            !gridContainer || !pageSelect || !pageTotalSpan || !prevButton || !nextButton ||
             !limitSelect || !yearSelect || !channelSelect || !loadingIndicator
         ) return;
 
@@ -278,7 +292,8 @@ if (!validLimits.includes(initialLimit)) {
 
         if (isDataLoading) {
             // If still loading, ensure pagination/filters are disabled
-            pageInfo.textContent = "Page loading...";
+            pageSelect.disabled = true;
+            pageTotalSpan.textContent = "of ?";
             prevButton.classList.add("disabled");
             prevButton.setAttribute("aria-disabled", "true");
             nextButton.classList.add("disabled");
@@ -297,6 +312,7 @@ if (!validLimits.includes(initialLimit)) {
         limitSelect.disabled = false;
         yearSelect.disabled = false;
         channelSelect.disabled = false;
+        pageSelect.disabled = totalPages <= 1; // Disable if only one page
         if (removeFiltersButton) removeFiltersButton.disabled = false;
 
 
@@ -324,7 +340,7 @@ if (!validLimits.includes(initialLimit)) {
 
         // Generate grid HTML or "No results" message
         if (videosToShow.length > 0) {
-             gridContainer.innerHTML = videosToShow
+            gridContainer.innerHTML = videosToShow
                 .map((video) => {
                     // Ensure title is a string, provide fallback
                     const title = typeof video.title === 'string' ? video.title : 'Untitled Video';
@@ -337,8 +353,9 @@ if (!validLimits.includes(initialLimit)) {
                     }
 
                     const imageUrl = video.thumbnail_url;
-                    const imageHtml =
-                        imageUrl && typeof imageUrl === "string" && imageUrl.trim() !== ""
+                    // Ensure imageUrl is a string and looks like a valid URL before using it in <img>
+                    const isValidImageUrl = typeof imageUrl === 'string' && imageUrl.trim() !== '' && imageUrl.startsWith('http');
+                    const imageHtml = isValidImageUrl
                             ? `<img src="${imageUrl}" alt="${title}" loading="lazy" class="w-full aspect-video object-cover block"/>`
                             : `<div class="w-full aspect-video bg-gray-200 dark:bg-gray-600 flex items-center justify-center"><span class="text-xs text-gray-500 dark:text-gray-400">No Thumbnail</span></div>`;
 
@@ -360,8 +377,28 @@ if (!validLimits.includes(initialLimit)) {
                 </div>`;
         }
 
-        // Update pagination info
-        pageInfo.textContent = `Page ${currentPage} of ${totalPages > 0 ? totalPages : 1}`;
+        // --- Update Page Select Dropdown --- 
+        pageTotalSpan.textContent = `of ${totalPages > 0 ? totalPages : 1}`;
+        // Populate dropdown options
+        pageSelect.innerHTML = ''; // Clear previous options
+        const maxOptionsToShow = 500; // Limit options for performance if totalPages is huge
+        for (let i = 1; i <= Math.min(totalPages, maxOptionsToShow); i++) {
+            const option = document.createElement('option');
+            option.value = i.toString();
+            option.textContent = i.toString();
+            pageSelect.appendChild(option);
+        }
+        if (totalPages > maxOptionsToShow) {
+             const option = document.createElement('option');
+             option.value = currentPage.toString(); // Ensure current is selectable if > max
+             option.textContent = `${currentPage} (current)`;
+             option.disabled = true; // Visually indicate it might be outside normal range
+             pageSelect.appendChild(option);
+             console.warn(`Page dropdown limited to first ${maxOptionsToShow} options due to large number of pages.`);
+        }
+        pageSelect.value = currentPage.toString();
+        pageSelect.disabled = totalPages <= 1; // Re-evaluate disable state
+        // --- End Update Page Select --- 
 
         // --- Show/Hide Remove Filters Button ---
         if (removeFiltersButton) {
@@ -439,46 +476,49 @@ if (!validLimits.includes(initialLimit)) {
              // --- End Validation ---
 
             allVideos = data; // Store fetched data globally
+            // Filter out videos titled "Private Video"
+            allVideos = allVideos.filter(video => video.title !== "Private video");
+
             isDataLoading = false; // Mark loading as complete
 
             // --- Set Initial State from URL AFTER data load ---
-             const urlParams = new URLSearchParams(window.location.search);
-             const initialPage = parseInt(urlParams.get("page") || "1");
+        const urlParams = new URLSearchParams(window.location.search);
+        const initialPage = parseInt(urlParams.get("page") || "1");
              const initialLimit = parseInt(urlParams.get("limit") || validLimits[0].toString());
-             const initialYear = urlParams.get("year") || "all";
-             const initialChannel = urlParams.get("channel") || "all";
+        const initialYear = urlParams.get("year") || "all";
+        const initialChannel = urlParams.get("channel") || "all";
 
-             // Set Limit
+        // Set Limit
              if (validLimits.includes(initialLimit)) {
-                 itemsPerPage = initialLimit;
-             } else {
+            itemsPerPage = initialLimit;
+        } else {
                  itemsPerPage = validLimits[0];
-             }
+        }
              limitSelect.value = itemsPerPage.toString();
 
              // Set Year Filter (Validate against build-time filters)
-             if (initialYear === "all" || uniqueYears.includes(initialYear)) {
-                  selectedYear = initialYear;
-             } else {
+        if (initialYear === "all" || uniqueYears.includes(initialYear)) {
+            selectedYear = initialYear;
+        } else {
                   selectedYear = "all";
-             }
-             yearSelect.value = selectedYear;
+        }
+        yearSelect.value = selectedYear;
 
              // Set Channel Filter (Validate against build-time filters)
-             const validChannelIds = ["all", ...uniqueChannels.map((c) => c.id)];
-             if (validChannelIds.includes(initialChannel)) {
-                 selectedChannelId = initialChannel;
-             } else {
+        const validChannelIds = ["all", ...uniqueChannels.map((c) => c.id)];
+        if (validChannelIds.includes(initialChannel)) {
+            selectedChannelId = initialChannel;
+        } else {
                   selectedChannelId = "all";
-             }
-             channelSelect.value = selectedChannelId;
+        }
+        channelSelect.value = selectedChannelId;
 
-              // Apply filters to determine initial total pages before setting current page
-              let initialFilteredVideos = allVideos;
-              if (selectedYear !== "all") {
+        // Apply filters to determine initial total pages before setting current page
+        let initialFilteredVideos = allVideos;
+        if (selectedYear !== "all") {
                   initialFilteredVideos = initialFilteredVideos.filter(v => v.published_at && v.published_at.startsWith(selectedYear));
-              }
-              if (selectedChannelId !== "all") {
+        }
+        if (selectedChannelId !== "all") {
                   initialFilteredVideos = initialFilteredVideos.filter(v => v.video_owner_channel_id === selectedChannelId);
               }
               const initialFilteredTotalItems = initialFilteredVideos.length;
@@ -486,8 +526,8 @@ if (!validLimits.includes(initialLimit)) {
 
               // Set Current Page (Validate against calculated total pages)
               if (initialPage >= 1 && initialPage <= (totalPages > 0 ? totalPages : 1)) {
-                  currentPage = initialPage;
-              } else {
+            currentPage = initialPage;
+        } else {
                    currentPage = 1;
               }
 
@@ -514,14 +554,15 @@ if (!validLimits.includes(initialLimit)) {
              if (removeFiltersButton) removeFiltersButton.disabled = true;
              if (prevButton) prevButton.classList.add("disabled"); prevButton.setAttribute("aria-disabled", "true");
              if (nextButton) nextButton.classList.add("disabled"); nextButton.setAttribute("aria-disabled", "true");
-             if (pageInfo) pageInfo.textContent = "Error";
+             if (pageSelect) pageSelect.disabled = true;
+             if (pageTotalSpan) pageTotalSpan.textContent = "of ?";
         }
     }
 
 
     function setupEventListeners() {
         // console.log("Setting up event listeners...");
-        if (!limitSelect || !yearSelect || !channelSelect || !prevButton || !nextButton) return;
+        if (!limitSelect || !yearSelect || !channelSelect || !prevButton || !nextButton || !pageSelect) return;
 
         // Helper to replace listeners (avoids duplicates on HMR/popstate)
         const replaceListener = (element, eventType, newHandler) => {
@@ -544,7 +585,7 @@ if (!validLimits.includes(initialLimit)) {
         replaceListener(yearSelect, "change", handleYearChange);
 
         const handleChannelChange = (event) => {
-             const target = event.target;
+            const target = event.target;
             if (target && "value" in target) {
                 selectedChannelId = target.value;
                 currentPage = 1;
@@ -586,6 +627,21 @@ if (!validLimits.includes(initialLimit)) {
             replaceListener(removeFiltersButton, "click", handleRemoveFilters);
         }
 
+        // --- Page Select Listener ---
+         const handlePageSelectChange = (event) => {
+            const target = event.target;
+             if (target && "value" in target) {
+                const newPage = parseInt(target.value);
+                 if (!isNaN(newPage) && newPage >= 1 && newPage <= totalPages) {
+                     currentPage = newPage;
+                     updateUrl();
+                     renderPage();
+                 }
+            }
+        };
+        replaceListener(pageSelect, "change", handlePageSelectChange);
+        // --- End Page Select Listener ---
+
         // Handle browser back/forward buttons
         if (!window._popstateHandledVideos) {
             window.addEventListener("popstate", () => {
@@ -621,3 +677,26 @@ if (!validLimits.includes(initialLimit)) {
     initializeAndFetchData();
 
 </script>
+
+<style is:global>
+    /* Thin scrollbar for #page-select in Webkit browsers */
+    #page-select::-webkit-scrollbar {
+      width: 5px;
+    }
+
+    #page-select::-webkit-scrollbar-track {
+      background: transparent;
+    }
+
+    #page-select::-webkit-scrollbar-thumb {
+      background-color: var(--text-secondary);
+      border-radius: 10px;
+      border: none;
+    }
+
+    /* Thin scrollbar for #page-select in Firefox */
+    #page-select {
+      scrollbar-width: thin;
+      scrollbar-color: var(--text-secondary) transparent;
+    }
+</style>
