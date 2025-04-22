@@ -197,7 +197,9 @@ def main():
                  for item in node:
                       count_urls(item)
 
-        count_urls(structured_bookmarks) # Count URLs in the filtered data
+        # Iterate through the root folders ('bookmark_bar', 'other', etc.) in the dictionary
+        for root_node in structured_bookmarks.values():
+            count_urls(root_node) # Count URLs within each root folder
 
         if total_urls > 0:
             print(f"Successfully extracted {total_urls} filtered bookmarks to {output_path}")
