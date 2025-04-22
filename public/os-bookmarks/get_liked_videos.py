@@ -59,7 +59,12 @@ def get_liked_videos(youtube):
             video_id = content_details.get("videoId")
             video_title = snippet.get("title", "No Title")
             video_url = f"https://www.youtube.com/watch?v={video_id}" if video_id else "No URL"
-            
+            # Get video owner details instead of playlist item channel details
+            video_owner_channel_id = snippet.get("videoOwnerChannelId", "No Owner Channel ID") 
+            video_owner_channel_title = snippet.get("videoOwnerChannelTitle", "No Owner Channel Title")
+            published_at = snippet.get("publishedAt", "No Date") # Playlist item publish date
+            # video_published_at = content_details.get("videoPublishedAt", "No Date") # Specific video publish date
+
             # Get the 'high' resolution thumbnail URL, fall back to 'medium' or 'default' if 'high' is not available
             thumbnail_url = thumbnails.get("high", {}).get("url")
             if not thumbnail_url:
@@ -69,11 +74,15 @@ def get_liked_videos(youtube):
 
             if video_id: # Only add if we have a valid video ID
                 liked_videos.append({
-                    "title": video_title, 
+                    "title": video_title,
                     "url": video_url,
-                    "thumbnail_url": thumbnail_url 
+                    # Use video owner details
+                    "video_owner_channel_id": video_owner_channel_id,
+                    "video_owner_channel_title": video_owner_channel_title,
+                    "published_at": published_at,
+                    "thumbnail_url": thumbnail_url
                 })
-            # print(f"Liked: {video_title} ({video_url}) Thumbnail: {thumbnail_url}") # Uncomment to print during fetch
+            # print(f"Liked: {video_title} ({video_url}) Owner: {video_owner_channel_title} Published: {published_at} Thumbnail: {thumbnail_url}") # Uncomment to print during fetch
 
         next_page_token = response.get("nextPageToken")
 
@@ -95,11 +104,16 @@ if __name__ == "__main__":
         print("Authentication successful. Fetching liked videos...")
         all_liked_videos = get_liked_videos(youtube_service)
 
-        print(f"Found {len(all_liked_videos)} liked videos:")
-        for video in all_liked_videos:
-            # Print title, URL, and thumbnail URL
-            print(f"- {video['title']} ({video['url']})")
-            print(f"  Thumbnail: {video.get('thumbnail_url', 'N/A')}")
+        print(f"\\nFound {len(all_liked_videos)} liked videos:")
+        # for video in all_liked_videos:
+            # Print details
+            # print(f"- Title: {video['title']}")
+            # print(f"  URL: {video['url']}")
+            # Print video owner channel details
+            # print(f"  Video Owner: {video.get('video_owner_channel_title', 'N/A')} (ID: {video.get('video_owner_channel_id', 'N/A')})") 
+            # print(f"  Published: {video.get('published_at', 'N/A')}")
+            # print(f"  Thumbnail: {video.get('thumbnail_url', 'N/A')}")
+            #print("---")
 
         # Define the output file path relative to the script directory
         output_json_path = os.path.join(SCRIPT_DIR, "liked_videos.json")

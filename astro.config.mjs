@@ -6,6 +6,8 @@ import remarkSmartypants from 'remark-smartypants'
 import rehypeExternalLinks from 'rehype-external-links'
 import react from "@astrojs/react"
 
+import tailwind from '@astrojs/tailwind';
+
 export default defineConfig({
   site: 'https://raihankalla.id',
   output: 'static',
@@ -59,26 +61,22 @@ export default defineConfig({
       'cross-origin-resource-policy': ['cross-origin']
     }
   },
-  integrations: [
-    svelte(),
-    mdx(
-      //   {
-      //   remarkPlugins: [remarkGfm, remarkSmartypants],
-      //   rehypePlugins: [
-      //     [
-      //       rehypeExternalLinks,
-      //       {
-      //         target: '_blank',
-      //       },
-      //     ],
-      //   ],
-      //   shikiConfig: {
-      //     theme: 'nord',
-      //   },
-      // }
-    ),
-    react(),
-  ],
+  integrations: [svelte(), mdx(
+    //   {
+    //   remarkPlugins: [remarkGfm, remarkSmartypants],
+    //   rehypePlugins: [
+    //     [
+    //       rehypeExternalLinks,
+    //       {
+    //         target: '_blank',
+    //       },
+    //     ],
+    //   ],
+    //   shikiConfig: {
+    //     theme: 'nord',
+    //   },
+    // }
+  ), react(), tailwind()],
   markdown: {
     shikiConfig: {
       theme: 'nord',

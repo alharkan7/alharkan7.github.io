@@ -9,6 +9,9 @@ interface Video {
     thumbnail_url: string;
     url: string;
     // Add other properties if they exist in your JSON
+    video_owner_channel_id: string; // Added for filtering
+    video_owner_channel_title: string; // Added for filtering
+    published_at: string; // Added for filtering
 }
 
 const title = "Videos - Al Harkan";
@@ -16,8 +19,30 @@ const description =
     "Videos Curation on AI Research, Software, and Digital Media";
 const permalink = Astro.site?.href ? `${Astro.site.href}videos` : "/videos";
 
+// --- Filter Data Extraction ---
+const uniqueYears = [...new Set(videosData.map(v => v.published_at.substring(0, 4)))]
+    .sort((a, b) => parseInt(b) - parseInt(a)); // Sort descending
+
+const uniqueChannelsMap = new Map<string, string>();
+videosData.forEach(v => {
+    if (!uniqueChannelsMap.has(v.video_owner_channel_id)) {
+        uniqueChannelsMap.set(v.video_owner_channel_id, v.video_owner_channel_title);
+    }
+});
+const uniqueChannels = Array.from(uniqueChannelsMap.entries())
+    .map(([id, title]) => ({ id, title }))
+    .sort((a, b) => a.title.localeCompare(b.title)); // Sort alphabetically by title
+// --- End Filter Data Extraction ---
+
 // Pagination logic
-const urlParams = Astro.url.searchParams;
+// const urlParams = Astro.url.searchParams; // Previous method
+const requestUrl = new URL(Astro.request.url);
+const urlParams = requestUrl.searchParams; // Get params from request URL
+// console.log("--- Videos Page Re-rendering ---");
+// console.log("Astro.url:", Astro.url.toString()); // Keep if useful, might be stale
+// console.log("Astro.request.url:", Astro.request.url);
+// console.log("Raw Params from request:", urlParams.toString());
+
 const validLimits = [30, 60, 90];
 let limit = parseInt(urlParams.get("limit") || "30");
 if (!validLimits.includes(limit)) {
@@ -28,8 +53,12 @@ const totalItems = videosData.length;
 const totalPages = Math.ceil(totalItems / limit);
 const currentPage = Math.max(1, Math.min(page, totalPages)); // Clamp page number
 const offset = (currentPage - 1) * limit;
+// console.log(`Parsed Params: page=${page}, limit=${limit}`);
+// console.log(`Calculated: currentPage=${currentPage}, totalPages=${totalPages}, offset=${offset}, totalItems=${totalItems}`);
+
 // Explicitly type the sliced array
 const videosToShow: Video[] = videosData.slice(offset, offset + limit);
+// console.log(`Videos to show: ${videosToShow.length}`);
 
 const hasPrevPage = currentPage > 1;
 const hasNextPage = currentPage < totalPages;
@@ -48,200 +77,392 @@ const nextPageUrl = hasNextPage
     current="bookmarks"
 >
     <div class="container">
-        <h1>My Liked Videos</h1>
+        <h1>My {totalItems} Liked Videos</h1>
         <p>On AI Research, Software, and Digital Media</p>
         <hr />
 
+        <!-- Filter Controls -->
+        <div class="filter-controls flex justify-center items-center gap-4 my-4">
+            <div class="flex items-center">
+                 <label for="year-select" class="mr-2 whitespace-nowrap text-sm">Year:</label>
+                 <select id="year-select" class="border rounded px-2 py-1 text-sm dark:bg-gray-700 dark:text-white dark:border-gray-600">
+                    <option value="all">All Years</option>
+                    {uniqueYears.map(year => (
+                        <option value={year}>{year}</option>
+                    ))}
+                 </select>
+            </div>
+            <div class="flex items-center">
+                <label for="channel-select" class="mr-2 whitespace-nowrap text-sm">Channel:</label>
+                <select id="channel-select" class="border rounded px-2 py-1 text-sm dark:bg-gray-700 dark:text-white dark:border-gray-600">
+                    <option value="all">All Channels</option>
+                    {uniqueChannels.map(channel => {
+                        const maxLen = 15;
+                        const displayTitle = channel.title.length > maxLen
+                            ? channel.title.substring(0, maxLen) + '…'
+                            : channel.title;
+                        return (
+                            <option value={channel.id} title={channel.title}>{displayTitle}</option>
+                        );
+                    })}
+                </select>
+            </div>
+        </div>
+
         <!-- Video Grid -->
-        <div class="video-grid">
-            {
-                videosToShow.map((video: Video) => (
-                    <a
-                        href={video.url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        class="video-item"
-                        title={video.title}
-                    >
-                        <img
-                            src={video.thumbnail_url}
-                            alt={video.title}
-                            loading="lazy"
-                        />
-                        <p class="video-title">{video.title}</p>
-                    </a>
-                ))
-            }
+        <div
+            id="video-grid-container"
+            class="grid grid-cols-[repeat(auto-fill,minmax(200px,1fr))] gap-6 mt-8 mb-8 min-h-[200px]"
+        >
+            {/* Centered loading indicator */}
+            <div class="col-span-full flex flex-col items-center justify-center min-h-[200px]">
+                <div
+                    class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2"
+                >
+                </div>
+                <p class="mt-4">Loading Videos...</p>
+            </div>
         </div>
 
         <!-- Pagination Controls -->
         {
             totalItems > 0 && (
-                <div class="pagination-controls">
-                    <div class="pagination-nav">
+                <div class="pagination-controls flex flex-col sm:flex-row justify-between items-center gap-4 my-6">
+                    {/* Items per page selector (appears first visually on larger screens due to flex order) */}
+                    <div class="pagination-limit flex items-center order-1 sm:order-1">
+                        <label for="limit-select" class="mr-2 whitespace-nowrap">Items:</label>
+                        <select id="limit-select" class="border rounded px-2 py-1 text-sm dark:bg-gray-700 dark:text-white dark:border-gray-600">
+                            {validLimits.map((l) => (
+                                <option value={l}>{l}</option>
+                            ))}
+                        </select>
+                        <span id="total-items-info" class="total-items ml-2 text-sm whitespace-nowrap">
+                            ({totalItems} videos)
+                        </span>
+                    </div>
+
+                    {/* Navigation buttons and page info (appears second visually on larger screens) */}
+                    <div class="pagination-nav flex items-center gap-4 order-2 sm:order-2">
                         <a
-                            href={prevPageUrl}
-                            class:list={["nav-button", { disabled: !hasPrevPage }]}
-                            aria-disabled={!hasPrevPage}
+                            id="prev-button"
+                            href="#"
+                            class="nav-button disabled text-[color:var(--text-secondary)] font-sans text-sm font-bold no-underline transition-all duration-200 ease-in-out shadow-[inset_0_-0.12em_0_var(--primary-color)] hover:shadow-[inset_0_-1.5em_0_var(--primary-color)] hover:text-white aria-disabled:opacity-50 aria-disabled:cursor-not-allowed aria-disabled:pointer-events-none aria-disabled:shadow-[inset_0_-0.12em_0_var(--text-secondary)] aria-disabled:hover:text-[color:var(--text-secondary)]"
+                            aria-disabled="true"
                         >
                             &laquo; Prev
                         </a>
-                        <span>
-                            Page {currentPage} of {totalPages}
-                        </span>
+                        <span id="page-info" class="text-sm px-2 whitespace-nowrap">Page loading...</span>
                         <a
-                            href={nextPageUrl}
-                            class:list={["nav-button", { disabled: !hasNextPage }]}
-                            aria-disabled={!hasNextPage}
+                            id="next-button"
+                            href="#"
+                            class="nav-button disabled text-[color:var(--text-secondary)] font-sans text-sm font-bold no-underline transition-all duration-200 ease-in-out shadow-[inset_0_-0.12em_0_var(--primary-color)] hover:shadow-[inset_0_-1.5em_0_var(--primary-color)] hover:text-white aria-disabled:opacity-50 aria-disabled:cursor-not-allowed aria-disabled:pointer-events-none aria-disabled:shadow-[inset_0_-0.12em_0_var(--text-secondary)] aria-disabled:hover:text-[color:var(--text-secondary)]"
+                            aria-disabled="true"
                         >
                             Next &raquo;
                         </a>
                     </div>
-                    <div class="pagination-limit">
-                        <label for="limit-select">Items per page:</label>
-                        <select
-                            id="limit-select"
-                        >
-                            {validLimits.map((l) => (
-                                <option value={l} selected={l === limit}>
-                                    {l}
-                                </option>
-                            ))}
-                        </select>
-                        <span class="total-items">({totalItems} videos total)</span>
-                    </div>
                 </div>
             )
         }
-        <p class="footnote">
-            This bookmarks list is automatically updated daily and synced with
+        <hr />
+        <p class="footnote text-sm">
+            This video playlist is automatically updated daily and synced with
             my YouTube account.
         </p>
     </div>
 </BaseLayout>
 
-<script>
+<script define:vars={{ allVideos: videosData, validLimits, uniqueYears, uniqueChannels }}>
+    // Get elements
+    const gridContainer = document.getElementById('video-grid-container');
+    const prevButton = document.getElementById('prev-button');
+    const nextButton = document.getElementById('next-button');
+    const pageInfo = document.getElementById('page-info');
     const limitSelect = document.getElementById('limit-select');
-    if (limitSelect) {
-        limitSelect.addEventListener('change', (event) => {
-            // In JS, event.target for a change event on a select element
-            // should have a 'value' property.
+    const totalItemsInfo = document.getElementById('total-items-info'); // Added for consistency
+    const yearSelect = document.getElementById('year-select'); // New filter element
+    const channelSelect = document.getElementById('channel-select'); // New filter element
+
+    // State variables
+    let currentPage = 1;
+    let itemsPerPage = validLimits[0];
+    const globalTotalItems = allVideos.length; // Keep track of the original total
+    let totalPages = 1;
+    let selectedYear = 'all'; // New filter state
+    let selectedChannelId = 'all'; // New filter state
+
+    function updateUrl() {
+        const url = new URL(window.location.href);
+        url.searchParams.set('page', currentPage.toString());
+        url.searchParams.set('limit', itemsPerPage.toString());
+        url.searchParams.set('year', selectedYear); // Add year param
+        url.searchParams.set('channel', selectedChannelId); // Add channel param
+        // Use pushState to change URL without reloading
+        history.pushState({}, '', url.toString());
+    }
+
+    function renderPage() {
+        if (!gridContainer || !pageInfo || !prevButton || !nextButton || !limitSelect || !yearSelect || !channelSelect) return;
+
+        // --- Apply Filters ---
+        let filteredVideos = allVideos;
+        if (selectedYear !== 'all') {
+            filteredVideos = filteredVideos.filter(video => video.published_at.startsWith(selectedYear));
+        }
+        if (selectedChannelId !== 'all') {
+            filteredVideos = filteredVideos.filter(video => video.video_owner_channel_id === selectedChannelId);
+        }
+        // --- End Apply Filters ---
+
+        const currentTotalItems = filteredVideos.length;
+        totalPages = Math.ceil(currentTotalItems / itemsPerPage);
+        // Clamp currentPage based on filtered results
+        currentPage = Math.max(1, Math.min(currentPage, totalPages > 0 ? totalPages : 1)); // Ensure currentPage is at least 1
+
+        const offset = (currentPage - 1) * itemsPerPage;
+        const videosToShow = filteredVideos.slice(offset, offset + itemsPerPage);
+
+        const maxLength = 40; // Max characters for title
+
+        // Generate grid HTML or "No results" message
+        if (videosToShow.length > 0) {
+            gridContainer.innerHTML = videosToShow.map(video => {
+                let displayTitle = video.title;
+                if (displayTitle.length > maxLength) {
+                    // Find the last space before maxLength to avoid cutting words
+                    const lastSpace = displayTitle.lastIndexOf(' ', maxLength - 1);
+                    if (lastSpace > maxLength / 2) { // Only truncate at space if it's reasonably far in
+                         displayTitle = displayTitle.substring(0, lastSpace) + '…';
+                    } else {
+                         displayTitle = displayTitle.substring(0, maxLength - 1) + '…'; // Hard cut if no good space
+                    }
+                }
+
+                // Use displayTitle in the HTML
+                return `
+                <a
+                    href="${video.url}"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    class="flex flex-col no-underline text-inherit rounded-lg overflow-hidden shadow-md hover:shadow-xl hover:-translate-y-1 transition duration-200 ease-in-out"
+                    title="${video.title}" // Keep full title for hover tooltip
+                >
+                    <img
+                        src="${video.thumbnail_url}"
+                        alt="${video.title}" // Keep full title for alt text
+                        loading="lazy"
+                        class="w-full aspect-video object-cover block"
+                    />
+                    <p class="px-3 pt-3 pb-4 text-sm m-0 leading-tight">
+                        ${displayTitle}
+                    </p>
+                </a>
+            `}).join('');
+        } else {
+             gridContainer.innerHTML = `
+                <div class="col-span-full text-center py-10">
+                    <p class="text-lg text-[color:var(--text-secondary)]">No videos found matching your filters.</p>
+                </div>
+             `;
+        }
+
+
+        // Update pagination info
+        pageInfo.textContent = `Page ${currentPage} of ${totalPages > 0 ? totalPages : 1}`; // Show Page 1 of 1 if no results
+
+        // Update button states and links (disable if no pages or only one page)
+        const hasPrev = currentPage > 1 && totalPages > 0;
+        const hasNext = currentPage < totalPages && totalPages > 0;
+
+        prevButton.classList.toggle('disabled', !hasPrev);
+        prevButton.setAttribute('aria-disabled', (!hasPrev).toString());
+        prevButton.href = hasPrev ? '#' : '#'; // Href updated in handler, just control state here
+
+        nextButton.classList.toggle('disabled', !hasNext);
+        nextButton.setAttribute('aria-disabled', (!hasNext).toString());
+        nextButton.href = hasNext ? '#' : '#'; // Href updated in handler, just control state here
+
+
+        // Update selected limit, year, and channel in dropdowns
+        limitSelect.value = itemsPerPage.toString();
+        yearSelect.value = selectedYear;
+        channelSelect.value = selectedChannelId;
+
+        // Update total items info
+        if (currentTotalItems === globalTotalItems) {
+            totalItemsInfo.textContent = `(${globalTotalItems} videos)`;
+        } else {
+            totalItemsInfo.textContent = `(${currentTotalItems} of ${globalTotalItems} videos)`;
+        }
+    }
+
+    function handleNavClick(event, newPage) {
+         event.preventDefault(); // Prevent default link navigation
+         // Calculate totalPages based on current filters and itemsPerPage *before* checking bounds
+         let currentFilteredVideos = allVideos;
+         if (selectedYear !== 'all') {
+             currentFilteredVideos = currentFilteredVideos.filter(video => video.published_at.startsWith(selectedYear));
+         }
+         if (selectedChannelId !== 'all') {
+             currentFilteredVideos = currentFilteredVideos.filter(video => video.video_owner_channel_id === selectedChannelId);
+         }
+         const currentTotalItems = currentFilteredVideos.length;
+         const currentTotalPages = Math.ceil(currentTotalItems / itemsPerPage);
+
+         if (newPage < 1 || newPage > (currentTotalPages > 0 ? currentTotalPages : 1)) return; // Check bounds against current filtered total pages
+
+         currentPage = newPage;
+         updateUrl();
+         renderPage();
+    }
+
+    function initPagination() {
+        if (!limitSelect || !yearSelect || !channelSelect) return; // Ensure elements exist
+
+        const urlParams = new URLSearchParams(window.location.search);
+        const initialPage = parseInt(urlParams.get('page') || '1');
+        const initialLimit = parseInt(urlParams.get('limit') || validLimits[0].toString());
+        const initialYear = urlParams.get('year') || 'all';
+        const initialChannel = urlParams.get('channel') || 'all';
+
+
+        // Set Limit
+        if (!isNaN(initialLimit) && validLimits.includes(initialLimit)) {
+             itemsPerPage = initialLimit;
+        } else {
+             itemsPerPage = validLimits[0]; // Default if invalid limit in URL
+        }
+        limitSelect.value = itemsPerPage.toString(); // Set initial dropdown value
+
+        // Set Year Filter
+        // Validate initialYear against uniqueYears (passed from server)
+        if (initialYear === 'all' || uniqueYears.includes(initialYear)) {
+            selectedYear = initialYear;
+        } else {
+            selectedYear = 'all'; // Default if invalid
+        }
+        yearSelect.value = selectedYear;
+
+        // Set Channel Filter
+        // Validate initialChannel against uniqueChannels (passed from server)
+        const validChannelIds = ['all', ...uniqueChannels.map(c => c.id)];
+        if (validChannelIds.includes(initialChannel)) {
+            selectedChannelId = initialChannel;
+        } else {
+            selectedChannelId = 'all'; // Default if invalid
+        }
+        channelSelect.value = selectedChannelId;
+
+
+        // Apply filters to determine initial total pages before setting current page
+        let initialFilteredVideos = allVideos;
+        if (selectedYear !== 'all') {
+            initialFilteredVideos = initialFilteredVideos.filter(video => video.published_at.startsWith(selectedYear));
+        }
+        if (selectedChannelId !== 'all') {
+            initialFilteredVideos = initialFilteredVideos.filter(video => video.video_owner_channel_id === selectedChannelId);
+        }
+        const initialTotalItems = initialFilteredVideos.length;
+        totalPages = Math.ceil(initialTotalItems / itemsPerPage); // Set initial totalPages based on filters
+
+        // Set Current Page
+        if (!isNaN(initialPage) && initialPage >= 1 && initialPage <= (totalPages > 0 ? totalPages : 1)) {
+             currentPage = initialPage;
+        } else {
+             currentPage = 1; // Default if invalid page in URL or no pages
+        }
+
+        // Initial render
+        renderPage();
+        // Update URL to reflect initial state (or cleaned state)
+        updateUrl();
+
+        // Add event listeners
+
+        // --- Remove existing listeners first to avoid duplicates on popstate/HMR ---
+        // Helper to remove/add listener
+        const replaceListener = (element, eventType, newHandler) => {
+            if (element._handler) { // Remove previous handler if stored
+                element.removeEventListener(eventType, element._handler);
+            }
+            element.addEventListener(eventType, newHandler);
+            element._handler = newHandler; // Store the new handler
+        };
+
+        // --- Filter Listeners ---
+        const handleYearChange = (event) => {
             const target = event.target;
             if (target && 'value' in target) {
-              window.location.href = `?page=1&limit=${target.value}`;
+                selectedYear = target.value;
+                currentPage = 1; // Reset to first page on filter change
+                updateUrl();
+                renderPage();
             }
-        });
+        };
+        replaceListener(yearSelect, 'change', handleYearChange);
+
+
+        const handleChannelChange = (event) => {
+            const target = event.target;
+             if (target && 'value' in target) {
+                selectedChannelId = target.value;
+                currentPage = 1; // Reset to first page on filter change
+                updateUrl();
+                renderPage();
+             }
+        };
+        replaceListener(channelSelect, 'change', handleChannelChange);
+
+
+        // --- Pagination Listeners ---
+        const handleLimitChange = (event) => {
+            const target = event.target;
+            if (target && 'value' in target) {
+                const newLimit = parseInt(target.value);
+                if (!isNaN(newLimit) && validLimits.includes(newLimit)) {
+                    itemsPerPage = newLimit;
+                    currentPage = 1; // Reset to first page on limit change
+                    updateUrl();
+                    renderPage();
+                }
+            }
+        };
+        replaceListener(limitSelect, 'change', handleLimitChange);
+
+
+        const handlePrevClick = (event) => {
+            handleNavClick(event, currentPage - 1);
+        };
+        replaceListener(prevButton, 'click', handlePrevClick);
+
+
+        const handleNextClick = (event) => {
+             handleNavClick(event, currentPage + 1);
+        };
+        replaceListener(nextButton, 'click', handleNextClick);
+
+
+        // Handle browser back/forward buttons
+        // Avoid adding multiple popstate listeners
+        if (!window._popstateHandled) {
+             window.addEventListener('popstate', () => {
+                // console.log("Popstate triggered, re-initializing pagination.");
+                initPagination(); // Re-initialize based on the new URL state
+             });
+             window._popstateHandled = true;
+        }
     }
+
+    // Run initialization when the DOM is ready
+    // Use standard DOMContentLoaded listener
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initPagination);
+    } else {
+        // DOM is already loaded, but Astro might still be initializing islands/scripts.
+        // A small timeout can sometimes help ensure dependent elements are ready,
+        // though ideally Astro's lifecycle handles this.
+        // Alternatively, if issues persist, consider Astro's client:visible or client:idle directives.
+        setTimeout(initPagination, 0); // Use setTimeout 0 to queue after current JS execution
+    }
+
 </script>
-
-<style>
-    /* Style the last paragraph as a footnote */
-    p.footnote {
-        font-size: 0.85em; /* Smaller font size */
-        color: var(--text-secondary, grey); /* Muted color */
-        margin-top: 2em; /* Add some space above it */
-    }
-
-    .video-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-        gap: 1.5rem;
-        margin-top: 2rem;
-        margin-bottom: 2rem;
-    }
-
-    .video-item {
-        display: flex;
-        flex-direction: column;
-        text-decoration: none;
-        color: inherit;
-        background-color: var(--bg-secondary, #f9f9f9);
-        border-radius: 8px;
-        overflow: hidden;
-        transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    }
-
-    .video-item:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
-    }
-
-    .video-item img {
-        width: 100%;
-        height: auto;
-        aspect-ratio: 16 / 9; /* Maintain aspect ratio */
-        object-fit: cover;
-        display: block; /* Remove bottom space */
-    }
-
-    .video-title {
-        padding: 0.75rem;
-        font-size: 0.9em;
-        margin: 0;
-        line-height: 1.3;
-        /* Clamp title to 2 lines */
-        display: -webkit-box;
-        -webkit-line-clamp: 2;
-        -webkit-box-orient: vertical;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        min-height: calc(2 * 1.3em); /* Ensure space for 2 lines */
-    }
-
-    .pagination-controls {
-        margin-top: 2.5rem;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        gap: 1rem;
-        font-size: 0.95em;
-        border-top: 1px solid var(--border-color, #eee);
-        padding-top: 1.5rem;
-    }
-
-    .pagination-nav {
-        display: flex;
-        align-items: center;
-        gap: 1rem;
-    }
-
-    .nav-button {
-        padding: 0.5em 1em;
-        border: 1px solid var(--border-color, #ddd);
-        border-radius: 4px;
-        text-decoration: none;
-        color: var(--text-link, blue);
-        background-color: var(--bg-secondary, #fff);
-        transition: background-color 0.2s;
-    }
-
-    .nav-button:hover:not(.disabled) {
-        background-color: var(--bg-tertiary, #f0f0f0);
-    }
-
-    .nav-button.disabled {
-        color: var(--text-muted, #aaa);
-        pointer-events: none;
-        border-color: var(--border-color-muted, #eee);
-        background-color: var(--bg-muted, #f9f9f9);
-    }
-
-    .pagination-limit {
-        display: flex;
-        align-items: center;
-        gap: 0.5rem;
-        color: var(--text-secondary, grey);
-    }
-
-    #limit-select {
-        padding: 0.3em 0.5em;
-        border-radius: 4px;
-        border: 1px solid var(--border-color, #ddd);
-    }
-
-    .total-items {
-      margin-left: 0.5rem;
-      font-style: italic;
-    }
-</style>
