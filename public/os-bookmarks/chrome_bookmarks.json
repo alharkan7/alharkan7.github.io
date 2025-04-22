@@ -2305,6 +2305,12 @@
                         "name": "AI Engineer World's Fair",
                         "url": "https://www.ai.engineer/",
                         "date_added": "13389716278789009"
+                    },
+                    {
+                        "type": "url",
+                        "name": "xsai.js.org",
+                        "url": "https://xsai.js.org/",
+                        "date_added": "13389810683755555"
                     }
                 ],
                 "date_added": "13313210870914736"
@@ -3549,6 +3555,12 @@
                         "name": "Open WebUI",
                         "url": "https://openwebui.com/",
                         "date_added": "13389492166115565"
+                    },
+                    {
+                        "type": "url",
+                        "name": "ComputeSDK: Embed compute into your app, agent, or network",
+                        "url": "https://computesdk.com/",
+                        "date_added": "13389789023569623"
                     }
                 ],
                 "date_added": "13313210870769945"
