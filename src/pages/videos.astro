@@ -85,7 +85,7 @@ const nextPageUrl = hasNextPage
         <div class="filter-controls flex justify-center items-center gap-4 my-4">
             <div class="flex items-center">
                  <label for="year-select" class="mr-2 whitespace-nowrap text-sm">Year:</label>
-                 <select id="year-select" class="border rounded px-2 py-1 text-sm dark:bg-gray-700 dark:text-white dark:border-gray-600">
+                 <select id="year-select" class="border rounded px-2 py-1 text-sm bg-[var(--background-body)]">
                     <option value="all">All Years</option>
                     {uniqueYears.map(year => (
                         <option value={year}>{year}</option>
@@ -94,7 +94,7 @@ const nextPageUrl = hasNextPage
             </div>
             <div class="flex items-center">
                 <label for="channel-select" class="mr-2 whitespace-nowrap text-sm">Channel:</label>
-                <select id="channel-select" class="border rounded px-2 py-1 text-sm dark:bg-gray-700 dark:text-white dark:border-gray-600">
+                <select id="channel-select" class="border rounded px-2 py-1 text-sm bg-[var(--background-body)]">
                     <option value="all">All Channels</option>
                     {uniqueChannels.map(channel => {
                         const maxLen = 15;
@@ -107,6 +107,10 @@ const nextPageUrl = hasNextPage
                     })}
                 </select>
             </div>
+            <!-- Remove Filter Button (hidden by default) -->
+            <button id="remove-filters-button" class="hidden text-sm hover:underline focus:outline-none flex justify-start">
+                <span>Remove Filters</span>
+            </button>
         </div>
 
         <!-- Video Grid -->
@@ -131,7 +135,7 @@ const nextPageUrl = hasNextPage
                     {/* Items per page selector (appears first visually on larger screens due to flex order) */}
                     <div class="pagination-limit flex items-center order-1 sm:order-1">
                         <label for="limit-select" class="mr-2 whitespace-nowrap">Items:</label>
-                        <select id="limit-select" class="border rounded px-2 py-1 text-sm dark:bg-gray-700 dark:text-white dark:border-gray-600">
+                        <select id="limit-select" class="border rounded px-2 py-1 text-sm bg-[var(--background-body)]">
                             {validLimits.map((l) => (
                                 <option value={l}>{l}</option>
                             ))}
@@ -182,6 +186,7 @@ const nextPageUrl = hasNextPage
     const totalItemsInfo = document.getElementById('total-items-info'); // Added for consistency
     const yearSelect = document.getElementById('year-select'); // New filter element
     const channelSelect = document.getElementById('channel-select'); // New filter element
+    const removeFiltersButton = document.getElementById('remove-filters-button'); // New button
 
     // State variables
     let currentPage = 1;
@@ -238,7 +243,19 @@ const nextPageUrl = hasNextPage
                     }
                 }
 
-                // Use displayTitle in the HTML
+                // Check for valid thumbnail URL
+                const imageUrl = video.thumbnail_url;
+                const imageHtml = imageUrl && typeof imageUrl === 'string' && imageUrl.trim() !== ''
+                    ? `<img
+                            src="${imageUrl}"
+                            alt="${video.title}" // Keep full title for alt text
+                            loading="lazy"
+                            class="w-full aspect-video object-cover block"
+                        />`
+                    : `<div class="w-full aspect-video bg-gray-200 dark:bg-gray-600 flex items-center justify-center">
+                            <span class="text-xs text-gray-500 dark:text-gray-400">No Thumbnail</span>
+                        </div>`;
+
                 return `
                 <a
                     href="${video.url}"
@@ -247,12 +264,7 @@ const nextPageUrl = hasNextPage
                     class="flex flex-col no-underline text-inherit rounded-lg overflow-hidden shadow-md hover:shadow-xl hover:-translate-y-1 transition duration-200 ease-in-out"
                     title="${video.title}" // Keep full title for hover tooltip
                 >
-                    <img
-                        src="${video.thumbnail_url}"
-                        alt="${video.title}" // Keep full title for alt text
-                        loading="lazy"
-                        class="w-full aspect-video object-cover block"
-                    />
+                    ${imageHtml}
                     <p class="px-3 pt-3 pb-4 text-sm m-0 leading-tight">
                         ${displayTitle}
                     </p>
@@ -261,7 +273,7 @@ const nextPageUrl = hasNextPage
         } else {
              gridContainer.innerHTML = `
                 <div class="col-span-full text-center py-10">
-                    <p class="text-lg text-[color:var(--text-secondary)]">No videos found matching your filters.</p>
+                    <p class="text-lg text-[color:var(--text-secondary)]">No videos match your filters.<br>Try removing a filter.</p>
                 </div>
              `;
         }
@@ -269,6 +281,13 @@ const nextPageUrl = hasNextPage
 
         // Update pagination info
         pageInfo.textContent = `Page ${currentPage} of ${totalPages > 0 ? totalPages : 1}`; // Show Page 1 of 1 if no results
+
+        // --- Show/Hide Remove Filters Button ---
+        if (removeFiltersButton) {
+            const filtersActive = selectedYear !== 'all' || selectedChannelId !== 'all';
+            removeFiltersButton.classList.toggle('hidden', !filtersActive);
+        }
+        // --- End Show/Hide --- 
 
         // Update button states and links (disable if no pages or only one page)
         const hasPrev = currentPage > 1 && totalPages > 0;
@@ -441,6 +460,19 @@ const nextPageUrl = hasNextPage
         };
         replaceListener(nextButton, 'click', handleNextClick);
 
+
+        // --- Remove Filters Listener ---
+        const handleRemoveFilters = (event) => {
+            event.preventDefault();
+            selectedYear = 'all';
+            selectedChannelId = 'all';
+            currentPage = 1;
+            updateUrl();
+            renderPage(); // This will also hide the button again
+        };
+        if (removeFiltersButton) {
+             replaceListener(removeFiltersButton, 'click', handleRemoveFilters);
+        }
 
         // Handle browser back/forward buttons
         // Avoid adding multiple popstate listeners
