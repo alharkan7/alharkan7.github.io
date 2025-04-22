@@ -236,8 +236,9 @@ if (!validLimits.includes(initialLimit)) {
         // Pass only necessary data, NOT the full video list
         initialTotalItems: totalItems,
         validLimits,
-        initialUniqueYears: uniqueYears, // Pass build-time filters
-        initialUniqueChannels: uniqueChannels, // Pass build-time filters
+        // Keep build-time lists for initial render & validation
+        initialUniqueYears: uniqueYears,
+        initialUniqueChannels: uniqueChannels,
         jsonUrl: '/os-bookmarks/liked_videos.json' // URL to fetch
     }}
 >
@@ -262,9 +263,9 @@ if (!validLimits.includes(initialLimit)) {
     let totalPages = 1;
     let selectedYear = "all";
     let selectedChannelId = "all";
-    // Keep track of build-time filters for validation
-    const uniqueYears = initialUniqueYears.map(y => y); // Simple clone
-    const uniqueChannels = initialUniqueChannels.map(c => ({ ...c })); // Simple clone
+    // Keep track of build-time filters for validation/initial state
+    const uniqueYearsFromBuild = initialUniqueYears.map(y => y);
+    const uniqueChannelsFromBuild = initialUniqueChannels.map(c => ({ ...c }));
 
 
     function updateUrl() {
@@ -276,6 +277,104 @@ if (!validLimits.includes(initialLimit)) {
         // Use pushState to change URL without reloading
         history.pushState({}, "", url.toString());
     }
+
+    // --- Functions to Update Dropdown Options ---
+
+    function updateYearOptions() {
+        if (!yearSelect || allVideos.length === 0) return;
+
+        // Determine available years based on the *selected channel*
+        const videosForSelectedChannel = selectedChannelId === "all"
+            ? allVideos
+            : allVideos.filter(v => v.video_owner_channel_id === selectedChannelId);
+
+        const availableYears = [
+            ...new Set(videosForSelectedChannel.map((v) => v.published_at?.substring(0, 4)).filter(Boolean))
+        ].sort((a, b) => parseInt(b) - parseInt(a)); // Sort descending
+
+        // Preserve current selection if still valid
+        const currentSelectedYearIsValid = availableYears.includes(selectedYear);
+        if (!currentSelectedYearIsValid && selectedYear !== "all") {
+            // If the current selection is no longer valid due to the channel filter,
+            // we don't reset it here, as the user might be switching *between* filters.
+            // The main filtering logic in renderPage will handle showing "no results".
+            // We just ensure the option is visually available if possible.
+        }
+
+        // Update options
+        let optionsHtml = '<option value="all">All Years</option>';
+        availableYears.forEach(year => {
+            optionsHtml += `<option value="${year}" ${year === selectedYear ? 'selected' : ''}>${year}</option>`;
+        });
+
+        // Add the currently selected year back if it was filtered out, but keep it selected
+        // This prevents the dropdown from visually resetting while the user is actively filtering
+        if (selectedYear !== "all" && !availableYears.includes(selectedYear)) {
+             optionsHtml += `<option value="${selectedYear}" selected style="display: none;">${selectedYear} (filtered)</option>`; // Add hidden option
+        }
+
+
+        yearSelect.innerHTML = optionsHtml;
+        yearSelect.value = selectedYear; // Ensure the value property matches state
+        yearSelect.disabled = availableYears.length === 0 && selectedChannelId === "all"; // Disable only if truly no options
+    }
+
+
+     function updateChannelOptions() {
+        if (!channelSelect || allVideos.length === 0) return;
+
+        // Determine available channels based on the *selected year*
+        const videosForSelectedYear = selectedYear === "all"
+            ? allVideos
+            : allVideos.filter(v => v.published_at?.startsWith(selectedYear));
+
+        const availableChannelsMap = new Map();
+        videosForSelectedYear.forEach((v) => {
+            if (v.video_owner_channel_id && !availableChannelsMap.has(v.video_owner_channel_id)) {
+                availableChannelsMap.set(
+                    v.video_owner_channel_id,
+                    v.video_owner_channel_title || 'Unknown Channel'
+                );
+            }
+        });
+
+        const availableChannels = Array.from(availableChannelsMap.entries())
+            .map(([id, title]) => ({ id, title }))
+            .sort((a, b) => a.title.localeCompare(b.title)); // Sort alphabetically
+
+        // Preserve current selection if still valid
+        const currentSelectedChannelIsValid = availableChannels.some(c => c.id === selectedChannelId);
+         if (!currentSelectedChannelIsValid && selectedChannelId !== "all") {
+             // Similar logic as for years - don't reset automatically
+         }
+
+        // Update options
+        let optionsHtml = '<option value="all">All Channels</option>';
+        const maxLen = 15; // Title truncation length
+        availableChannels.forEach(channel => {
+            const displayTitle = channel.title.length > maxLen
+                ? channel.title.substring(0, maxLen) + "…"
+                : channel.title;
+            optionsHtml += `<option value="${channel.id}" title="${channel.title}" ${channel.id === selectedChannelId ? 'selected' : ''}>${displayTitle}</option>`;
+        });
+
+         // Add the currently selected channel back if it was filtered out, but keep it selected
+        if (selectedChannelId !== "all" && !availableChannels.some(c => c.id === selectedChannelId)) {
+             // Find the original title from build-time data or fallback
+             const originalChannel = uniqueChannelsFromBuild.find(c => c.id === selectedChannelId);
+             const title = originalChannel ? originalChannel.title : 'Unknown Channel (filtered)';
+             const displayTitle = title.length > maxLen ? title.substring(0, maxLen) + "…" : title;
+             optionsHtml += `<option value="${selectedChannelId}" title="${title}" selected style="display: none;">${displayTitle} (filtered)</option>`; // Add hidden option
+        }
+
+
+        channelSelect.innerHTML = optionsHtml;
+        channelSelect.value = selectedChannelId; // Ensure the value property matches state
+        channelSelect.disabled = availableChannels.length === 0 && selectedYear === "all"; // Disable only if truly no options
+    }
+
+
+    // --- End Functions to Update Dropdown Options ---
 
     function renderPage() {
          // console.log("Render page called. Loading:", isDataLoading, "Data length:", allVideos.length);
@@ -291,7 +390,7 @@ if (!validLimits.includes(initialLimit)) {
 
 
         if (isDataLoading) {
-            // If still loading, ensure pagination/filters are disabled
+            // If still loading, ensure pagination/filters are disabled (or use build-time defaults)
             pageSelect.disabled = true;
             pageTotalSpan.textContent = "of ?";
             prevButton.classList.add("disabled");
@@ -299,6 +398,7 @@ if (!validLimits.includes(initialLimit)) {
             nextButton.classList.add("disabled");
             nextButton.setAttribute("aria-disabled", "true");
             limitSelect.disabled = true;
+            // Keep build-time options visible but disabled during initial load
             yearSelect.disabled = true;
             channelSelect.disabled = true;
             if (removeFiltersButton) removeFiltersButton.disabled = true;
@@ -308,19 +408,20 @@ if (!validLimits.includes(initialLimit)) {
         }
 
         // --- Data Loaded ---
-        // Enable controls now that data is loaded
+        // Enable core controls now that data is loaded
         limitSelect.disabled = false;
-        yearSelect.disabled = false;
-        channelSelect.disabled = false;
-        pageSelect.disabled = totalPages <= 1; // Disable if only one page
-        if (removeFiltersButton) removeFiltersButton.disabled = false;
 
+        // --- Update Dropdown Options BASED on current state ---
+        updateYearOptions(); // Update year options based on selectedChannelId
+        updateChannelOptions(); // Update channel options based on selectedYear
+        // --- End Update Dropdown Options ---
 
         // --- Apply Filters ---
         let filteredVideos = allVideos;
         if (selectedYear !== "all") {
+            // Ensure filtering uses optional chaining for safety if published_at is missing
             filteredVideos = filteredVideos.filter((video) =>
-                video.published_at && video.published_at.startsWith(selectedYear),
+                video.published_at?.startsWith(selectedYear),
             );
         }
         if (selectedChannelId !== "all") {
@@ -332,7 +433,14 @@ if (!validLimits.includes(initialLimit)) {
 
         const currentTotalItems = filteredVideos.length;
         totalPages = Math.ceil(currentTotalItems / itemsPerPage);
-        currentPage = Math.max(1, Math.min(currentPage, totalPages > 0 ? totalPages : 1));
+        // Ensure currentPage is valid after filtering
+        if (totalPages > 0 && currentPage > totalPages) {
+            currentPage = totalPages; // Go to last page if current page is too high
+        } else if (totalPages === 0) {
+            currentPage = 1; // Reset to page 1 if no results
+        }
+        currentPage = Math.max(1, currentPage); // Ensure it's at least 1
+
 
         const offset = (currentPage - 1) * itemsPerPage;
         const videosToShow = filteredVideos.slice(offset, offset + itemsPerPage);
@@ -373,16 +481,16 @@ if (!validLimits.includes(initialLimit)) {
         } else {
             gridContainer.innerHTML = `
                 <div class="col-span-full text-center py-10">
-                    <p class="text-lg text-[color:var(--text-secondary)]">No videos match your filters.<br>Try removing a filter.</p>
+                    <p class="text-lg text-[color:var(--text-secondary)]">No videos match your filters.<br>${selectedYear !== 'all' || selectedChannelId !== 'all' ? 'Try adjusting or clearing filters.' : ''}</p>
                 </div>`;
         }
 
-        // --- Update Page Select Dropdown --- 
+        // --- Update Page Select Dropdown ---
         pageTotalSpan.textContent = `of ${totalPages > 0 ? totalPages : 1}`;
         // Populate dropdown options
         pageSelect.innerHTML = ''; // Clear previous options
         const maxOptionsToShow = 500; // Limit options for performance if totalPages is huge
-        for (let i = 1; i <= Math.min(totalPages, maxOptionsToShow); i++) {
+        for (let i = 1; i <= Math.min(totalPages > 0 ? totalPages : 1, maxOptionsToShow); i++) { // Ensure loop runs even if totalPages is 0
             const option = document.createElement('option');
             option.value = i.toString();
             option.textContent = i.toString();
@@ -398,12 +506,13 @@ if (!validLimits.includes(initialLimit)) {
         }
         pageSelect.value = currentPage.toString();
         pageSelect.disabled = totalPages <= 1; // Re-evaluate disable state
-        // --- End Update Page Select --- 
+        // --- End Update Page Select ---
 
         // --- Show/Hide Remove Filters Button ---
         if (removeFiltersButton) {
             const filtersActive = selectedYear !== "all" || selectedChannelId !== "all";
             removeFiltersButton.classList.toggle("hidden", !filtersActive);
+            removeFiltersButton.disabled = !filtersActive; // Also disable if not active
         }
 
         // Update button states
@@ -416,10 +525,9 @@ if (!validLimits.includes(initialLimit)) {
         nextButton.classList.toggle("disabled", !hasNext);
         nextButton.setAttribute("aria-disabled", (!hasNext).toString());
 
-        // Ensure dropdowns reflect current state (might have been set by URL initially)
-        limitSelect.value = itemsPerPage.toString();
-        yearSelect.value = selectedYear;
-        channelSelect.value = selectedChannelId;
+        // Ensure filter dropdowns correctly reflect state (value was set within updateXXXOptions)
+        // yearSelect.value = selectedYear;
+        // channelSelect.value = selectedChannelId;
     }
 
     function handleNavClick(event, newPage) {
@@ -429,7 +537,7 @@ if (!validLimits.includes(initialLimit)) {
         // Recalculate total pages based on current filters *before* checking bounds
         let currentFilteredVideos = allVideos;
         if (selectedYear !== "all") {
-             currentFilteredVideos = currentFilteredVideos.filter(v => v.published_at && v.published_at.startsWith(selectedYear));
+             currentFilteredVideos = currentFilteredVideos.filter(v => v.published_at?.startsWith(selectedYear));
         }
         if (selectedChannelId !== "all") {
             currentFilteredVideos = currentFilteredVideos.filter(v => v.video_owner_channel_id === selectedChannelId);
@@ -449,7 +557,7 @@ if (!validLimits.includes(initialLimit)) {
         // console.log("Initializing and fetching data...");
         isDataLoading = true;
         if (errorMessageElement) errorMessageElement.classList.add('hidden'); // Hide previous errors
-        renderPage(); // Show initial loading state
+        renderPage(); // Show initial loading state (with build-time dropdowns disabled)
 
         try {
             // console.log(`Fetching from: ${jsonUrl}`);
@@ -475,65 +583,50 @@ if (!validLimits.includes(initialLimit)) {
             }
              // --- End Validation ---
 
-            allVideos = data; // Store fetched data globally
-            // Filter out videos titled "Private Video"
-            allVideos = allVideos.filter(video => video.title !== "Private video");
+            // Filter out videos titled "Private Video" immediately after fetch
+            allVideos = data.filter(video => video.title !== "Private video");
 
-            isDataLoading = false; // Mark loading as complete
+            isDataLoading = false; // Mark loading as complete BEFORE setting state
 
             // --- Set Initial State from URL AFTER data load ---
-        const urlParams = new URLSearchParams(window.location.search);
-        const initialPage = parseInt(urlParams.get("page") || "1");
-             const initialLimit = parseInt(urlParams.get("limit") || validLimits[0].toString());
-        const initialYear = urlParams.get("year") || "all";
-        const initialChannel = urlParams.get("channel") || "all";
+            const urlParams = new URLSearchParams(window.location.search);
+            const initialPage = parseInt(urlParams.get("page") || "1");
+            const initialLimit = parseInt(urlParams.get("limit") || validLimits[0].toString());
+            const initialYear = urlParams.get("year") || "all";
+            const initialChannel = urlParams.get("channel") || "all";
 
-        // Set Limit
-             if (validLimits.includes(initialLimit)) {
-            itemsPerPage = initialLimit;
-        } else {
-                 itemsPerPage = validLimits[0];
-        }
-             limitSelect.value = itemsPerPage.toString();
+            // Set Limit
+            itemsPerPage = validLimits.includes(initialLimit) ? initialLimit : validLimits[0];
+            limitSelect.value = itemsPerPage.toString();
 
-             // Set Year Filter (Validate against build-time filters)
-        if (initialYear === "all" || uniqueYears.includes(initialYear)) {
-            selectedYear = initialYear;
-        } else {
-                  selectedYear = "all";
-        }
-        yearSelect.value = selectedYear;
+            // Set Year Filter (Validate against potentially available years AFTER fetch)
+            // Note: Validation against build-time list is less useful now, but kept for consistency
+            const allFetchedYears = [...new Set(allVideos.map(v => v.published_at?.substring(0, 4)).filter(Boolean))];
+            selectedYear = (initialYear === "all" || allFetchedYears.includes(initialYear)) ? initialYear : "all";
+            // yearSelect.value will be set by updateYearOptions within renderPage
 
-             // Set Channel Filter (Validate against build-time filters)
-        const validChannelIds = ["all", ...uniqueChannels.map((c) => c.id)];
-        if (validChannelIds.includes(initialChannel)) {
-            selectedChannelId = initialChannel;
-        } else {
-                  selectedChannelId = "all";
-        }
-        channelSelect.value = selectedChannelId;
+            // Set Channel Filter (Validate against potentially available channels AFTER fetch)
+            const allFetchedChannelIds = ["all", ...new Set(allVideos.map(v => v.video_owner_channel_id).filter(Boolean))];
+            selectedChannelId = allFetchedChannelIds.includes(initialChannel) ? initialChannel : "all";
+            // channelSelect.value will be set by updateChannelOptions within renderPage
 
-        // Apply filters to determine initial total pages before setting current page
-        let initialFilteredVideos = allVideos;
-        if (selectedYear !== "all") {
-                  initialFilteredVideos = initialFilteredVideos.filter(v => v.published_at && v.published_at.startsWith(selectedYear));
-        }
-        if (selectedChannelId !== "all") {
-                  initialFilteredVideos = initialFilteredVideos.filter(v => v.video_owner_channel_id === selectedChannelId);
-              }
-              const initialFilteredTotalItems = initialFilteredVideos.length;
-              totalPages = Math.ceil(initialFilteredTotalItems / itemsPerPage);
+            // Calculate initial totalPages based on the potentially filtered data (before setting page)
+            let initialFilteredVideos = allVideos;
+            if (selectedYear !== "all") {
+                initialFilteredVideos = initialFilteredVideos.filter(v => v.published_at?.startsWith(selectedYear));
+            }
+            if (selectedChannelId !== "all") {
+                initialFilteredVideos = initialFilteredVideos.filter(v => v.video_owner_channel_id === selectedChannelId);
+            }
+            const initialFilteredTotalItems = initialFilteredVideos.length;
+            totalPages = Math.ceil(initialFilteredTotalItems / itemsPerPage);
 
-              // Set Current Page (Validate against calculated total pages)
-              if (initialPage >= 1 && initialPage <= (totalPages > 0 ? totalPages : 1)) {
-            currentPage = initialPage;
-        } else {
-                   currentPage = 1;
-              }
+            // Set Current Page (Validate against calculated total pages)
+            currentPage = (initialPage >= 1 && initialPage <= (totalPages > 0 ? totalPages : 1)) ? initialPage : 1;
 
             // --- End Set Initial State ---
 
-            renderPage(); // First render with actual data
+            renderPage(); // First render with actual data and updated dropdowns
             updateUrl(); // Sync URL
             setupEventListeners(); // Add listeners now that data is ready
 
@@ -547,10 +640,10 @@ if (!validLimits.includes(initialLimit)) {
              }
             // Optionally disable controls or show a persistent error message in the grid
             gridContainer.innerHTML = `<div class="col-span-full text-center py-10 text-red-600">Failed to load videos.</div>`;
-             // Disable controls on error
+             // Disable controls on error - Keep build-time dropdowns visible but disabled
              if (limitSelect) limitSelect.disabled = true;
-             if (yearSelect) yearSelect.disabled = true;
-             if (channelSelect) channelSelect.disabled = true;
+             if (yearSelect) yearSelect.disabled = true; // Keep disabled
+             if (channelSelect) channelSelect.disabled = true; // Keep disabled
              if (removeFiltersButton) removeFiltersButton.disabled = true;
              if (prevButton) prevButton.classList.add("disabled"); prevButton.setAttribute("aria-disabled", "true");
              if (nextButton) nextButton.classList.add("disabled"); nextButton.setAttribute("aria-disabled", "true");
@@ -577,9 +670,9 @@ if (!validLimits.includes(initialLimit)) {
             const target = event.target;
             if (target && "value" in target) {
                 selectedYear = target.value;
-                currentPage = 1;
+                currentPage = 1; // Reset page when filter changes
                 updateUrl();
-                renderPage();
+                renderPage(); // Re-render which includes updating channel options
             }
         };
         replaceListener(yearSelect, "change", handleYearChange);
@@ -588,9 +681,9 @@ if (!validLimits.includes(initialLimit)) {
             const target = event.target;
             if (target && "value" in target) {
                 selectedChannelId = target.value;
-                currentPage = 1;
+                currentPage = 1; // Reset page when filter changes
                 updateUrl();
-                renderPage();
+                renderPage(); // Re-render which includes updating year options
             }
         };
         replaceListener(channelSelect, "change", handleChannelChange);
@@ -601,7 +694,7 @@ if (!validLimits.includes(initialLimit)) {
                 const newLimit = parseInt(target.value);
                 if (validLimits.includes(newLimit)) {
                     itemsPerPage = newLimit;
-                    currentPage = 1;
+                    currentPage = 1; // Reset page when limit changes
                     updateUrl();
                     renderPage();
                 }
@@ -621,7 +714,7 @@ if (!validLimits.includes(initialLimit)) {
             selectedChannelId = "all";
             currentPage = 1;
             updateUrl();
-            renderPage();
+            renderPage(); // Re-render which includes updating both dropdowns to full lists
         };
         if (removeFiltersButton) {
             replaceListener(removeFiltersButton, "click", handleRemoveFilters);
@@ -632,7 +725,8 @@ if (!validLimits.includes(initialLimit)) {
             const target = event.target;
              if (target && "value" in target) {
                 const newPage = parseInt(target.value);
-                 if (!isNaN(newPage) && newPage >= 1 && newPage <= totalPages) {
+                 // Check against totalPages which is updated in renderPage
+                 if (!isNaN(newPage) && newPage >= 1 && newPage <= (totalPages > 0 ? totalPages : 1)) {
                      currentPage = newPage;
                      updateUrl();
                      renderPage();
@@ -654,11 +748,27 @@ if (!validLimits.includes(initialLimit)) {
                  const popChannel = urlParams.get("channel") || "all";
 
                  // Set state directly from URL
-                 currentPage = popPage;
                  itemsPerPage = validLimits.includes(popLimit) ? popLimit : validLimits[0];
-                 selectedYear = (popYear === "all" || uniqueYears.includes(popYear)) ? popYear : "all";
-                 const validChannelIds = ["all", ...uniqueChannels.map((c) => c.id)];
-                 selectedChannelId = validChannelIds.includes(popChannel) ? popChannel : "all";
+                 // Validate filters against the currently loaded 'allVideos' data
+                 const allFetchedYears = ["all", ...new Set(allVideos.map(v => v.published_at?.substring(0, 4)).filter(Boolean))];
+                 selectedYear = allFetchedYears.includes(popYear) ? popYear : "all";
+
+                 const allFetchedChannelIds = ["all", ...new Set(allVideos.map(v => v.video_owner_channel_id).filter(Boolean))];
+                 selectedChannelId = allFetchedChannelIds.includes(popChannel) ? popChannel : "all";
+
+                 // Recalculate totalPages based on pop state filters before setting page
+                 let popFilteredVideos = allVideos;
+                 if (selectedYear !== "all") {
+                    popFilteredVideos = popFilteredVideos.filter(v => v.published_at?.startsWith(selectedYear));
+                 }
+                 if (selectedChannelId !== "all") {
+                     popFilteredVideos = popFilteredVideos.filter(v => v.video_owner_channel_id === selectedChannelId);
+                 }
+                 const popFilteredTotalItems = popFilteredVideos.length;
+                 const popTotalPages = Math.ceil(popFilteredTotalItems / itemsPerPage);
+
+                 currentPage = (popPage >= 1 && popPage <= (popTotalPages > 0 ? popTotalPages : 1)) ? popPage : 1;
+
 
                  if (!isDataLoading) { // Only render if data is actually loaded
                     renderPage();
