@@ -18,10 +18,10 @@ const permalink = Astro.site?.href ? `${Astro.site.href}videos` : "/videos";
 
 // Pagination logic
 const urlParams = Astro.url.searchParams;
-const validLimits = [25, 50, 75, 100];
-let limit = parseInt(urlParams.get("limit") || "50");
+const validLimits = [30, 60, 90];
+let limit = parseInt(urlParams.get("limit") || "30");
 if (!validLimits.includes(limit)) {
-    limit = 50; // Default to 50 if invalid limit
+    limit = 30; // Default to 50 if invalid limit
 }
 const page = parseInt(urlParams.get("page") || "1");
 const totalItems = videosData.length;
@@ -101,7 +101,6 @@ const nextPageUrl = hasNextPage
                         <label for="limit-select">Items per page:</label>
                         <select
                             id="limit-select"
-                            onchange={`window.location.href = '?page=1&limit=' + this.value`}
                         >
                             {validLimits.map((l) => (
                                 <option value={l} selected={l === limit}>
@@ -120,6 +119,20 @@ const nextPageUrl = hasNextPage
         </p>
     </div>
 </BaseLayout>
+
+<script>
+    const limitSelect = document.getElementById('limit-select');
+    if (limitSelect) {
+        limitSelect.addEventListener('change', (event) => {
+            // In JS, event.target for a change event on a select element
+            // should have a 'value' property.
+            const target = event.target;
+            if (target && 'value' in target) {
+              window.location.href = `?page=1&limit=${target.value}`;
+            }
+        });
+    }
+</script>
 
 <style>
     /* Style the last paragraph as a footnote */
