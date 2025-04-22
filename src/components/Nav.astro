@@ -163,9 +163,25 @@ const { current = "" } = Astro.props;
 <div class="nav-container">
   <nav>
     <a class={current === "" ? "selected" : ""} href="/">home</a>
-    <a class={current === "threads" ? "selected" : ""} href="/threads"
-      >threads</a
-    >
+
+    <div class="dropdown-container">
+      <a
+        class={current === "bookmarks" ||
+        current === "videos" ||
+        current === "about"
+          ? "selected"
+          : ""}
+        data-dropdown-toggle
+        role="button"
+        tabindex="0"
+        class="dropdown-button">Personal</a
+      >
+      <div class="dropdown-content">
+        <a href="/videos">Videos</a>
+        <a href="/bookmarks">Bookmarks</a>
+        <a href="/about">Profile</a>
+      </div>
+    </div>
 
     <div class="dropdown-container">
       <a
@@ -173,8 +189,6 @@ const { current = "" } = Astro.props;
         current === "stories" ||
         current === "works" ||
         current === "search" ||
-        current === "bookmarks" ||
-        current === "videos" ||
         current === "uncategorized"
           ? "selected"
           : ""}
@@ -187,8 +201,6 @@ const { current = "" } = Astro.props;
         <a href="/shorts">Shorts</a>
         <a href="/stories">Stories</a>
         <a href="/works">Works</a>
-        <a href="/videos">Videos</a>
-        <a href="/bookmarks">Bookmarks</a>
         <!-- <a href="/uncategorized">Uncategorized</a> -->
         <a href="/search">Search</a>
       </div>
@@ -196,21 +208,18 @@ const { current = "" } = Astro.props;
 
     <div class="dropdown-container">
       <a
-        class={current === "links" ||
-        current === "about"
-? "selected" : ""}
+        class={current === "links" ? "selected" : ""}
         data-dropdown-toggle
         role="button"
         tabindex="0"
         class="dropdown-button">Links</a
       >
       <div class="dropdown-content">
-
-        <a href="https://alhrkn.vercel.app" 
-        target="_blank" 
-        class="highlight-link"
-        rel="noopener noreferrer"
-          >Apps</a
+        <a
+          href="https://alhrkn.vercel.app"
+          target="_blank"
+          class="highlight-link"
+          rel="noopener noreferrer">Apps</a
         >
         <!-- <a
           href="https://instagram.com/alhrkn"
@@ -220,12 +229,9 @@ const { current = "" } = Astro.props;
         <a
           href="https://enaiblr.org/apps"
           target="_blank"
-          rel="noopener noreferrer"
-          >Enaiblr</a
+          rel="noopener noreferrer">Enaiblr</a
         >
-        <a href="https://x.com/alhrkn" 
-        target="_blank" 
-        rel="noopener noreferrer"
+        <a href="https://x.com/alhrkn" target="_blank" rel="noopener noreferrer"
           >Twitter</a
         >
         <a
@@ -233,7 +239,6 @@ const { current = "" } = Astro.props;
           target="_blank"
           rel="noopener noreferrer">LinkedIn</a
         >
-        <a href="/about">Profile</a>
         <!-- <a
         href="/logout">Logout</a
       > -->
