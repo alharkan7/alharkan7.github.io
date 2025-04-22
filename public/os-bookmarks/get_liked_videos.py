@@ -15,20 +15,6 @@ SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 CLIENT_SECRETS_FILE = os.path.join(SCRIPT_DIR, "client_secrets.json")
 TOKEN_PICKLE_FILE = os.path.join(SCRIPT_DIR, "token.pickle") # Also store token relative to script
 
-if os.path.exists(TOKEN_PICKLE_FILE):
-    with open(TOKEN_PICKLE_FILE, "rb") as token_file:
-        credentials = pickle.load(token_file)
-        if hasattr(credentials, 'refresh_token') and credentials.refresh_token:
-            print("------------------------------------------")
-            print("Your Refresh Token (Copy this value):")
-            print(credentials.refresh_token)
-            print("------------------------------------------")
-        else:
-            print("Refresh token not found in token.pickle. Please ensure you completed the auth flow.")
-else:
-    print(f"{TOKEN_PICKLE_FILE} not found. Run the main script first to authenticate.")
-
-
 def get_authenticated_service():
     """Authenticates the user and returns the YouTube API service object."""
     credentials = None
