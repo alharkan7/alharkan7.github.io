@@ -157,7 +157,7 @@ const nextPageUrl = hasNextPage
                 class="col-span-full flex flex-col items-center justify-center min-h-[200px]"
             >
                 <div
-                    class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2"
+                    class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-[var(--primary-color)]"
                 >
                 </div>
                 <p class="mt-4">Loading Videos...</p>
@@ -167,8 +167,8 @@ const nextPageUrl = hasNextPage
         <!-- Pagination Controls -->
         {
             totalItems > 0 && (
-                <div class="pagination-controls flex flex-col sm:flex-row justify-center items-center gap-4 my-6">
-                    {/* Navigation buttons and page info (appears second visually on larger screens) */}
+                <div class="pagination-controls flex flex-row flex-nowrap justify-center items-center gap-2 sm:gap-4 my-6">
+                    {/* Navigation buttons and page info */}
                         <a
                             id="prev-button"
                             href="#"
