@@ -2,8 +2,8 @@ name: Update Liked Videos JSON
 
 on:
   schedule:
-    # Runs every day at 4:05 AM UTC (adjust as needed)
-    - cron: '5 4 * * *'
+    # Runs every day at 1:00 AM UTC (8:00 AM WIB)
+    - cron: '0 1 * * *'
   workflow_dispatch: # Allows manual triggering from the Actions tab
 
 jobs:
