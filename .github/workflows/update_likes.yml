@@ -14,6 +14,8 @@ jobs:
     steps:
       - name: Check out repository
         uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.ACTIONS_PAT }} # Use PAT to allow triggering other workflows
 
       - name: Set up Python
         uses: actions/setup-python@v5
