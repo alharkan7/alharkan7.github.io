@@ -2311,6 +2311,12 @@
                         "name": "xsai.js.org",
                         "url": "https://xsai.js.org/",
                         "date_added": "13389810683755555"
+                    },
+                    {
+                        "type": "url",
+                        "name": "Kortix Suna",
+                        "url": "https://www.suna.so/",
+                        "date_added": "13389833804501278"
                     }
                 ],
                 "date_added": "13313210870914736"
@@ -3561,6 +3567,12 @@
                         "name": "ComputeSDK: Embed compute into your app, agent, or network",
                         "url": "https://computesdk.com/",
                         "date_added": "13389789023569623"
+                    },
+                    {
+                        "type": "url",
+                        "name": "Discover stories and stacks behind your favorite apps",
+                        "url": "https://appstacks.club/",
+                        "date_added": "13389836012192538"
                     }
                 ],
                 "date_added": "13313210870769945"
