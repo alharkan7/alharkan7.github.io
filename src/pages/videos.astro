@@ -739,45 +739,66 @@ if (!validLimits.includes(initialLimit)) {
         // Handle browser back/forward buttons
         if (!window._popstateHandledVideos) {
             window.addEventListener("popstate", () => {
-                 // console.log("Popstate triggered, re-initializing from URL.");
-                 // Re-read URL and set state, then render (no re-fetch needed)
-                 const urlParams = new URLSearchParams(window.location.search);
-                 const popPage = parseInt(urlParams.get("page") || "1");
-                 const popLimit = parseInt(urlParams.get("limit") || validLimits[0].toString());
-                 const popYear = urlParams.get("year") || "all";
-                 const popChannel = urlParams.get("channel") || "all";
+                // console.log("Popstate triggered, re-initializing from URL.");
+                const urlParams = new URLSearchParams(window.location.search);
+                const popPage = parseInt(urlParams.get("page") || "1");
+                const popLimit = parseInt(urlParams.get("limit") || validLimits[0].toString());
+                const popYear = urlParams.get("year") || "all";
+                const popChannel = urlParams.get("channel") || "all";
 
-                 // Set state directly from URL
-                 itemsPerPage = validLimits.includes(popLimit) ? popLimit : validLimits[0];
-                 // Validate filters against the currently loaded 'allVideos' data
-                 const allFetchedYears = ["all", ...new Set(allVideos.map(v => v.published_at?.substring(0, 4)).filter(Boolean))];
-                 selectedYear = allFetchedYears.includes(popYear) ? popYear : "all";
+                // Set state directly from URL
+                itemsPerPage = validLimits.includes(popLimit) ? popLimit : validLimits[0];
+                
+                // If we don't have data yet or allVideos is empty, need to fetch first
+                if (isDataLoading || allVideos.length === 0) {
+                    // Store the values to be applied after data loads
+                    window._pendingPopstateValues = {
+                        page: popPage,
+                        limit: popLimit,
+                        year: popYear,
+                        channel: popChannel
+                    };
+                    
+                    // If we're already loading, just let that complete
+                    // If not, start a fresh load
+                    if (!isDataLoading) {
+                        initializeAndFetchData();
+                    }
+                    return;
+                }
+                
+                // Reset loading state - ensure we're not stuck in loading
+                isDataLoading = false;
+                if (loadingIndicator) loadingIndicator.classList.add('hidden');
+                if (gridContainer) gridContainer.classList.add('grid');
+                
+                // Validate filters against the currently loaded data
+                const allFetchedYears = ["all", ...new Set(allVideos.map(v => v.published_at?.substring(0, 4)).filter(Boolean))];
+                selectedYear = allFetchedYears.includes(popYear) ? popYear : "all";
 
-                 const allFetchedChannelIds = ["all", ...new Set(allVideos.map(v => v.video_owner_channel_id).filter(Boolean))];
-                 selectedChannelId = allFetchedChannelIds.includes(popChannel) ? popChannel : "all";
+                const allFetchedChannelIds = ["all", ...new Set(allVideos.map(v => v.video_owner_channel_id).filter(Boolean))];
+                selectedChannelId = allFetchedChannelIds.includes(popChannel) ? popChannel : "all";
+                
+                // Update form controls to match URL state
+                if (yearSelect) yearSelect.value = selectedYear;
+                if (channelSelect) channelSelect.value = selectedChannelId;
+                if (limitSelect) limitSelect.value = itemsPerPage.toString();
 
-                 // Recalculate totalPages based on pop state filters before setting page
-                 let popFilteredVideos = allVideos;
-                 if (selectedYear !== "all") {
+                // Recalculate totalPages based on pop state filters
+                let popFilteredVideos = allVideos;
+                if (selectedYear !== "all") {
                     popFilteredVideos = popFilteredVideos.filter(v => v.published_at?.startsWith(selectedYear));
-                 }
-                 if (selectedChannelId !== "all") {
-                     popFilteredVideos = popFilteredVideos.filter(v => v.video_owner_channel_id === selectedChannelId);
-                 }
-                 const popFilteredTotalItems = popFilteredVideos.length;
-                 const popTotalPages = Math.ceil(popFilteredTotalItems / itemsPerPage);
+                }
+                if (selectedChannelId !== "all") {
+                    popFilteredVideos = popFilteredVideos.filter(v => v.video_owner_channel_id === selectedChannelId);
+                }
+                const popFilteredTotalItems = popFilteredVideos.length;
+                const popTotalPages = Math.ceil(popFilteredTotalItems / itemsPerPage);
 
-                 currentPage = (popPage >= 1 && popPage <= (popTotalPages > 0 ? popTotalPages : 1)) ? popPage : 1;
+                currentPage = (popPage >= 1 && popPage <= (popTotalPages > 0 ? popTotalPages : 1)) ? popPage : 1;
 
-
-                 if (!isDataLoading) { // Only render if data is actually loaded
-                    renderPage();
-                 } else {
-                     // If popstate happens before initial load finishes,
-                     // the initializeAndFetchData function will handle the URL params correctly when it finishes.
-                     console.log("Popstate occurred before initial data load finished.");
-                 }
-
+                // Always render the page when popstate happens
+                renderPage();
             });
             window._popstateHandledVideos = true;
         }
