@@ -443,12 +443,14 @@ if (!validLimits.includes(initialLimit)) {
                         // Ensure title is a string, provide fallback
                         const title = typeof video.title === 'string' ? video.title : 'Untitled Video';
                         let displayTitle = title;
+                        /* Comment out the truncation logic to show full titles
                         if (displayTitle.length > maxLength) {
                             const lastSpace = displayTitle.lastIndexOf(" ", maxLength - 1);
                             displayTitle = (lastSpace > maxLength / 2)
                                 ? displayTitle.substring(0, lastSpace) + "…"
                                 : displayTitle.substring(0, maxLength - 1) + "…";
                         }
+                        */
 
                         const imageUrl = video.thumbnail_url;
                         // Ensure imageUrl is a string and looks like a valid URL before using it in <img>
