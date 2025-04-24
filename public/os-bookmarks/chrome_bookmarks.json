@@ -2335,6 +2335,12 @@
                         "name": "Help Build Descript’s AI Co-Creator",
                         "url": "https://www.descript.com/agent",
                         "date_added": "13389855440754542"
+                    },
+                    {
+                        "type": "url",
+                        "name": "Listen Labs",
+                        "url": "https://listenlabs.ai/",
+                        "date_added": "13389929559554340"
                     }
                 ],
                 "date_added": "13313210870914736"
@@ -3591,6 +3597,12 @@
                         "name": "Discover stories and stacks behind your favorite apps",
                         "url": "https://appstacks.club/",
                         "date_added": "13389836012192538"
+                    },
+                    {
+                        "type": "url",
+                        "name": "Microsoft Open Source Blog | Open Source Insights & Standards",
+                        "url": "https://opensource.microsoft.com/blog/",
+                        "date_added": "13389874997742441"
                     }
                 ],
                 "date_added": "13313210870769945"
