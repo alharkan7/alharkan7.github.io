@@ -3603,6 +3603,12 @@
                         "name": "Microsoft Open Source Blog | Open Source Insights & Standards",
                         "url": "https://opensource.microsoft.com/blog/",
                         "date_added": "13389874997742441"
+                    },
+                    {
+                        "type": "url",
+                        "name": "Mergent - Serverless Crons & Background Jobs",
+                        "url": "https://mergent.co/",
+                        "date_added": "13389935222100437"
                     }
                 ],
                 "date_added": "13313210870769945"
