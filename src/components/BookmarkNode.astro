@@ -90,7 +90,7 @@ if (node.type === 'folder') {
         .map((child: BookmarkURL) => (
           <li>
             <div class="toc-item">
-              <span class="bookmark-icon"><Bookmark size={18} strokeWidth={2} /></span>
+              <span class="bookmark-icon"><Bookmark size={20} strokeWidth={2} /></span>
               <a href={child.url} target="_blank" rel="noopener noreferrer" class="bookmark-link toc-title">
                 {child.name}
               </a>
@@ -290,7 +290,7 @@ if (node.type === 'folder') {
   .toc-item {
     display: flex;
     justify-content: space-between;
-    align-items: baseline;
+    align-items: center;
     gap: 0.5em;
     overflow: hidden;
   }
@@ -426,5 +426,23 @@ if (node.type === 'folder') {
   li > details {
     /* list-style-type: none; // Handled by parent li */
     margin-left: 0; /* Reset potential inherited margin */
+  }
+
+  /* Style for the bookmark icon container */
+  .bookmark-icon {
+    display: inline-flex; /* Align icon nicely */
+    align-items: center;  /* Center vertically if needed */
+    line-height: 1;       /* Prevent extra space */
+    flex-shrink: 0;       /* Prevent icon from shrinking */
+    /* Ensure default fill is none */
+    > svg {
+        fill: none;
+    }
+  }
+
+  /* Fill bookmark icon on toc-item hover */
+  .toc-item:hover .bookmark-icon svg {
+    fill: var(--primary-color);
+    stroke: var(--primary-color);
   }
 </style> 
