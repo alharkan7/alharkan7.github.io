@@ -111,41 +111,46 @@ const totalStars = starredRepos.length;
                 })
             }
         </div>
-        <hr class="mt-8" />
 
         <!-- Pagination Controls -->
-        {starredRepos.length > 0 && (
-            <div class="pagination-controls">
-                <a
-                    id="prev-button"
-                    href="#"
-                    class="nav-button disabled"
-                    aria-disabled="true"
-                >
-                    &laquo; Prev
-                </a>
-                <div class="page-select-container">
-                    <span class="mr-1">Page</span>
-                    <select
-                        id="page-select"
-                        class="page-select"
-                        disabled
-                        aria-label="Select page number"
+        {
+            starredRepos.length > 0 && (
+                <div class="pagination-controls">
+                    <a
+                        id="prev-button"
+                        href="#"
+                        class="nav-button disabled"
+                        aria-disabled="true"
                     >
-                        <option value="1">1</option> {/* Placeholder */}
-                    </select>
-                    <span id="page-total-span" class="ml-2">of ?</span>
+                        &laquo; Prev
+                    </a>
+                    <div class="page-select-container">
+                        <span class="mr-1">Page</span>
+                        <select
+                            id="page-select"
+                            class="page-select"
+                            disabled
+                            aria-label="Select page number"
+                        >
+                            <option value="1">1</option> {/* Placeholder */}
+                        </select>
+                        <span id="page-total-span" class="ml-2">
+                            of ?
+                        </span>
+                    </div>
+                    <a
+                        id="next-button"
+                        href="#"
+                        class="nav-button disabled"
+                        aria-disabled="true"
+                    >
+                        Next &raquo;
+                    </a>
                 </div>
-                <a
-                    id="next-button"
-                    href="#"
-                    class="nav-button disabled"
-                    aria-disabled="true"
-                >
-                    Next &raquo;
-                </a>
-            </div>
-        )}
+            )
+        }
+
+        <hr class="mt-8" />
 
         <p class="footnote text-sm">
             This list is automatically updated daily based on my GitHub stars.
@@ -309,22 +314,31 @@ const totalStars = starredRepos.length;
         opacity: 0.7;
         cursor: not-allowed;
     }
-
 </style>
 
 <script>
-    document.addEventListener('DOMContentLoaded', () => {
-        const itemsPerPage = 30;// Show 15 repos per page
-        const repoGrid = document.querySelector('.repo-grid');
-        const allRepos = Array.from(repoGrid?.querySelectorAll('.repo-card') || []);
+    document.addEventListener("DOMContentLoaded", () => {
+        const itemsPerPage = 30; // Show 15 repos per page
+        const repoGrid = document.querySelector(".repo-grid");
+        const allRepos = Array.from(
+            repoGrid?.querySelectorAll(".repo-card") || [],
+        );
         const totalItems = allRepos.length;
         const totalPages = Math.ceil(totalItems / itemsPerPage);
 
-        const prevButton = document.getElementById('prev-button') as HTMLAnchorElement;
-        const nextButton = document.getElementById('next-button') as HTMLAnchorElement;
-        const pageSelect = document.getElementById('page-select') as HTMLSelectElement;
-        const pageTotalSpan = document.getElementById('page-total-span');
-        const paginationControls = document.querySelector('.pagination-controls') as HTMLElement | null;
+        const prevButton = document.getElementById(
+            "prev-button",
+        ) as HTMLAnchorElement;
+        const nextButton = document.getElementById(
+            "next-button",
+        ) as HTMLAnchorElement;
+        const pageSelect = document.getElementById(
+            "page-select",
+        ) as HTMLSelectElement;
+        const pageTotalSpan = document.getElementById("page-total-span");
+        const paginationControls = document.querySelector(
+            ".pagination-controls",
+        ) as HTMLElement | null;
 
         let currentPage = 1;
 
@@ -332,35 +346,42 @@ const totalStars = starredRepos.length;
             if (!repoGrid || !paginationControls) return;
 
             if (totalItems === 0) {
-                paginationControls.style.display = 'none'; // Hide controls if no items
+                paginationControls.style.display = "none"; // Hide controls if no items
                 return;
             }
 
-            paginationControls.style.display = 'flex'; // Show controls if items exist
+            paginationControls.style.display = "flex"; // Show controls if items exist
 
             const startIndex = (currentPage - 1) * itemsPerPage;
             const endIndex = startIndex + itemsPerPage;
 
             // Hide all repos first
-            allRepos.forEach(repo => (repo as HTMLElement).style.display = 'none');
+            allRepos.forEach(
+                (repo) => ((repo as HTMLElement).style.display = "none"),
+            );
 
             // Show only repos for the current page
             const reposToShow = allRepos.slice(startIndex, endIndex);
-            reposToShow.forEach(repo => (repo as HTMLElement).style.display = 'flex'); // Use 'flex' based on .repo-card style
+            reposToShow.forEach(
+                (repo) => ((repo as HTMLElement).style.display = "flex"),
+            ); // Use 'flex' based on .repo-card style
 
             // Update button states
-            prevButton.setAttribute('aria-disabled', String(currentPage === 1));
-            prevButton.classList.toggle('disabled', currentPage === 1);
-            nextButton.setAttribute('aria-disabled', String(currentPage === totalPages));
-            nextButton.classList.toggle('disabled', currentPage === totalPages);
+            prevButton.setAttribute("aria-disabled", String(currentPage === 1));
+            prevButton.classList.toggle("disabled", currentPage === 1);
+            nextButton.setAttribute(
+                "aria-disabled",
+                String(currentPage === totalPages),
+            );
+            nextButton.classList.toggle("disabled", currentPage === totalPages);
 
             // Update page select
             if (pageSelect) {
-                 // Only populate if not already done or if totalPages changed (unlikely here)
+                // Only populate if not already done or if totalPages changed (unlikely here)
                 if (pageSelect.options.length !== totalPages) {
-                    pageSelect.innerHTML = ''; // Clear existing options
+                    pageSelect.innerHTML = ""; // Clear existing options
                     for (let i = 1; i <= totalPages; i++) {
-                        const option = document.createElement('option');
+                        const option = document.createElement("option");
                         option.value = String(i);
                         option.textContent = String(i);
                         pageSelect.appendChild(option);
@@ -375,33 +396,38 @@ const totalStars = starredRepos.length;
         }
 
         // Event Listeners
-        prevButton?.addEventListener('click', (e) => {
+        prevButton?.addEventListener("click", (e) => {
             e.preventDefault();
             if (currentPage > 1) {
                 currentPage--;
                 updatePageDisplay();
-                repoGrid?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                repoGrid?.scrollIntoView({
+                    behavior: "smooth",
+                    block: "start",
+                });
             }
         });
 
-        nextButton?.addEventListener('click', (e) => {
+        nextButton?.addEventListener("click", (e) => {
             e.preventDefault();
             if (currentPage < totalPages) {
                 currentPage++;
                 updatePageDisplay();
-                repoGrid?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                repoGrid?.scrollIntoView({
+                    behavior: "smooth",
+                    block: "start",
+                });
             }
         });
 
-        pageSelect?.addEventListener('change', (e) => {
+        pageSelect?.addEventListener("change", (e) => {
             const target = e.target as HTMLSelectElement;
             currentPage = parseInt(target.value, 10);
             updatePageDisplay();
-            repoGrid?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            repoGrid?.scrollIntoView({ behavior: "smooth", block: "start" });
         });
 
         // Initial setup
         updatePageDisplay();
     });
 </script>
-
