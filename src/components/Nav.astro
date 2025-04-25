@@ -168,6 +168,7 @@ const { current = "" } = Astro.props;
       <a
         class={current === "bookmarks" ||
         current === "videos" ||
+        current === "stars" ||
         current === "about"
           ? "selected"
           : ""}
@@ -179,6 +180,7 @@ const { current = "" } = Astro.props;
       <div class="dropdown-content">
         <a href="/videos">Videos</a>
         <a href="/bookmarks">Bookmarks</a>
+        <a href="/stars">Repo Stars</a>
         <a href="/about">Profile</a>
       </div>
     </div>

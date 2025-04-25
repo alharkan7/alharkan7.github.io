@@ -1,6 +1,7 @@
 import os
 import pickle
 import json
+import requests # <-- Add requests import
 
 # Remove google_auth_oauthlib import if not falling back to local flow
 # from google_auth_oauthlib.flow import InstalledAppFlow
@@ -149,6 +150,53 @@ def get_liked_videos(youtube):
 
     return liked_videos
 
+def get_github_stars(username, token):
+    """Fetches all starred repositories for a given GitHub user using pagination."""
+    all_repos = []
+    # Start with the first page, requesting 100 items per page (max)
+    url = f"https://api.github.com/users/{username}/starred?per_page=100&sort=created&direction=desc"
+    headers = {
+        "Accept": "application/vnd.github.v3+json",
+        "Authorization": f"token {token}"
+    }
+
+    while url:
+        try:
+            print(f"Fetching GitHub stars page: {url}")
+            response = requests.get(url, headers=headers)
+            response.raise_for_status()  # Raise HTTPError for bad responses (4XX or 5XX)
+            
+            page_data = response.json()
+            if not isinstance(page_data, list):
+                print(f"Warning: Expected a list but got {type(page_data)}. Stopping pagination.")
+                print(f"Response content: {response.text[:500]}...") # Log part of unexpected response
+                break # Stop if the response is not a list as expected
+                
+            all_repos.extend(page_data)
+
+            # Check for the 'next' link in the Link header
+            if 'Link' in response.headers:
+                links = requests.utils.parse_header_links(response.headers['Link'])
+                next_link = None
+                for link in links:
+                    if link.get('rel') == 'next':
+                        next_link = link.get('url')
+                        break
+                url = next_link # Set url to None if 'next' link is not found, ending the loop
+            else:
+                url = None # No Link header, assume end of pages
+        
+        except requests.exceptions.RequestException as e:
+            print(f"Error during GitHub API request: {e}")
+            # Depending on the error, you might want to retry or just stop
+            raise # Re-raise the exception to be caught by the main block
+        except json.JSONDecodeError as e:
+            print(f"Error decoding JSON response from GitHub: {e}")
+            print(f"Response content: {response.text[:500]}...")
+            raise # Re-raise
+            
+    return all_repos
+
 if __name__ == "__main__":
     # No longer need to check for client_secrets.json here,
     # as the auth function handles both methods and raises errors if needed.
@@ -188,9 +236,35 @@ if __name__ == "__main__":
         print(f"\nLiked videos saved to {output_json_path}") # Use the full path
 
     except Exception as e:
-        print(f"An error occurred: {e}")
-        # Remove the logic that deletes token.pickle on generic errors,
-        # as the auth function handles token issues more specifically now.
-        # if os.path.exists(TOKEN_PICKLE_FILE): # Use the full path
-        #     os.remove(TOKEN_PICKLE_FILE) # Use the full path
-        #     print("Removed potentially corrupt token.pickle. Please try running the script again.") 
+        print(f"An error occurred while fetching YouTube videos: {e}")
+        # Exit or handle YouTube error appropriately, maybe continue to GitHub fetch?
+        # For now, we'll let the script exit if YouTube fails.
+        exit(1) # Exit if YouTube fetch fails
+
+    # --- Fetch GitHub Stars --- 
+    print("\nFetching GitHub starred repositories...")
+    github_user = os.environ.get("GITHUB_USER")
+    github_token = os.environ.get("GITHUB_TOKEN") # <-- Get the token
+    if not github_user:
+        print("Error: GITHUB_USER environment variable not set.")
+        exit(1)
+    if not github_token:
+        # Allow running without a token for public data, but might hit rate limits faster
+        print("Warning: GITHUB_TOKEN environment variable not set. Proceeding without authentication, may encounter rate limits.")
+        
+    try:
+        # Pass token to the function
+        all_starred_repos = get_github_stars(github_user, github_token)
+        print(f"Found {len(all_starred_repos)} starred repositories.")
+        
+        # Define the output file path for stars
+        stars_output_json_path = os.path.join(SCRIPT_DIR, "github_stars.json")
+        
+        # Save starred repos to JSON
+        with open(stars_output_json_path, "w", encoding="utf-8") as f:
+            json.dump(all_starred_repos, f, ensure_ascii=False, indent=4)
+        print(f"Starred repositories saved to {stars_output_json_path}")
+        
+    except Exception as e:
+        print(f"An error occurred while fetching GitHub stars: {e}")
+        exit(1) # Exit if GitHub fetch fails 

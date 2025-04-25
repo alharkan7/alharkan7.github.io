@@ -27,21 +27,14 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r public/os-bookmarks/requirements.txt # Adjust path if needed
 
-      - name: Run script to fetch liked videos
+      - name: Run script to fetch data
         env:
           GOOGLE_CLIENT_ID: ${{ secrets.GOOGLE_CLIENT_ID }}
           GOOGLE_CLIENT_SECRET: ${{ secrets.GOOGLE_CLIENT_SECRET }}
           GOOGLE_REFRESH_TOKEN: ${{ secrets.GOOGLE_REFRESH_TOKEN }}
+          GITHUB_USER: ${{ github.repository_owner }} # Use the repo owner as the GitHub user
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # Pass the token to the script
         run: python public/os-bookmarks/get_liked_videos.py # Adjust path if needed
-
-      - name: Fetch GitHub Stars
-        run: |
-          mkdir -p public/os-bookmarks # Ensure the directory exists
-          curl -L -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
-               -H "Accept: application/vnd.github.v3+json" \
-               "https://api.github.com/users/alharkan7/starred?per_page=100&sort=created&direction=desc" \
-               > public/os-bookmarks/github_stars.json
-          echo "Fetched starred repositories."
 
       - name: Commit and push if changed
         run: |
@@ -52,10 +45,10 @@ jobs:
           LIKES_FILE="public/os-bookmarks/liked_videos.json"
           STARS_FILE="public/os-bookmarks/github_stars.json"
           
-          # Stage potential changes
+          # Stage potential changes for both files
           git add "$LIKES_FILE" "$STARS_FILE"
           
-          # Check if there are staged changes
+          # Check if there are staged changes in either file
           if git diff --staged --quiet; then
             echo "No changes detected in liked videos or starred repos."
           else
