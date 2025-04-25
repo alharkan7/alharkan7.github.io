@@ -2,68 +2,52 @@
 import BaseLayout from "../layouts/BaseLayout.astro";
 // Import the data fetched by the GitHub Action
 import starredReposData from "../../public/os-bookmarks/github_stars.json"; // Adjust path if needed
+// Import Lucide icons
+import { Code, Star, GitFork } from "lucide-react";
 
 // Define the TypeScript interface for a single starred repository item
 interface GitHubOwner {
-    login: string;
-    id: number;
-    avatar_url: string;
-    html_url: string;
+    login: string | undefined; // Allow undefined if owner data might be missing
+    avatar_url: string | undefined;
+    // Remove id and html_url as they are not stored
 }
 
 interface GitHubRepo {
-    id: number;
-    node_id: string;
-    name: string;
-    full_name: string;
-    private: boolean;
+    id: number; // Keep id
+    // Remove node_id, name, private, url, created_at, updated_at, etc.
+    full_name: string | null;
     owner: GitHubOwner;
     html_url: string;
     description: string | null;
-    fork: boolean;
-    url: string;
-    created_at: string;
-    updated_at: string;
-    pushed_at: string;
-    homepage: string | null;
-    size: number;
-    stargazers_count: number;
-    watchers_count: number;
+    // Remove fork, size, watchers_count, has_*, license, etc.
     language: string | null;
-    has_issues: boolean;
-    has_projects: boolean;
-    has_downloads: boolean;
-    has_wiki: boolean;
-    has_pages: boolean;
-    forks_count: number;
-    archived: boolean;
-    disabled: boolean;
-    open_issues_count: number;
-    license: {
-        key: string;
-        name: string;
-        spdx_id: string;
-        url: string | null;
-        node_id: string;
-    } | null;
-    allow_forking: boolean;
-    is_template: boolean;
-    topics: string[];
-    visibility: string;
-    forks: number;
-    open_issues: number;
-    watchers: number;
-    default_branch: string;
+    stargazers_count: number | null;
+    forks_count: number | null;
+    pushed_at: string | null; // Add pushed_at
+    // Remove topics, visibility, etc.
 }
 
 // Cast the imported data
 const starredRepos = starredReposData as GitHubRepo[];
 
+// Helper function to format date
+function formatDate(dateString: string | null): string {
+    if (!dateString) return "N/A";
+    try {
+        return new Date(dateString).toLocaleDateString("en-US", {
+            year: "numeric",
+            month: "short",
+            day: "numeric",
+        });
+    } catch (e) {
+        console.error("Error formatting date:", e);
+        return "Invalid Date";
+    }
+}
+
 const title = "Starred Repos - Al Harkan";
 const description = "A curated list of starred GitHub repositories.";
-const permalink = Astro.site?.href
-    ? `${Astro.site.href}stars`
-    : "/stars";
+const permalink = Astro.site?.href ? `${Astro.site.href}stars` : "/stars";
 const totalStars = starredRepos.length;
 ---
 
@@ -79,35 +63,90 @@ const totalStars = starredRepos.length;
         <hr />
 
         <div class="repo-grid">
-            {starredRepos.map((repo) => {
-                // Calculate the CSS variable name for the language color
-                const languageVar = repo.language
-                    ? `var(--color-${repo.language.toLowerCase().replace(/[^a-z0-9]/g, '-')}, #ccc)`
-                    : 'var(--color-unknown, #ccc)'; // Fallback for unknown language
+            {
+                starredRepos.map((repo) => {
+                    // Calculate the CSS variable name for the language color
+                    const languageVar = repo.language
+                        ? `var(--color-${repo.language.toLowerCase().replace(/[^a-z0-9]/g, "-")}, #ccc)`
+                        : "var(--color-unknown, #ccc)"; // Fallback for unknown language
 
-                return (
-                    <a href={repo.html_url} target="_blank" rel="noopener noreferrer" class="repo-card">
-                        <div class="repo-card-header">
-                            <img src={repo.owner.avatar_url} alt={`${repo.owner.login} avatar`} width="24" height="24" class="repo-owner-avatar" />
-                            <span class="repo-full-name">{repo.full_name}</span>
-                        </div>
-                        <p class="repo-description">{repo.description || "No description provided."}</p>
-                        <div class="repo-meta">
-                            {repo.language && (
-                                <span class="repo-language">
-                                    {/* Use the pre-calculated variable */}
-                                    <span class="language-color" style={{ backgroundColor: languageVar }}></span>
-                                    {repo.language}
+                    return (
+                        <a
+                            href={repo.html_url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            class="repo-card"
+                        >
+                            <div class="repo-card-header">
+                                <img
+                                    src={repo.owner.avatar_url}
+                                    alt={`${repo.owner.login} avatar`}
+                                    width="24"
+                                    height="24"
+                                    class="repo-owner-avatar"
+                                />
+                                <span class="repo-full-name">
+                                    {repo.full_name}
                                 </span>
-                            )}
-                            <span class="repo-stars">★ {repo.stargazers_count}</span>
-                            <span class="repo-forks"> Forks: {repo.forks_count}</span>
-                        </div>
-                    </a>
-                );
-            })}
+                            </div>
+                            <p class="repo-description">
+                                {repo.description || "No description provided."}
+                            </p>
+                            <div class="repo-meta">
+                                <span class="repo-language">
+                                    <Code size={16} aria-hidden="true" />
+                                    <span>{repo.language}</span>
+                                </span>
+                                <span class="repo-stars">
+                                    <Star size={16} aria-hidden="true" />
+                                    {repo.stargazers_count ?? 0}
+                                </span>
+                                <span class="repo-forks">
+                                    <GitFork size={16} aria-hidden="true" />
+                                    {repo.forks_count ?? 0}
+                                </span>
+                            </div>
+                        </a>
+                    );
+                })
+            }
         </div>
-          <hr class="mt-8" />
+        <hr class="mt-8" />
+
+        <!-- Pagination Controls -->
+        {starredRepos.length > 0 && (
+            <div class="pagination-controls">
+                <a
+                    id="prev-button"
+                    href="#"
+                    class="nav-button disabled"
+                    aria-disabled="true"
+                >
+                    &laquo; Prev
+                </a>
+                <div class="page-select-container">
+                    <span class="mr-1">Page</span>
+                    <select
+                        id="page-select"
+                        class="page-select"
+                        disabled
+                        aria-label="Select page number"
+                    >
+                        <option value="1">1</option> {/* Placeholder */}
+                    </select>
+                    <span id="page-total-span" class="ml-2">of ?</span>
+                </div>
+                <a
+                    id="next-button"
+                    href="#"
+                    class="nav-button disabled"
+                    aria-disabled="true"
+                >
+                    Next &raquo;
+                </a>
+            </div>
+        )}
+
         <p class="footnote text-sm">
             This list is automatically updated daily based on my GitHub stars.
         </p>
@@ -119,7 +158,8 @@ const totalStars = starredRepos.length;
         margin-block-start: 1em;
         margin-block-end: 0.5em;
     }
-    .container > p:first-of-type { /* Target the description paragraph */
+    .container > p:first-of-type {
+        /* Target the description paragraph */
         margin-block-end: 1.5em;
     }
 
@@ -139,7 +179,9 @@ const totalStars = starredRepos.length;
         text-decoration: none;
         color: inherit;
         background-color: var(--background-alt, #f9f9f9);
-        transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+        transition:
+            transform 0.2s ease-in-out,
+            box-shadow 0.2s ease-in-out;
         height: 100%; /* Make cards in a row equal height */
     }
 
@@ -184,25 +226,17 @@ const totalStars = starredRepos.length;
         flex-wrap: wrap; /* Allow wrapping on small cards */
     }
 
-    .repo-language {
+    .repo-language,
+    .repo-stars,
+    .repo-forks {
         display: inline-flex;
         align-items: center;
         gap: 0.3rem;
     }
 
-    .language-color {
-        display: inline-block;
-        width: 10px;
-        height: 10px;
-        border-radius: 50%;
-        /* Background color set inline via style */
-        /* Add fallback colors for common languages */
-    }
-    /* You might want to add specific background colors for common languages */
-    /* e.g., :root { --color-javascript: #f1e05a; --color-python: #3572A5; ... } */
-
-    .repo-stars, .repo-forks {
-        /* Add styles if needed */
+    .repo-updated {
+        /* Optional: Add specific styling for the date */
+        white-space: nowrap; /* Prevent date from wrapping */
     }
 
     .footnote {
@@ -211,4 +245,163 @@ const totalStars = starredRepos.length;
         margin-top: 2em;
         text-align: center;
     }
-</style> 
+
+    /* Pagination Styles */
+    .pagination-controls {
+        display: flex;
+        flex-direction: row;
+        flex-wrap: nowrap;
+        justify-content: center;
+        align-items: center;
+        gap: 1rem; /* Adjust gap as needed */
+        margin: 2em 0;
+        font-family: var(--font-family-sans);
+    }
+
+    .nav-button {
+        color: var(--text-secondary, grey);
+        font-size: 0.9em;
+        font-weight: bold;
+        text-decoration: none;
+        transition: all 0.2s ease-in-out;
+        box-shadow: inset 0 -0.12em 0 var(--primary-color, #007bff);
+        padding: 0.2em 0.1em; /* Add slight padding for hover effect */
+    }
+
+    .nav-button:hover {
+        box-shadow: inset 0 -1.5em 0 var(--primary-color, #007bff);
+        color: var(--background-body, white);
+    }
+
+    .nav-button.disabled,
+    .nav-button[aria-disabled="true"] {
+        opacity: 0.5;
+        cursor: not-allowed;
+        pointer-events: none;
+        box-shadow: inset 0 -0.12em 0 var(--text-secondary, grey);
+    }
+
+    .nav-button.disabled:hover,
+    .nav-button[aria-disabled="true"]:hover {
+        color: var(--text-secondary, grey);
+        box-shadow: inset 0 -0.12em 0 var(--text-secondary, grey);
+    }
+
+    .page-select-container {
+        display: flex;
+        align-items: center;
+        font-size: 0.9em;
+        white-space: nowrap;
+    }
+
+    .page-select {
+        padding: 0.25rem 0.5rem;
+        font-size: 0.9em;
+        background-color: var(--background-alt, #f9f9f9);
+        color: var(--text-main);
+        border: 1px solid var(--border-color, #ddd);
+        border-radius: 4px;
+        text-align: center;
+        margin: 0 0.25rem;
+    }
+
+    .page-select:disabled {
+        opacity: 0.7;
+        cursor: not-allowed;
+    }
+
+</style>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const itemsPerPage = 30;// Show 15 repos per page
+        const repoGrid = document.querySelector('.repo-grid');
+        const allRepos = Array.from(repoGrid?.querySelectorAll('.repo-card') || []);
+        const totalItems = allRepos.length;
+        const totalPages = Math.ceil(totalItems / itemsPerPage);
+
+        const prevButton = document.getElementById('prev-button') as HTMLAnchorElement;
+        const nextButton = document.getElementById('next-button') as HTMLAnchorElement;
+        const pageSelect = document.getElementById('page-select') as HTMLSelectElement;
+        const pageTotalSpan = document.getElementById('page-total-span');
+        const paginationControls = document.querySelector('.pagination-controls') as HTMLElement | null;
+
+        let currentPage = 1;
+
+        function updatePageDisplay() {
+            if (!repoGrid || !paginationControls) return;
+
+            if (totalItems === 0) {
+                paginationControls.style.display = 'none'; // Hide controls if no items
+                return;
+            }
+
+            paginationControls.style.display = 'flex'; // Show controls if items exist
+
+            const startIndex = (currentPage - 1) * itemsPerPage;
+            const endIndex = startIndex + itemsPerPage;
+
+            // Hide all repos first
+            allRepos.forEach(repo => (repo as HTMLElement).style.display = 'none');
+
+            // Show only repos for the current page
+            const reposToShow = allRepos.slice(startIndex, endIndex);
+            reposToShow.forEach(repo => (repo as HTMLElement).style.display = 'flex'); // Use 'flex' based on .repo-card style
+
+            // Update button states
+            prevButton.setAttribute('aria-disabled', String(currentPage === 1));
+            prevButton.classList.toggle('disabled', currentPage === 1);
+            nextButton.setAttribute('aria-disabled', String(currentPage === totalPages));
+            nextButton.classList.toggle('disabled', currentPage === totalPages);
+
+            // Update page select
+            if (pageSelect) {
+                 // Only populate if not already done or if totalPages changed (unlikely here)
+                if (pageSelect.options.length !== totalPages) {
+                    pageSelect.innerHTML = ''; // Clear existing options
+                    for (let i = 1; i <= totalPages; i++) {
+                        const option = document.createElement('option');
+                        option.value = String(i);
+                        option.textContent = String(i);
+                        pageSelect.appendChild(option);
+                    }
+                }
+                pageSelect.value = String(currentPage);
+                pageSelect.disabled = totalPages <= 1;
+            }
+            if (pageTotalSpan) {
+                pageTotalSpan.textContent = `of ${totalPages}`;
+            }
+        }
+
+        // Event Listeners
+        prevButton?.addEventListener('click', (e) => {
+            e.preventDefault();
+            if (currentPage > 1) {
+                currentPage--;
+                updatePageDisplay();
+                repoGrid?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+        });
+
+        nextButton?.addEventListener('click', (e) => {
+            e.preventDefault();
+            if (currentPage < totalPages) {
+                currentPage++;
+                updatePageDisplay();
+                repoGrid?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+        });
+
+        pageSelect?.addEventListener('change', (e) => {
+            const target = e.target as HTMLSelectElement;
+            currentPage = parseInt(target.value, 10);
+            updatePageDisplay();
+            repoGrid?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        });
+
+        // Initial setup
+        updatePageDisplay();
+    });
+</script>
+

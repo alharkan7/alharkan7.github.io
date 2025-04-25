@@ -2,6 +2,7 @@ import os
 import pickle
 import json
 import requests # <-- Add requests import
+from dotenv import load_dotenv # <-- Import load_dotenv
 
 # Remove google_auth_oauthlib import if not falling back to local flow
 # from google_auth_oauthlib.flow import InstalledAppFlow
@@ -151,14 +152,17 @@ def get_liked_videos(youtube):
     return liked_videos
 
 def get_github_stars(username, token):
-    """Fetches all starred repositories for a given GitHub user using pagination."""
+    """Fetches all starred repositories for a given GitHub user using pagination, extracting only needed fields."""
     all_repos = []
     # Start with the first page, requesting 100 items per page (max)
     url = f"https://api.github.com/users/{username}/starred?per_page=100&sort=created&direction=desc"
     headers = {
         "Accept": "application/vnd.github.v3+json",
-        "Authorization": f"token {token}"
+        "Authorization": f"token {token}" if token else None # Handle case where token might be None
     }
+    # Remove None Authorization header if token is not provided
+    if headers["Authorization"] is None:
+        del headers["Authorization"]
 
     while url:
         try:
@@ -169,10 +173,30 @@ def get_github_stars(username, token):
             page_data = response.json()
             if not isinstance(page_data, list):
                 print(f"Warning: Expected a list but got {type(page_data)}. Stopping pagination.")
-                print(f"Response content: {response.text[:500]}...") # Log part of unexpected response
-                break # Stop if the response is not a list as expected
+                print(f"Response content: {response.text[:500]}...")
+                break
                 
-            all_repos.extend(page_data)
+            # Extract only necessary fields
+            for repo_raw in page_data:
+                repo_minimal = {
+                    "id": repo_raw.get("id"),
+                    "full_name": repo_raw.get("full_name"),
+                    "html_url": repo_raw.get("html_url"),
+                    "description": repo_raw.get("description"),
+                    "language": repo_raw.get("language"),
+                    "stargazers_count": repo_raw.get("stargazers_count"),
+                    "forks_count": repo_raw.get("forks_count"),
+                    "pushed_at": repo_raw.get("pushed_at"),
+                    "owner": {
+                        "login": repo_raw.get("owner", {}).get("login"),
+                        "avatar_url": repo_raw.get("owner", {}).get("avatar_url")
+                    }
+                }
+                # Add basic validation if needed, e.g., check if id and html_url exist
+                if repo_minimal["id"] and repo_minimal["html_url"]:
+                     all_repos.append(repo_minimal)
+                else:
+                    print(f"Warning: Skipping repo due to missing id or html_url. Raw data snippet: {str(repo_raw)[:200]}...")
 
             # Check for the 'next' link in the Link header
             if 'Link' in response.headers:
@@ -182,22 +206,31 @@ def get_github_stars(username, token):
                     if link.get('rel') == 'next':
                         next_link = link.get('url')
                         break
-                url = next_link # Set url to None if 'next' link is not found, ending the loop
+                url = next_link
             else:
-                url = None # No Link header, assume end of pages
+                url = None
         
         except requests.exceptions.RequestException as e:
             print(f"Error during GitHub API request: {e}")
-            # Depending on the error, you might want to retry or just stop
-            raise # Re-raise the exception to be caught by the main block
+            raise
         except json.JSONDecodeError as e:
             print(f"Error decoding JSON response from GitHub: {e}")
             print(f"Response content: {response.text[:500]}...")
-            raise # Re-raise
+            raise
             
     return all_repos
 
 if __name__ == "__main__":
+    # Load environment variables from .env file if it exists
+    # This is primarily for local development/testing
+    print("Checking for .env file for local execution...")
+    dotenv_path = os.path.join(SCRIPT_DIR, '.env')
+    if os.path.exists(dotenv_path):
+        load_dotenv(dotenv_path=dotenv_path)
+        print(".env file loaded.")
+    else:
+        print(".env file not found, relying on system environment variables.")
+
     # No longer need to check for client_secrets.json here,
     # as the auth function handles both methods and raises errors if needed.
     # if not os.path.exists(CLIENT_SECRETS_FILE):

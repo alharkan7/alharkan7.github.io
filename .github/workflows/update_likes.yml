@@ -1,4 +1,4 @@
-name: Update Liked Videos JSON
+name: Update Videos and Stars JSON
 
 on:
   schedule:
