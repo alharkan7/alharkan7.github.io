@@ -5,6 +5,9 @@
   --primary-color: #548e9b;
   --font-family-serif: Merriweather, serif;
   --font-family-sans: 'Fira Sans', sans-serif;
+  /* Custom variables for components */
+  --border-color: #e0e0e0; /* Light grey border */
+  --background-alt: #f9f9f9; /* Slightly off-white background */
 }
 
 :root.theme-dark {
@@ -12,6 +15,9 @@
   --text-main: #fff;
   --text-secondary: #ccc;
   --primary-color: #548e9b;
+  /* Custom variable overrides for dark theme */
+  --border-color: #444; /* Dark grey border */
+  --background-alt: #2a2b2c; /* Slightly off-black background */
 }
 
 html {

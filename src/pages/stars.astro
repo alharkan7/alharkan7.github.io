@@ -3,7 +3,7 @@ import BaseLayout from "../layouts/BaseLayout.astro";
 // Import the data fetched by the GitHub Action
 import starredReposData from "../../public/os-bookmarks/github_stars.json"; // Adjust path if needed
 // Import Lucide icons
-import { Code, Star, GitFork } from "lucide-react";
+import { Code, Star, GitFork, ChevronDown, ChevronUp } from "lucide-react";
 
 // Define the TypeScript interface for a single starred repository item
 interface GitHubOwner {
@@ -89,9 +89,11 @@ const totalStars = starredRepos.length;
                                     {repo.full_name}
                                 </span>
                             </div>
-                            <p class="repo-description">
-                                {repo.description || "No description provided."}
-                            </p>
+                            <div class="repo-description-container">
+                                <p class="repo-description" id={`desc-${repo.id}`}>
+                                    {repo.description || "No description provided."}
+                                </p>
+                            </div>
                             <div class="repo-meta">
                                 <span class="repo-language">
                                     <Code size={16} aria-hidden="true" />
@@ -122,7 +124,7 @@ const totalStars = starredRepos.length;
                         class="nav-button disabled"
                         aria-disabled="true"
                     >
-                        &laquo; Prev
+                        Prev
                     </a>
                     <div class="page-select-container">
                         <span class="mr-1">Page</span>
@@ -134,7 +136,7 @@ const totalStars = starredRepos.length;
                         >
                             <option value="1">1</option> {/* Placeholder */}
                         </select>
-                        <span id="page-total-span" class="ml-2">
+                        <span id="page-total-span">
                             of ?
                         </span>
                     </div>
@@ -144,7 +146,7 @@ const totalStars = starredRepos.length;
                         class="nav-button disabled"
                         aria-disabled="true"
                     >
-                        Next &raquo;
+                        Next
                     </a>
                 </div>
             )
@@ -153,7 +155,7 @@ const totalStars = starredRepos.length;
         <hr class="mt-8" />
 
         <p class="footnote text-sm">
-            This list is automatically updated daily based on my GitHub stars.
+            This list is automatically updated daily based on my GitHub <a href="https://github.com/alharkan7?tab=stars" target="_blank" rel="noopener noreferrer">stars</a>.
         </p>
     </div>
 </BaseLayout>
@@ -178,12 +180,12 @@ const totalStars = starredRepos.length;
     .repo-card {
         display: flex;
         flex-direction: column;
-        border: 1px solid var(--border-color, #ddd);
+        border: 1px solid var(--border-color);
         border-radius: 8px;
         padding: 1rem;
         text-decoration: none;
         color: inherit;
-        background-color: var(--background-alt, #f9f9f9);
+        background-color: var(--background-alt);
         transition:
             transform 0.2s ease-in-out,
             box-shadow 0.2s ease-in-out;
@@ -193,14 +195,13 @@ const totalStars = starredRepos.length;
     .repo-card:hover {
         transform: translateY(-3px);
         box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-        border-color: var(--primary-color, #007bff);
+        border-color: var(--primary-color);
     }
 
     .repo-card-header {
         display: flex;
         align-items: center;
         gap: 0.5rem;
-        margin-bottom: 0.75rem;
     }
 
     .repo-owner-avatar {
@@ -215,10 +216,52 @@ const totalStars = starredRepos.length;
 
     .repo-description {
         font-size: 0.9em;
-        color: var(--text-secondary, #555);
-        margin-bottom: 1rem;
-        flex-grow: 1; /* Allows description to push meta down */
+        color: var(--text-secondary);
+        margin-bottom: 1rem; /* Keep margin for spacing when expanded */
         line-height: 1.4;
+        word-break: break-word; /* Allow long words to break and wrap */
+        /* --- Line Clamping --- */
+        overflow: hidden;
+        display: -webkit-box;
+        -webkit-box-orient: vertical;
+        -webkit-line-clamp: 3; /* Limit to 3 lines */
+    }
+
+    /* Remove line clamp when expanded */
+    .repo-description.expanded {
+        -webkit-line-clamp: unset;
+        display: block; /* Or initial, depending on original display */
+    }
+
+    .repo-description-container {
+        flex-grow: 1; /* Allows container to push meta down */
+        margin-bottom: 0;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .show-more-button {
+        background: none;
+        border: none;
+        padding: 0; /* Reset padding */
+        margin: 0;
+        cursor: pointer;
+        color: var(--text-secondary); /* Match meta text color */
+        line-height: 1; /* Prevent extra space */
+        /* display: inline-flex; Alignment handled by flex container */
+        align-items: center;
+        /* gap: 0.2rem; No gap needed for icon only */
+        /* align-self: flex-start; Remove specific alignment */
+        flex-shrink: 0; /* Prevent shrinking */
+    }
+
+    .show-more-button svg {
+        width: 16px; /* Consistent size with other icons */
+        height: 16px;
+    }
+
+    .show-more-button:hover {
+        color: var(--primary-color); /* Highlight on hover */
     }
 
     .repo-meta {
@@ -226,9 +269,11 @@ const totalStars = starredRepos.length;
         align-items: center;
         gap: 1rem;
         font-size: 0.85em;
-        color: var(--text-secondary, #555);
+        color: var(--text-secondary);
         margin-top: auto; /* Pushes meta to the bottom */
         flex-wrap: wrap; /* Allow wrapping on small cards */
+        padding-top: 0.5rem; /* Add some top padding if description was long */
+        justify-content: space-between; /* Distribute items evenly */
     }
 
     .repo-language,
@@ -246,9 +291,9 @@ const totalStars = starredRepos.length;
 
     .footnote {
         font-size: 0.85em;
-        color: var(--text-secondary, grey);
+        color: var(--text-secondary);
         margin-top: 2em;
-        text-align: center;
+        text-align: left;
     }
 
     /* Pagination Styles */
@@ -264,18 +309,19 @@ const totalStars = starredRepos.length;
     }
 
     .nav-button {
-        color: var(--text-secondary, grey);
+        color: var(--text-secondary);
         font-size: 0.9em;
         font-weight: bold;
         text-decoration: none;
         transition: all 0.2s ease-in-out;
-        box-shadow: inset 0 -0.12em 0 var(--primary-color, #007bff);
+        box-shadow: inset 0 -0.12em 0 var(--primary-color);
         padding: 0.2em 0.1em; /* Add slight padding for hover effect */
     }
 
     .nav-button:hover {
-        box-shadow: inset 0 -1.5em 0 var(--primary-color, #007bff);
-        color: var(--background-body, white);
+        box-shadow: inset 0 -1.5em 0 var(--primary-color);
+        /* Use white text on primary background hover, works for both themes */
+        color: #fff;
     }
 
     .nav-button.disabled,
@@ -283,13 +329,13 @@ const totalStars = starredRepos.length;
         opacity: 0.5;
         cursor: not-allowed;
         pointer-events: none;
-        box-shadow: inset 0 -0.12em 0 var(--text-secondary, grey);
+        box-shadow: inset 0 -0.12em 0 var(--text-secondary);
     }
 
     .nav-button.disabled:hover,
     .nav-button[aria-disabled="true"]:hover {
-        color: var(--text-secondary, grey);
-        box-shadow: inset 0 -0.12em 0 var(--text-secondary, grey);
+        color: var(--text-secondary);
+        box-shadow: inset 0 -0.12em 0 var(--text-secondary);
     }
 
     .page-select-container {
@@ -300,134 +346,307 @@ const totalStars = starredRepos.length;
     }
 
     .page-select {
-        padding: 0.25rem 0.5rem;
+        padding: 0.25rem; /* Adjusted padding */
         font-size: 0.9em;
-        background-color: var(--background-alt, #f9f9f9);
+        background-color: var(--background-body); /* Use body background for theme compatibility */
         color: var(--text-main);
-        border: 1px solid var(--border-color, #ddd);
+        border: none; /* Remove border */
+        outline: none; /* Remove outline */
         border-radius: 4px;
         text-align: center;
-        margin: 0 0.25rem;
+        margin: 0; /* Remove margin, rely on gap */
     }
 
     .page-select:disabled {
         opacity: 0.7;
         cursor: not-allowed;
     }
+
+    /* Add margin specifically to the total pages span */
+    #page-total-span {
+        margin-left: 0.5em; /* Adjust value as needed */
+    }
+</style>
+
+<style is:global>
+    /* Thin scrollbar for #page-select in Webkit browsers */
+    #page-select::-webkit-scrollbar {
+      width: 5px;
+    }
+
+    #page-select::-webkit-scrollbar-track {
+      background: transparent;
+    }
+
+    #page-select::-webkit-scrollbar-thumb {
+      background-color: var(--text-secondary);
+      border-radius: 10px;
+      border: none;
+    }
+
+    /* Thin scrollbar for #page-select in Firefox */
+    #page-select {
+      scrollbar-width: thin;
+      scrollbar-color: var(--text-secondary) transparent;
+    }
 </style>
 
 <script>
-    document.addEventListener("DOMContentLoaded", () => {
-        const itemsPerPage = 30; // Show 15 repos per page
+    // Declare custom window property type needed for the popstate guard
+    declare global {
+        interface Window { 
+            _popstateHandledStars?: boolean; 
+        }
+    }
+
+    function initializePagination() {
+        console.log("Initializing stars pagination...");
+
+        // Query DOM elements
         const repoGrid = document.querySelector(".repo-grid");
-        const allRepos = Array.from(
-            repoGrid?.querySelectorAll(".repo-card") || [],
-        );
-        const totalItems = allRepos.length;
-        const totalPages = Math.ceil(totalItems / itemsPerPage);
-
-        const prevButton = document.getElementById(
-            "prev-button",
-        ) as HTMLAnchorElement;
-        const nextButton = document.getElementById(
-            "next-button",
-        ) as HTMLAnchorElement;
-        const pageSelect = document.getElementById(
-            "page-select",
-        ) as HTMLSelectElement;
+        const prevButton = document.getElementById("prev-button") as HTMLAnchorElement;
+        const nextButton = document.getElementById("next-button") as HTMLAnchorElement;
+        const pageSelect = document.getElementById("page-select") as HTMLSelectElement;
         const pageTotalSpan = document.getElementById("page-total-span");
-        const paginationControls = document.querySelector(
-            ".pagination-controls",
-        ) as HTMLElement | null;
+        const paginationControls = document.querySelector(".pagination-controls") as HTMLElement | null;
 
-        let currentPage = 1;
+        // Check if elements exist
+        if (!repoGrid || !prevButton || !nextButton || !pageSelect || !pageTotalSpan || !paginationControls) {
+            console.error("Pagination elements missing. Aborting initialization.");
+            // Hide controls if they partially exist but others are missing
+            if(paginationControls) paginationControls.style.display = 'none';
+            return;
+        }
 
+        // --- State Calculation ---
+        const itemsPerPage = 30;
+        // Get all repo cards directly from the grid container
+        const allRepos = Array.from(repoGrid.children).filter(el => el.classList.contains('repo-card'));
+        const totalItems = allRepos.length;
+        const totalPages = Math.ceil(totalItems / itemsPerPage) || 1; // Ensure at least 1 page
+
+        // --- Read Current Page from URL --- 
+        const urlParams = new URLSearchParams(window.location.search);
+        let currentPage = parseInt(urlParams.get("page") || "1", 10);
+        // Clamp page number to valid range
+        currentPage = Math.max(1, Math.min(currentPage, totalPages)); 
+
+        console.log(`Stars State: currentPage=${currentPage}, totalPages=${totalPages}, totalItems=${totalItems}`);
+
+        // --- Update Display Function --- 
         function updatePageDisplay() {
-            if (!repoGrid || !paginationControls) return;
+            // Re-check core elements in case something went wrong
+            if (!paginationControls || !pageSelect || !pageTotalSpan) return; 
 
             if (totalItems === 0) {
-                paginationControls.style.display = "none"; // Hide controls if no items
+                console.log("No repo items found, hiding pagination.");
+                paginationControls.style.display = 'none';
                 return;
             }
-
-            paginationControls.style.display = "flex"; // Show controls if items exist
+            paginationControls.style.display = 'flex'; // Ensure controls are visible
 
             const startIndex = (currentPage - 1) * itemsPerPage;
             const endIndex = startIndex + itemsPerPage;
 
-            // Hide all repos first
-            allRepos.forEach(
-                (repo) => ((repo as HTMLElement).style.display = "none"),
-            );
-
-            // Show only repos for the current page
+            // Hide all repo cards initially
+            allRepos.forEach(repo => (repo as HTMLElement).style.display = 'none');
+            
+            // Show only the cards for the current page
             const reposToShow = allRepos.slice(startIndex, endIndex);
-            reposToShow.forEach(
-                (repo) => ((repo as HTMLElement).style.display = "flex"),
-            ); // Use 'flex' based on .repo-card style
+            reposToShow.forEach(repo => (repo as HTMLElement).style.display = 'flex'); // Use flex based on .repo-card style
 
-            // Update button states
-            prevButton.setAttribute("aria-disabled", String(currentPage === 1));
-            prevButton.classList.toggle("disabled", currentPage === 1);
-            nextButton.setAttribute(
-                "aria-disabled",
-                String(currentPage === totalPages),
-            );
-            nextButton.classList.toggle("disabled", currentPage === totalPages);
+            console.log(`Displaying repos ${startIndex + 1} to ${Math.min(endIndex, totalItems)}`);
 
-            // Update page select
-            if (pageSelect) {
-                // Only populate if not already done or if totalPages changed (unlikely here)
-                if (pageSelect.options.length !== totalPages) {
-                    pageSelect.innerHTML = ""; // Clear existing options
-                    for (let i = 1; i <= totalPages; i++) {
-                        const option = document.createElement("option");
-                        option.value = String(i);
-                        option.textContent = String(i);
-                        pageSelect.appendChild(option);
-                    }
-                }
-                pageSelect.value = String(currentPage);
-                pageSelect.disabled = totalPages <= 1;
-            }
-            if (pageTotalSpan) {
-                pageTotalSpan.textContent = `of ${totalPages}`;
+            // --- Update Controls State --- 
+            prevButton.setAttribute('aria-disabled', String(currentPage === 1));
+            prevButton.classList.toggle('disabled', currentPage === 1);
+            nextButton.setAttribute('aria-disabled', String(currentPage === totalPages));
+            nextButton.classList.toggle('disabled', currentPage === totalPages);
+
+            // Update page select dropdown
+            // Check if update is needed (different total pages or selected value)
+            if (pageSelect.options.length !== totalPages || parseInt(pageSelect.value, 10) !== currentPage) {
+                 console.log("Rebuilding page select dropdown");
+                 pageSelect.innerHTML = ''; // Clear existing options
+                 for (let i = 1; i <= totalPages; i++) {
+                     const option = document.createElement('option');
+                     option.value = String(i);
+                     option.textContent = String(i);
+                     if (i === currentPage) {
+                         option.selected = true;
+                     }
+                     pageSelect.appendChild(option);
+                 }
+             } else {
+                 // Ensure the value is correct even if options weren't rebuilt
+                 pageSelect.value = String(currentPage);
+             }
+             pageSelect.disabled = totalPages <= 1;
+
+            // Update "of X" text
+            pageTotalSpan.innerHTML = `of&nbsp;&nbsp;&nbsp;${totalPages}`;
+        }
+
+        // --- URL Update Function (uses pushState) ---
+        function updateUrl() {
+            const url = new URL(window.location.href);
+            url.searchParams.set("page", currentPage.toString());
+            // Only push state if the URL actually changes
+            if (url.toString() !== window.location.href) {
+                history.pushState({ page: currentPage }, "", url.toString()); 
+                console.log(`Pushed history state: ${url.toString()}`);
             }
         }
 
-        // Event Listeners
-        prevButton?.addEventListener("click", (e) => {
-            e.preventDefault();
+        // --- Event Handlers --- 
+        function handlePrevClick(event: MouseEvent) {
+            event.preventDefault();
             if (currentPage > 1) {
                 currentPage--;
+                updateUrl(); 
                 updatePageDisplay();
-                repoGrid?.scrollIntoView({
-                    behavior: "smooth",
-                    block: "start",
-                });
             }
-        });
+        }
 
-        nextButton?.addEventListener("click", (e) => {
-            e.preventDefault();
+        function handleNextClick(event: MouseEvent) {
+            event.preventDefault();
             if (currentPage < totalPages) {
                 currentPage++;
+                updateUrl();
                 updatePageDisplay();
-                repoGrid?.scrollIntoView({
-                    behavior: "smooth",
-                    block: "start",
+            }
+        }
+
+        function handlePageSelectChange(event: Event) {
+            const target = event.target as HTMLSelectElement;
+            const newPage = parseInt(target.value, 10);
+            // Check if the value is a valid number and within range
+            if (!isNaN(newPage) && newPage >= 1 && newPage <= totalPages) {
+                currentPage = newPage;
+                updateUrl();
+                updatePageDisplay();
+            }
+        }
+
+        // --- Attach Event Listeners --- 
+        // Remove potentially existing listeners first to be safe, although reload makes it less critical
+        prevButton.removeEventListener("click", handlePrevClick as EventListener);
+        prevButton.addEventListener("click", handlePrevClick as EventListener);
+
+        nextButton.removeEventListener("click", handleNextClick as EventListener);
+        nextButton.addEventListener("click", handleNextClick as EventListener);
+
+        pageSelect.removeEventListener("change", handlePageSelectChange);
+        pageSelect.addEventListener("change", handlePageSelectChange);
+
+        // --- Initial Setup --- 
+        updatePageDisplay(); // Render the correct page view first
+        
+        // Set initial URL using replaceState to match the potentially clamped currentPage
+        const initialUrl = new URL(window.location.href);
+        initialUrl.searchParams.set("page", currentPage.toString());
+        if (initialUrl.toString() !== window.location.href) { // Only replace if the URL needs adjustment
+             history.replaceState({ page: currentPage }, "", initialUrl.toString());
+             console.log(`Initial URL set (replaceState): ${initialUrl.toString()}`);
+        } else {
+            console.log(`Initial URL (${initialUrl.toString()}) already correct.`);
+        }
+
+    } // End initializePagination
+
+    // --- Description Toggle Functionality ---
+    function initializeDescriptionToggles() {
+        console.log("Initializing description toggles...");
+
+        // Define SVG icons
+        const chevronDownIcon = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chevron-down"><path d="m6 9 6 6 6-6"/></svg>`;
+        const chevronUpIcon = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chevron-up"><path d="m18 15-6-6-6 6"/></svg>`;
+
+        // Find all repo cards to iterate through descriptions and metas together
+        const repoCards = document.querySelectorAll('.repo-card');
+
+        repoCards.forEach(card => {
+            const descriptionElement = card.querySelector('.repo-description') as HTMLElement | null;
+            const metaElement = card.querySelector('.repo-meta') as HTMLElement | null;
+            const descriptionContainer = card.querySelector('.repo-description-container') as HTMLElement | null;
+
+            if (!descriptionElement || !metaElement || !descriptionContainer) {
+                console.warn("Missing elements in a repo card, skipping toggle setup.", card);
+                return;
+            }
+
+            // Check if the content is overflowing the clamped height
+            const isOverflowing = descriptionElement.scrollHeight > descriptionElement.clientHeight;
+
+            // Clean up any existing button from the meta element first
+            const existingButton = metaElement.querySelector('.show-more-button');
+            if (existingButton) {
+                existingButton.remove();
+            }
+            // Reset potential padding added previously
+            metaElement.style.paddingTop = '';
+
+            if (isOverflowing) {
+                 // Add padding to meta only if overflowing
+                 metaElement.style.paddingTop = '0.5rem';
+
+                // Create the button
+                const button = document.createElement('button');
+                button.type = 'button'; // Good practice for buttons not submitting forms
+                button.classList.add('show-more-button');
+                button.setAttribute('aria-expanded', 'false');
+                button.setAttribute('aria-controls', descriptionElement.id);
+                button.setAttribute('aria-label', 'Show full description'); // Accessibility
+                button.innerHTML = chevronDownIcon; // Initial state: chevron down
+
+                // Add event listener to toggle expansion
+                button.addEventListener('click', (event) => {
+                    event.preventDefault();
+                    event.stopPropagation();
+                    const isExpanded = descriptionElement.classList.toggle('expanded');
+                    button.setAttribute('aria-expanded', String(isExpanded));
+                    if (isExpanded) {
+                        button.innerHTML = chevronUpIcon; // Expanded state: chevron up
+                        button.setAttribute('aria-label', 'Show less description');
+                    } else {
+                        button.innerHTML = chevronDownIcon; // Collapsed state: chevron down
+                        button.setAttribute('aria-label', 'Show full description');
+                    }
                 });
+
+                // Append the button to the meta element
+                metaElement.appendChild(button);
             }
         });
+        console.log("Description toggles initialized.");
+    }
 
-        pageSelect?.addEventListener("change", (e) => {
-            const target = e.target as HTMLSelectElement;
-            currentPage = parseInt(target.value, 10);
-            updatePageDisplay();
-            repoGrid?.scrollIntoView({ behavior: "smooth", block: "start" });
-        });
+    // --- Global Listeners --- 
 
-        // Initial setup
-        updatePageDisplay();
+    // Run initialization after Astro navigates to the page or on initial load
+    document.addEventListener("astro:page-load", () => {
+        // Ensure we are on the stars page before initializing
+        if (window.location.pathname === '/stars' || window.location.pathname === '/stars/') {
+            console.log("Astro:page-load event fired on /stars, initializing...");
+            initializePagination();
+            initializeDescriptionToggles(); // <-- Call the new function here
+        } else {
+            console.log("Astro:page-load event fired, but not on /stars page.");
+        }
     });
+
+    // Handle back/forward navigation using popstate -> RELOAD strategy
+    if (!window._popstateHandledStars) { // Guard to add listener only once
+        window.addEventListener("popstate", (event: PopStateEvent) => {
+            // Check if we are definitely on the stars page before reloading
+            if (window.location.pathname === '/stars' || window.location.pathname === '/stars/') {
+                console.log("Reloading /stars page due to popstate event.");
+                window.location.reload(); 
+            } else {
+                console.log("Popstate event ignored (not on /stars page).");
+            }
+        });
+        window._popstateHandledStars = true;
+    }
+
 </script>
