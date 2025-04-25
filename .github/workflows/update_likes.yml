@@ -34,17 +34,33 @@ jobs:
           GOOGLE_REFRESH_TOKEN: ${{ secrets.GOOGLE_REFRESH_TOKEN }}
         run: python public/os-bookmarks/get_liked_videos.py # Adjust path if needed
 
+      - name: Fetch GitHub Stars
+        run: |
+          mkdir -p public/os-bookmarks # Ensure the directory exists
+          curl -L -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+               -H "Accept: application/vnd.github.v3+json" \
+               "https://api.github.com/users/alharkan7/starred?per_page=100&sort=created&direction=desc" \
+               > public/os-bookmarks/github_stars.json
+          echo "Fetched starred repositories."
+
       - name: Commit and push if changed
         run: |
           git config --global user.name 'github-actions[bot]'
           git config --global user.email 'github-actions[bot]@users.noreply.github.com'
-          # Check if the file exists and has changes
-          if [[ -f "public/os-bookmarks/liked_videos.json" ]] && git diff --quiet -- "public/os-bookmarks/liked_videos.json"; then
-            echo "No changes to liked_videos.json"
+          
+          # Define file paths
+          LIKES_FILE="public/os-bookmarks/liked_videos.json"
+          STARS_FILE="public/os-bookmarks/github_stars.json"
+          
+          # Stage potential changes
+          git add "$LIKES_FILE" "$STARS_FILE"
+          
+          # Check if there are staged changes
+          if git diff --staged --quiet; then
+            echo "No changes detected in liked videos or starred repos."
           else
-            echo "Changes detected in liked_videos.json. Committing..."
-            git add public/os-bookmarks/liked_videos.json # Adjust path if needed
-            git commit -m "Automated update of liked_videos.json"
-            # Retry push on failure (e.g., temporary network issue or race condition)
+            echo "Changes detected. Committing..."
+            git commit -m "Automated update of liked videos and/or starred repos"
+            # Retry push on failure
             for i in 1 2 3; do git push && break || sleep 15; done
           fi

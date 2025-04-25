@@ -1,0 +1,214 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+// Import the data fetched by the GitHub Action
+import starredReposData from "../../public/os-bookmarks/github_stars.json"; // Adjust path if needed
+
+// Define the TypeScript interface for a single starred repository item
+interface GitHubOwner {
+    login: string;
+    id: number;
+    avatar_url: string;
+    html_url: string;
+}
+
+interface GitHubRepo {
+    id: number;
+    node_id: string;
+    name: string;
+    full_name: string;
+    private: boolean;
+    owner: GitHubOwner;
+    html_url: string;
+    description: string | null;
+    fork: boolean;
+    url: string;
+    created_at: string;
+    updated_at: string;
+    pushed_at: string;
+    homepage: string | null;
+    size: number;
+    stargazers_count: number;
+    watchers_count: number;
+    language: string | null;
+    has_issues: boolean;
+    has_projects: boolean;
+    has_downloads: boolean;
+    has_wiki: boolean;
+    has_pages: boolean;
+    forks_count: number;
+    archived: boolean;
+    disabled: boolean;
+    open_issues_count: number;
+    license: {
+        key: string;
+        name: string;
+        spdx_id: string;
+        url: string | null;
+        node_id: string;
+    } | null;
+    allow_forking: boolean;
+    is_template: boolean;
+    topics: string[];
+    visibility: string;
+    forks: number;
+    open_issues: number;
+    watchers: number;
+    default_branch: string;
+}
+
+// Cast the imported data
+const starredRepos = starredReposData as GitHubRepo[];
+
+const title = "Starred Repos - Al Harkan";
+const description = "A curated list of starred GitHub repositories.";
+const permalink = Astro.site?.href
+    ? `${Astro.site.href}stars`
+    : "/stars";
+const totalStars = starredRepos.length;
+---
+
+<BaseLayout
+    title={title}
+    description={description}
+    permalink={permalink ?? "/"}
+    current="stars"
+>
+    <div class="container">
+        <h1>My {totalStars} Starred Repositories</h1>
+        <p>{description}</p>
+        <hr />
+
+        <div class="repo-grid">
+            {starredRepos.map((repo) => {
+                // Calculate the CSS variable name for the language color
+                const languageVar = repo.language
+                    ? `var(--color-${repo.language.toLowerCase().replace(/[^a-z0-9]/g, '-')}, #ccc)`
+                    : 'var(--color-unknown, #ccc)'; // Fallback for unknown language
+
+                return (
+                    <a href={repo.html_url} target="_blank" rel="noopener noreferrer" class="repo-card">
+                        <div class="repo-card-header">
+                            <img src={repo.owner.avatar_url} alt={`${repo.owner.login} avatar`} width="24" height="24" class="repo-owner-avatar" />
+                            <span class="repo-full-name">{repo.full_name}</span>
+                        </div>
+                        <p class="repo-description">{repo.description || "No description provided."}</p>
+                        <div class="repo-meta">
+                            {repo.language && (
+                                <span class="repo-language">
+                                    {/* Use the pre-calculated variable */}
+                                    <span class="language-color" style={{ backgroundColor: languageVar }}></span>
+                                    {repo.language}
+                                </span>
+                            )}
+                            <span class="repo-stars">★ {repo.stargazers_count}</span>
+                            <span class="repo-forks"> Forks: {repo.forks_count}</span>
+                        </div>
+                    </a>
+                );
+            })}
+        </div>
+          <hr class="mt-8" />
+        <p class="footnote text-sm">
+            This list is automatically updated daily based on my GitHub stars.
+        </p>
+    </div>
+</BaseLayout>
+
+<style>
+    .container h1 {
+        margin-block-start: 1em;
+        margin-block-end: 0.5em;
+    }
+    .container > p:first-of-type { /* Target the description paragraph */
+        margin-block-end: 1.5em;
+    }
+
+    .repo-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+        gap: 1.5rem;
+        margin-block: 2em;
+    }
+
+    .repo-card {
+        display: flex;
+        flex-direction: column;
+        border: 1px solid var(--border-color, #ddd);
+        border-radius: 8px;
+        padding: 1rem;
+        text-decoration: none;
+        color: inherit;
+        background-color: var(--background-alt, #f9f9f9);
+        transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+        height: 100%; /* Make cards in a row equal height */
+    }
+
+    .repo-card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        border-color: var(--primary-color, #007bff);
+    }
+
+    .repo-card-header {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        margin-bottom: 0.75rem;
+    }
+
+    .repo-owner-avatar {
+        border-radius: 50%;
+    }
+
+    .repo-full-name {
+        font-weight: 600;
+        font-size: 1.1em;
+        word-break: break-all; /* Prevent long names from overflowing */
+    }
+
+    .repo-description {
+        font-size: 0.9em;
+        color: var(--text-secondary, #555);
+        margin-bottom: 1rem;
+        flex-grow: 1; /* Allows description to push meta down */
+        line-height: 1.4;
+    }
+
+    .repo-meta {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        font-size: 0.85em;
+        color: var(--text-secondary, #555);
+        margin-top: auto; /* Pushes meta to the bottom */
+        flex-wrap: wrap; /* Allow wrapping on small cards */
+    }
+
+    .repo-language {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.3rem;
+    }
+
+    .language-color {
+        display: inline-block;
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        /* Background color set inline via style */
+        /* Add fallback colors for common languages */
+    }
+    /* You might want to add specific background colors for common languages */
+    /* e.g., :root { --color-javascript: #f1e05a; --color-python: #3572A5; ... } */
+
+    .repo-stars, .repo-forks {
+        /* Add styles if needed */
+    }
+
+    .footnote {
+        font-size: 0.85em;
+        color: var(--text-secondary, grey);
+        margin-top: 2em;
+        text-align: center;
+    }
+</style> 
