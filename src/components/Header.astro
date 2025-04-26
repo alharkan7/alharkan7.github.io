@@ -18,11 +18,12 @@ const { current = '' } = Astro.props;
     flex-direction: column;
   }
 
-  /* @media screen and (max-width: 520px) {
-    header {
-      padding: 2em 0;
-    }
-  } */
+  /* Mobile styles (adjust max-width if needed) */
+  @media screen and (max-width: 520px) {
+  header {
+    padding: 0 2em 0.5em 2em; /* top right bottom left */
+   }
+  } 
 
 </style>
 
