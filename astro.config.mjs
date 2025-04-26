@@ -5,6 +5,7 @@ import remarkGfm from 'remark-gfm'
 import remarkSmartypants from 'remark-smartypants'
 import rehypeExternalLinks from 'rehype-external-links'
 import react from "@astrojs/react"
+import icon from "astro-icon"
 
 import tailwind from '@astrojs/tailwind';
 
@@ -76,7 +77,7 @@ export default defineConfig({
     //     theme: 'nord',
     //   },
     // }
-  ), react(), tailwind()],
+  ), react(), tailwind(), icon()],
   markdown: {
     shikiConfig: {
       theme: 'nord',
