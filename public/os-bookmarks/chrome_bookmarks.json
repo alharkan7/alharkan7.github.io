@@ -2371,6 +2371,30 @@
                         "name": "Spawn",
                         "url": "https://www.spawn.co/",
                         "date_added": "13390032039139027"
+                    },
+                    {
+                        "type": "url",
+                        "name": "LMNT – Ultrafast Lifelike AI Speech",
+                        "url": "https://www.lmnt.com/",
+                        "date_added": "13390047632550769"
+                    },
+                    {
+                        "type": "url",
+                        "name": "Odyssey",
+                        "url": "https://odyssey.world/",
+                        "date_added": "13390128872038043"
+                    },
+                    {
+                        "type": "url",
+                        "name": "Quadratic: AI Spreadsheet with Code and Connections",
+                        "url": "https://www.quadratichq.com/",
+                        "date_added": "13390208823125439"
+                    },
+                    {
+                        "type": "url",
+                        "name": "Float UI - Mailgo Tailwind CSS Template",
+                        "url": "https://floatui.com/templates/mailgo",
+                        "date_added": "13390211203533180"
                     }
                 ],
                 "date_added": "13313210870914736"
@@ -5047,6 +5071,18 @@
                         "name": "the shadcn/ui registry | UI.pub",
                         "url": "https://uipub.com/",
                         "date_added": "13388868686319508"
+                    },
+                    {
+                        "type": "url",
+                        "name": "Shadcn Theme Editor - Shadcn Studio",
+                        "url": "https://shadcnstudio.com/theme-editor",
+                        "date_added": "13390047322828922"
+                    },
+                    {
+                        "type": "url",
+                        "name": "Klack — Satisfying sound with every keystroke",
+                        "url": "https://tryklack.com/",
+                        "date_added": "13390103262232470"
                     }
                 ],
                 "date_added": "13313210871614953"
