@@ -2419,6 +2419,24 @@
                         "name": "Clova - AI Video Organization",
                         "url": "https://www.joinclova.com/edit",
                         "date_added": "13390717867788117"
+                    },
+                    {
+                        "type": "url",
+                        "name": "Take Action | ControlAI",
+                        "url": "https://controlai.com/take-action",
+                        "date_added": "13390787337977476"
+                    },
+                    {
+                        "type": "url",
+                        "name": "Xynth Finance",
+                        "url": "https://www.xynth.finance/",
+                        "date_added": "13390793208121617"
+                    },
+                    {
+                        "type": "url",
+                        "name": "Abacus.AI - DeepAgent",
+                        "url": "https://deepagent.abacus.ai/",
+                        "date_added": "13390816600995422"
                     }
                 ],
                 "date_added": "13313210870914736"
@@ -3705,6 +3723,12 @@
                         "name": "Mergent - Serverless Crons & Background Jobs",
                         "url": "https://mergent.co/",
                         "date_added": "13389935222100437"
+                    },
+                    {
+                        "type": "url",
+                        "name": "OpenNext",
+                        "url": "https://github.com/opennextjs",
+                        "date_added": "13390838136233054"
                     }
                 ],
                 "date_added": "13313210870769945"
