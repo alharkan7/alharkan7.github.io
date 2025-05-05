@@ -2437,6 +2437,12 @@
                         "name": "Abacus.AI - DeepAgent",
                         "url": "https://deepagent.abacus.ai/",
                         "date_added": "13390816600995422"
+                    },
+                    {
+                        "type": "url",
+                        "name": "Prompt Library",
+                        "url": "https://www.promptly.fyi/library",
+                        "date_added": "13390881962317794"
                     }
                 ],
                 "date_added": "13313210870914736"
