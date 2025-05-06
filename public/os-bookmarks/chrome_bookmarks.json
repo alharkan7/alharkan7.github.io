@@ -2443,6 +2443,12 @@
                         "name": "Prompt Library",
                         "url": "https://www.promptly.fyi/library",
                         "date_added": "13390881962317794"
+                    },
+                    {
+                        "type": "url",
+                        "name": "Shapes, Inc",
+                        "url": "https://shapes.inc/",
+                        "date_added": "13390950382943428"
                     }
                 ],
                 "date_added": "13313210870914736"
@@ -5161,6 +5167,12 @@
                         "name": "Create your own design system - StyleGlide.ai",
                         "url": "https://www.styleglide.ai/themes",
                         "date_added": "13390753846443524"
+                    },
+                    {
+                        "type": "url",
+                        "name": "Homepage | GSAP",
+                        "url": "https://gsap.com/",
+                        "date_added": "13390901066023343"
                     }
                 ],
                 "date_added": "13313210871614953"
