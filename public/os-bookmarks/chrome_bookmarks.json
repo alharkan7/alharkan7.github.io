@@ -2449,6 +2449,12 @@
                         "name": "Shapes, Inc",
                         "url": "https://shapes.inc/",
                         "date_added": "13390950382943428"
+                    },
+                    {
+                        "type": "url",
+                        "name": "Sim Studio",
+                        "url": "https://www.simstudio.ai/",
+                        "date_added": "13391051104044341"
                     }
                 ],
                 "date_added": "13313210870914736"
@@ -3741,6 +3747,12 @@
                         "name": "OpenNext",
                         "url": "https://github.com/opennextjs",
                         "date_added": "13390838136233054"
+                    },
+                    {
+                        "type": "url",
+                        "name": "Codespaces",
+                        "url": "https://github.com/codespaces",
+                        "date_added": "13391051844039530"
                     }
                 ],
                 "date_added": "13313210870769945"
