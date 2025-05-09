@@ -2473,6 +2473,12 @@
                         "name": "Zapier MCP",
                         "url": "https://mcp.zapier.com/mcp/servers",
                         "date_added": "13391215182046295"
+                    },
+                    {
+                        "type": "url",
+                        "name": "Harvey",
+                        "url": "https://www.harvey.ai/",
+                        "date_added": "13391241248472472"
                     }
                 ],
                 "date_added": "13313210870914736"
