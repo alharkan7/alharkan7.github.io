@@ -1,4 +1,5 @@
 # raihankalla.id
+[![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/alharkan7/alharkan7.github.io)
 
 This is the source code for [raihankalla.id](https://www.raihankalla.id), my personal blog built with [Astro](https://astro.build) - the modern web framework for content-driven websites.
 
