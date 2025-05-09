@@ -2467,6 +2467,12 @@
                         "name": "Computer Agent - a Hugging Face Space by smolagents",
                         "url": "https://huggingface.co/spaces/smolagents/computer-agent",
                         "date_added": "13391155178862490"
+                    },
+                    {
+                        "type": "url",
+                        "name": "Zapier MCP",
+                        "url": "https://mcp.zapier.com/mcp/servers",
+                        "date_added": "13391215182046295"
                     }
                 ],
                 "date_added": "13313210870914736"
