@@ -2479,6 +2479,12 @@
                         "name": "Harvey",
                         "url": "https://www.harvey.ai/",
                         "date_added": "13391241248472472"
+                    },
+                    {
+                        "type": "url",
+                        "name": "LiveKit",
+                        "url": "https://livekit.io/",
+                        "date_added": "13391252407485885"
                     }
                 ],
                 "date_added": "13313210870914736"
