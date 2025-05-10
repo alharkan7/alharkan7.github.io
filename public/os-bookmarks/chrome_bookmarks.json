@@ -2485,6 +2485,12 @@
                         "name": "LiveKit",
                         "url": "https://livekit.io/",
                         "date_added": "13391252407485885"
+                    },
+                    {
+                        "type": "url",
+                        "name": "Conjecture",
+                        "url": "https://www.conjecture.dev/",
+                        "date_added": "13391333563923672"
                     }
                 ],
                 "date_added": "13313210870914736"
