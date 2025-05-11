@@ -2491,6 +2491,12 @@
                         "name": "Conjecture",
                         "url": "https://www.conjecture.dev/",
                         "date_added": "13391333563923672"
+                    },
+                    {
+                        "type": "url",
+                        "name": "Prompt engineering overview - Anthropic",
+                        "url": "https://docs.anthropic.com/en/docs/build-with-claude/prompt-engineering/overview",
+                        "date_added": "13391445652835453"
                     }
                 ],
                 "date_added": "13313210870914736"
