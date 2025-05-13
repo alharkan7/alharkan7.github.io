@@ -2503,6 +2503,12 @@
                         "name": "Find Insights With AI | TextQL",
                         "url": "https://textql.com/",
                         "date_added": "13391539229659147"
+                    },
+                    {
+                        "type": "url",
+                        "name": "Pica: The Open-Source Catalyst for Autonomous AI",
+                        "url": "https://www.picaos.com/",
+                        "date_added": "13391590257542146"
                     }
                 ],
                 "date_added": "13313210870914736"
@@ -4536,6 +4542,12 @@
                         "name": "NewLimit | Extending human healthspan",
                         "url": "https://www.newlimit.com/",
                         "date_added": "13391067204120057"
+                    },
+                    {
+                        "type": "url",
+                        "name": "Exa Websets",
+                        "url": "https://websets.exa.ai/datasets",
+                        "date_added": "13391584731470692"
                     }
                 ],
                 "date_added": "13313210871655038"
