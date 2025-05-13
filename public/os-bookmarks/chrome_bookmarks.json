@@ -2497,6 +2497,12 @@
                         "name": "Prompt engineering overview - Anthropic",
                         "url": "https://docs.anthropic.com/en/docs/build-with-claude/prompt-engineering/overview",
                         "date_added": "13391445652835453"
+                    },
+                    {
+                        "type": "url",
+                        "name": "Find Insights With AI | TextQL",
+                        "url": "https://textql.com/",
+                        "date_added": "13391539229659147"
                     }
                 ],
                 "date_added": "13313210870914736"
