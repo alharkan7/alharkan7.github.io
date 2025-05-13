@@ -3807,6 +3807,12 @@
                         "name": "Codespaces",
                         "url": "https://github.com/codespaces",
                         "date_added": "13391051844039530"
+                    },
+                    {
+                        "type": "url",
+                        "name": "The Recurse Center",
+                        "url": "https://www.recurse.com/",
+                        "date_added": "13391613593739447"
                     }
                 ],
                 "date_added": "13313210870769945"
