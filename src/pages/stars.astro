@@ -1,7 +1,8 @@
 ---
 import BaseLayout from "../layouts/BaseLayout.astro";
 // Import the data fetched by the GitHub Action
-import starredReposData from "../../public/os-bookmarks/github_stars.json"; // Adjust path if needed
+// import starredReposData from "../../public/os-bookmarks/github_stars.json"; // Adjust path if needed
+import { createClient } from "@supabase/supabase-js";
 // Import Lucide icons
 import { Code, Star, GitFork, ChevronDown, ChevronUp } from "lucide-react";
 
@@ -27,8 +28,69 @@ interface GitHubRepo {
     // Remove topics, visibility, etc.
 }
 
+// Define an interface for the raw Supabase data
+interface SupabaseGitHubStar {
+    repo_id: number;
+    full_name: string | null;
+    html_url: string;
+    description: string | null;
+    language: string | null;
+    stargazers_count: number | null;
+    forks_count: number | null;
+    pushed_at: string | null;
+    owner_login: string | undefined;
+    owner_avatar_url: string | undefined;
+}
+
+// Initialize Supabase client
+// IMPORTANT: Replace with your actual Supabase URL and Anon Key
+const supabaseUrl = import.meta.env.SUPABASE_URL || "SUPABASE_URL";
+const supabaseAnonKey = import.meta.env.SUPABASE_ANON_KEY || "SUPABASE_ANON_KEY";
+
+if (supabaseUrl === "YOUR_SUPABASE_URL" || supabaseAnonKey === "YOUR_SUPABASE_ANON_KEY") {
+    console.warn(
+        "Supabase URL or Anon Key is not set. Please update them in your environment variables or directly in the code.",
+    );
+}
+
+const supabase = createClient(supabaseUrl, supabaseAnonKey);
+
+// Fetch data from Supabase
+async function getStarredRepos(): Promise<GitHubRepo[]> {
+    const { data, error } = await supabase
+        .from("github_stars")
+        .select(
+            "repo_id, full_name, html_url, description, language, stargazers_count, forks_count, pushed_at, owner_login, owner_avatar_url",
+        )
+        .order("stargazers_count", { ascending: false }); // Example ordering
+
+    if (error) {
+        console.error("Error fetching starred repos from Supabase:", error);
+        return [];
+    }
+
+    // Transform data to match GitHubRepo interface
+    return data
+        ? data.map((repo: SupabaseGitHubStar) => ({
+              id: repo.repo_id,
+              full_name: repo.full_name,
+              owner: {
+                  login: repo.owner_login,
+                  avatar_url: repo.owner_avatar_url,
+              },
+              html_url: repo.html_url,
+              description: repo.description,
+              language: repo.language,
+              stargazers_count: repo.stargazers_count,
+              forks_count: repo.forks_count,
+              pushed_at: repo.pushed_at,
+          }))
+        : [];
+}
+
 // Cast the imported data
-const starredRepos = starredReposData as GitHubRepo[];
+// const starredRepos = starredReposData as GitHubRepo[];
+const starredRepos = await getStarredRepos();
 
 // Helper function to format date
 function formatDate(dateString: string | null): string {

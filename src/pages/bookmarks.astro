@@ -1,22 +1,16 @@
 ---
 import BaseLayout from "../layouts/BaseLayout.astro";
-import bookmarksDataUntyped from "../../public/os-bookmarks/chrome_bookmarks.json" assert { type: "json" };
+// import bookmarksDataUntyped from "../../public/os-bookmarks/chrome_bookmarks.json" assert { type: "json" };
+import { createClient } from "@supabase/supabase-js";
 import BookmarkNodeComponent from "../components/BookmarkNode.astro"; // Import the new component
 import type {
-    BookmarkNode,
-    BookmarkFolder as BookmarkFolderType,
+    BookmarkNode as ComponentBookmarkNode, // Rename to avoid conflict
+    BookmarkFolder as ComponentBookmarkFolder, // Rename to avoid conflict
+    BookmarkURL as ComponentBookmarkURL, // Import ComponentBookmarkURL
 } from "../components/BookmarkNode.astro"; // Import types
 
-// Define ONLY the top-level BookmarkData type here
-interface BookmarkFolder {
-    type: "folder";
-    id: string;
-    name: string;
-    date_added: string;
-    date_modified?: string;
-    guid: string;
-    children: any[]; // Use any temporarily, full types are in the component
-}
+// Local type for the main root folders, must be compatible with ComponentBookmarkFolder
+interface BookmarkFolder extends ComponentBookmarkFolder {}
 
 interface BookmarkData {
     roots: {
@@ -27,8 +21,146 @@ interface BookmarkData {
     };
 }
 
-// Cast the imported data
-const bookmarkRoots = bookmarksDataUntyped as unknown as BookmarkData["roots"];
+// Initialize Supabase client
+const supabaseUrl = import.meta.env.SUPABASE_URL;
+const supabaseAnonKey = import.meta.env.SUPABASE_ANON_KEY;
+
+if (!supabaseUrl || !supabaseAnonKey) {
+    console.warn(
+        "Supabase URL or Anon Key is not set. Please update them in your environment variables.",
+    );
+}
+// Create a single Supabase client instance
+const supabase = supabaseUrl && supabaseAnonKey ? createClient(supabaseUrl, supabaseAnonKey) : null;
+
+// Type for raw data from Supabase
+interface SupabaseBookmark {
+    id: number;
+    name: string;
+    type: 'url' | 'folder';
+    url?: string | null;
+    date_added: bigint | string;
+    parent_id?: number | null;
+    source?: string | null;
+}
+
+// Intermediate type for processing: Component types + temp DB fields
+type ProcessingNode = 
+    (ComponentBookmarkURL & { _db_parent_id?: number | null; _db_source?: string | null; }) |
+    (ComponentBookmarkFolder & { _db_parent_id?: number | null; _db_source?: string | null; });
+
+
+async function getChromeBookmarksFromSupabase(): Promise<BookmarkData['roots']> {
+    if (!supabase) {
+        console.error("Supabase client not initialized.");
+        const defaultGuid = "error-guid-empty-client";
+        return {
+            bookmark_bar: { id: 'empty_bar', name: 'Bookmarks bar (Error)', type: 'folder', children: [], date_added: '0', guid: defaultGuid, date_modified: undefined },
+            other: { id: 'empty_other', name: 'Other bookmarks (Error)', type: 'folder', children: [], date_added: '0', guid: defaultGuid, date_modified: undefined },
+        };
+    }
+
+    const { data, error } = await supabase
+        .from("chrome_bookmarks")
+        .select("id, name, type, url, date_added, parent_id, source");
+
+    if (error) {
+        console.error("Error fetching bookmarks from Supabase:", error);
+        const defaultGuid = "error-guid-fetch";
+        return {
+            bookmark_bar: { id: 'error_bar', name: 'Bookmarks bar (Error)', type: 'folder', children: [], date_added: '0', guid: defaultGuid, date_modified: undefined },
+            other: { id: 'error_other', name: 'Other bookmarks (Error)', type: 'folder', children: [], date_added: '0', guid: defaultGuid, date_modified: undefined },
+        };
+    }
+
+    if (!data) {
+        const defaultGuid = "no-data-guid-fetch";
+        return {
+            bookmark_bar: { id: 'no_data_bar', name: 'Bookmarks bar (No Data)', type: 'folder', children: [], date_added: '0', guid: defaultGuid, date_modified: undefined },
+            other: { id: 'no_data_other', name: 'Other bookmarks (No Data)', type: 'folder', children: [], date_added: '0', guid: defaultGuid, date_modified: undefined },
+        };
+    }
+
+    const nodesMap: Map<string, ProcessingNode> = new Map();
+    const allNodes: ProcessingNode[] = data.map((dbNode: SupabaseBookmark) => {
+        const baseProps = {
+            id: String(dbNode.id),
+            name: dbNode.name,
+            date_added: String(dbNode.date_added),
+            date_modified: undefined, // Not in DB, ComponentBookmarkNodeBase allows optional
+            _db_parent_id: dbNode.parent_id,
+            _db_source: dbNode.source,
+        };
+
+        if (dbNode.type === 'folder') {
+            return {
+                ...baseProps,
+                type: 'folder',
+                children: [],
+                guid: `folder_guid_${dbNode.id}`, // Folders require a guid
+            } as ProcessingNode; // Cast to ProcessingNode (Folder variant)
+        } else {
+            return {
+                ...baseProps,
+                type: 'url',
+                url: dbNode.url || "#", // URLs require a url and guid
+                guid: `url_guid_${dbNode.id}`,
+            } as ProcessingNode; // Cast to ProcessingNode (URL variant)
+        }
+    });
+
+    allNodes.forEach((node: ProcessingNode) => nodesMap.set(node.id, node));
+
+    const supabaseRoots: BookmarkData['roots'] = {
+        bookmark_bar: { id: 'root_bar_default', name: 'Bookmarks bar', type: 'folder', children: [], date_added: '0', guid: 'guid_bookmark_bar_root', date_modified: undefined },
+        other: { id: 'root_other_default', name: 'Other bookmarks', type: 'folder', children: [], date_added: '0', guid: 'guid_other_root', date_modified: undefined },
+    };
+
+    allNodes.forEach((node: ProcessingNode) => {
+        if (node.type === 'folder') {
+            if (node._db_source === 'bookmark_bar' && node.name === 'Bookmarks bar' && !node._db_parent_id) {
+                supabaseRoots.bookmark_bar = { ...node, children: node.children || [] }; // node is ProcessingNode (Folder), assign to BookmarkFolder
+                nodesMap.set(node.id, supabaseRoots.bookmark_bar as ProcessingNode); 
+            } else if (node._db_source === 'other' && node.name === 'Other bookmarks' && !node._db_parent_id) {
+                supabaseRoots.other = { ...node, children: node.children || [] };
+                nodesMap.set(node.id, supabaseRoots.other as ProcessingNode);
+            } else if (node._db_source === 'synced' && node.name === 'Synced bookmarks' && !node._db_parent_id && supabaseRoots.synced) {
+                supabaseRoots.synced = { ...node, children: node.children || [] };
+                nodesMap.set(node.id, supabaseRoots.synced as ProcessingNode);
+            }
+        }
+    });
+    
+    allNodes.forEach((node: ProcessingNode) => {
+        const parentId = node._db_parent_id ? String(node._db_parent_id) : null;
+        if (parentId) {
+            const parentNodeFromMap = nodesMap.get(parentId);
+            if (parentNodeFromMap && parentNodeFromMap.type === 'folder') {
+                // Construct a clean ComponentBookmarkNode for the children array
+                let childNodeForTree: ComponentBookmarkNode;
+                if (node.type === 'url') {
+                    childNodeForTree = {
+                        id: node.id, name: node.name, type: 'url', date_added: node.date_added, 
+                        guid: node.guid, url: node.url, date_modified: node.date_modified, meta_info: node.meta_info
+                    };
+                } else { // type === 'folder'
+                    childNodeForTree = {
+                        id: node.id, name: node.name, type: 'folder', date_added: node.date_added,
+                        guid: node.guid, children: node.children || [], date_modified: node.date_modified
+                    };
+                }
+                parentNodeFromMap.children.push(childNodeForTree);
+            }
+        }
+    });
+
+    // The supabaseRoots object now holds BookmarkFolder types which are compatible
+    // with ComponentBookmarkFolder. Children have been populated with ComponentBookmarkNode types.
+    return supabaseRoots;
+}
+
+// Use ComponentBookmarkNode for type safety with the component
+const bookmarkRoots = await getChromeBookmarksFromSupabase();
 
 const title = "Bookmarks - Al Harkan";
 const description = "Bookmarks on AI Research, Business, Software, and Digital Media";
@@ -49,37 +181,37 @@ const allowedFolderNames = [
 ];
 
 // Prepare the roots to iterate over (handle potential undefined)
+// Cast to ComponentBookmarkFolder as this is what BookmarkNodeComponent expects for folders
 const rootsToRender = [bookmarkRoots.bookmark_bar, bookmarkRoots.other].filter(
     Boolean,
-) as BookmarkFolderType[]; // Cast to proper type
+) as ComponentBookmarkFolder[];
 
 // --- Add URL Counting Logic ---
-const countUrls = (node: BookmarkNode): number => {
-    if (!node) return 0; // Guard against null/undefined nodes if data is imperfect
+const countUrls = (node: ComponentBookmarkNode): number => { // Use ComponentBookmarkNode
+    if (!node) return 0;
     if (node.type === "url") {
         return 1;
     } else if (node.type === "folder") {
-        // Recursively count URLs in children
-        return node.children.reduce(
-            (sum: number, child: BookmarkNode) => sum + countUrls(child),
+        return (node.children || []).reduce( // Add null check for children
+            (sum: number, child: ComponentBookmarkNode) => sum + countUrls(child),
             0,
         );
     }
-    return 0; // Handle other types or errors gracefully
+    return 0;
 };
 
 // Calculate total count only across the *allowed* folders that will be rendered
 let totalUrlCount = 0;
-rootsToRender.forEach((root: BookmarkFolderType) => {
+rootsToRender.forEach((root: ComponentBookmarkFolder) => { // Use ComponentBookmarkFolder
     if (root.children) {
         root.children
             .filter(
-                (node: BookmarkNode) =>
+                (node: ComponentBookmarkNode) => // Use ComponentBookmarkNode
                     node.type === "folder" &&
                     allowedFolderNames.includes(node.name),
             )
-            .forEach((allowedFolder: BookmarkNode) => {
-                totalUrlCount += countUrls(allowedFolder); // Count URLs within each allowed folder
+            .forEach((allowedFolder: ComponentBookmarkNode) => { // Use ComponentBookmarkNode
+                totalUrlCount += countUrls(allowedFolder);
             });
     }
 });
@@ -101,18 +233,15 @@ rootsToRender.forEach((root: BookmarkFolderType) => {
         <div>
             {
                 rootsToRender.map(
-                    (root: BookmarkFolderType) =>
-                        // Iterate through the children of each main root ('bookmark_bar', 'other')
+                    (root: ComponentBookmarkFolder) => // Use ComponentBookmarkFolder
                         root.children &&
                         root.children
-                            // Filter children: only include folders whose names are in the allowed list
                             .filter(
-                                (node: BookmarkNode) =>
+                                (node: ComponentBookmarkNode) => // Use ComponentBookmarkNode
                                     node.type === "folder" &&
                                     allowedFolderNames.includes(node.name),
                             )
-                            // Render the allowed folders, passing the allowed list down
-                            .map((node: BookmarkNode) => (
+                            .map((node: ComponentBookmarkNode) => ( // Use ComponentBookmarkNode
                                 <BookmarkNodeComponent
                                     node={node}
                                     allowedFolderNames={allowedFolderNames}

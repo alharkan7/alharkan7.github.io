@@ -1,7 +1,8 @@
 ---
 import BaseLayout from "../layouts/BaseLayout.astro";
-import { readFile } from 'node:fs/promises'; // Import Node.js fs for build-time reading
-import path from 'node:path';
+// import { readFile } from 'node:fs/promises'; // Remove Node.js fs
+// import path from 'node:path'; // Remove Node.js path
+import { createClient } from "@supabase/supabase-js";
 
 // Define the expected structure of a video object
 interface Video {
@@ -10,70 +11,103 @@ interface Video {
     url: string;
     video_owner_channel_id: string;
     video_owner_channel_title: string;
-    published_at: string;
+    published_at: string; // Supabase typically returns TIMESTAMPTZ as ISO string
 }
 
-const title = "Videos - Al Harkan";
+const page_title = "Videos - Al Harkan"; // Renamed to avoid conflict with Video.title
 const description =
     "Videos Curation on AI Research, Software, and Digital Media";
 const permalink = Astro.site?.href ? `${Astro.site.href}videos` : "/videos";
 
-// --- Build-time Data Extraction for Filters & Count ---
-let buildTimeVideosData: Video[] = [];
+// Initialize Supabase client
+const supabaseUrl = import.meta.env.SUPABASE_URL;
+const supabaseAnonKey = import.meta.env.SUPABASE_ANON_KEY;
+
+let allVideosData: Video[] = [];
 let totalItems = 0;
 let uniqueYears: string[] = [];
 let uniqueChannels: { id: string; title: string }[] = [];
 let errorMessage: string | null = null;
 
-try {
-    // Construct the absolute path relative to the project root
-    const jsonPath = path.resolve('public/os-bookmarks/liked_videos.json');
-    // console.log(`Reading JSON from: ${jsonPath}`); // Debug path
-    const jsonData = await readFile(jsonPath, 'utf-8');
-    let allParsedVideos = JSON.parse(jsonData);
-
-    // Filter out "Private video" entries *before* counting or processing
-    buildTimeVideosData = allParsedVideos.filter((video: Video) => video.title !== "Private video");
-
-    // Calculate total items based on the *filtered* data
-    totalItems = buildTimeVideosData.length;
-
-    // Now extract unique years and channels from the filtered data
-    uniqueYears = [
-        ...new Set(buildTimeVideosData.map((v) => v.published_at.substring(0, 4))),
-].sort((a, b) => parseInt(b) - parseInt(a)); // Sort descending
-
-const uniqueChannelsMap = new Map<string, string>();
-    buildTimeVideosData.forEach((v) => {
-        if (v.video_owner_channel_id && !uniqueChannelsMap.has(v.video_owner_channel_id)) {
-        uniqueChannelsMap.set(
-            v.video_owner_channel_id,
-                v.video_owner_channel_title || 'Unknown Channel', // Provide fallback
-        );
-    }
-});
-    uniqueChannels = Array.from(uniqueChannelsMap.entries())
-    .map(([id, title]) => ({ id, title }))
-    .sort((a, b) => a.title.localeCompare(b.title)); // Sort alphabetically by title
-
-    // Clear the large data structure after extracting info to prevent accidental bundling
-    buildTimeVideosData = [];
-
-} catch (error) {
-    console.error("Error reading or processing liked_videos.json during build:", error);
-    errorMessage = "Could not load video data during build. Filters might be unavailable.";
-    // Assign default empty values if build fails
-    totalItems = 0;
-    uniqueYears = [];
-    uniqueChannels = [];
+if (!supabaseUrl || !supabaseAnonKey) {
+    errorMessage = "Supabase URL or Anon Key is not set in environment variables.";
+    console.warn(errorMessage);
 }
-// --- End Build-time Data Extraction ---
+
+const supabase = supabaseUrl && supabaseAnonKey ? createClient(supabaseUrl, supabaseAnonKey) : null;
+
+async function getLikedVideosFromSupabase(): Promise<Video[]> {
+    if (!supabase) {
+        throw new Error("Supabase client not initialized.");
+    }
+    const { data, error } = await supabase
+        .from("liked_videos")
+        .select("title, thumbnail_url, url, video_owner_channel_id, video_owner_channel_title, published_at")
+        .order("published_at", { ascending: false });
+
+    if (error) {
+        console.error("Error fetching liked videos from Supabase:", error);
+        throw error;
+    }
+
+    return data 
+        ? data.map(item => ({ // Ensure mapping to Video interface
+            title: item.title,
+            thumbnail_url: item.thumbnail_url,
+            url: item.url,
+            video_owner_channel_id: item.video_owner_channel_id,
+            video_owner_channel_title: item.video_owner_channel_title,
+            published_at: item.published_at, // Assuming it's already a string
+        }))
+        : [];
+}
+
+if (supabase) {
+    try {
+        const rawVideos = await getLikedVideosFromSupabase();
+        // Filter out "Private video" entries
+        allVideosData = rawVideos.filter((video: Video) => video.title !== "Private video" && video.title !== null);
+
+        totalItems = allVideosData.length;
+
+        if (totalItems > 0) {
+            uniqueYears = [
+                ...new Set(allVideosData.map((v) => v.published_at?.substring(0, 4)).filter(Boolean)),
+            ].sort((a, b) => parseInt(b) - parseInt(a));
+
+            const uniqueChannelsMap = new Map<string, string>();
+            allVideosData.forEach((v) => {
+                if (v.video_owner_channel_id && !uniqueChannelsMap.has(v.video_owner_channel_id)) {
+                    uniqueChannelsMap.set(
+                        v.video_owner_channel_id,
+                        v.video_owner_channel_title || 'Unknown Channel',
+                    );
+                }
+            });
+            uniqueChannels = Array.from(uniqueChannelsMap.entries())
+                .map(([id, title]) => ({ id, title }))
+                .sort((a, b) => a.title.localeCompare(b.title));
+        }
+    } catch (error) {
+        console.error("Error fetching or processing liked_videos from Supabase:", error);
+        if (error instanceof Error) {
+            errorMessage = `Could not load video data: ${error.message}`;
+        } else {
+            errorMessage = "Could not load video data: An unknown error occurred.";
+        }
+        // Assign default empty values if fetch fails
+        totalItems = 0;
+        uniqueYears = [];
+        uniqueChannels = [];
+        allVideosData = []; // Ensure it's empty on error
+    }
+} else if (!errorMessage) { // If supabase is null and no specific env var message
+    errorMessage = "Supabase client could not be initialized. Videos cannot be loaded.";
+}
 
 
 // --- Initial State from URL (Client will refine) ---
-// We still need validLimits defined for the client script to use
 const validLimits = [30, 60, 90];
-// Basic check for initial limit to pass, client will validate more strictly
 const requestUrl = new URL(Astro.request.url);
 const urlParams = requestUrl.searchParams;
 let initialLimit = parseInt(urlParams.get("limit") || validLimits[0].toString());
@@ -85,10 +119,10 @@ if (!validLimits.includes(initialLimit)) {
 ---
 
 <BaseLayout
-    title={title}
+    title={page_title}
     description={description}
     permalink={permalink ?? "/"}
-    current="bookmarks"
+    current="videos"
 >
     <div class="container">
         <h1 class="!mb-4">My Entire YouTube History in {totalItems > 0 ? `${totalItems} ` : ''} Videos</h1>
@@ -233,13 +267,14 @@ if (!validLimits.includes(initialLimit)) {
 
 <script
     define:vars={{
-        // Pass only necessary data, NOT the full video list
-        initialTotalItems: totalItems,
+        // Pass the full video dataset fetched from Supabase
+        allVideosData: allVideosData,
+        initialTotalItems: totalItems, // Still useful for initial display before client hydration
+        initialUniqueYears: uniqueYears, // Still useful for initial filter population
+        initialUniqueChannels: uniqueChannels, // Still useful for initial filter population
         validLimits,
-        // Keep build-time lists for initial render & validation
-        initialUniqueYears: uniqueYears,
-        initialUniqueChannels: uniqueChannels,
-        jsonUrl: '/os-bookmarks/liked_videos.json' // URL to fetch
+        // jsonUrl: '/os-bookmarks/liked_videos.json' // Remove jsonUrl
+        fetchErrorMessage: errorMessage // Pass any fetch error to the client
     }}
 >
     // Get elements
@@ -256,8 +291,9 @@ if (!validLimits.includes(initialLimit)) {
     const errorMessageElement = document.getElementById("error-message"); // Added error message display
 
     // State variables
-    let allVideos = []; // Will be populated by fetch
-    let isDataLoading = true;
+    let allVideos = allVideosData; // Use data passed from Astro frontmatter
+    let isDataLoading = false; // Data is pre-loaded by Astro
+    let fetchErrorFromServer = fetchErrorMessage; // Get error message from server
     let currentPage = 1;
     let itemsPerPage = validLimits[0];
     let totalPages = 1;
@@ -560,18 +596,16 @@ if (!validLimits.includes(initialLimit)) {
     }
 
     async function initializeAndFetchData() {
-        console.log("Initializing data fetch");
-        isDataLoading = true;
-        if (errorMessageElement) errorMessageElement.classList.add('hidden'); // Hide previous errors
-        
-        // Read initial state from URL parameters immediately
+        console.log("Initializing with pre-loaded data from Astro");
+        isDataLoading = true; // Set to true initially, then false after processing
+        if (errorMessageElement) errorMessageElement.classList.add('hidden');
+
         const urlParams = new URLSearchParams(window.location.search);
         const initialPage = parseInt(urlParams.get("page") || "1");
         const initialLimit = parseInt(urlParams.get("limit") || validLimits[0].toString());
         const initialYear = urlParams.get("year") || "all";
         const initialChannel = urlParams.get("channel") || "all";
         
-        // Set initial state from URL
         currentPage = initialPage;
         itemsPerPage = validLimits.includes(initialLimit) ? initialLimit : validLimits[0]; 
         selectedYear = initialYear;
@@ -584,119 +618,73 @@ if (!validLimits.includes(initialLimit)) {
             channel: selectedChannelId
         });
         
-        // Update form controls to match URL parameters
         if (limitSelect) limitSelect.value = itemsPerPage.toString();
-        if (yearSelect) yearSelect.value = selectedYear;
-        if (channelSelect) channelSelect.value = selectedChannelId;
+        if (yearSelect) yearSelect.value = selectedYear; // Will be refined by updateYearOptions
+        if (channelSelect) channelSelect.value = selectedChannelId; // Will be refined by updateChannelOptions
         
-        // Show loading state
-        renderPage();
+        // renderPage(); // Show loading state - No, data is already here
 
-        try {
-            // Ensure we're using the correct path to the JSON file
-            // The jsonUrl variable should be '/os-bookmarks/liked_videos.json'
-            console.log("Fetching data from:", jsonUrl);
-            
-            // Add a timestamp to bust cache if needed
-            const fetchUrl = `${jsonUrl}?t=${Date.now()}`;
-            const response = await fetch(fetchUrl);
-            
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status} ${response.statusText}`);
-            }
-            
-            const jsonText = await response.text(); // Get raw text first
-            
-            // Try to parse JSON safely
-            let data;
-            try {
-                data = JSON.parse(jsonText);
-            } catch (parseError) {
-                console.error("JSON parse error:", parseError);
-                throw new Error(`Failed to parse JSON: ${parseError.message}. First 100 chars: ${jsonText.substring(0, 100)}`);
-            }
-            
-            console.log(`Fetched ${data.length} videos`);
-
-            if (!Array.isArray(data)) {
-                throw new Error(`Data is not an array. Received type: ${typeof data}. First 100 chars: ${JSON.stringify(data).substring(0, 100)}`);
-            }
-
-            // Filter out videos with missing data or "Private Video" titles
-            allVideos = data.filter(video => {
-                return video && typeof video === 'object' && video.title !== "Private video";
-            });
-            
-            console.log(`After filtering, have ${allVideos.length} usable videos`);
-            
-            if (allVideos.length === 0 && data.length > 0) {
-                // We had data but filtered everything out - probably a data structure issue
-                console.error("Filtered out all videos from non-empty dataset - possible data structure problem");
-                throw new Error("Data appears valid but no usable videos found. Data structure may have changed.");
-            }
-            
-            isDataLoading = false; // Mark loading as complete
-
-            // Validate current filters against loaded data
-            const allYears = [...new Set(allVideos.map(v => v.published_at?.substring(0, 4)).filter(Boolean))];
-            if (selectedYear !== "all" && !allYears.includes(selectedYear)) {
-                console.log("Selected year not found in data, resetting to 'all'");
-                selectedYear = "all";
-            }
-            
-            const allChannels = [...new Set(allVideos.map(v => v.video_owner_channel_id).filter(Boolean))];
-            if (selectedChannelId !== "all" && !allChannels.includes(selectedChannelId)) {
-                console.log("Selected channel not found in data, resetting to 'all'");
-                selectedChannelId = "all";
-            }
-            
-            // Render with data and setup listeners
-            renderPage();
-            setupEventListeners();
-            
-            // Update URL without creating history entry, keeping the current URL parameters
-            updateUrl(true); // Use replaceState during initialization
-
-        } catch (error) {
-            console.error("Failed to fetch or process video data:", error);
+        if (fetchErrorFromServer) {
+            console.error("Error passed from server:", fetchErrorFromServer);
             isDataLoading = false;
             if (loadingIndicator) loadingIndicator.classList.add('hidden');
             if (errorMessageElement) {
-                errorMessageElement.textContent = `Error loading videos: ${error.message}. Please try refreshing the page.`;
+                errorMessageElement.textContent = `Error loading videos: ${fetchErrorFromServer}. Please try refreshing the page.`;
                 errorMessageElement.classList.remove('hidden');
             }
-            
-            // Show error in grid area
             if (gridContainer) {
-                gridContainer.innerHTML = `<div class="col-span-full text-center py-10 text-red-600">Failed to load videos. Please try refreshing the page.</div>`;
+                gridContainer.innerHTML = `<div class="col-span-full text-center py-10 text-red-600">Failed to load videos (server error). Please try refreshing.</div>`;
             }
-            
-            // Fallback: keep showing build-time data if available
-            if (allVideos.length === 0 && initialTotalItems > 0) {
-                console.log("Attempting to use build-time data as fallback...");
-                // Enable controls despite fetch error
-                if (limitSelect) limitSelect.disabled = false;
-                if (yearSelect) yearSelect.disabled = false;
-                if (channelSelect) yearSelect.disabled = false;
-                if (removeFiltersButton) removeFiltersButton.disabled = false;
-            } else {
-                // Otherwise disable controls on error
-                if (limitSelect) limitSelect.disabled = true;
-                if (yearSelect) yearSelect.disabled = true;
-                if (channelSelect) channelSelect.disabled = true;
-                if (removeFiltersButton) removeFiltersButton.disabled = true;
-                if (prevButton) {
-                    prevButton.classList.add("disabled");
-                    prevButton.setAttribute("aria-disabled", "true");
-                }
-                if (nextButton) {
-                    nextButton.classList.add("disabled");
-                    nextButton.setAttribute("aria-disabled", "true");
-                }
-                if (pageSelect) pageSelect.disabled = true;
-                if (pageTotalSpan) pageTotalSpan.textContent = "of ?";
+             // Disable controls on server error
+            if (limitSelect) limitSelect.disabled = true;
+            if (yearSelect) yearSelect.disabled = true;
+            if (channelSelect) channelSelect.disabled = true;
+            if (removeFiltersButton) removeFiltersButton.disabled = true;
+            if (prevButton) { prevButton.classList.add("disabled"); prevButton.setAttribute("aria-disabled", "true");}
+            if (nextButton) { nextButton.classList.add("disabled"); nextButton.setAttribute("aria-disabled", "true");}
+            if (pageSelect) pageSelect.disabled = true;
+            if (pageTotalSpan) pageTotalSpan.textContent = "of ?";
+            return; // Stop initialization if server-side error occurred
+        }
+
+        // Data (`allVideos`) is already populated from define:vars
+        // We can treat it as if it was "fetched"
+        console.log(`Using ${allVideos.length} videos passed from Astro frontmatter.`);
+
+        if (!Array.isArray(allVideos)) { // Should not happen if Astro passes correctly
+            console.error("Videos data from Astro is not an array!");
+            allVideos = []; // Prevent further errors
+            // Display an error
+            if (loadingIndicator) loadingIndicator.classList.add('hidden');
+            if (errorMessageElement) {
+                errorMessageElement.textContent = "Internal error: Video data format is incorrect.";
+                errorMessageElement.classList.remove('hidden');
             }
         }
+            
+        isDataLoading = false; // Mark loading as complete as data is from frontmatter
+
+        // Validate current filters against loaded data (if not already done server-side)
+        // The server-side uniqueYears/Channels should be mostly correct, but client might have stale URL params
+        const currentAvailableYears = [...new Set(allVideos.map(v => v.published_at?.substring(0, 4)).filter(Boolean))];
+        if (selectedYear !== "all" && !currentAvailableYears.includes(selectedYear)) {
+            console.log(`Client: Selected year ${selectedYear} not in available [${currentAvailableYears.join()}], resetting to 'all'`);
+            selectedYear = "all";
+        }
+        
+        const currentAvailableChannels = [...new Set(allVideos.map(v => v.video_owner_channel_id).filter(Boolean))];
+        if (selectedChannelId !== "all" && !currentAvailableChannels.includes(selectedChannelId)) {
+            console.log(`Client: Selected channel ${selectedChannelId} not in available channels, resetting to 'all'`);
+            selectedChannelId = "all";
+        }
+            
+        renderPage(); // Initial render with pre-loaded data
+        setupEventListeners();
+            
+        updateUrl(true); // Use replaceState during initialization to reflect any corrected params
+
+        // No try-catch needed here for fetch, as data is pre-loaded.
+        // Error handling for data loading is now in Astro frontmatter.
     }
 
     function setupEventListeners() {
