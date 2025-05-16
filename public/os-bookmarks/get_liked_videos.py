@@ -157,7 +157,7 @@ def get_github_stars(username, token):
     # Start with the first page, requesting 100 items per page (max)
     url = f"https://api.github.com/users/{username}/starred?per_page=100&sort=created&direction=desc"
     headers = {
-        "Accept": "application/vnd.github.v3+json",
+        "Accept": "application/vnd.github.star+json", # Ensure this header is present for starred_at
         "Authorization": f"token {token}" if token else None # Handle case where token might be None
     }
     # Remove None Authorization header if token is not provided
@@ -179,18 +179,19 @@ def get_github_stars(username, token):
             # Extract only necessary fields
             for repo_raw in page_data:
                 repo_minimal = {
-                    "id": repo_raw.get("id"),
-                    "full_name": repo_raw.get("full_name"),
-                    "html_url": repo_raw.get("html_url"),
-                    "description": repo_raw.get("description"),
-                    "language": repo_raw.get("language"),
-                    "stargazers_count": repo_raw.get("stargazers_count"),
-                    "forks_count": repo_raw.get("forks_count"),
-                    "pushed_at": repo_raw.get("pushed_at"),
+                    "id": repo_raw.get("repo", {}).get("id"),
+                    "full_name": repo_raw.get("repo", {}).get("full_name"),
+                    "html_url": repo_raw.get("repo", {}).get("html_url"),
+                    "description": repo_raw.get("repo", {}).get("description"),
+                    "language": repo_raw.get("repo", {}).get("language"),
+                    "stargazers_count": repo_raw.get("repo", {}).get("stargazers_count"),
+                    "forks_count": repo_raw.get("repo", {}).get("forks_count"),
+                    "pushed_at": repo_raw.get("repo", {}).get("pushed_at"),
                     "owner": {
-                        "login": repo_raw.get("owner", {}).get("login"),
-                        "avatar_url": repo_raw.get("owner", {}).get("avatar_url")
-                    }
+                        "login": repo_raw.get("repo", {}).get("owner", {}).get("login"),
+                        "avatar_url": repo_raw.get("repo", {}).get("owner", {}).get("avatar_url")
+                    },
+                    "starred_at": repo_raw.get("starred_at")
                 }
                 # Add basic validation if needed, e.g., check if id and html_url exist
                 if repo_minimal["id"] and repo_minimal["html_url"]:

@@ -15,7 +15,8 @@ csv_columns = [
     'forks_count', 
     'pushed_at', 
     'owner_login', 
-    'owner_avatar_url'
+    'owner_avatar_url',
+    'starred_at'
 ]
 
 try:
@@ -36,7 +37,8 @@ try:
                 'forks_count': item.get('forks_count'),
                 'pushed_at': item.get('pushed_at'),
                 'owner_login': item.get('owner', {}).get('login') if item.get('owner') else None,
-                'owner_avatar_url': item.get('owner', {}).get('avatar_url') if item.get('owner') else None
+                'owner_avatar_url': item.get('owner', {}).get('avatar_url') if item.get('owner') else None,
+                'starred_at': item.get('starred_at')
             }
             writer.writerow(row_to_write)
             

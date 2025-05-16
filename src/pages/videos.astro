@@ -40,26 +40,54 @@ async function getLikedVideosFromSupabase(): Promise<Video[]> {
     if (!supabase) {
         throw new Error("Supabase client not initialized.");
     }
-    const { data, error } = await supabase
-        .from("liked_videos")
-        .select("title, thumbnail_url, url, video_owner_channel_id, video_owner_channel_title, published_at")
-        .order("published_at", { ascending: false });
 
-    if (error) {
-        console.error("Error fetching liked videos from Supabase:", error);
-        throw error;
+    const CHUNK_SIZE = 1000; // Supabase default max limit
+    let allData: Video[] = [];
+    let offset = 0;
+    let keepFetching = true;
+
+    while (keepFetching) {
+        const { data, error, count } = await supabase
+            .from("liked_videos")
+            .select("title, thumbnail_url, url, video_owner_channel_id, video_owner_channel_title, published_at", { count: 'exact' }) // Request count
+            .order("published_at", { ascending: false })
+            .range(offset, offset + CHUNK_SIZE - 1);
+
+        if (error) {
+            console.error("Error fetching liked videos from Supabase (chunk):", error);
+            // Depending on desired behavior, you might throw the error or return partially fetched data.
+            // For now, let's throw to indicate failure.
+            throw error;
+        }
+
+        if (data) {
+            const mappedData = data.map(item => ({
+                title: item.title,
+                thumbnail_url: item.thumbnail_url,
+                url: item.url,
+                video_owner_channel_id: item.video_owner_channel_id,
+                video_owner_channel_title: item.video_owner_channel_title,
+                published_at: item.published_at,
+            }));
+            allData = allData.concat(mappedData);
+        }
+
+        if (data && data.length < CHUNK_SIZE) {
+            keepFetching = false; // Last chunk fetched
+        } else if (!data || data.length === 0) {
+            // This case handles if count was not exact or if something unexpected happened
+            keepFetching = false; 
+        } else {
+            offset += CHUNK_SIZE;
+        }
+
+        // Safety break if count is available and we've fetched enough, though data.length check should suffice
+        if (count !== null && allData.length >= count) {
+            keepFetching = false;
+        }
     }
-
-    return data 
-        ? data.map(item => ({ // Ensure mapping to Video interface
-            title: item.title,
-            thumbnail_url: item.thumbnail_url,
-            url: item.url,
-            video_owner_channel_id: item.video_owner_channel_id,
-            video_owner_channel_title: item.video_owner_channel_title,
-            published_at: item.published_at, // Assuming it's already a string
-        }))
-        : [];
+    console.log(`Fetched a total of ${allData.length} videos from Supabase.`);
+    return allData;
 }
 
 if (supabase) {

@@ -241,6 +241,15 @@ rootsToRender.forEach((root: ComponentBookmarkFolder) => { // Use ComponentBookm
                                     node.type === "folder" &&
                                     allowedFolderNames.includes(node.name),
                             )
+                            .sort((a: ComponentBookmarkNode, b: ComponentBookmarkNode) => {
+                                // Ensure names are valid and in allowedFolderNames for robust sorting
+                                const indexA = allowedFolderNames.indexOf(a.name);
+                                const indexB = allowedFolderNames.indexOf(b.name);
+                                // If a name isn't in allowedFolderNames (shouldn't happen due to filter),
+                                // it can be pushed to the end or handled as an error.
+                                // Here, we assume filter ensures presence.
+                                return indexA - indexB;
+                            })
                             .map((node: ComponentBookmarkNode) => ( // Use ComponentBookmarkNode
                                 <BookmarkNodeComponent
                                     node={node}

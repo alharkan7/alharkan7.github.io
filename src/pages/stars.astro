@@ -40,6 +40,7 @@ interface SupabaseGitHubStar {
     pushed_at: string | null;
     owner_login: string | undefined;
     owner_avatar_url: string | undefined;
+    starred_at: string | null; // Add starred_at
 }
 
 // Initialize Supabase client
@@ -60,9 +61,9 @@ async function getStarredRepos(): Promise<GitHubRepo[]> {
     const { data, error } = await supabase
         .from("github_stars")
         .select(
-            "repo_id, full_name, html_url, description, language, stargazers_count, forks_count, pushed_at, owner_login, owner_avatar_url",
+            "repo_id, full_name, html_url, description, language, stargazers_count, forks_count, pushed_at, owner_login, owner_avatar_url, starred_at",
         )
-        .order("stargazers_count", { ascending: false }); // Example ordering
+        .order("starred_at", { ascending: false }); // Order by starred_at descending
 
     if (error) {
         console.error("Error fetching starred repos from Supabase:", error);
