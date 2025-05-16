@@ -12,21 +12,6 @@ import tailwind from '@astrojs/tailwind';
 export default defineConfig({
   site: 'https://raihankalla.id',
   output: 'static',
-  redirects: {
-    '/apps': 'https://alhrkn.vercel.app/',
-    '/papermap': 'https://alhrkn.vercel.app/papermap',
-    '/enaiblr': 'https://enaiblr.org/apps',
-    '/menara-gading': 'https://twitter.com/alhrkn/status/1526933166597935105',
-    '/pandemic-face': 'https://twitter.com/alhrkn/status/1494865215191588868',
-    '/ai-scicomm': 'https://twitter.com/alhrkn/status/1461501420008394754',
-    '/learning-cone': 'https://twitter.com/alhrkn/status/1450779651580698629',
-    '/apple-presence': 'https://twitter.com/alhrkn/status/1435078828259373063',
-    '/gratitude': 'https://twitter.com/alhrkn/status/1418209085791510535',
-    '/future': 'https://twitter.com/alhrkn/status/1356493528356900864',
-    '/ideas': 'https://twitter.com/alhrkn/status/1327205937271115777',
-    '/trivia': 'https://twitter.com/alhrkn/status/1308629643264626688',
-    '/legendary-math': 'https://twitter.com/alhrkn/status/1430491571519057927'
-  },
   security: {
     directives: {
       'script-src': [

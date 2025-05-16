@@ -50,6 +50,21 @@
             "permanent": true,
             "destination": "https://twitter.com/alhrkn/status/1430491571519057927",
             "source": "/legendary-math"
+        },
+        {
+            "permanent": true,
+            "destination": "https://alhrkn.vercel.app/",
+            "source": "/apps"
+        },
+        {
+            "permanent": true,
+            "destination": "https://alhrkn.vercel.app/papermap",
+            "source": "/papermap"
+        },
+        {
+            "permanent": true,
+            "destination": "https://enaiblr.org/apps",
+            "source": "/enaiblr"
         }
     ]
 }
