@@ -33,6 +33,8 @@ jobs:
       PUBLIC_FIREBASE_APP_ID: "1:750502255268:web:9110a83cfc0fbc3acda431"
       PUBLIC_USERNAME: ${{ secrets.PUBLIC_USERNAME }}
       PUBLIC_PASSWORD: ${{ secrets.PUBLIC_PASSWORD }}
+      SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+      SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
     steps:
       - name: Checkout your repository using git
         uses: actions/checkout@v4
