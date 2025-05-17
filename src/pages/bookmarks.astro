@@ -60,21 +60,57 @@ async function getChromeBookmarksFromSupabase(): Promise<BookmarkData['roots']> 
         };
     }
 
-    const { data, error } = await supabase
-        .from("chrome_bookmarks")
-        .select("id, name, type, url, date_added, parent_id, source");
+    const CHUNK_SIZE = 1000; // Supabase default max limit
+    let allRawData: SupabaseBookmark[] = [];
+    let offset = 0;
+    let keepFetching = true;
+    let totalCountFromQuery: number | null = null;
 
-    if (error) {
-        console.error("Error fetching bookmarks from Supabase:", error);
-        const defaultGuid = "error-guid-fetch";
-        return {
-            bookmark_bar: { id: 'error_bar', name: 'Bookmarks bar (Error)', type: 'folder', children: [], date_added: '0', guid: defaultGuid, date_modified: undefined },
-            other: { id: 'error_other', name: 'Other bookmarks (Error)', type: 'folder', children: [], date_added: '0', guid: defaultGuid, date_modified: undefined },
-        };
+    console.log("Starting to fetch chrome bookmarks from Supabase with chunking...");
+
+    while (keepFetching) {
+        const { data: chunkData, error, count } = await supabase
+            .from("chrome_bookmarks")
+            .select("id, name, type, url, date_added, parent_id, source", { count: 'exact' }) // Request exact count
+            .range(offset, offset + CHUNK_SIZE - 1);
+
+        if (error) {
+            console.error("Error fetching bookmarks from Supabase (chunk):", error);
+            const defaultGuid = "error-guid-fetch-chunk";
+            // Depending on desired behavior, you might throw, or return partial/error state.
+            // For now, returning an error state similar to other errors.
+            return {
+                bookmark_bar: { id: 'error_bar_chunk', name: 'Bookmarks bar (Fetch Error)', type: 'folder', children: [], date_added: '0', guid: defaultGuid, date_modified: undefined },
+                other: { id: 'error_other_chunk', name: 'Other bookmarks (Fetch Error)', type: 'folder', children: [], date_added: '0', guid: defaultGuid, date_modified: undefined },
+            };
+        }
+
+        if (chunkData) {
+            allRawData = allRawData.concat(chunkData);
+            if (totalCountFromQuery === null && count !== null) {
+                totalCountFromQuery = count; // Store the total count
+            }
+        }
+
+        if (chunkData && chunkData.length < CHUNK_SIZE) {
+            keepFetching = false; // Last chunk fetched
+        } else if (!chunkData || chunkData.length === 0) {
+            keepFetching = false; // No more data or unexpected empty chunk
+        } else {
+            offset += CHUNK_SIZE;
+        }
+
+        // Safety break if exact count is available and we've fetched enough
+        if (totalCountFromQuery !== null && allRawData.length >= totalCountFromQuery) {
+            keepFetching = false;
+        }
     }
+    console.log(`Fetched a total of ${allRawData.length} bookmarks from Supabase. Exact count from query: ${totalCountFromQuery ?? 'N/A'}`);
 
-    if (!data) {
+
+    if (allRawData.length === 0) { // Changed from !data to !allRawData.length after fetching
         const defaultGuid = "no-data-guid-fetch";
+        console.warn("No bookmark data returned from Supabase after fetching.");
         return {
             bookmark_bar: { id: 'no_data_bar', name: 'Bookmarks bar (No Data)', type: 'folder', children: [], date_added: '0', guid: defaultGuid, date_modified: undefined },
             other: { id: 'no_data_other', name: 'Other bookmarks (No Data)', type: 'folder', children: [], date_added: '0', guid: defaultGuid, date_modified: undefined },
@@ -82,7 +118,8 @@ async function getChromeBookmarksFromSupabase(): Promise<BookmarkData['roots']> 
     }
 
     const nodesMap: Map<string, ProcessingNode> = new Map();
-    const allNodes: ProcessingNode[] = data.map((dbNode: SupabaseBookmark) => {
+    // Use allRawData instead of data for mapping
+    const allNodes: ProcessingNode[] = allRawData.map((dbNode: SupabaseBookmark) => {
         const baseProps = {
             id: String(dbNode.id),
             name: dbNode.name,

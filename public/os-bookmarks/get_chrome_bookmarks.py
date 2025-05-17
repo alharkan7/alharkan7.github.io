@@ -127,22 +127,22 @@ def extract_bookmarks(node, allowed_folders):
         # Unknown type, ignore
         return None
 
-# Global counters for reporting
+# Global counters and sets for reporting and sync logic
 newly_added_count_global = 0
 processed_count_global = 0
+deleted_count_global = 0 # New counter for deletions
+processed_paths_this_run = set() # New set to track all valid paths from current Chrome run
 
 def insert_or_get_id(node_data, parent_id_in_db, parent_full_path, source_key, existing_paths_in_db_set, cursor, connection):
     """
     Inserts a bookmark/folder if it doesn't exist based on its path, or gets its ID if it exists.
-    Updates existing_paths_in_db_set and newly_added_count_global.
+    Updates existing_paths_in_db_set, newly_added_count_global, and processed_paths_this_run.
     """
-    global newly_added_count_global
+    global newly_added_count_global, processed_paths_this_run
 
     node_name = node_data.get('name')
     node_type = node_data.get('type')
     node_url = node_data.get('url', None)
-    # Chrome's date_added is a BIGINT (microseconds since Jan 1, 1601, Windows epoch, or similar for Mac/Linux)
-    # The schema expects BIGINT, so this is fine.
     node_date_added = node_data.get('date_added')
     if node_date_added is not None:
         try:
@@ -150,7 +150,6 @@ def insert_or_get_id(node_data, parent_id_in_db, parent_full_path, source_key, e
         except ValueError:
             print(f"Warning: Could not convert date_added '{node_date_added}' to int for '{node_name}'. Setting to NULL.", file=sys.stderr)
             node_date_added = None
-
 
     current_full_path = f"{parent_full_path}>>{node_name}" if parent_full_path else node_name
     item_db_id = None
@@ -161,33 +160,27 @@ def insert_or_get_id(node_data, parent_id_in_db, parent_full_path, source_key, e
             result = cursor.fetchone()
             if result:
                 item_db_id = result[0]
+                processed_paths_this_run.add(current_full_path) # Mark as processed this run
             else:
-                # This case means the path was in the initial set but somehow not found now (e.g., deleted by another process)
-                # or it's a path collision that the UNIQUE constraint on path should prevent if active.
-                # For robustness, we'll try to insert it.
-                print(f"Info: Path '{current_full_path}' was in existing_paths_in_db_set but no ID found. Attempting insert.", file=sys.stderr)
+                print(f"Info: Path '{current_full_path}' was in initial DB set but no ID found. Attempting insert.", file=sys.stderr)
         except psycopg2.Error as e:
             print(f"Error fetching ID for existing path '{current_full_path}': {e}. Attempting insert.", file=sys.stderr)
-            connection.rollback() # Rollback previous operations in this transaction before retrying
-            # Fall through to insert logic
+            connection.rollback()
     
-    if item_db_id is None: # Path not in set, or fetching ID failed, so attempt insert
+    if item_db_id is None:
         sql = """
             INSERT INTO chrome_bookmarks (name, type, url, date_added, parent_id, source, path, parent_path)
             VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
             ON CONFLICT (path) DO UPDATE SET
-                name = EXCLUDED.name, -- Example: update name if path conflicts, or simply DO NOTHING
+                name = EXCLUDED.name,
                 type = EXCLUDED.type,
                 url = EXCLUDED.url,
                 date_added = EXCLUDED.date_added,
                 parent_id = EXCLUDED.parent_id,
                 source = EXCLUDED.source,
                 parent_path = EXCLUDED.parent_path
-            RETURNING id, (xmax = 0); -- xmax = 0 indicates an INSERT occurred
+            RETURNING id, (xmax = 0);
         """
-        # xmax = 0 check is for PostgreSQL to see if an INSERT happened vs an UPDATE on conflict.
-        # For other DBs, ON CONFLICT syntax or checking rowcount might differ.
-        # Given Supabase (PostgreSQL), this is fine.
         try:
             cursor.execute(sql, (
                 node_name, node_type, node_url, node_date_added,
@@ -196,16 +189,18 @@ def insert_or_get_id(node_data, parent_id_in_db, parent_full_path, source_key, e
             ))
             result = cursor.fetchone()
             item_db_id = result[0]
-            was_inserted = result[1] # True if INSERT happened, False if UPDATE (or DO NOTHING if that was the conflict action)
+            was_inserted = result[1] 
             
             if was_inserted:
                  newly_added_count_global += 1
-            # Add to set whether inserted or updated, to reflect it's processed and in DB
-            existing_paths_in_db_set.add(current_full_path)
+            
+            existing_paths_in_db_set.add(current_full_path) # Add to set of paths known to be in DB (either old or new)
+            processed_paths_this_run.add(current_full_path) # Mark as processed this run
+
         except psycopg2.Error as e:
             print(f"Database error (INSERT/UPDATE) for '{current_full_path}': {e}", file=sys.stderr)
             connection.rollback()
-            raise # Re-raise to stop processing this branch
+            raise 
     
     return item_db_id
 
@@ -236,9 +231,11 @@ def process_filtered_structure_for_db(node_data, parent_id_in_db, parent_full_pa
                                              source_key, existing_paths_in_db_set, cursor, connection)
 
 def main():
-    global newly_added_count_global, processed_count_global
+    global newly_added_count_global, processed_count_global, deleted_count_global, processed_paths_this_run
     newly_added_count_global = 0
     processed_count_global = 0
+    deleted_count_global = 0 
+    processed_paths_this_run = set()
 
     if not DB_HOST or not DB_PASSWORD:
         print("Error: Database credentials (SUPABASE_DB_HOST, SUPABASE_DB_PASSWORD) not set in environment variables.", file=sys.stderr)
@@ -304,33 +301,28 @@ def main():
 
         # This structure will hold the filtered bookmarks, similar to the old structured_bookmarks
         filtered_roots_for_db_processing = {}
+        source_keys_processed_this_run = [] # Track which roots we are managing
 
         for root_key, root_node_from_chrome in roots.items():
-            # root_key is 'bookmark_bar', 'other', 'synced'
-            # root_node_from_chrome is the dict for "Bookmarks bar", "Other bookmarks", etc.
             if root_node_from_chrome and root_node_from_chrome.get('type') == 'folder':
-                # Create the representation for the root folder itself
                 current_root_data = {
                     'type': 'folder',
-                    'name': root_node_from_chrome.get('name', root_key), # e.g., "Bookmarks bar"
+                    'name': root_node_from_chrome.get('name', root_key),
                     'date_added': root_node_from_chrome.get('date_added'),
-                    'children': [] # Will be populated with filtered children
+                    'children': []
                 }
-                
-                # Process children of this root using extract_bookmarks for filtering
                 if 'children' in root_node_from_chrome:
                     for child_of_root in root_node_from_chrome.get('children', []):
                         processed_child = extract_bookmarks(child_of_root, allowed_folders)
                         if processed_child:
                             current_root_data['children'].append(processed_child)
                 
-                # Add this root to our processing structure if it has a name 
-                # (even if it has no children after filtering, the root folder itself might be new)
                 if current_root_data['name']:
                      filtered_roots_for_db_processing[root_key] = current_root_data
+                     if root_key not in source_keys_processed_this_run: # Ensure we only add once
+                         source_keys_processed_this_run.append(root_key)
             else:
                 print(f"Skipping root '{root_key}' as it's not a valid folder or is missing.", file=sys.stderr)
-
 
         if not filtered_roots_for_db_processing:
             print("Warning: No valid bookmark roots found or all were empty after initial processing.", file=sys.stderr)
@@ -339,29 +331,78 @@ def main():
                 print(f"\nProcessing and syncing bookmarks for root: {root_data_to_insert.get('name')} (Source: {root_source_key})")
                 try:
                     process_filtered_structure_for_db(
-                        node_data=root_data_to_insert, # This is the dict for the root folder itself
-                        parent_id_in_db=None,          # Root folders have no parent in the DB
-                        parent_full_path=None,         # Root folder's own path starts fresh
-                        source_key=root_source_key,    # 'bookmark_bar', 'other', etc.
-                        existing_paths_in_db_set=existing_db_paths, # This set is updated live
+                        node_data=root_data_to_insert,
+                        parent_id_in_db=None,
+                        parent_full_path=None, 
+                        source_key=root_source_key,
+                        existing_paths_in_db_set=existing_db_paths, 
                         cursor=cur,
                         connection=conn
                     )
-                    conn.commit() # Commit after each root is fully processed
+                    conn.commit() 
                     print(f"Successfully processed and committed root: {root_data_to_insert.get('name')}")
                 except Exception as e:
-                    print(f"Critical error while processing root '{root_data_to_insert.get('name')}': {e}. Rolling back changes for this root.", file=sys.stderr)
+                    print(f"Critical error while processing root '{root_data_to_insert.get('name')}' : {e}. Rolling back changes for this root.", file=sys.stderr)
                     conn.rollback()
         
-        print(f"\n--- Sync Summary ---")
+        # --- Deletion Logic ---
+        if source_keys_processed_this_run:
+            print("\n--- Starting Deletion Sync ---")
+            db_paths_for_managed_sources = set()
+            try:
+                cur.execute("SELECT path FROM chrome_bookmarks WHERE source = ANY(%s)", (source_keys_processed_this_run,))
+                for row in cur.fetchall():
+                    if row[0] is not None:
+                        db_paths_for_managed_sources.add(row[0])
+                print(f"Fetched {len(db_paths_for_managed_sources)} paths from DB for managed sources: {source_keys_processed_this_run}")
+
+                paths_to_delete = db_paths_for_managed_sources - processed_paths_this_run
+                
+                if paths_to_delete:
+                    print(f"Found {len(paths_to_delete)} orphaned paths to delete.")
+                    # Example: print first 5 paths to be deleted for logging
+                    # for i, p_del in enumerate(list(paths_to_delete)[:5]):
+                    #     print(f"  Preview delete: {p_del}")
+                    # if len(paths_to_delete) > 5:
+                    #     print(f"  ...and {len(paths_to_delete) - 5} more.")
+
+                    for path_to_del in paths_to_delete:
+                        try:
+                            # Ensure deletion is only for managed sources to be safe
+                            cur.execute("DELETE FROM chrome_bookmarks WHERE path = %s AND source = ANY(%s)", 
+                                        (path_to_del, source_keys_processed_this_run))
+                            if cur.rowcount > 0:
+                                deleted_count_global += cur.rowcount
+                        except psycopg2.Error as e_del:
+                            print(f"Error deleting path '{path_to_del}': {e_del}", file=sys.stderr)
+                            conn.rollback() # Rollback this specific deletion attempt
+                            # Potentially re-raise or log more severely if a single deletion failure is critical
+                    
+                    if deleted_count_global > 0: # Only commit if actual deletions happened
+                        conn.commit()
+                        print(f"Committed deletion of {deleted_count_global} orphaned items.")
+                    else:
+                        # This could happen if rowcount was 0 for all attempted deletions or errors occurred
+                        print("No items were confirmed deleted in this batch (or errors occurred during deletion attempts).")
+                else:
+                    print("No orphaned paths found. Database is in sync with current Chrome bookmarks for managed sources.")
+
+            except psycopg2.Error as e_sync:
+                print(f"Error during deletion sync phase: {e_sync}", file=sys.stderr)
+                conn.rollback() 
+        else:
+            print("\nSkipping deletion sync as no bookmark sources were processed in this run.")
+
+        print("\n--- Sync Summary ---")
         print(f"Total items processed from Chrome data (after filtering): {processed_count_global}")
         print(f"New items added to the database: {newly_added_count_global}")
-        if processed_count_global == 0 and newly_added_count_global == 0 :
+        print(f"Items deleted from the database: {deleted_count_global}") # New summary line
+        
+        if processed_count_global == 0 and newly_added_count_global == 0 and deleted_count_global == 0:
              if not any(filtered_roots_for_db_processing.values()):
                  print("No bookmarks matched the allowed folder names or roots were empty.")
              else:
                  print("All found and filtered bookmarks were already present in the database.")
-
 
     except psycopg2.Error as e:
         print(f"Database connection or operational error: {e}", file=sys.stderr)
@@ -375,7 +416,6 @@ def main():
         if conn:
             conn.close()
             print("Database connection closed.")
-
 
 if __name__ == "__main__":
     main() 
