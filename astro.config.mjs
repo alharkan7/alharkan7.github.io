@@ -11,7 +11,7 @@ import tailwind from '@astrojs/tailwind';
 
 export default defineConfig({
   site: 'https://raihankalla.id',
-  output: 'static',
+  output: 'server',
   security: {
     directives: {
       'script-src': [
