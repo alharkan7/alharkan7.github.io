@@ -34,6 +34,11 @@ jobs:
           GOOGLE_REFRESH_TOKEN: ${{ secrets.GOOGLE_REFRESH_TOKEN }}
           GITHUB_USER: ${{ github.repository_owner }} # Use the repo owner as the GitHub user
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # Pass the token to the script
+          SUPABASE_DB_HOST: ${{ secrets.SUPABASE_DB_HOST }}
+          SUPABASE_DB_NAME: ${{ secrets.SUPABASE_DB_NAME }}
+          SUPABASE_DB_USER: ${{ secrets.SUPABASE_DB_USER }}
+          SUPABASE_DB_PASSWORD: ${{ secrets.SUPABASE_DB_PASSWORD }}
+          SUPABASE_DB_PORT: ${{ secrets.SUPABASE_DB_PORT }}
         run: python public/os-bookmarks/get_liked_videos.py # Adjust path if needed
 
       - name: Commit and push if changed
