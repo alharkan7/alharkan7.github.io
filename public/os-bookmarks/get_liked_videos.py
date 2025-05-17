@@ -49,6 +49,22 @@ DB_USER = os.getenv("SUPABASE_DB_USER", "postgres")
 DB_PASSWORD = os.getenv("SUPABASE_DB_PASSWORD")
 DB_PORT = os.getenv("SUPABASE_DB_PORT", "5432")
 
+def trigger_vercel_deploy(hook_url):
+    if not hook_url:
+        print("Info: VERCEL_DEPLOY_HOOK_URL not set. Skipping Vercel build trigger.", file=sys.stderr)
+        return
+    try:
+        print(f"Attempting to trigger Vercel deploy hook: {hook_url[:30]}... (URL truncated for safety)")
+        response = requests.post(hook_url) # No data/payload needed for Vercel deploy hooks
+        response.raise_for_status() # Raises an HTTPError for bad responses (4XX or 5XX)
+        print(f"Vercel deploy hook triggered successfully. Status: {response.status_code}")
+        # Example response from Vercel: {"job": {"id": "...", "state": "PENDING", "createdAt": ...}}
+        print(f"Vercel response: {response.json()}")
+    except requests.exceptions.RequestException as e:
+        print(f"Error triggering Vercel deploy hook: {e}", file=sys.stderr)
+    except json.JSONDecodeError as e:
+        print(f"Error decoding Vercel deploy hook response: {e}. Response text: {response.text[:200]}", file=sys.stderr)
+
 def get_authenticated_service():
     client_id = os.environ.get("GOOGLE_CLIENT_ID")
     client_secret = os.environ.get("GOOGLE_CLIENT_SECRET")
@@ -407,3 +423,19 @@ if __name__ == "__main__":
         print("\n--- Sync Summary ---")
         print(f"YouTube Liked Videos: {youtube_synced_count} added, {youtube_updated_count} updated, {youtube_deleted_count} deleted.")
         print(f"GitHub Starred Repos: {github_synced_count} added, {github_updated_count} updated, {github_deleted_count} deleted.")
+
+        # Trigger Vercel build if any changes were made
+        changes_made = any([
+            youtube_synced_count > 0, youtube_updated_count > 0, youtube_deleted_count > 0,
+            github_synced_count > 0, github_updated_count > 0, github_deleted_count > 0
+        ])
+
+        if changes_made:
+            vercel_hook_url = os.getenv("VERCEL_DEPLOY_HOOK_URL")
+            if vercel_hook_url:
+                print("\nAttempting to trigger Vercel deployment...")
+                trigger_vercel_deploy(vercel_hook_url)
+            else:
+                print("\nInfo: VERCEL_DEPLOY_HOOK_URL not set in environment. Skipping Vercel build trigger despite changes.", file=sys.stderr)
+        else:
+            print("\nNo changes detected in database. Skipping Vercel build trigger.")
