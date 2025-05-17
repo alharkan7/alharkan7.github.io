@@ -5,6 +5,7 @@ import requests # <-- Add requests import
 from dotenv import load_dotenv # <-- Import load_dotenv
 from pathlib import Path # Added for .env path handling
 import psycopg2 # Added for PostgreSQL interaction
+from psycopg2.extras import execute_values # <--- IMPORT execute_values
 import sys # For sys.stderr and sys.exit
 
 # Remove google_auth_oauthlib import if not falling back to local flow
@@ -288,20 +289,27 @@ if __name__ == "__main__":
                 all_liked_videos = get_liked_videos(youtube_service)
                 print(f"Found {len(all_liked_videos)} liked videos. Syncing to database...")
 
-                for video_idx, video in enumerate(all_liked_videos):
-                    # Ensure published_at is valid or None for DB
-                    published_at_dt = video.get("published_at")
-                    if published_at_dt == "No Date": # Handle placeholder
-                        published_at_dt = None
-                    
-                    # Ensure thumbnail_url is valid or None
-                    thumbnail_url_val = video.get("thumbnail_url")
-                    if thumbnail_url_val == "No Thumbnail":
-                        thumbnail_url_val = None
+                if all_liked_videos: # Proceed only if there are videos
+                    video_data_tuples = []
+                    for video in all_liked_videos:
+                        published_at_dt = video.get("published_at")
+                        if published_at_dt == "No Date":
+                            published_at_dt = None
+                        thumbnail_url_val = video.get("thumbnail_url")
+                        if thumbnail_url_val == "No Thumbnail":
+                            thumbnail_url_val = None
+                        video_data_tuples.append((
+                            video.get("title", "No Title"),
+                            video.get("url", "No URL"),
+                            video.get("video_owner_channel_id"),
+                            video.get("video_owner_channel_title"),
+                            published_at_dt,
+                            thumbnail_url_val
+                        ))
 
                     sql_youtube = """
                         INSERT INTO liked_videos (title, url, video_owner_channel_id, video_owner_channel_title, published_at, thumbnail_url)
-                        VALUES (%s, %s, %s, %s, %s, %s)
+                        VALUES %s
                         ON CONFLICT (url) DO UPDATE SET
                             title = EXCLUDED.title,
                             video_owner_channel_id = EXCLUDED.video_owner_channel_id,
@@ -310,27 +318,18 @@ if __name__ == "__main__":
                             thumbnail_url = EXCLUDED.thumbnail_url
                         RETURNING (xmax = 0);
                     """
-                    cur.execute(sql_youtube, (
-                        video.get("title", "No Title"),
-                        video.get("url", "No URL"),
-                        video.get("video_owner_channel_id"),
-                        video.get("video_owner_channel_title"),
-                        published_at_dt,
-                        thumbnail_url_val
-                    ))
-                    # Added logging
-                    temp_rowcount = cur.rowcount
-                    temp_statusmessage = cur.statusmessage
-                    if video_idx < 3 or temp_rowcount == 0:
-                        print(f"  Video URL '{video.get('url', 'N/A')}': DB op result: rowcount={temp_rowcount}, status='{temp_statusmessage}'")
-
-                    was_inserted = cur.fetchone()[0] if cur.rowcount > 0 else False
-                    if was_inserted:
-                        youtube_synced_count += 1
-                    elif temp_rowcount > 0: # An update occurred
-                        youtube_updated_count +=1
-
-                conn.commit()
+                    # Use execute_values for batch insert/update
+                    results = execute_values(cur, sql_youtube, video_data_tuples, fetch=True)
+                    
+                    youtube_synced_count = 0
+                    youtube_updated_count = 0
+                    for result in results:
+                        if result[0]: # (xmax = 0) is true if a new row was inserted
+                            youtube_synced_count += 1
+                        else:
+                            youtube_updated_count += 1
+                    
+                    conn.commit()
                 print(f"YouTube liked videos sync complete. Added: {youtube_synced_count}, Updated: {youtube_updated_count}.")
         
         except Exception as e_yt:
@@ -352,12 +351,28 @@ if __name__ == "__main__":
                 all_starred_repos = get_github_stars(github_user, github_token)
                 print(f"Found {len(all_starred_repos)} starred repositories. Syncing to database...")
 
-                for repo_idx, repo in enumerate(all_starred_repos):
+                if all_starred_repos: # Proceed only if there are repos
+                    repo_data_tuples = []
+                    for repo in all_starred_repos:
+                        repo_data_tuples.append((
+                            repo.get("id"),
+                            repo.get("full_name"),
+                            repo.get("html_url"),
+                            repo.get("description"),
+                            repo.get("language"),
+                            repo.get("stargazers_count"),
+                            repo.get("forks_count"),
+                            repo.get("pushed_at"),
+                            repo.get("owner", {}).get("login"),
+                            repo.get("owner", {}).get("avatar_url"),
+                            repo.get("starred_at")
+                        ))
+
                     sql_github = """
                         INSERT INTO github_stars (repo_id, full_name, html_url, description, language, 
                                                 stargazers_count, forks_count, pushed_at, owner_login, 
                                                 owner_avatar_url, starred_at)
-                        VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+                        VALUES %s
                         ON CONFLICT (repo_id) DO UPDATE SET
                             full_name = EXCLUDED.full_name,
                             html_url = EXCLUDED.html_url,
@@ -371,32 +386,18 @@ if __name__ == "__main__":
                             starred_at = EXCLUDED.starred_at
                         RETURNING (xmax = 0);
                     """
-                    cur.execute(sql_github, (
-                        repo.get("id"),
-                        repo.get("full_name"),
-                        repo.get("html_url"),
-                        repo.get("description"),
-                        repo.get("language"),
-                        repo.get("stargazers_count"),
-                        repo.get("forks_count"),
-                        repo.get("pushed_at"),
-                        repo.get("owner", {}).get("login"),
-                        repo.get("owner", {}).get("avatar_url"),
-                        repo.get("starred_at")
-                    ))
-                    # Added logging
-                    temp_rowcount = cur.rowcount
-                    temp_statusmessage = cur.statusmessage
-                    if repo_idx < 3 or temp_rowcount == 0:
-                        print(f"  Repo ID '{repo.get('id', 'N/A')}': DB op result: rowcount={temp_rowcount}, status='{temp_statusmessage}'")
-                    
-                    was_inserted = cur.fetchone()[0] if cur.rowcount > 0 else False
-                    if was_inserted:
-                        github_synced_count += 1
-                    elif temp_rowcount > 0: # An update occurred
-                        github_updated_count += 1
+                    # Use execute_values for batch insert/update
+                    results = execute_values(cur, sql_github, repo_data_tuples, fetch=True)
 
-                conn.commit()
+                    github_synced_count = 0
+                    github_updated_count = 0
+                    for result in results:
+                        if result[0]: # (xmax = 0) is true if a new row was inserted
+                            github_synced_count += 1
+                        else:
+                            github_updated_count += 1
+                            
+                    conn.commit()
                 print(f"GitHub starred repositories sync complete. Added: {github_synced_count}, Updated: {github_updated_count}.")
 
             except Exception as e_gh:
