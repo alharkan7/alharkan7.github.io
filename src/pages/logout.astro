@@ -41,18 +41,12 @@ Astro.cookies.delete('session', {
 </style>
 
 <script>
-  import { auth } from "../lib/firebase";
+  import { logout } from "../lib/auth";
   
   const performLogout = async () => {
     try {
-      // Sign out from Firebase
-      await auth.signOut();
-      
-      // Clear any remaining session data
-      const response = await fetch('/api/auth/google', {
-        method: 'DELETE',
-        credentials: 'include'
-      });
+      // Sign out using our auth utility
+      const result = await logout();
       
       // Add a small delay to show the loading state
       await new Promise(resolve => setTimeout(resolve, 500));

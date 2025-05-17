@@ -1,26 +1,6 @@
 ---
 import BaseLayout from "../layouts/BaseLayout.astro";
 
-// Check if user is already logged in
-const session = Astro.cookies.get("session")?.value;
-
-if (session) {
-  try {
-    const response = await fetch(`${Astro.url.origin}/api/auth/google`, {
-      method: "GET",
-      headers: {
-        Cookie: `session=${session}`,
-      },
-    });
-
-    if (response.ok) {
-      return (window.location.href = "/uncategorized");
-    }
-  } catch (error) {
-    console.error("Session verification failed:", error);
-  }
-}
-
 let error = "";
 ---
 
@@ -86,8 +66,15 @@ let error = "";
 </BaseLayout>
 
 <script>
-  import { auth } from "../lib/firebase";
-  import { signInWithEmailAndPassword, AuthErrorCodes } from "firebase/auth";
+  import { isAuthenticated, login } from "../lib/auth";
+
+  // Check if user is already logged in on client side
+  document.addEventListener("DOMContentLoaded", async () => {
+    const authenticated = await isAuthenticated();
+    if (authenticated) {
+      window.location.href = "/uncategorized";
+    }
+  });
 
   // Handle email/password login
   const loginForm = document.getElementById("login-form");
@@ -97,34 +84,12 @@ let error = "";
     const password = (document.getElementById("password") as HTMLInputElement).value;
 
     try {
-      // console.log("Attempting login with email:", email);
-      const userCredential = await signInWithEmailAndPassword(auth, email, password);
-      // console.log("Login successful, getting token...");
-
-      // Get the ID token
-      const token = await userCredential.user.getIdToken();
-      // console.log("Got token, sending to backend...");
-
-      // Send token to backend
-      const response = await fetch("/api/auth/google", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          token,
-          email: userCredential.user.email,
-          uid: userCredential.user.uid,
-        }),
-      });
-
-      const data = await response.json().catch(() => ({}));
+      const result = await login(email, password);
       
-      if (!response.ok) {
-        throw new Error(data.error || "Authentication failed");
+      if (!result.success) {
+        throw result.error;
       }
 
-      // console.log("Authentication successful, redirecting...");
       window.location.href = "/uncategorized";
     } catch (error: any) {
       console.error("Login error:", error);

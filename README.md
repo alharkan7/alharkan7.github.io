@@ -118,3 +118,40 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
 4. Push to the branch (`git push origin feature/AmazingFeature`)
 5. Open a Pull Request
+
+## Authentication in Static Mode
+
+This project implements a fully client-side authentication strategy to ensure compatibility with static site hosting (GitHub Pages) while still providing secure authenticated routes.
+
+### How it works:
+
+1. **Client-side Authentication:**
+   - All Firebase authentication happens in the browser
+   - No server-side endpoints are required for auth flows
+   - Session state is maintained using Firebase Auth + localStorage 
+
+2. **Protected Routes:**
+   - Protected pages include the `<ProtectedRoute />` component
+   - This component checks auth status on page load
+   - Unauthenticated users are automatically redirected to the login page
+
+3. **Implementation Example:**
+   ```astro
+   ---
+   import BaseLayout from "../layouts/BaseLayout.astro";
+   import ProtectedRoute from "../components/ProtectedRoute.astro";
+   ---
+
+   <BaseLayout title="Protected Page">
+     <ProtectedRoute />
+     
+     <!-- Your protected content here -->
+     <div>This content is only visible to authenticated users</div>
+   </BaseLayout>
+   ```
+
+### Deployment Notes:
+
+- Works with both GitHub Pages and Vercel without requiring server-side rendering
+- Authentication state persists across page reloads
+- Logout will properly clear all auth state

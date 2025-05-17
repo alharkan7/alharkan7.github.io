@@ -1,0 +1,44 @@
+import LoadingScreen from './LoadingScreen.astro';
+
+<div id="protected-route-container">
+  <div class="fixed inset-0 flex items-center justify-center bg-white">
+    <div class="text-center">
+      <div class="inline-block animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-gray-900 mb-4"></div>
+      <h2 class="text-xl font-semibold text-gray-800">Checking authentication...</h2>
+      <p class="text-gray-600 mt-2">Please wait while we redirect you</p>
+    </div>
+  </div>
+</div>
+
+<script>
+  import { isAuthenticated } from '../lib/auth';
+
+  // Check authentication status on component load
+  document.addEventListener('DOMContentLoaded', async () => {
+    try {
+      const authenticated = await isAuthenticated();
+      
+      if (!authenticated) {
+        // Redirect to login page if not authenticated
+        window.location.href = '/login';
+      } else {
+        // Remove loading screen if authenticated
+        const container = document.getElementById('protected-route-container');
+        if (container) {
+          container.style.display = 'none';
+        }
+      }
+    } catch (error) {
+      console.error('Authentication check failed:', error);
+      // Redirect to login on error
+      window.location.href = '/login';
+    }
+  });
+</script>
+
+<style>
+  @keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
+</style> 
