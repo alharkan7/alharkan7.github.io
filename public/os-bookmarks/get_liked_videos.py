@@ -288,7 +288,7 @@ if __name__ == "__main__":
                 all_liked_videos = get_liked_videos(youtube_service)
                 print(f"Found {len(all_liked_videos)} liked videos. Syncing to database...")
 
-                for video in all_liked_videos:
+                for video_idx, video in enumerate(all_liked_videos):
                     # Ensure published_at is valid or None for DB
                     published_at_dt = video.get("published_at")
                     if published_at_dt == "No Date": # Handle placeholder
@@ -318,10 +318,16 @@ if __name__ == "__main__":
                         published_at_dt,
                         thumbnail_url_val
                     ))
+                    # Added logging
+                    temp_rowcount = cur.rowcount
+                    temp_statusmessage = cur.statusmessage
+                    if video_idx < 3 or temp_rowcount == 0:
+                        print(f"  Video URL '{video.get('url', 'N/A')}': DB op result: rowcount={temp_rowcount}, status='{temp_statusmessage}'")
+
                     was_inserted = cur.fetchone()[0] if cur.rowcount > 0 else False
                     if was_inserted:
                         youtube_synced_count += 1
-                    elif cur.rowcount > 0: # An update occurred
+                    elif temp_rowcount > 0: # An update occurred
                         youtube_updated_count +=1
 
                 conn.commit()
@@ -346,7 +352,7 @@ if __name__ == "__main__":
                 all_starred_repos = get_github_stars(github_user, github_token)
                 print(f"Found {len(all_starred_repos)} starred repositories. Syncing to database...")
 
-                for repo in all_starred_repos:
+                for repo_idx, repo in enumerate(all_starred_repos):
                     sql_github = """
                         INSERT INTO github_stars (repo_id, full_name, html_url, description, language, 
                                                 stargazers_count, forks_count, pushed_at, owner_login, 
@@ -378,10 +384,16 @@ if __name__ == "__main__":
                         repo.get("owner", {}).get("avatar_url"),
                         repo.get("starred_at")
                     ))
+                    # Added logging
+                    temp_rowcount = cur.rowcount
+                    temp_statusmessage = cur.statusmessage
+                    if repo_idx < 3 or temp_rowcount == 0:
+                        print(f"  Repo ID '{repo.get('id', 'N/A')}': DB op result: rowcount={temp_rowcount}, status='{temp_statusmessage}'")
+                    
                     was_inserted = cur.fetchone()[0] if cur.rowcount > 0 else False
                     if was_inserted:
                         github_synced_count += 1
-                    elif cur.rowcount > 0: # An update occurred
+                    elif temp_rowcount > 0: # An update occurred
                         github_updated_count += 1
 
                 conn.commit()
