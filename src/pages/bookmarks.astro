@@ -31,13 +31,16 @@ if (!supabaseUrl || !supabaseAnonKey) {
     );
 }
 // Create a single Supabase client instance
-const supabase = supabaseUrl && supabaseAnonKey ? createClient(supabaseUrl, supabaseAnonKey) : null;
+const supabase =
+    supabaseUrl && supabaseAnonKey
+        ? createClient(supabaseUrl, supabaseAnonKey)
+        : null;
 
 // Type for raw data from Supabase
 interface SupabaseBookmark {
     id: number;
     name: string;
-    type: 'url' | 'folder';
+    type: "url" | "folder";
     url?: string | null;
     date_added: bigint | string;
     parent_id?: number | null;
@@ -45,18 +48,41 @@ interface SupabaseBookmark {
 }
 
 // Intermediate type for processing: Component types + temp DB fields
-type ProcessingNode = 
-    (ComponentBookmarkURL & { _db_parent_id?: number | null; _db_source?: string | null; }) |
-    (ComponentBookmarkFolder & { _db_parent_id?: number | null; _db_source?: string | null; });
+type ProcessingNode =
+    | (ComponentBookmarkURL & {
+          _db_parent_id?: number | null;
+          _db_source?: string | null;
+      })
+    | (ComponentBookmarkFolder & {
+          _db_parent_id?: number | null;
+          _db_source?: string | null;
+      });
 
-
-async function getChromeBookmarksFromSupabase(): Promise<BookmarkData['roots']> {
+async function getChromeBookmarksFromSupabase(): Promise<
+    BookmarkData["roots"]
+> {
     if (!supabase) {
         console.error("Supabase client not initialized.");
         const defaultGuid = "error-guid-empty-client";
         return {
-            bookmark_bar: { id: 'empty_bar', name: 'Bookmarks bar (Error)', type: 'folder', children: [], date_added: '0', guid: defaultGuid, date_modified: undefined },
-            other: { id: 'empty_other', name: 'Other bookmarks (Error)', type: 'folder', children: [], date_added: '0', guid: defaultGuid, date_modified: undefined },
+            bookmark_bar: {
+                id: "empty_bar",
+                name: "Bookmarks bar (Error)",
+                type: "folder",
+                children: [],
+                date_added: "0",
+                guid: defaultGuid,
+                date_modified: undefined,
+            },
+            other: {
+                id: "empty_other",
+                name: "Other bookmarks (Error)",
+                type: "folder",
+                children: [],
+                date_added: "0",
+                guid: defaultGuid,
+                date_modified: undefined,
+            },
         };
     }
 
@@ -66,22 +92,49 @@ async function getChromeBookmarksFromSupabase(): Promise<BookmarkData['roots']> 
     let keepFetching = true;
     let totalCountFromQuery: number | null = null;
 
-    console.log("Starting to fetch chrome bookmarks from Supabase with chunking...");
+    console.log(
+        "Starting to fetch chrome bookmarks from Supabase with chunking...",
+    );
 
     while (keepFetching) {
-        const { data: chunkData, error, count } = await supabase
+        const {
+            data: chunkData,
+            error,
+            count,
+        } = await supabase
             .from("chrome_bookmarks")
-            .select("id, name, type, url, date_added, parent_id, source", { count: 'exact' }) // Request exact count
+            .select("id, name, type, url, date_added, parent_id, source", {
+                count: "exact",
+            }) // Request exact count
             .range(offset, offset + CHUNK_SIZE - 1);
 
         if (error) {
-            console.error("Error fetching bookmarks from Supabase (chunk):", error);
+            console.error(
+                "Error fetching bookmarks from Supabase (chunk):",
+                error,
+            );
             const defaultGuid = "error-guid-fetch-chunk";
             // Depending on desired behavior, you might throw, or return partial/error state.
             // For now, returning an error state similar to other errors.
             return {
-                bookmark_bar: { id: 'error_bar_chunk', name: 'Bookmarks bar (Fetch Error)', type: 'folder', children: [], date_added: '0', guid: defaultGuid, date_modified: undefined },
-                other: { id: 'error_other_chunk', name: 'Other bookmarks (Fetch Error)', type: 'folder', children: [], date_added: '0', guid: defaultGuid, date_modified: undefined },
+                bookmark_bar: {
+                    id: "error_bar_chunk",
+                    name: "Bookmarks bar (Fetch Error)",
+                    type: "folder",
+                    children: [],
+                    date_added: "0",
+                    guid: defaultGuid,
+                    date_modified: undefined,
+                },
+                other: {
+                    id: "error_other_chunk",
+                    name: "Other bookmarks (Fetch Error)",
+                    type: "folder",
+                    children: [],
+                    date_added: "0",
+                    guid: defaultGuid,
+                    date_modified: undefined,
+                },
             };
         }
 
@@ -101,89 +154,165 @@ async function getChromeBookmarksFromSupabase(): Promise<BookmarkData['roots']> 
         }
 
         // Safety break if exact count is available and we've fetched enough
-        if (totalCountFromQuery !== null && allRawData.length >= totalCountFromQuery) {
+        if (
+            totalCountFromQuery !== null &&
+            allRawData.length >= totalCountFromQuery
+        ) {
             keepFetching = false;
         }
     }
-    console.log(`Fetched a total of ${allRawData.length} bookmarks from Supabase. Exact count from query: ${totalCountFromQuery ?? 'N/A'}`);
+    console.log(
+        `Fetched a total of ${allRawData.length} bookmarks from Supabase. Exact count from query: ${totalCountFromQuery ?? "N/A"}`,
+    );
 
-
-    if (allRawData.length === 0) { // Changed from !data to !allRawData.length after fetching
+    if (allRawData.length === 0) {
+        // Changed from !data to !allRawData.length after fetching
         const defaultGuid = "no-data-guid-fetch";
         console.warn("No bookmark data returned from Supabase after fetching.");
         return {
-            bookmark_bar: { id: 'no_data_bar', name: 'Bookmarks bar (No Data)', type: 'folder', children: [], date_added: '0', guid: defaultGuid, date_modified: undefined },
-            other: { id: 'no_data_other', name: 'Other bookmarks (No Data)', type: 'folder', children: [], date_added: '0', guid: defaultGuid, date_modified: undefined },
+            bookmark_bar: {
+                id: "no_data_bar",
+                name: "Bookmarks bar (No Data)",
+                type: "folder",
+                children: [],
+                date_added: "0",
+                guid: defaultGuid,
+                date_modified: undefined,
+            },
+            other: {
+                id: "no_data_other",
+                name: "Other bookmarks (No Data)",
+                type: "folder",
+                children: [],
+                date_added: "0",
+                guid: defaultGuid,
+                date_modified: undefined,
+            },
         };
     }
 
     const nodesMap: Map<string, ProcessingNode> = new Map();
     // Use allRawData instead of data for mapping
-    const allNodes: ProcessingNode[] = allRawData.map((dbNode: SupabaseBookmark) => {
-        const baseProps = {
-            id: String(dbNode.id),
-            name: dbNode.name,
-            date_added: String(dbNode.date_added),
-            date_modified: undefined, // Not in DB, ComponentBookmarkNodeBase allows optional
-            _db_parent_id: dbNode.parent_id,
-            _db_source: dbNode.source,
-        };
+    const allNodes: ProcessingNode[] = allRawData.map(
+        (dbNode: SupabaseBookmark) => {
+            const baseProps = {
+                id: String(dbNode.id),
+                name: dbNode.name,
+                date_added: String(dbNode.date_added),
+                date_modified: undefined, // Not in DB, ComponentBookmarkNodeBase allows optional
+                _db_parent_id: dbNode.parent_id,
+                _db_source: dbNode.source,
+            };
 
-        if (dbNode.type === 'folder') {
-            return {
-                ...baseProps,
-                type: 'folder',
-                children: [],
-                guid: `folder_guid_${dbNode.id}`, // Folders require a guid
-            } as ProcessingNode; // Cast to ProcessingNode (Folder variant)
-        } else {
-            return {
-                ...baseProps,
-                type: 'url',
-                url: dbNode.url || "#", // URLs require a url and guid
-                guid: `url_guid_${dbNode.id}`,
-            } as ProcessingNode; // Cast to ProcessingNode (URL variant)
-        }
-    });
+            if (dbNode.type === "folder") {
+                return {
+                    ...baseProps,
+                    type: "folder",
+                    children: [],
+                    guid: `folder_guid_${dbNode.id}`, // Folders require a guid
+                } as ProcessingNode; // Cast to ProcessingNode (Folder variant)
+            } else {
+                return {
+                    ...baseProps,
+                    type: "url",
+                    url: dbNode.url || "#", // URLs require a url and guid
+                    guid: `url_guid_${dbNode.id}`,
+                } as ProcessingNode; // Cast to ProcessingNode (URL variant)
+            }
+        },
+    );
 
     allNodes.forEach((node: ProcessingNode) => nodesMap.set(node.id, node));
 
-    const supabaseRoots: BookmarkData['roots'] = {
-        bookmark_bar: { id: 'root_bar_default', name: 'Bookmarks bar', type: 'folder', children: [], date_added: '0', guid: 'guid_bookmark_bar_root', date_modified: undefined },
-        other: { id: 'root_other_default', name: 'Other bookmarks', type: 'folder', children: [], date_added: '0', guid: 'guid_other_root', date_modified: undefined },
+    const supabaseRoots: BookmarkData["roots"] = {
+        bookmark_bar: {
+            id: "root_bar_default",
+            name: "Bookmarks bar",
+            type: "folder",
+            children: [],
+            date_added: "0",
+            guid: "guid_bookmark_bar_root",
+            date_modified: undefined,
+        },
+        other: {
+            id: "root_other_default",
+            name: "Other bookmarks",
+            type: "folder",
+            children: [],
+            date_added: "0",
+            guid: "guid_other_root",
+            date_modified: undefined,
+        },
     };
 
     allNodes.forEach((node: ProcessingNode) => {
-        if (node.type === 'folder') {
-            if (node._db_source === 'bookmark_bar' && node.name === 'Bookmarks bar' && !node._db_parent_id) {
-                supabaseRoots.bookmark_bar = { ...node, children: node.children || [] }; // node is ProcessingNode (Folder), assign to BookmarkFolder
-                nodesMap.set(node.id, supabaseRoots.bookmark_bar as ProcessingNode); 
-            } else if (node._db_source === 'other' && node.name === 'Other bookmarks' && !node._db_parent_id) {
-                supabaseRoots.other = { ...node, children: node.children || [] };
+        if (node.type === "folder") {
+            if (
+                node._db_source === "bookmark_bar" &&
+                node.name === "Bookmarks bar" &&
+                !node._db_parent_id
+            ) {
+                supabaseRoots.bookmark_bar = {
+                    ...node,
+                    children: node.children || [],
+                }; // node is ProcessingNode (Folder), assign to BookmarkFolder
+                nodesMap.set(
+                    node.id,
+                    supabaseRoots.bookmark_bar as ProcessingNode,
+                );
+            } else if (
+                node._db_source === "other" &&
+                node.name === "Other bookmarks" &&
+                !node._db_parent_id
+            ) {
+                supabaseRoots.other = {
+                    ...node,
+                    children: node.children || [],
+                };
                 nodesMap.set(node.id, supabaseRoots.other as ProcessingNode);
-            } else if (node._db_source === 'synced' && node.name === 'Synced bookmarks' && !node._db_parent_id && supabaseRoots.synced) {
-                supabaseRoots.synced = { ...node, children: node.children || [] };
+            } else if (
+                node._db_source === "synced" &&
+                node.name === "Synced bookmarks" &&
+                !node._db_parent_id &&
+                supabaseRoots.synced
+            ) {
+                supabaseRoots.synced = {
+                    ...node,
+                    children: node.children || [],
+                };
                 nodesMap.set(node.id, supabaseRoots.synced as ProcessingNode);
             }
         }
     });
-    
+
     allNodes.forEach((node: ProcessingNode) => {
         const parentId = node._db_parent_id ? String(node._db_parent_id) : null;
         if (parentId) {
             const parentNodeFromMap = nodesMap.get(parentId);
-            if (parentNodeFromMap && parentNodeFromMap.type === 'folder') {
+            if (parentNodeFromMap && parentNodeFromMap.type === "folder") {
                 // Construct a clean ComponentBookmarkNode for the children array
                 let childNodeForTree: ComponentBookmarkNode;
-                if (node.type === 'url') {
+                if (node.type === "url") {
                     childNodeForTree = {
-                        id: node.id, name: node.name, type: 'url', date_added: node.date_added, 
-                        guid: node.guid, url: node.url, date_modified: node.date_modified, meta_info: node.meta_info
+                        id: node.id,
+                        name: node.name,
+                        type: "url",
+                        date_added: node.date_added,
+                        guid: node.guid,
+                        url: node.url,
+                        date_modified: node.date_modified,
+                        meta_info: node.meta_info,
                     };
-                } else { // type === 'folder'
+                } else {
+                    // type === 'folder'
                     childNodeForTree = {
-                        id: node.id, name: node.name, type: 'folder', date_added: node.date_added,
-                        guid: node.guid, children: node.children || [], date_modified: node.date_modified
+                        id: node.id,
+                        name: node.name,
+                        type: "folder",
+                        date_added: node.date_added,
+                        guid: node.guid,
+                        children: node.children || [],
+                        date_modified: node.date_modified,
                     };
                 }
                 parentNodeFromMap.children.push(childNodeForTree);
@@ -200,7 +329,8 @@ async function getChromeBookmarksFromSupabase(): Promise<BookmarkData['roots']> 
 const bookmarkRoots = await getChromeBookmarksFromSupabase();
 
 const title = "Bookmarks - Al Harkan";
-const description = "Bookmarks on AI Research, Business, Software, and Digital Media";
+const description =
+    "Bookmarks on AI Research, Business, Software, and Digital Media";
 const permalink = Astro.site?.href
     ? `${Astro.site.href}bookmarks`
     : "/bookmarks";
@@ -208,12 +338,18 @@ const permalink = Astro.site?.href
 // Define the list of allowed top-level folder names
 const allowedFolderNames = [
     "AI",
-    "Startups & Business",
     "Tech & Engineering",
+    "Coding Games",
+    "No-Code",
+    "Data Science & Machine Learning",
+    "Startups & Business",
     "Research",
     "Academic Tools",
     "Reference/Citation Map",
+    "Digital Humanities",
+    "Media Analytics",
     "Design & Marketing",
+    "Education",
     "Journalism",
 ];
 
@@ -224,13 +360,16 @@ const rootsToRender = [bookmarkRoots.bookmark_bar, bookmarkRoots.other].filter(
 ) as ComponentBookmarkFolder[];
 
 // --- Add URL Counting Logic ---
-const countUrls = (node: ComponentBookmarkNode): number => { // Use ComponentBookmarkNode
+const countUrls = (node: ComponentBookmarkNode): number => {
+    // Use ComponentBookmarkNode
     if (!node) return 0;
     if (node.type === "url") {
         return 1;
     } else if (node.type === "folder") {
-        return (node.children || []).reduce( // Add null check for children
-            (sum: number, child: ComponentBookmarkNode) => sum + countUrls(child),
+        return (node.children || []).reduce(
+            // Add null check for children
+            (sum: number, child: ComponentBookmarkNode) =>
+                sum + countUrls(child),
             0,
         );
     }
@@ -239,15 +378,19 @@ const countUrls = (node: ComponentBookmarkNode): number => { // Use ComponentBoo
 
 // Calculate total count only across the *allowed* folders that will be rendered
 let totalUrlCount = 0;
-rootsToRender.forEach((root: ComponentBookmarkFolder) => { // Use ComponentBookmarkFolder
+rootsToRender.forEach((root: ComponentBookmarkFolder) => {
+    // Use ComponentBookmarkFolder
     if (root.children) {
         root.children
             .filter(
-                (node: ComponentBookmarkNode) => // Use ComponentBookmarkNode
+                (
+                    node: ComponentBookmarkNode, // Use ComponentBookmarkNode
+                ) =>
                     node.type === "folder" &&
                     allowedFolderNames.includes(node.name),
             )
-            .forEach((allowedFolder: ComponentBookmarkNode) => { // Use ComponentBookmarkNode
+            .forEach((allowedFolder: ComponentBookmarkNode) => {
+                // Use ComponentBookmarkNode
                 totalUrlCount += countUrls(allowedFolder);
             });
     }
@@ -270,29 +413,46 @@ rootsToRender.forEach((root: ComponentBookmarkFolder) => { // Use ComponentBookm
         <div>
             {
                 rootsToRender.map(
-                    (root: ComponentBookmarkFolder) => // Use ComponentBookmarkFolder
+                    (
+                        root: ComponentBookmarkFolder, // Use ComponentBookmarkFolder
+                    ) =>
                         root.children &&
                         root.children
                             .filter(
-                                (node: ComponentBookmarkNode) => // Use ComponentBookmarkNode
+                                (
+                                    node: ComponentBookmarkNode, // Use ComponentBookmarkNode
+                                ) =>
                                     node.type === "folder" &&
                                     allowedFolderNames.includes(node.name),
                             )
-                            .sort((a: ComponentBookmarkNode, b: ComponentBookmarkNode) => {
-                                // Ensure names are valid and in allowedFolderNames for robust sorting
-                                const indexA = allowedFolderNames.indexOf(a.name);
-                                const indexB = allowedFolderNames.indexOf(b.name);
-                                // If a name isn't in allowedFolderNames (shouldn't happen due to filter),
-                                // it can be pushed to the end or handled as an error.
-                                // Here, we assume filter ensures presence.
-                                return indexA - indexB;
-                            })
-                            .map((node: ComponentBookmarkNode) => ( // Use ComponentBookmarkNode
-                                <BookmarkNodeComponent
-                                    node={node}
-                                    allowedFolderNames={allowedFolderNames}
-                                />
-                            )),
+                            .sort(
+                                (
+                                    a: ComponentBookmarkNode,
+                                    b: ComponentBookmarkNode,
+                                ) => {
+                                    // Ensure names are valid and in allowedFolderNames for robust sorting
+                                    const indexA = allowedFolderNames.indexOf(
+                                        a.name,
+                                    );
+                                    const indexB = allowedFolderNames.indexOf(
+                                        b.name,
+                                    );
+                                    // If a name isn't in allowedFolderNames (shouldn't happen due to filter),
+                                    // it can be pushed to the end or handled as an error.
+                                    // Here, we assume filter ensures presence.
+                                    return indexA - indexB;
+                                },
+                            )
+                            .map(
+                                (
+                                    node: ComponentBookmarkNode, // Use ComponentBookmarkNode
+                                ) => (
+                                    <BookmarkNodeComponent
+                                        node={node}
+                                        allowedFolderNames={allowedFolderNames}
+                                    />
+                                ),
+                            ),
                 )
             }
         </div>
@@ -305,31 +465,44 @@ rootsToRender.forEach((root: ComponentBookmarkFolder) => { // Use ComponentBookm
 
 <script>
     // Select the container holding the top-level bookmark folders
-    const bookmarkContainer = document.querySelector('.container > div');
+    const bookmarkContainer = document.querySelector(".container > div");
 
     if (bookmarkContainer) {
-        bookmarkContainer.addEventListener('toggle', (event) => {
-            const target = event.target as HTMLElement; // Cast to HTMLElement first
+        bookmarkContainer.addEventListener(
+            "toggle",
+            (event) => {
+                const target = event.target as HTMLElement; // Cast to HTMLElement first
 
-            // Check if the event target is a <details> element and if it was opened
-            // AND ensure the target is a DIRECT CHILD of the container
-            if (target && target.tagName === 'DETAILS' && target.parentElement === bookmarkContainer && (target as HTMLDetailsElement).open) {
-                // Cast target specifically to HTMLDetailsElement for accessing .open
-                const openedDetails = target as HTMLDetailsElement;
+                // Check if the event target is a <details> element and if it was opened
+                // AND ensure the target is a DIRECT CHILD of the container
+                if (
+                    target &&
+                    target.tagName === "DETAILS" &&
+                    target.parentElement === bookmarkContainer &&
+                    (target as HTMLDetailsElement).open
+                ) {
+                    // Cast target specifically to HTMLDetailsElement for accessing .open
+                    const openedDetails = target as HTMLDetailsElement;
 
-                // Get all direct children <details> elements within the container
-                // Cast the NodeListOf<Element> to HTMLDetailsElement[]
-                const allDetails = Array.from(bookmarkContainer.querySelectorAll<HTMLDetailsElement>(':scope > details'));
+                    // Get all direct children <details> elements within the container
+                    // Cast the NodeListOf<Element> to HTMLDetailsElement[]
+                    const allDetails = Array.from(
+                        bookmarkContainer.querySelectorAll<HTMLDetailsElement>(
+                            ":scope > details",
+                        ),
+                    );
 
-                // Close all other <details> elements
-                allDetails.forEach(details => {
-                    // Now 'details' is correctly typed as HTMLDetailsElement
-                    if (details !== openedDetails) {
-                        details.open = false;
-                    }
-                });
-            }
-        }, true); // Use capture phase to potentially handle nested toggles if needed later
+                    // Close all other <details> elements
+                    allDetails.forEach((details) => {
+                        // Now 'details' is correctly typed as HTMLDetailsElement
+                        if (details !== openedDetails) {
+                            details.open = false;
+                        }
+                    });
+                }
+            },
+            true,
+        ); // Use capture phase to potentially handle nested toggles if needed later
     }
 </script>
 

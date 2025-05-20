@@ -265,8 +265,20 @@ def main():
     # output_path = script_dir / output_filename # No longer primary output
 
     allowed_folders = {
-        "AI", "Startups & Business", "Tech & Engineering", "Research",
-        "Academic Tools", "Reference/Citation Map", "Design & Marketing", "Journalism"
+        "AI", 
+        "Tech & Engineering",
+        "Coding Games",
+        "No-Code",
+        "Data Science & Machine Learning",
+        "Startups & Business", 
+        "Research",
+        "Academic Tools", 
+        "Reference/Citation Map",
+        "Digital Humanities",
+        "Media Analytics",
+        "Design & Marketing",
+        "Education",
+        "Journalism"
     }
 
     if not bookmarks_path:
