@@ -14,7 +14,7 @@ interface Video {
     published_at: string; // Supabase typically returns TIMESTAMPTZ as ISO string
 }
 
-const page_title = "Videos - Al Harkan"; // Renamed to avoid conflict with Video.title
+const page_title = "Videos"; // Renamed to avoid conflict with Video.title
 const description =
     "Videos Curation on AI Research, Software, and Digital Media";
 const permalink = Astro.site?.href ? `${Astro.site.href}videos` : "/videos";
