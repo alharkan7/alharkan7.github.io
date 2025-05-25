@@ -25,7 +25,7 @@ const {
 <html lang="en">
 <head>
   <BaseHead 
-    title=`${title} - Al Harkan` 
+    title={title === "Al Harkan's Blog" ? title : `${title} - Al Harkan`}
     description={description} 
     permalink={permalink}
     image={image}
