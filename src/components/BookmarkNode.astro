@@ -1,7 +1,7 @@
 ---
 // src/components/BookmarkNode.astro
 // import type { BookmarkNode, BookmarkURL, BookmarkFolder } from '../types'; // Assume types are moved to src/types.ts <-- REMOVE THIS LINE
-import { ChevronRight, ChevronDown, Bookmark } from 'lucide-react';
+import { ChevronRight, ChevronDown, Bookmark } from "lucide-react";
 
 // Define TypeScript interfaces for bookmarks (or import from shared location)
 export interface BookmarkNodeBase {
@@ -13,13 +13,13 @@ export interface BookmarkNodeBase {
 }
 
 export interface BookmarkURL extends BookmarkNodeBase {
-  type: 'url';
+  type: "url";
   url: string;
   meta_info?: { [key: string]: string };
 }
 
 export interface BookmarkFolder extends BookmarkNodeBase {
-  type: 'folder';
+  type: "folder";
   children: BookmarkNode[];
 }
 
@@ -37,11 +37,11 @@ const { node, allowedFolderNames } = Astro.props;
 const formatDate = (chromeTimestampStr: string): string => {
   try {
     const chromeTimestamp = parseInt(chromeTimestampStr, 10);
-    if (isNaN(chromeTimestamp)) return ''; // Handle invalid input
+    if (isNaN(chromeTimestamp)) return ""; // Handle invalid input
     // Convert Chrome timestamp (microseconds since 1601-01-01) to JS timestamp (ms since 1970-01-01)
-    const jsTimestamp = (chromeTimestamp / 1000) - 11644473600000;
+    const jsTimestamp = chromeTimestamp / 1000 - 11644473600000;
     const date = new Date(jsTimestamp);
-    
+
     // Get parts for D/M/YY format
     const day = date.getDate(); // No leading zero
     const month = date.getMonth() + 1; // getMonth() is 0-indexed, add 1
@@ -50,70 +50,92 @@ const formatDate = (chromeTimestampStr: string): string => {
     // return date.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }); // Old format
     return `${day}/${month}/${year}`; // New format: D/M/'YY
   } catch (error) {
-    console.error('Error formatting date:', error);
-    return ''; // Return empty string on error
+    console.error("Error formatting date:", error);
+    return ""; // Return empty string on error
   }
 };
 
 // Calculate count for folders
 let childrenCount = 0;
-if (node.type === 'folder') {
-  const urlChildrenCount = node.children.filter((child: BookmarkNode) => child.type === 'url').length;
-  const allowedFolderChildrenCount = node.children.filter((child: BookmarkNode) => 
-    child.type === 'folder' && 
-    (!allowedFolderNames || allowedFolderNames.includes(child.name))
+if (node.type === "folder") {
+  const urlChildrenCount = node.children.filter(
+    (child: BookmarkNode) => child.type === "url",
+  ).length;
+  const allowedFolderChildrenCount = node.children.filter(
+    (child: BookmarkNode) =>
+      child.type === "folder" &&
+      (!allowedFolderNames || allowedFolderNames.includes(child.name)),
   ).length;
   childrenCount = urlChildrenCount + allowedFolderChildrenCount;
 }
 ---
 
 {/* Render a Folder */}
-{node.type === 'folder' && (
-  <details class="bookmark-folder">
-    <summary>
-      <span>
-        {node.name}
-        {childrenCount > 0 && <span class="folder-count"> ({childrenCount})</span>}
-      </span>
-      <span class="chevron-icon closed">
-        <ChevronRight size={20} strokeWidth={2.5} />
-      </span>
-      <span class="chevron-icon open">
-        <ChevronDown size={20} strokeWidth={2.5} />
-      </span>
-    </summary>
-    <ul>
-      {/* Render immediate URL children FIRST */}
-      {node.children
-        .filter((child: BookmarkNode): child is BookmarkURL => child.type === 'url') // Type guard
-        .sort((a: BookmarkURL, b: BookmarkURL) => parseInt(b.date_added, 10) - parseInt(a.date_added, 10)) // Sort by date descending
-        .map((child: BookmarkURL) => (
-          <li>
-            <div class="toc-item">
-              <span class="bookmark-icon"><Bookmark size={20} strokeWidth={2} /></span>
-              <a href={child.url} target="_blank" rel="noopener noreferrer" class="bookmark-link toc-title">
-                {child.name}
-              </a>
-              <span class="toc-date">{formatDate(child.date_added)}</span>
-            </div>
-          </li>
-        ))}
+{
+  node.type === "folder" && (
+    <details class="bookmark-folder">
+      <summary>
+        <span>
+          {node.name}
+          {childrenCount > 0 && (
+            <span class="folder-count"> ({childrenCount})</span>
+          )}
+        </span>
+        <span class="chevron-icon closed">
+          <ChevronRight size={20} strokeWidth={2.5} />
+        </span>
+        <span class="chevron-icon open">
+          <ChevronDown size={20} strokeWidth={2.5} />
+        </span>
+      </summary>
+      <ul>
+        {/* Render immediate Folder children AFTER URLs if their name is in the allowed list (if list is provided) */}
+        {node.children
+          .filter(
+            (child: BookmarkNode) =>
+              child.type === "folder" &&
+              (!allowedFolderNames || allowedFolderNames.includes(child.name)), // Check if allowed
+          )
+          .map((child: BookmarkFolder) => (
+            <li>
+              {/* Recurse, passing down the allowed list */}
+              <Astro.self
+                node={child}
+                allowedFolderNames={allowedFolderNames}
+              />
+            </li>
+          ))}
 
-      {/* Render immediate Folder children AFTER URLs if their name is in the allowed list (if list is provided) */}
-      {node.children
-        .filter((child: BookmarkNode) => 
-          child.type === 'folder' && 
-          (!allowedFolderNames || allowedFolderNames.includes(child.name)) // Check if allowed
-        )
-        .map((child: BookmarkFolder) => (
-          <li>
-            {/* Recurse, passing down the allowed list */}
-            <Astro.self node={child} allowedFolderNames={allowedFolderNames} />
-          </li>
-        ))}
-      
-      {/* Render immediate Folder children ONLY if their name is in the allowed list (if list is provided) */}
-      {/* {node.children
+        {/* Render immediate URL children FIRST */}
+        {node.children
+          .filter(
+            (child: BookmarkNode): child is BookmarkURL => child.type === "url",
+          ) // Type guard
+          .sort(
+            (a: BookmarkURL, b: BookmarkURL) =>
+              parseInt(b.date_added, 10) - parseInt(a.date_added, 10),
+          ) // Sort by date descending
+          .map((child: BookmarkURL) => (
+            <li>
+              <div class="toc-item">
+                <span class="bookmark-icon">
+                  <Bookmark size={20} strokeWidth={2} />
+                </span>
+                <a
+                  href={child.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  class="bookmark-link toc-title"
+                >
+                  {child.name}
+                </a>
+                <span class="toc-date">{formatDate(child.date_added)}</span>
+              </div>
+            </li>
+          ))}
+
+        {/* Render immediate Folder children ONLY if their name is in the allowed list (if list is provided) */}
+        {/* {node.children
         .filter((child: BookmarkNode) => 
           child.type === 'folder' && 
           (!allowedFolderNames || allowedFolderNames.includes(child.name)) // Check if allowed
@@ -124,16 +146,26 @@ if (node.type === 'folder') {
             <Astro.self node={child} allowedFolderNames={allowedFolderNames} />
           </li>
         ))} */}
-    </ul>
-  </details>
-)}
+      </ul>
+    </details>
+  )
+}
 
-{/* Render a URL (only happens if called directly on a URL node, not typical here) */}
-{node.type === 'url' && (
-  <a href={node.url} target="_blank" rel="noopener noreferrer" class="bookmark-link">
-    {node.name}
-  </a>
-)}
+{
+  /* Render a URL (only happens if called directly on a URL node, not typical here) */
+}
+{
+  node.type === "url" && (
+    <a
+      href={node.url}
+      target="_blank"
+      rel="noopener noreferrer"
+      class="bookmark-link"
+    >
+      {node.name}
+    </a>
+  )
+}
 
 <style>
   details.bookmark-folder > summary {
@@ -314,7 +346,7 @@ if (node.type === 'folder') {
   }
 
   .toc-title::after {
-    content: '';
+    content: "";
     position: absolute;
     bottom: 0.3em;
     left: 100%;
@@ -364,7 +396,10 @@ if (node.type === 'folder') {
   }
 
   details.bookmark-folder > ul::-webkit-scrollbar-thumb {
-    background-color: var(--text-secondary, grey); /* Color of the scroll thumb */
+    background-color: var(
+      --text-secondary,
+      grey
+    ); /* Color of the scroll thumb */
     border-radius: 6px; /* Round the scroll thumb */
     border: none; /* Remove border */
   }
@@ -379,7 +414,7 @@ if (node.type === 'folder') {
     align-items: center; /* Vertically align items */
     /* --- Sticky styles REMOVED --- */
     /* position: sticky; */
-    /* top: 0; */ 
+    /* top: 0; */
     /* background-color: var(--bg-color, white); */
     /* z-index: 1; */
     /* --- End Sticky styles REMOVED --- */
@@ -431,12 +466,12 @@ if (node.type === 'folder') {
   /* Style for the bookmark icon container */
   .bookmark-icon {
     display: inline-flex; /* Align icon nicely */
-    align-items: center;  /* Center vertically if needed */
-    line-height: 1;       /* Prevent extra space */
-    flex-shrink: 0;       /* Prevent icon from shrinking */
+    align-items: center; /* Center vertically if needed */
+    line-height: 1; /* Prevent extra space */
+    flex-shrink: 0; /* Prevent icon from shrinking */
     /* Ensure default fill is none */
     > svg {
-        fill: none;
+      fill: none;
     }
   }
 
@@ -445,4 +480,4 @@ if (node.type === 'folder') {
     fill: var(--primary-color);
     stroke: var(--primary-color);
   }
-</style> 
+</style>
