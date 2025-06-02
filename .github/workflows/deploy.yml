@@ -25,7 +25,7 @@ jobs:
       FIREBASE_PROJECT_ID: ${{ secrets.FIREBASE_PROJECT_ID }}
       FIREBASE_CLIENT_EMAIL: ${{ secrets.FIREBASE_CLIENT_EMAIL }}
       FIREBASE_PRIVATE_KEY: ${{ secrets.FIREBASE_PRIVATE_KEY }}
-      PUBLIC_FIREBASE_API_KEY: "AIzaSyBJutoLILzn0JrV_g2miztuLEuX138WYqk"
+      PUBLIC_FIREBASE_API_KEY: ""
       PUBLIC_FIREBASE_AUTH_DOMAIN: "raihankallaid.firebaseapp.com"
       PUBLIC_FIREBASE_PROJECT_ID: "raihankallaid"
       PUBLIC_FIREBASE_STORAGE_BUCKET: "raihankallaid.firebasestorage.app"
