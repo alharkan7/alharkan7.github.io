@@ -245,41 +245,25 @@ async function getChromeBookmarksFromSupabase(): Promise<
         },
     };
 
-    allNodes.forEach((node: ProcessingNode) => {
+    // Find root nodes (those without a parent_id) and assign them.
+    const rootDbNodes = allNodes.filter((node) => !node._db_parent_id);
+
+    rootDbNodes.forEach((node) => {
         if (node.type === "folder") {
-            if (
-                node._db_source === "bookmark_bar" &&
-                node.name === "Bookmarks bar" &&
-                !node._db_parent_id
-            ) {
+            if (node._db_source === "bookmark_bar") {
                 supabaseRoots.bookmark_bar = {
                     ...node,
                     children: node.children || [],
-                }; // node is ProcessingNode (Folder), assign to BookmarkFolder
+                };
                 nodesMap.set(
                     node.id,
                     supabaseRoots.bookmark_bar as ProcessingNode,
                 );
-            } else if (
-                node._db_source === "other" &&
-                node.name === "Other bookmarks" &&
-                !node._db_parent_id
-            ) {
-                supabaseRoots.other = {
-                    ...node,
-                    children: node.children || [],
-                };
+            } else if (node._db_source === "other") {
+                supabaseRoots.other = { ...node, children: node.children || [] };
                 nodesMap.set(node.id, supabaseRoots.other as ProcessingNode);
-            } else if (
-                node._db_source === "synced" &&
-                node.name === "Synced bookmarks" &&
-                !node._db_parent_id &&
-                supabaseRoots.synced
-            ) {
-                supabaseRoots.synced = {
-                    ...node,
-                    children: node.children || [],
-                };
+            } else if (node._db_source === "synced" && supabaseRoots.synced) {
+                supabaseRoots.synced = { ...node, children: node.children || [] };
                 nodesMap.set(node.id, supabaseRoots.synced as ProcessingNode);
             }
         }
