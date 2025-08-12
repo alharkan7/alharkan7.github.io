@@ -3,6 +3,8 @@ import BaseLayout from "../layouts/BaseLayout.astro";
 // import { readFile } from 'node:fs/promises'; // Remove Node.js fs
 // import path from 'node:path'; // Remove Node.js path
 import { createClient } from "@supabase/supabase-js";
+import fs from "fs";
+import path from "path";
 
 // Define the expected structure of a video object
 interface Video {
@@ -133,6 +135,20 @@ if (supabase) {
     errorMessage = "Supabase client could not be initialized. Videos cannot be loaded.";
 }
 
+// Get the last modified date of the liked_videos.json file
+let lastUpdateDate = "Unknown";
+try {
+    const videosFilePath = path.join(process.cwd(), "public", "os-bookmarks", "liked_videos.json");
+    const stats = fs.statSync(videosFilePath);
+    const lastModified = stats.mtime;
+    lastUpdateDate = lastModified.toLocaleDateString("en-GB", {
+        year: "numeric",
+        month: "short",
+        day: "numeric",
+    });
+} catch (error) {
+    console.warn("Could not read liked_videos.json file stats:", error);
+}
 
 // --- Initial State from URL (Client will refine) ---
 const validLimits = [30, 60, 90];
@@ -287,7 +303,7 @@ if (!validLimits.includes(initialLimit)) {
         }
         <hr />
         <p class="footnote text-sm">
-            This video playlist is automatically updated daily and synced with
+            This video playlist is automatically updated daily (last update: {lastUpdateDate}) and synced with
             my YouTube account —<a href="https://www.youtube.com/@alhrkn/playlists" target="_blank" rel="noopener noreferrer">check it out</a> for more playlists!
         </p>
     </div>

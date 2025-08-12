@@ -3,6 +3,8 @@ import BaseLayout from "../layouts/BaseLayout.astro";
 // Import the data fetched by the GitHub Action
 // import starredReposData from "../../public/os-bookmarks/github_stars.json"; // Adjust path if needed
 import { createClient } from "@supabase/supabase-js";
+import fs from "fs";
+import path from "path";
 // Import Lucide icons
 import { Code, Star, GitFork, ChevronDown, ChevronUp } from "lucide-react";
 
@@ -125,6 +127,21 @@ async function getStarredRepos(): Promise<GitHubRepo[]> {
 // Cast the imported data
 // const starredRepos = starredReposData as GitHubRepo[];
 const starredRepos = await getStarredRepos();
+
+// Get the last modified date of the github_stars.json file
+let lastUpdateDate = "Unknown";
+try {
+    const starsFilePath = path.join(process.cwd(), "public", "os-bookmarks", "github_stars.json");
+    const stats = fs.statSync(starsFilePath);
+    const lastModified = stats.mtime;
+    lastUpdateDate = lastModified.toLocaleDateString("en-GB", {
+        year: "numeric",
+        month: "short",
+        day: "numeric",
+    });
+} catch (error) {
+    console.warn("Could not read github_stars.json file stats:", error);
+}
 
 // Helper function to format date
 function formatDate(dateString: string | null): string {
@@ -251,7 +268,7 @@ const totalStars = starredRepos.length;
         <hr class="mt-8" />
 
         <p class="footnote text-sm">
-            This list is automatically updated daily based on my GitHub <a href="https://github.com/alharkan7?tab=stars" target="_blank" rel="noopener noreferrer">stars</a>.
+            This list is automatically updated daily (last update: {lastUpdateDate}) based on my GitHub <a href="https://github.com/alharkan7?tab=stars" target="_blank" rel="noopener noreferrer">stars</a>.
         </p>
     </div>
 </BaseLayout>

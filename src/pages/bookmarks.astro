@@ -2,6 +2,8 @@
 import BaseLayout from "../layouts/BaseLayout.astro";
 // import bookmarksDataUntyped from "../../public/os-bookmarks/chrome_bookmarks.json" assert { type: "json" };
 import { createClient } from "@supabase/supabase-js";
+import fs from "fs";
+import path from "path";
 import BookmarkNodeComponent from "../components/BookmarkNode.astro"; // Import the new component
 import type {
     BookmarkNode as ComponentBookmarkNode, // Rename to avoid conflict
@@ -260,10 +262,16 @@ async function getChromeBookmarksFromSupabase(): Promise<
                     supabaseRoots.bookmark_bar as ProcessingNode,
                 );
             } else if (node._db_source === "other") {
-                supabaseRoots.other = { ...node, children: node.children || [] };
+                supabaseRoots.other = {
+                    ...node,
+                    children: node.children || [],
+                };
                 nodesMap.set(node.id, supabaseRoots.other as ProcessingNode);
             } else if (node._db_source === "synced" && supabaseRoots.synced) {
-                supabaseRoots.synced = { ...node, children: node.children || [] };
+                supabaseRoots.synced = {
+                    ...node,
+                    children: node.children || [],
+                };
                 nodesMap.set(node.id, supabaseRoots.synced as ProcessingNode);
             }
         }
@@ -311,6 +319,26 @@ async function getChromeBookmarksFromSupabase(): Promise<
 
 // Use ComponentBookmarkNode for type safety with the component
 const bookmarkRoots = await getChromeBookmarksFromSupabase();
+
+// Get the last modified date of the chrome_bookmarks.json file
+let lastUpdateDate = "Unknown";
+try {
+    const bookmarksFilePath = path.join(
+        process.cwd(),
+        "public",
+        "os-bookmarks",
+        "chrome_bookmarks.json",
+    );
+    const stats = fs.statSync(bookmarksFilePath);
+    const lastModified = stats.mtime;
+    lastUpdateDate = lastModified.toLocaleDateString("en-GB", {
+        year: "numeric",
+        month: "short",
+        day: "numeric",
+    });
+} catch (error) {
+    console.warn("Could not read chrome_bookmarks.json file stats:", error);
+}
 
 const title = "Bookmarks";
 const description =
@@ -441,8 +469,9 @@ rootsToRender.forEach((root: ComponentBookmarkFolder) => {
             }
         </div>
         <p>
-            This bookmarks list is automatically updated daily and synced with
-            my Chrome browser.
+            This bookmarks list is automatically updated daily (last update: {
+                lastUpdateDate
+            }) and synced with my Chrome browser.
         </p>
     </div>
 </BaseLayout>
