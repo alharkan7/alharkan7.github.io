@@ -276,7 +276,7 @@ def main():
         "Reference/Citation Map",
         "Digital Humanities",
         "Media Analytics",
-        "Design & Marketing",
+        "Design & Creative",
         "Education",
         "Journalism"
     }
