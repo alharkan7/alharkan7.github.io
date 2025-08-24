@@ -1,0 +1,59 @@
+---
+title: 'Draft a Research Paper in One Minute'
+description: 'As a weekend project, I made an app that helps you rapidly iterate on research ideas. I call this app Outliner.'
+publishDate: '23 August 2025'
+---
+
+With the arrival of LLMs, most work that involves typing on a computer is gradually becoming obsolete, and that includes many of our traditional research workflows. However, this also opens up opportunities to adapt this technology, freeing researchers from boring administrative tasks to let them focus on the substantial research ideas themselves. It gives them a tool for rapid iteration on multiple research ideas at once.
+
+Some tools have arrived and look promising, like Jenni AI. But I dislike that these tools are not open-source and do not embody the spirit of open knowledge.
+
+I've been waiting for months for the "Lib Gen & Sci-Hub" of these AI research tools to appear, but I've grown tired of waiting as none have emerged. So, I'm building one.
+
+<iframe width="560" height="315" src="https://www.youtube.com/embed/YjCXcdyAWuU?si=ciQjAIlIAFab2Qu6" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+
+
+Here's the simple architecture of how Outliner works.
+
+
+```mermaid
+graph TD
+    A[User Input Keywords] --> B{Language Selection}
+    B -->|English| C[AI Processing EN]
+    B -->|Bahasa Indonesia| D[AI Processing ID]
+    
+    C --> E[Large Language Model]
+    D --> E
+    
+    E --> F[Research Ideas Generation]
+    F --> G[Structured Abstracts]
+    G --> H[Ideas Grid Display]
+    
+    H --> I[User Selection]
+    I --> J[Document Editor]
+    J --> K[AI-Powered Tools]
+    
+    K --> L[Expand Tool]
+    K --> M[Citation Tool]
+    K --> M[Paraphrase Tool]
+    K --> N[Chat Tool]
+    
+    L --> O[Real-time Streaming]
+    M --> O
+    N --> O
+    
+    O --> P[Rich Text Editor]
+    P --> Q[Export Options]
+    Q --> R[PDF, Markdown, DOCX]
+    
+    style A fill:#e1f5fe
+    style R fill:#c8e6c9
+    style E fill:#fff3e0
+    style O fill:#f3e5f5
+```
+
+This is my 15th experimental app, but as always, I hope it's useful to you. Please give Outliner a try here:
+
+## [apps.raihankalla.id/outliner](https://alhrkn.vercel.app/outliner)
+
+If you have any questions or feedback, please let me know [@alhrkn](https://x.com/alhrkn).
