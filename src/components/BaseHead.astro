@@ -107,3 +107,90 @@ const socialImageURL = image
   // Load when Twitter script is ready
   window.twttr.ready(loadTwitterWidgets);
 </script>
+
+<!-- Mermaid Script -->
+<script type="module">
+  import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+  
+  // Initialize Mermaid
+  mermaid.initialize({
+    startOnLoad: true,
+    theme: 'default',
+    themeVariables: {
+      primaryColor: '#ff6b6b',
+      primaryTextColor: '#333',
+      primaryBorderColor: '#ff6b6b',
+      lineColor: '#666',
+      secondaryColor: '#f9f9f9',
+      tertiaryColor: '#fff'
+    }
+  });
+  
+  // Function to render Mermaid diagrams
+  function renderMermaidDiagrams() {
+    // Try multiple selectors to catch different MDX rendering patterns
+    const selectors = [
+      'pre code.language-mermaid',
+      'code.language-mermaid', 
+      'pre[class*="language-mermaid"]',
+      'code[class*="language-mermaid"]',
+      'pre:has(code.language-mermaid)',
+      '.astro-code.language-mermaid'
+    ];
+    
+    let mermaidElements = [];
+    selectors.forEach(selector => {
+      try {
+        const elements = document.querySelectorAll(selector);
+        mermaidElements = [...mermaidElements, ...elements];
+      } catch (e) {
+        // Skip selectors that aren't supported
+      }
+    });
+    
+    // Also check for any pre elements containing "graph TB" or "graph TD"
+    const preElements = document.querySelectorAll('pre');
+    preElements.forEach(pre => {
+      const text = pre.textContent || pre.innerText;
+      if (text.includes('graph TB') || text.includes('graph TD') || text.includes('flowchart')) {
+        mermaidElements.push(pre);
+      }
+    });
+    
+    console.log('Found mermaid elements:', mermaidElements.length);
+    
+    mermaidElements.forEach((element, index) => {
+      // Skip if already processed
+      if (element.classList.contains('mermaid-processed')) return;
+      
+      const mermaidCode = element.textContent || element.innerText;
+      console.log('Processing mermaid code:', mermaidCode.substring(0, 50) + '...');
+      
+      const mermaidId = `mermaid-${index}-${Date.now()}`;
+      
+      // Create a div to hold the rendered diagram
+      const mermaidDiv = document.createElement('div');
+      mermaidDiv.id = mermaidId;
+      mermaidDiv.className = 'mermaid';
+      mermaidDiv.textContent = mermaidCode.trim();
+      
+      // Replace the code block with the mermaid div
+      const parent = element.closest('pre') || element;
+      parent.parentNode.replaceChild(mermaidDiv, parent);
+      
+      // Mark as processed
+      mermaidDiv.classList.add('mermaid-processed');
+    });
+    
+    // Re-run mermaid on the new elements
+    if (mermaidElements.length > 0) {
+      mermaid.run();
+    }
+  }
+  
+  // Render on initial load
+  document.addEventListener('DOMContentLoaded', renderMermaidDiagrams);
+  
+  // Render on Astro page transitions
+  document.addEventListener('astro:page-load', renderMermaidDiagrams);
+</script>
