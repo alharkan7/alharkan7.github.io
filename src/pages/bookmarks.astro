@@ -60,31 +60,35 @@ type ProcessingNode =
           _db_source?: string | null;
       });
 
-async function getChromeBookmarksFromSupabase(): Promise<
-    BookmarkData["roots"]
-> {
+async function getChromeBookmarksFromSupabase(): Promise<{
+    roots: BookmarkData["roots"];
+    lastUpdatedAt: string | null;
+}> {
     if (!supabase) {
         console.error("Supabase client not initialized.");
         const defaultGuid = "error-guid-empty-client";
         return {
-            bookmark_bar: {
-                id: "empty_bar",
-                name: "Bookmarks bar (Error)",
-                type: "folder",
-                children: [],
-                date_added: "0",
-                guid: defaultGuid,
-                date_modified: undefined,
+            roots: {
+                bookmark_bar: {
+                    id: "empty_bar",
+                    name: "Bookmarks bar (Error)",
+                    type: "folder",
+                    children: [],
+                    date_added: "0",
+                    guid: defaultGuid,
+                    date_modified: undefined,
+                },
+                other: {
+                    id: "empty_other",
+                    name: "Other bookmarks (Error)",
+                    type: "folder",
+                    children: [],
+                    date_added: "0",
+                    guid: defaultGuid,
+                    date_modified: undefined,
+                },
             },
-            other: {
-                id: "empty_other",
-                name: "Other bookmarks (Error)",
-                type: "folder",
-                children: [],
-                date_added: "0",
-                guid: defaultGuid,
-                date_modified: undefined,
-            },
+            lastUpdatedAt: null,
         };
     }
 
@@ -97,6 +101,28 @@ async function getChromeBookmarksFromSupabase(): Promise<
     console.log(
         "Starting to fetch chrome bookmarks from Supabase with chunking...",
     );
+
+    let lastUpdatedAt: string | null = null;
+    try {
+        const { data, error } = await supabase
+            .from("chrome_bookmarks")
+            .select("created_at")
+            .order("created_at", { ascending: false })
+            .limit(1);
+
+        if (error) {
+            console.error("Error fetching last updated timestamp:", error);
+        } else if (data && data.length > 0) {
+            const date = new Date(data[0].created_at);
+            lastUpdatedAt = date.toLocaleDateString("en-GB", {
+                year: "numeric",
+                month: "short",
+                day: "numeric",
+            });
+        }
+    } catch (error) {
+        console.error("Exception fetching last updated timestamp:", error);
+    }
 
     while (keepFetching) {
         const {
@@ -119,24 +145,27 @@ async function getChromeBookmarksFromSupabase(): Promise<
             // Depending on desired behavior, you might throw, or return partial/error state.
             // For now, returning an error state similar to other errors.
             return {
-                bookmark_bar: {
-                    id: "error_bar_chunk",
-                    name: "Bookmarks bar (Fetch Error)",
-                    type: "folder",
-                    children: [],
-                    date_added: "0",
-                    guid: defaultGuid,
-                    date_modified: undefined,
+                roots: {
+                    bookmark_bar: {
+                        id: "error_bar_chunk",
+                        name: "Bookmarks bar (Fetch Error)",
+                        type: "folder",
+                        children: [],
+                        date_added: "0",
+                        guid: defaultGuid,
+                        date_modified: undefined,
+                    },
+                    other: {
+                        id: "error_other_chunk",
+                        name: "Other bookmarks (Fetch Error)",
+                        type: "folder",
+                        children: [],
+                        date_added: "0",
+                        guid: defaultGuid,
+                        date_modified: undefined,
+                    },
                 },
-                other: {
-                    id: "error_other_chunk",
-                    name: "Other bookmarks (Fetch Error)",
-                    type: "folder",
-                    children: [],
-                    date_added: "0",
-                    guid: defaultGuid,
-                    date_modified: undefined,
-                },
+                lastUpdatedAt: null,
             };
         }
 
@@ -172,24 +201,27 @@ async function getChromeBookmarksFromSupabase(): Promise<
         const defaultGuid = "no-data-guid-fetch";
         console.warn("No bookmark data returned from Supabase after fetching.");
         return {
-            bookmark_bar: {
-                id: "no_data_bar",
-                name: "Bookmarks bar (No Data)",
-                type: "folder",
-                children: [],
-                date_added: "0",
-                guid: defaultGuid,
-                date_modified: undefined,
+            roots: {
+                bookmark_bar: {
+                    id: "no_data_bar",
+                    name: "Bookmarks bar (No Data)",
+                    type: "folder",
+                    children: [],
+                    date_added: "0",
+                    guid: defaultGuid,
+                    date_modified: undefined,
+                },
+                other: {
+                    id: "no_data_other",
+                    name: "Other bookmarks (No Data)",
+                    type: "folder",
+                    children: [],
+                    date_added: "0",
+                    guid: defaultGuid,
+                    date_modified: undefined,
+                },
             },
-            other: {
-                id: "no_data_other",
-                name: "Other bookmarks (No Data)",
-                type: "folder",
-                children: [],
-                date_added: "0",
-                guid: defaultGuid,
-                date_modified: undefined,
-            },
+            lastUpdatedAt: null,
         };
     }
 
@@ -314,31 +346,16 @@ async function getChromeBookmarksFromSupabase(): Promise<
 
     // The supabaseRoots object now holds BookmarkFolder types which are compatible
     // with ComponentBookmarkFolder. Children have been populated with ComponentBookmarkNode types.
-    return supabaseRoots;
+    return {
+        roots: supabaseRoots,
+        lastUpdatedAt,
+    };
 }
 
 // Use ComponentBookmarkNode for type safety with the component
-const bookmarkRoots = await getChromeBookmarksFromSupabase();
+const { roots: bookmarkRoots, lastUpdatedAt } = await getChromeBookmarksFromSupabase();
 
-// Get the last modified date of the chrome_bookmarks.json file
-let lastUpdateDate = "Unknown";
-try {
-    const bookmarksFilePath = path.join(
-        process.cwd(),
-        "public",
-        "os-bookmarks",
-        "chrome_bookmarks.json",
-    );
-    const stats = fs.statSync(bookmarksFilePath);
-    const lastModified = stats.mtime;
-    lastUpdateDate = lastModified.toLocaleDateString("en-GB", {
-        year: "numeric",
-        month: "short",
-        day: "numeric",
-    });
-} catch (error) {
-    console.warn("Could not read chrome_bookmarks.json file stats:", error);
-}
+let lastUpdateDate = lastUpdatedAt || "Unknown";
 
 const title = "Bookmarks";
 const description =

@@ -30,6 +30,8 @@ let totalItems = 0;
 let uniqueYears: string[] = [];
 let uniqueChannels: { id: string; title: string }[] = [];
 let errorMessage: string | null = null;
+let lastUpdateDate: string = "Unknown";
+
 
 if (!supabaseUrl || !supabaseAnonKey) {
     errorMessage = "Supabase URL or Anon Key is not set in environment variables.";
@@ -38,7 +40,7 @@ if (!supabaseUrl || !supabaseAnonKey) {
 
 const supabase = supabaseUrl && supabaseAnonKey ? createClient(supabaseUrl, supabaseAnonKey) : null;
 
-async function getLikedVideosFromSupabase(): Promise<Video[]> {
+async function getLikedVideosFromSupabase(): Promise<{ videos: Video[]; lastUpdatedAt: string | null }> {
     if (!supabase) {
         throw new Error("Supabase client not initialized.");
     }
@@ -88,15 +90,37 @@ async function getLikedVideosFromSupabase(): Promise<Video[]> {
             keepFetching = false;
         }
     }
+    // Fetch the latest created_at timestamp
+    const { data: latestVideo, error: latestError } = await supabase
+        .from("liked_videos")
+        .select("created_at")
+        .order("created_at", { ascending: false })
+        .limit(1);
+
+    let lastUpdatedAt: string | null = null;
+    if (latestError) {
+        console.error("Error fetching latest created_at from Supabase:", latestError);
+    } else if (latestVideo && latestVideo.length > 0) {
+        const date = new Date(latestVideo[0].created_at);
+        lastUpdatedAt = date.toLocaleDateString("en-GB", {
+            year: "numeric",
+            month: "short",
+            day: "numeric",
+        });
+    }
+
     console.log(`Fetched a total of ${allData.length} videos from Supabase.`);
-    return allData;
+    return { videos: allData, lastUpdatedAt };
 }
 
 if (supabase) {
     try {
-        const rawVideos = await getLikedVideosFromSupabase();
+        const { videos: rawVideos, lastUpdatedAt: dbLastUpdatedAt } = await getLikedVideosFromSupabase();
         // Filter out "Private video" entries
         allVideosData = rawVideos.filter((video: Video) => video.title !== "Private video" && video.title !== null);
+        if (dbLastUpdatedAt) {
+            lastUpdateDate = dbLastUpdatedAt;
+        }
 
         totalItems = allVideosData.length;
 
@@ -136,19 +160,6 @@ if (supabase) {
 }
 
 // Get the last modified date of the liked_videos.json file
-let lastUpdateDate = "Unknown";
-try {
-    const videosFilePath = path.join(process.cwd(), "public", "os-bookmarks", "liked_videos.json");
-    const stats = fs.statSync(videosFilePath);
-    const lastModified = stats.mtime;
-    lastUpdateDate = lastModified.toLocaleDateString("en-GB", {
-        year: "numeric",
-        month: "short",
-        day: "numeric",
-    });
-} catch (error) {
-    console.warn("Could not read liked_videos.json file stats:", error);
-}
 
 // --- Initial State from URL (Client will refine) ---
 const validLimits = [30, 60, 90];

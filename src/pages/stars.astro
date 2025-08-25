@@ -130,17 +130,21 @@ const starredRepos = await getStarredRepos();
 
 // Get the last modified date of the github_stars.json file
 let lastUpdateDate = "Unknown";
-try {
-    const starsFilePath = path.join(process.cwd(), "public", "os-bookmarks", "github_stars.json");
-    const stats = fs.statSync(starsFilePath);
-    const lastModified = stats.mtime;
-    lastUpdateDate = lastModified.toLocaleDateString("en-GB", {
+if (starredRepos.length > 0) {
+    // Find the most recent starred_at date among all repositories
+    const latestStarredDate = starredRepos.reduce((maxDate, repo) => {
+        if (repo.pushed_at) {
+            const currentDate = new Date(repo.pushed_at);
+            return currentDate > maxDate ? currentDate : maxDate;
+        }
+        return maxDate;
+    }, new Date(0)); // Initialize with a very old date
+
+    lastUpdateDate = latestStarredDate.toLocaleDateString("en-GB", {
         year: "numeric",
         month: "short",
         day: "numeric",
     });
-} catch (error) {
-    console.warn("Could not read github_stars.json file stats:", error);
 }
 
 // Helper function to format date
