@@ -105,6 +105,10 @@ const { current = "" } = Astro.props;
   }
 
   @media screen and (max-width: 480px) {
+    nav {
+      gap: 0;
+    }
+
     .nav-container {
       max-width: 100%;
       padding: 0;
@@ -242,13 +246,37 @@ const { current = "" } = Astro.props;
       </div>
     </div>
 
-    <a
-      href="https://apps.raihankalla.id"
-      target="_blank"
-      rel="noopener noreferrer">Apps</a
-    >
-
-    <!-- <a class={current === "bookmarks" ? "selected" : ""} href="/bookmarks">bookmarks</a> -->
+    <div class="dropdown-container">
+      <a
+        class={current === "links" ? "selected" : ""}
+        data-dropdown-toggle
+        role="button"
+        tabindex="0"
+        class="dropdown-button">Apps</a
+      >
+      <div class="dropdown-content">
+        <a
+          href="https://apps.raihankalla.id/papermap"
+          target="_blank"
+          rel="noopener noreferrer">Papermap</a
+        >
+        <a
+          href="https://apps.raihankalla.id/outliner"
+          target="_blank"
+          rel="noopener noreferrer">Outliner</a
+        >
+        <a
+          href="https://apps.raihankalla.id/inztagram"
+          target="_blank"
+          rel="noopener noreferrer">Inztagram</a
+        >
+        <a
+          href="https://apps.raihankalla.id"
+          target="_blank"
+          rel="noopener noreferrer">All Apps</a
+        >
+      </div>
+    </div>
   </nav>
 
   <div class="theme-toggle-container">
