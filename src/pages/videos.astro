@@ -30,7 +30,7 @@ let totalItems = 0;
 let uniqueYears: string[] = [];
 let uniqueChannels: { id: string; title: string }[] = [];
 let errorMessage: string | null = null;
-let lastUpdateDate: string = "Unknown";
+let lastUpdateDate = "Unknown";
 
 
 if (!supabaseUrl || !supabaseAnonKey) {
@@ -160,6 +160,7 @@ if (supabase) {
 }
 
 // Get the last modified date of the liked_videos.json file
+
 
 // --- Initial State from URL (Client will refine) ---
 const validLimits = [30, 60, 90];
