@@ -1,0 +1,152 @@
+---
+import type { GetStaticPaths, Page } from "astro";
+import BaseLayout from "../../layouts/BaseLayout.astro";
+
+export const prerender = true;
+
+interface BlogPost {
+    file: string;
+    frontmatter: {
+        title: string;
+        description: string;
+        publishDate: string;
+    };
+}
+
+interface Props {
+    page: Page<BlogPost>;
+}
+
+export const getStaticPaths: GetStaticPaths = async ({ paginate }) => {
+    const allPosts: BlogPost[] = await Astro.glob(
+        "../../data/blog-posts/ptm/*.{md,mdx}",
+    );
+    const sortedPosts = allPosts.sort(
+        (a: BlogPost, b: BlogPost) =>
+            new Date(b.frontmatter.publishDate).valueOf() -
+            new Date(a.frontmatter.publishDate).valueOf(),
+    );
+
+    return paginate(sortedPosts, { pageSize: 10 });
+};
+
+const { page } = Astro.props as Props;
+const title = "Perspektif Teori Media";
+const description = "Perspektif Teori Media";
+const permalink = Astro.site?.href ? `${Astro.site.href}ptm` : "/ptm";
+---
+
+<BaseLayout
+    title={title}
+    description={description}
+    permalink={permalink ?? "/"}
+    current="ptm"
+>
+    <div class="container">
+        <h1>Perspektif Teori Media</h1>
+        <hr />
+        {
+            page.data.map((post: BlogPost, index: number) => {
+                const href = `/${post.file.split("/ptm/").pop()?.split(".").shift()}`;
+                return (
+                    <div>
+                        {index !== 0 && <hr />}
+                        <div class="post-item">
+                            <h2>
+                                <a href={href}>{post.frontmatter.title}</a>
+                            </h2>
+                            <p>{post.frontmatter.description}</p>
+                            <div class="post-item-footer">
+                                <span class="post-item-date">
+                                    — {post.frontmatter.publishDate}
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                );
+            })
+        }
+
+        <div class="pagination">
+            {
+                page.url.prev && (
+                    <a href={page.url.prev} class="pagination-prev">
+                        ← Prev
+                    </a>
+                )
+            }
+            {
+                page.url.next && (
+                    <a href={page.url.next} class="pagination-next">
+                        Next →
+                    </a>
+                )
+            }
+        </div>
+    </div>
+
+    <style>
+        h1 {
+            margin-bottom: 0.5rem;
+        }
+
+        h2,
+        .post-item-footer {
+            font-family: var(--font-family-sans);
+            font-weight: 700;
+        }
+
+        .post-item-date {
+            color: var(--text-secondary);
+            text-align: left;
+            text-transform: uppercase;
+            margin-right: 16px;
+        }
+
+        hr {
+            margin: 60px auto;
+        }
+
+        .pagination {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 60px;
+            /* padding: 1rem 0; */
+        }
+
+        .pagination-prev,
+        .pagination-next {
+            /* padding: 0.5rem 1rem; */
+            /* border: 1px solid var(--text-secondary); */
+            /* border-radius: 4px; */
+            /* text-decoration: none; */
+          color: var(--text-secondary);
+            transition: all 0.2s ease;
+            font-family: var(--font-family-sans);
+            font-size: 1.8em;
+            font-weight: 700;
+            text-decoration: none;
+            box-shadow: inset 0 -0.12em 0 var(--primary-color);
+            -webkit-transition:
+                box-shadow 0.2s ease-in-out,
+                color 0.2s ease-in-out;
+            transition:
+                box-shadow 0.2s ease-in-out,
+                color 0.2s ease-in-out;
+        }
+
+        .pagination-prev:hover,
+        .pagination-next:hover {
+            /* border-color: var(--text-primary); */
+            /* background-color: var(--text-primary); */
+            /* color: var(--background); */
+            color: var(--primary-color);
+            box-shadow: inset 0 -1.5em 0 var(--primary-color);
+            color: #fff;
+        }
+
+        .pagination-next {
+            margin-left: auto;
+        }
+    </style>
+</BaseLayout>
