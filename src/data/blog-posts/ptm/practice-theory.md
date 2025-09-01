@@ -18,7 +18,7 @@ Untuk memahami logika yang mendasari praktik-praktik ini, karya Pierre Bourdieu 
 
 Namun, ketergantungan semata pada konsep habitus berisiko menghadirkan gambaran deterministik yang mengabaikan agensi individu biasa. Di sinilah karya Michel de Certeau (1998) menawarkan sudut pandang yang tak kalah penting. De Certeau membedakan antara"strategi" yang berkuasa, yang beroperasi dari basis kelembagaan yang tepat (misalnya, pemerintah atau perusahaan), dan "taktik" dari yang lemah, yang harus beroperasi di wilayah pihak lain. Warga yang berada di platform media sosial menggunakan taktik, mereka adalah "pemburu gelap," dengan cerdik memanfaatkan dan mengalihkan sistem yang dipaksakan untuk kepentingan mereka sendiri (Song, 2017). Sebuah taktik "menyusup ke tempat pihak lain, secara terpisah-pisah, tanpa menguasainya secara utuh, tanpa mampu menjaga jarak" (de Certeau, 1998). Perspektif ini dengan kuat menerangi aktivisme digital di Indonesia, di mana warga menggunakan meme, tagar, dan kampanye terkoordinasi sebagai manuver taktis dalam arsitektur strategis platform dan pengawasan negara, menciptakan "kejutan" bagi pihak yang berkuasa. Hal ini bukanlah perlawanan arus utama yang terorganisir; namun merupakan "seni bertahan" dalam sistem yang mengekang.
 
-## *Research Gap* dan Pertanyaan Penelitian
+## *State of the Art* dan Pertanyaan Penelitian
 
 Penelitian yang ada mengenai politik digital di Indonesia telah mendokumentasikan lanskapnya secara cukup lengkap, termasuk mengidentifikasi peran "buzzer" politik dalam memanipulasi wacana (Sihidi, dkk., 2025\) serta menganalisis dampak media sosial terhadap keterlibatan masyarakat (Bajari & Morin, 2025). Penelitian-penelitian tersebut memberikan konteks, namun seringkali berhenti pada tingkat deskriptif atau tetap berada dalam kerangka responsif/rentannya Pemerintah atas viralnya isu di media sosial. Penelitian-penelitian tersebut mengidentifikasi aktor dan hasilnya, namun belum memiliki kerangka teoritis yang koheren untuk menjelaskan proses sosial yang mendasari interaksi tersebut.
 
@@ -59,4 +59,3 @@ Tarsidi, D. Z., Suryadi, K., Budimansyah, D., & Rahmat, R. (2023). *Social Media
 Sihidi, I. T., Romadhan, A. A., Salahudin, S., & Widodo, E. R. P. (2025). *Internet Freedom and the Impact of Social Media: Political Buzzer Behavior In Indonesia And Thailand.* Politika: Jurnal Ilmu Politik, 16(1), 68-83.
 
 Song, A. Y. (2017). *Critical media literacies in the twenty-first century: Writing autoethnographies, making connections, and creating virtual identities.* Journal of Media Literacy Education, 9(1), 64-78.
-
