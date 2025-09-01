@@ -1,7 +1,6 @@
 ---
-title: 'Practice Theory (Placeholder)'
+title: 'Practice Theory (WIP)'
 description: ''
-publishDate: '7 Sep 2025'
+publishDate: '31 Aug 2025'
 ---
 
-Text
