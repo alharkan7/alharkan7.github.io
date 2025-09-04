@@ -215,7 +215,7 @@ The path forward is not a simple return to the past, but it does demand a consci
 
 #### <small>*Acknowledgement*</small>
 
-<small>*This work has utilized generative artificial intelligence, Gemini 2.5 Pro by Google, to assist with several aspects of the writing process, including locating references and brainstorming the outline.*</small>
+<small>*This work has utilized generative artificial intelligence, Gemini 2.5 Pro by Google, to assist with several aspects of the writing process, including locating references, brainstorming the outline, and paraphrasing.*</small>
 
 ---
 
