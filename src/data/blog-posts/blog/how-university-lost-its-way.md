@@ -138,8 +138,7 @@ Campuses were transformed with resort-style dormitories, massive recreation cent
 As universities began to operate more like businesses competing in a marketplace, their internal structures changed accordingly. The most dramatic shift was the explosion in the number of non-teaching administrative staff.<sup>[19]</sup> The ranks of fundraisers, marketers, admissions officers, alumni relations staff, wellness counselors, and diversity, equity, and inclusion (DEI) officers swelled, growing at a rate that far outpaced the growth of full-time faculty.<sup>[20]</sup>
 
 <small>![](/assets/how-university-lost-its-way/image-copy-9.png)
-*Comic illustration of an administrative bloat in a university*  
-*(source: [College Planners of America](https://www.collegecost.org/))*</small>
+*Comic illustration of an administrative bloat in a university (source: [College Planners of America](https://www.collegecost.org/))*</small>
 
 This "administrative bloat" reflects a fundamental change in institutional priorities. A significant portion of the university's budget is now dedicated to non-academic functions like student recruitment, brand management, and providing an ever-expanding array of student support services.<sup>[20]</sup> This shift towards a corporate management model has also been accompanied by a sharp rise in executive-level salaries for top administrators, adding to the immense overhead costs that are ultimately funded by student tuition.<sup>[19]</sup>
 
@@ -194,8 +193,7 @@ In March 2025, the unemployment rate for college graduates aged 22-27 hit 5.8%, 
 This complex reality reveals that the "value of a college degree" has fractured into distinct components. There is the **Economic Value**, which provides a direct and high return on investment, but as the data shows, is now largely confined to specific, high-demand majors. There is the **Credential Value**, which serves as the necessary "ticket to ride" but does not guarantee a good job or a commensurate salary. And there is the **Intrinsic Value**, the personal growth, critical thinking, and intellectual expansion that has always been a part of the university's promise.<sup>[51]</sup>
 
 ![](/assets/how-university-lost-its-way/Venn-1.png)
-<small>*The current college degree crisis stems from*  
-*a profound misalignment of these values.*</small>
+<small>*The current college degree crisis stems from a profound misalignment of these values.*</small>
 
 The current crisis stems from a profound misalignment of these values. Students are taking on unprecedented levels of debt with the expectation of receiving clear Economic Value. The university system, in its marketing and mission statements, often sells a combination of Economic and Intrinsic Value. However, for the 52% of graduates who find themselves underemployed, the labor market grants them only Credential Value, which is insufficient to justify the enormous financial risk they have undertaken. This disconnect between the price paid, the value promised, and the reality delivered is the very heart of the modern degree's diminishing worth.
 
