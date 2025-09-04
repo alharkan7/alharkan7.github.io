@@ -13,7 +13,7 @@ This situation forces a series of critical questions.
 * **How did the university, an institution born from the noble mission to preserve, create, and transmit human knowledge, morph into a high-stakes, debt-financed consumer product?**  
 * **What happened along the way to turn seats of learning into engines of commerce?**  
 * **And perhaps most unsettlingly, as the price of admission has soared into the stratosphere, why does the prize itself, the degree, seem to offer less of a guarantee than ever before?**
-
+ 
 Graduates are increasingly finding themselves underemployed, working in jobs that don't require their expensive credentials, and facing a labor market that questions the value of their skills.
 
 Let’s trace the long, complex, and often contradictory history of the university to answer these questions. The journey begins in the ancient world, where the first centers of higher learning emerged to serve gods, kings, and scholars. It moves through the Middle Ages and the Enlightenment, which forged the university's identity as both a sanctuary for knowledge and a tool for public good. It will then pinpoint the critical turning points in the 20th century, particularly in the American system, where a series of policy decisions, economic shifts, and cultural changes began to unravel the post-war consensus of education as a publicly funded right. Finally, we will analyze the consequences of this transformation: a high-cost, market-driven system that has created a profound and painful paradox of value for today's students.
@@ -213,7 +213,15 @@ Reclaiming the university's promise requires moving beyond incremental fixes and
 
 The path forward is not a simple return to the past, but it does demand a conscious societal choice about what we value and how we are willing to fund that vision. The European models of heavily subsidized, low-tuition public education demonstrate that alternatives exist. A renewed commitment to higher education as a public good, an investment in our collective future rather than a private debt for individuals, is not a matter of nostalgia, but of necessity. The health of our economy, the strength of our democracy, and the promise of generational progress depend on it.
 
-## **Bibliography**
+---
+
+#### <small>*Acknowledgement*</small>
+
+<small>*This work has utilized generative artificial intelligence, Gemini 2.5 Pro by Google, to assist with several aspects of the writing process, including locating references and brainstorming the outline.*</small>
+
+---
+
+## **Reference**
 
 1. Recent Trends in the Cost of College Show the Continued ..., accessed on September 3, 2025, [https://www.americanprogress.org/article/recent-trends-in-the-cost-of-college-show-the-continued-importance-of-federal-and-state-investment/](https://www.americanprogress.org/article/recent-trends-in-the-cost-of-college-show-the-continued-importance-of-federal-and-state-investment/)  
 2. History of education \- Wikipedia, accessed on September 3, 2025, [https://en.wikipedia.org/wiki/History\_of\_education](https://en.wikipedia.org/wiki/History_of_education)  
