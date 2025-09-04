@@ -111,21 +111,6 @@ ul {
   list-style-position: outside;
 }
 
-/* Fix long URL text wrapping in content */
-.content {
-  word-wrap: break-word;
-  overflow-wrap: break-word;
-  hyphens: auto;
-}
-
-.content p,
-.content li,
-.content blockquote {
-  word-wrap: break-word;
-  overflow-wrap: break-word;
-  hyphens: auto;
-}
-
 li {
   margin: 1rem 0;
 }
