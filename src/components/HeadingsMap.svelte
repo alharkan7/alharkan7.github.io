@@ -83,25 +83,27 @@
   function scrollToHeading(headingId) {
     const element = document.getElementById(headingId);
     if (element) {
-      element.scrollIntoView({ 
-        behavior: 'smooth', 
-        block: 'start',
-        inline: 'nearest'
+      const elementPosition = element.offsetTop;
+      const offsetPosition = elementPosition - 100; // Add 100px offset from top
+      
+      window.scrollTo({
+        top: offsetPosition,
+        behavior: 'smooth'
       });
     }
   }
 
-  function getBarHeight(level) {
-    // Higher level headings (h1) get longer bars, lower level headings (h6) get shorter bars
-    const heights = {
-      1: '24px',
-      2: '20px', 
-      3: '16px',
-      4: '12px',
-      5: '10px',
+  function getBarWidth(level) {
+    // Different widths for different heading levels - more pronounced differences
+    const widths = {
+      1: '40px',
+      2: '32px',
+      3: '24px',
+      4: '18px',
+      5: '12px',
       6: '8px'
     };
-    return heights[level] || '8px';
+    return widths[level] || '8px';
   }
 
   function getBarOpacity(level) {
@@ -132,9 +134,8 @@
     {#each headings as heading}
       <div 
         class="heading-bar"
-        style="height: {getBarHeight(heading.level)}; opacity: {getBarOpacity(heading.level)}"
+        style="width: {getBarWidth(heading.level)}; opacity: {getBarOpacity(heading.level)}"
         on:click={() => scrollToHeading(heading.id)}
-        title={heading.text}
         role="button"
         tabindex="0"
         on:keydown={(e) => {
@@ -160,7 +161,7 @@
   .headings-map-trigger {
     position: fixed;
     top: 120px;
-    right: 20px;
+    left: 20px;
     width: 50px;
     height: calc(100vh - 240px);
     z-index: 1000;
@@ -169,15 +170,15 @@
 
   .headings-ruler {
     position: absolute;
-    right: 0;
+    left: 0;
     top: 0;
-    width: 4px;
+    width: 40px;
     height: 100%;
     display: flex;
     flex-direction: column;
     justify-content: flex-start;
-    gap: 3px;
-    opacity: 0;
+    gap: 6px;
+    opacity: 0.8;
     transition: opacity 0.3s ease;
     pointer-events: none;
   }
@@ -191,10 +192,10 @@
   .headings-ruler:not(.visible)::before {
     content: '';
     position: absolute;
-    right: 0;
+    left: 5px;
     top: 10px;
-    width: 3px;
-    height: 30px;
+    width: 30px;
+    height: 3px;
     background: var(--primary-color);
     opacity: 0.4;
     border-radius: 2px;
@@ -209,30 +210,32 @@
 
   .heading-bar {
     position: relative;
-    width: 100%;
+    height: 2px;
     background: var(--text-secondary);
     border-radius: 2px;
     cursor: pointer;
     transition: all 0.2s ease;
     flex-shrink: 0;
+    margin-bottom: 6px;
   }
 
   .heading-bar:hover {
     background: var(--primary-color);
-    transform: scaleX(1.5);
-    transform-origin: right;
+    transform: scaleY(2) scaleX(1.2);
+    transform-origin: left center;
   }
 
   .heading-tooltip {
     position: absolute;
-    right: 8px;
+    left: 45px;
     top: 50%;
     transform: translateY(-50%);
     background: var(--background-body);
     color: var(--text-main);
-    padding: 4px 8px;
-    border-radius: 4px;
-    font-size: 12px;
+    padding: 3px 8px;
+    border-radius: 3px;
+    font-size: 11px;
+    line-height: 1.1;
     white-space: nowrap;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
     border: 1px solid var(--border-color);
@@ -243,6 +246,7 @@
     max-width: 200px;
     overflow: hidden;
     text-overflow: ellipsis;
+    font-weight: 500;
   }
 
   .heading-bar:hover .heading-tooltip {
@@ -251,29 +255,33 @@
 
   /* Tablet adjustments */
   @media (max-width: 1024px) {
-    .headings-map-trigger {
-      right: 10px;
-      width: 40px;
+      .headings-map-trigger {
+        left: 10px;
+        width: 40px;
+      }
+      
+      .headings-ruler {
+        width: 35px;
+      }
+      
+      .heading-tooltip {
+        left: 40px;
+        max-width: 150px;
+        font-size: 10px;
+      }
     }
-    
-    .heading-tooltip {
-      right: 6px;
-      max-width: 150px;
-      font-size: 11px;
-    }
-  }
 
   /* Mobile responsiveness */
   @media (max-width: 768px) {
-    .headings-map-trigger {
-      display: none;
+      .headings-map-trigger {
+        display: none;
+      }
     }
-  }
 
   /* Ensure it doesn't interfere with content on smaller screens */
   @media (max-width: 1200px) {
     .headings-map-trigger {
-      right: 15px;
+      left: 15px;
     }
   }
 </style>
