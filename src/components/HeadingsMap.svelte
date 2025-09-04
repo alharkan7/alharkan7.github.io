@@ -208,7 +208,7 @@
           }
         }}
       >
-        <div class="heading-tooltip">
+        <div class="heading-tooltip" style="font-size: 11px;">
           {heading.text}
         </div>
       </div>
@@ -300,7 +300,7 @@
     left: 45px;
     top: 50%;
     transform: translateY(-50%);
-    background: var(--background-body);
+    background-color: var(--background-body);
     color: var(--text-main);
     padding: 3px 8px;
     border-radius: 3px;
