@@ -1,6 +1,7 @@
 ---
 import BaseLayout from "../layouts/BaseLayout.astro";
 import Bio from "../components/Bio.astro";
+import HeadingsMap from "../components/HeadingsMap.svelte";
 import getPostData from "../utils/getPostData";
 import { findRedirect } from "../utils/redirectHandler";
 
@@ -115,6 +116,9 @@ const recommendedPosts = await getRecommendedPosts();
   publishDate={publishDate}
   image={image}
 >
+  <!-- Headings Map Component -->
+  <HeadingsMap client:load />
+  
   <header>
     <!-- <p>{publishDate} ~ {readingTime}</p> -->
     <p>

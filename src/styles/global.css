@@ -91,6 +91,9 @@ ol {
   font-size: 1.3rem;
   line-height: 1.75em;
   margin: 1.2em 0;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  hyphens: auto;
 }
 
 ol,
@@ -123,6 +126,8 @@ li p {
 a {
   color: inherit;
   transition: color linear 0.15s;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
 }
 
 a:hover {
@@ -163,12 +168,18 @@ code {
   border-radius: 2px;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
 }
 
 pre {
   border-radius: 8px !important;
   margin: 1.2em 0 !important;
   padding: 1.2em;
+  overflow-x: auto;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  white-space: pre-wrap;
 }
 
 pre code {
@@ -328,4 +339,38 @@ input[name='theme-toggle'] {
     padding: 0.5rem;
     margin: 1rem 0;
   }
+}
+
+/* General text wrapping for long content without spaces */
+* {
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+}
+
+/* Specific handling for different content types */
+.content {
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  hyphens: auto;
+}
+
+/* Handle long URLs and text in various contexts */
+h1, h2, h3, h4, h5, h6 {
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  hyphens: auto;
+}
+
+/* Ensure blockquotes handle long text properly */
+blockquote {
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  hyphens: auto;
+}
+
+/* Handle long text in list items */
+li {
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  hyphens: auto;
 }
