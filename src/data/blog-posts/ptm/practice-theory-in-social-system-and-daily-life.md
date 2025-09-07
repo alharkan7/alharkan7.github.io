@@ -32,6 +32,14 @@ Namun sebaliknya, ***objection*** atas argumen ini adalah bahwa interaksi ini me
 
 Analisis terhadap interaksi digital antara pemerintah dengan warganet di Indonesia melalui lensa teori praktik telah memperluas diskusi dari sekadar pandangan sederhana hitam-putih antara responsif versus rentannya Pemerintah atas isu yang viral di media sosial. Hal ini mengungkapkan kontestasi yang kompleks di mana tata kelola narasi yang dilakukan Pemerintah itu sendiri adalah sebuah bentuk praktik strategis. Keterlibatan pemerintah terhadap isu-isu viral dapat dipahami sebagai **pertunjukan responsif (*performance of responsiveness*),** aksi simbolis yang dipandu oleh *habitus-*nya untuk menjaga legitimasi di bidang/*field* digital yang diperebutkan. Sementara warganet secara kreatif menggunakan taktik untuk membuat suara mereka didengar, negara beradaptasi dengan mengubah responsivitas mereka menjadi alat untuk manajemen narasi (*narrative management*). Dinamika ini menimbulkan tantangan besar bagi demokrasi Indonesia, sebuah pertarungan antara tontonan pemerintahan yang memprioritaskan pengelolaan momen viral daripada kerja keras pembuatan kebijakan sesungguhnya.
 
+---
+
+#### <small>*Acknowledgement*</small>
+
+<small>*This writing has utilized generative artificial intelligence, Gemini 2.5 by Google, to assist with several aspects of the writing process. The use of this AI includes summarizing documents in the references, paraphrasing some passages, and providing assistance with outlining and brainstorming.*</small>
+
+---
+
 ## Referensi
 
 De Certeau, M., & Mayol, P. (1998). The Practice of Everyday Life: Living and Cooking. Volume 2 (Vol. 2). U of Minnesota Press.
