@@ -41,12 +41,12 @@ if (!supabaseUrl || !supabaseAnonKey) {
 const supabase = supabaseUrl && supabaseAnonKey ? createClient(supabaseUrl, supabaseAnonKey) : null;
 
 async function getLikedVideosFromSupabase(): Promise<{ videos: Video[]; lastUpdatedAt: string | null }> {
-    console.log("Attempting to connect to Supabase...");
+    // console.log("Attempting to connect to Supabase...");
     if (!supabase) {
         console.error("Supabase client is null/undefined");
         throw new Error("Supabase client not initialized.");
     }
-    console.log("Supabase client initialized successfully");
+    // console.log("Supabase client initialized successfully");
 
     const CHUNK_SIZE = 1000; // Supabase default max limit
     let allData: Video[] = [];
@@ -54,7 +54,7 @@ async function getLikedVideosFromSupabase(): Promise<{ videos: Video[]; lastUpda
     let keepFetching = true;
 
     while (keepFetching) {
-        console.log(`Fetching chunk ${Math.floor(offset / CHUNK_SIZE) + 1}, offset: ${offset}-${offset + CHUNK_SIZE - 1}`);
+        // console.log(`Fetching chunk ${Math.floor(offset / CHUNK_SIZE) + 1}, offset: ${offset}-${offset + CHUNK_SIZE - 1}`);
 
         const { data, error, count } = await supabase
             .from("liked_videos")
@@ -75,7 +75,7 @@ async function getLikedVideosFromSupabase(): Promise<{ videos: Video[]; lastUpda
             throw error;
         }
 
-        console.log(`Successfully fetched ${data?.length || 0} records in chunk ${Math.floor(offset / CHUNK_SIZE) + 1}`);
+        // console.log(`Successfully fetched ${data?.length || 0} records in chunk ${Math.floor(offset / CHUNK_SIZE) + 1}`);
 
         if (data) {
             const mappedData = data.map(item => ({
@@ -104,7 +104,7 @@ async function getLikedVideosFromSupabase(): Promise<{ videos: Video[]; lastUpda
         }
     }
     // Fetch the latest created_at timestamp
-    console.log("Fetching latest created_at timestamp...");
+    // console.log("Fetching latest created_at timestamp...");
     const { data: latestVideo, error: latestError } = await supabase
         .from("liked_videos")
         .select("created_at")
@@ -122,7 +122,7 @@ async function getLikedVideosFromSupabase(): Promise<{ videos: Video[]; lastUpda
         });
         // Don't throw here, as we can still return the data without the timestamp
     } else if (latestVideo && latestVideo.length > 0) {
-        console.log("Successfully fetched latest timestamp:", latestVideo[0].created_at);
+        // console.log("Successfully fetched latest timestamp:", latestVideo[0].created_at);
         const date = new Date(latestVideo[0].created_at);
         lastUpdatedAt = date.toLocaleDateString("en-GB", {
             year: "numeric",
@@ -131,7 +131,7 @@ async function getLikedVideosFromSupabase(): Promise<{ videos: Video[]; lastUpda
         });
     }
 
-    console.log(`Fetched a total of ${allData.length} videos from Supabase.`);
+    // console.log(`Fetched a total of ${allData.length} videos from Supabase.`);
     return { videos: allData, lastUpdatedAt };
 }
 
@@ -409,7 +409,6 @@ if (!validLimits.includes(initialLimit)) {
     let isInitialLoad = true; // Track if this is initial page load
     
     // Keep track of build-time filters for validation/initial state
-    const uniqueYearsFromBuild = initialUniqueYears.map(y => y);
     const uniqueChannelsFromBuild = initialUniqueChannels.map(c => ({ ...c }));
 
     // Add a debug log function that shows in console
@@ -436,7 +435,7 @@ if (!validLimits.includes(initialLimit)) {
             channel: selectedChannelId
         };
         
-        console.log(`${replace ? "Replacing" : "Pushing"} URL:`, url.toString());
+        // console.log(`${replace ? "Replacing" : "Pushing"} URL:`, url.toString());
         
         if (replace || isInitialLoad) {
             // Use replaceState during initialization or when explicitly requested
@@ -449,20 +448,20 @@ if (!validLimits.includes(initialLimit)) {
     }
 
     function renderPage() {
-        console.log("Rendering page with state:", {
-            loading: isDataLoading,
-            page: currentPage,
-            limit: itemsPerPage,
-            year: selectedYear,
-            channel: selectedChannelId,
-            videosCount: allVideos?.length || 0
-        });
+        // console.log("Rendering page with state:", {
+        //     loading: isDataLoading,
+        //     page: currentPage,
+        //     limit: itemsPerPage,
+        //     year: selectedYear,
+        //     channel: selectedChannelId,
+        //     videosCount: allVideos?.length || 0
+        // });
 
         if (
             !gridContainer || !pageSelect || !pageTotalSpan || !prevButton || !nextButton ||
             !limitSelect || !yearSelect || !channelSelect || !loadingIndicator
         ) {
-            console.error("Missing required DOM elements for rendering");
+            // console.error("Missing required DOM elements for rendering");
             return;
         }
 
@@ -505,7 +504,7 @@ if (!validLimits.includes(initialLimit)) {
         // --- Data Loaded ---
         // Handle case where we don't have videos
         if (!allVideos || allVideos.length === 0) {
-            console.log("No videos available to render.");
+            // console.log("No videos available to render.");
             gridContainer.innerHTML = `
                 <div class="col-span-full text-center py-10">
                     <p class="text-lg text-[color:var(--text-secondary)]">No videos available.</p>
@@ -557,11 +556,11 @@ if (!validLimits.includes(initialLimit)) {
         const currentTotalItems = filteredVideos.length;
         totalPages = Math.ceil(currentTotalItems / itemsPerPage) || 1; // Ensure at least 1 page
         
-        console.log("Pagination calculation:", {
-            filteredCount: currentTotalItems,
-            totalPages: totalPages,
-            currentPage: currentPage
-        });
+        // console.log("Pagination calculation:", {
+        //     filteredCount: currentTotalItems,
+        //     totalPages: totalPages,
+        //     currentPage: currentPage
+        // });
         
         // Ensure currentPage is valid after filtering
         if (currentPage > totalPages) {
@@ -572,7 +571,7 @@ if (!validLimits.includes(initialLimit)) {
         const offset = (currentPage - 1) * itemsPerPage;
         const videosToShow = filteredVideos.slice(offset, Math.min(offset + itemsPerPage, filteredVideos.length));
         
-        console.log(`Showing ${videosToShow.length} videos on page ${currentPage}`);
+        // console.log(`Showing ${videosToShow.length} videos on page ${currentPage}`);
         
         const maxLength = 40; // Max characters for title
 
@@ -703,7 +702,7 @@ if (!validLimits.includes(initialLimit)) {
     }
 
     async function initializeAndFetchData() {
-        console.log("Initializing with pre-loaded data from Astro");
+        // console.log("Initializing with pre-loaded data from Astro");
         isDataLoading = true; // Set to true initially, then false after processing
         if (errorMessageElement) errorMessageElement.classList.add('hidden');
 
@@ -718,12 +717,12 @@ if (!validLimits.includes(initialLimit)) {
         selectedYear = initialYear;
         selectedChannelId = initialChannel;
         
-        console.log("Initial state from URL:", {
-            page: currentPage,
-            limit: itemsPerPage,
-            year: selectedYear, 
-            channel: selectedChannelId
-        });
+        // console.log("Initial state from URL:", {
+        //     page: currentPage,
+        //     limit: itemsPerPage,
+        //     year: selectedYear, 
+        //     channel: selectedChannelId
+        // });
         
         if (limitSelect) limitSelect.value = itemsPerPage.toString();
         if (yearSelect) yearSelect.value = selectedYear; // Will be refined by updateYearOptions
@@ -756,10 +755,10 @@ if (!validLimits.includes(initialLimit)) {
 
         // Data (`allVideos`) is already populated from define:vars
         // We can treat it as if it was "fetched"
-        console.log(`Using ${allVideos.length} videos passed from Astro frontmatter.`);
+        // console.log(`Using ${allVideos.length} videos passed from Astro frontmatter.`);
 
         if (!Array.isArray(allVideos)) { // Should not happen if Astro passes correctly
-            console.error("Videos data from Astro is not an array!");
+            // console.error("Videos data from Astro is not an array!");
             allVideos = []; // Prevent further errors
             // Display an error
             if (loadingIndicator) loadingIndicator.classList.add('hidden');
@@ -775,13 +774,13 @@ if (!validLimits.includes(initialLimit)) {
         // The server-side uniqueYears/Channels should be mostly correct, but client might have stale URL params
         const currentAvailableYears = [...new Set(allVideos.map(v => v.published_at?.substring(0, 4)).filter(Boolean))];
         if (selectedYear !== "all" && !currentAvailableYears.includes(selectedYear)) {
-            console.log(`Client: Selected year ${selectedYear} not in available [${currentAvailableYears.join()}], resetting to 'all'`);
+            // console.log(`Client: Selected year ${selectedYear} not in available [${currentAvailableYears.join()}], resetting to 'all'`);
             selectedYear = "all";
         }
         
         const currentAvailableChannels = [...new Set(allVideos.map(v => v.video_owner_channel_id).filter(Boolean))];
         if (selectedChannelId !== "all" && !currentAvailableChannels.includes(selectedChannelId)) {
-            console.log(`Client: Selected channel ${selectedChannelId} not in available channels, resetting to 'all'`);
+            // console.log(`Client: Selected channel ${selectedChannelId} not in available channels, resetting to 'all'`);
             selectedChannelId = "all";
         }
             
@@ -795,7 +794,7 @@ if (!validLimits.includes(initialLimit)) {
     }
 
     function setupEventListeners() {
-        console.log("Setting up event listeners");
+        // console.log("Setting up event listeners");
         
         if (!limitSelect || !yearSelect || !channelSelect || !prevButton || !nextButton || !pageSelect) {
             return;
@@ -900,7 +899,7 @@ if (!validLimits.includes(initialLimit)) {
         // Handle browser back/forward buttons
         if (!window._popstateHandledVideos) {
             window.addEventListener("popstate", (event) => {
-                console.log("POPSTATE triggered", event.state, window.location.search);
+                // console.log("POPSTATE triggered", event.state, window.location.search);
                 
                 // Simply reload the page on back/forward navigation for consistent behavior
                 // This guarantees the page state will match the URL
