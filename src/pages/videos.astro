@@ -41,9 +41,12 @@ if (!supabaseUrl || !supabaseAnonKey) {
 const supabase = supabaseUrl && supabaseAnonKey ? createClient(supabaseUrl, supabaseAnonKey) : null;
 
 async function getLikedVideosFromSupabase(): Promise<{ videos: Video[]; lastUpdatedAt: string | null }> {
+    console.log("Attempting to connect to Supabase...");
     if (!supabase) {
+        console.error("Supabase client is null/undefined");
         throw new Error("Supabase client not initialized.");
     }
+    console.log("Supabase client initialized successfully");
 
     const CHUNK_SIZE = 1000; // Supabase default max limit
     let allData: Video[] = [];
@@ -51,6 +54,8 @@ async function getLikedVideosFromSupabase(): Promise<{ videos: Video[]; lastUpda
     let keepFetching = true;
 
     while (keepFetching) {
+        console.log(`Fetching chunk ${Math.floor(offset / CHUNK_SIZE) + 1}, offset: ${offset}-${offset + CHUNK_SIZE - 1}`);
+
         const { data, error, count } = await supabase
             .from("liked_videos")
             .select("title, thumbnail_url, url, video_owner_channel_id, video_owner_channel_title, published_at", { count: 'exact' }) // Request count
@@ -58,11 +63,19 @@ async function getLikedVideosFromSupabase(): Promise<{ videos: Video[]; lastUpda
             .range(offset, offset + CHUNK_SIZE - 1);
 
         if (error) {
-            console.error("Error fetching liked videos from Supabase (chunk):", error);
+            console.error(`Error fetching liked videos from Supabase (chunk ${Math.floor(offset / CHUNK_SIZE) + 1}):`, {
+                error: error,
+                message: error.message,
+                details: error.details,
+                hint: error.hint,
+                code: error.code
+            });
             // Depending on desired behavior, you might throw the error or return partially fetched data.
             // For now, let's throw to indicate failure.
             throw error;
         }
+
+        console.log(`Successfully fetched ${data?.length || 0} records in chunk ${Math.floor(offset / CHUNK_SIZE) + 1}`);
 
         if (data) {
             const mappedData = data.map(item => ({
@@ -91,6 +104,7 @@ async function getLikedVideosFromSupabase(): Promise<{ videos: Video[]; lastUpda
         }
     }
     // Fetch the latest created_at timestamp
+    console.log("Fetching latest created_at timestamp...");
     const { data: latestVideo, error: latestError } = await supabase
         .from("liked_videos")
         .select("created_at")
@@ -99,8 +113,16 @@ async function getLikedVideosFromSupabase(): Promise<{ videos: Video[]; lastUpda
 
     let lastUpdatedAt: string | null = null;
     if (latestError) {
-        console.error("Error fetching latest created_at from Supabase:", latestError);
+        console.error("Error fetching latest created_at from Supabase:", {
+            error: latestError,
+            message: latestError.message,
+            details: latestError.details,
+            hint: latestError.hint,
+            code: latestError.code
+        });
+        // Don't throw here, as we can still return the data without the timestamp
     } else if (latestVideo && latestVideo.length > 0) {
+        console.log("Successfully fetched latest timestamp:", latestVideo[0].created_at);
         const date = new Date(latestVideo[0].created_at);
         lastUpdatedAt = date.toLocaleDateString("en-GB", {
             year: "numeric",
@@ -144,11 +166,40 @@ if (supabase) {
         }
     } catch (error) {
         console.error("Error fetching or processing liked_videos from Supabase:", error);
+
+        // Detailed error logging for debugging
         if (error instanceof Error) {
-            errorMessage = `Could not load video data: ${error.message}`;
+            console.error("Error details:", {
+                message: error.message,
+                name: error.name,
+                stack: error.stack,
+                cause: error.cause
+            });
+
+            // Check for common deployment-specific errors
+            const lowerCaseError = error.message.toLowerCase();
+            if (lowerCaseError.includes('network') || lowerCaseError.includes('fetch')) {
+                errorMessage = `Could not load video data: Network connection failed. Please check your internet connection and try again.`;
+            } else if (lowerCaseError.includes('timeout')) {
+                errorMessage = `Could not load video data: Request timed out. The server may be experiencing high load.`;
+            } else if (lowerCaseError.includes('cors') || lowerCaseError.includes('access-control')) {
+                errorMessage = `Could not load video data: Cross-origin request blocked. This may be a deployment configuration issue.`;
+            } else if (lowerCaseError.includes('unauthorized') || lowerCaseError.includes('401')) {
+                errorMessage = `Could not load video data: Authentication failed. Please check Supabase credentials.`;
+            } else if (lowerCaseError.includes('forbidden') || lowerCaseError.includes('403')) {
+                errorMessage = `Could not load video data: Access forbidden. Please check Supabase permissions.`;
+            } else if (lowerCaseError.includes('not found') || lowerCaseError.includes('404')) {
+                errorMessage = `Could not load video data: Database table not found. Please check Supabase configuration.`;
+            } else {
+                errorMessage = `Could not load video data: ${error.message}`;
+            }
         } else {
-            errorMessage = "Could not load video data: An unknown error occurred.";
+            // Handle non-Error objects (like strings, objects, etc.)
+            console.error("Non-standard error object:", typeof error, error);
+            const errorString = typeof error === 'string' ? error : JSON.stringify(error);
+            errorMessage = `Could not load video data: Unexpected error - ${errorString}`;
         }
+
         // Assign default empty values if fetch fails
         totalItems = 0;
         uniqueYears = [];
