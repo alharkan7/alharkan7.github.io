@@ -20,7 +20,7 @@ Warga yang berada di platform media sosial menggunakan taktik, mereka adalah “
 
 ---
 
-#### <small>*Acknowledgement*</small>
+#### <small>*Disclosure*</small>
 
 <small>*This writing has utilized generative artificial intelligence, Gemini 2.5 by Google, to assist with several aspects of the writing process. The use of this AI includes summarizing documents in the references, paraphrasing some passages, and providing assistance with outlining and brainstorming.*</small>
 
