@@ -38,7 +38,7 @@ Swidler, A. (2013). Cultural power and social movements. In *Social movements an
 
 Collins, R. (2014). Interaction ritual chains. In *Interaction ritual chains*. Princeton university press.
 
-Harder, R. A., Sevenans, J., & Van Aelst, P. (2017). *Intermedia Agenda Setting in the Social Media Age: How Traditional Players Dominate the News Agenda in Election Times.* The International Journal of Press/Politics, 22(3), 275-293. [https://doi.org/10.1177/1940161217704969](https://doi.org/10.1177/1940161217704969) (Original work published 2017\)
+Harder, R. A., Sevenans, J., & Van Aelst, P. (2017). *Intermedia Agenda Setting in the Social Media Age: How Traditional Players Dominate the News Agenda in Election Times.* The International Journal of Press/Politics, 22(3), 275-293. [https://doi.org/10.1177/1940161217704969](https://doi.org/10.1177/1940161217704969)
 
 Jurriëns, E., & Tapsell, R. (Eds.). (2017). *Digital Indonesia: Connectivity and divergence*. ISEAS – Yusof Ishak Institute.
 
