@@ -1,5 +1,5 @@
 ---
-title: 'Bergeser dari Kerangka Kerja Efek Media: Analisis Praktik Teori terhadap Interaksi Digital antara Pemerintah dan Netizen di Indonesia'
+title: '[SAP 2] Bergeser dari Kerangka Kerja Efek Media: Analisis Praktik Teori terhadap Interaksi Digital antara Pemerintah dan Netizen di Indonesia'
 description: 'Di negara-negara yang melek digital seperti Indonesia, media sosial telah menjadi kanal penting bagi masyarakat untuk menyampaikan aspirasi dan berdemokrasi. Hal ini memunculkan pola yang khas di mana tindakan dan pernyataan kebijakan resmi seringkali dikaitkan dengan isu-isu yang viral secara daring, hingga masyarakat melihat bahwa suatu kebijakan hanya dapat terjadi apabila sebuah isu viral di media sosial. Fenomena ini menghadirkan pertanyaan: Apakah reaksi cepat ini merupakan tanda dari sebuah pemerintahan yang responsif, yang peka terhadap kekhawatiran masyarakat? Atau apakah hal ini justru menunjukkan pemerintahan yang rentan terhadap tekanan media sosial, kemarahan yang diperkuat oleh algoritma, dan agenda kelompok-kelompok yang kuat di dunia digital, namun belum tentu representatif?'
 publishDate: '31 Aug 2025'
 ---

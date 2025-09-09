@@ -1,5 +1,5 @@
 ---
-title: 'Analisis Teori Praktik terhadap Interaksi Digital antara Pemerintah dan Warganet di Indonesia'
+title: '[SAP 3] Analisis Teori Praktik terhadap Interaksi Digital antara Pemerintah dan Warganet di Indonesia'
 description: 'Meskipun teori efek media seperti agenda-setting menawarkan lensa awal, teori ini seringkali terbatas pada menyajikan model linear yang gagal menangkap sifat multi-arah dan taktis dari media sosial. Framework seperti ini dapat mengaburkan dinamika kekuasaan yang sebenarnya mendasari fenomena tersebut, serta tindakan strategis negara dan warga negara sebagai aktor yang terlibat. Untuk mengisi kesenjangan teoritis ini, penulis bergerak dari kacamata teori efek media dan menawarkan lensa dari practice theory.'
 publishDate: '7 Sep 2025'
 ---
