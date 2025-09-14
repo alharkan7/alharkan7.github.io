@@ -1,5 +1,5 @@
 ---
-title: '[SAP 4] Analisis Fenomena Viral-based Policy di Indonesia dari Perspektif Teori Sosial'
+title: "[SAP 4] Analisis Fenomena 'Viral-based Policy/' di Indonesia Menggunakan Perspektif Teori Sosial"
 description: 'Penelitian ini bertujuan untuk menganalisis fenomena ‘viral-based policy’ di Indonesia, di mana isu-isu yang viral di media sosial tampak memiliki kekuatan untuk menekan Pemerintah dalam merumuskan sebuah kebijakan. Namun tak semua viralnya gerakan suara di media sosial ini membawa keberhasilan untuk mendorong perubahan sosial-politik. Inkonsistensi tersebut menunjukkan bahwa skala viralitas semata bukanlah kondisi yang cukup untuk keberhasilan sebuah gerakan yang menggunakan media sebagai alat perubahan. '
 publishDate: '14 Sep 2025'
 ---
