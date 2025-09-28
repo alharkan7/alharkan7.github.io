@@ -30,7 +30,7 @@ Menimbang bahwasannya platform media sosial berlaku sebagai *dispositive* yang s
 
 ---
 
-Daftar Pustaka
+# Daftar Pustaka
 
 Sum, N. L., & Jessop, B. (2013). *Towards a cultural political economy: Putting culture in its place in political economy*. Edward Elgar Publishing.
 
