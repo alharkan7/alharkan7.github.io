@@ -64,40 +64,40 @@ Fuchs, C. (2014). *Digital labour and Karl Marx.* Routledge.
 
 # Attachment: Reading Report
 
-### **Core Concepts**
+## Core Concepts
 
 | Aspect | Towards a Cultural Political Economy (Sum & Jessop, 2013\) | Media Industry Studies, Media Production Studies (Hesmondhalgh, 2010\) |
 | :---- | :---- | :---- |
-| **Primary Focus** | Developing a broad theoretical framework (CPE) to analyze the entire socio-economic sphere by integrating culture and political economy. | Analyzing the specific field of media production, its institutions, organizations, and labor practices. |
-| **Main Argument** | Economic and political systems can only be understood by examining the co-evolution of material structures (rules) and cultural meanings (stories). | The study of media production requires understanding the inherent tension between creativity and commerce, which plays out in organizational structures, corporate strategies, and the nature of creative work. |
-| **Core Problem** | How societies reduce overwhelming complexity through both meaning-making (semiosis) and rule-setting (structuration) to make social action possible. | How to manage and control the creative process within commercial, profit-driven media industries. |
-| **Key Concepts** | Cultural Political Economy (CPE), complexity reduction, semiosis, structuration, co-evolution, Scylla and Charybdis (theoretical traps). | Media production studies, creativity vs. commerce, authorship, art worlds, corporate power (oligopoly), cultural labor, boundaryless career. |
+| Primary Focus | Developing a broad theoretical framework (CPE) to analyze the entire socio-economic sphere by integrating culture and political economy. | Analyzing the specific field of media production, its institutions, organizations, and labor practices. |
+| Main Argument | Economic and political systems can only be understood by examining the co-evolution of material structures (rules) and cultural meanings (stories). | The study of media production requires understanding the inherent tension between creativity and commerce, which plays out in organizational structures, corporate strategies, and the nature of creative work. |
+| Core Problem | How societies reduce overwhelming complexity through both meaning-making (semiosis) and rule-setting (structuration) to make social action possible. | How to manage and control the creative process within commercial, profit-driven media industries. |
+| Key Concepts | Cultural Political Economy (CPE), complexity reduction, semiosis, structuration, co-evolution, Scylla and Charybdis (theoretical traps). | Media production studies, creativity vs. commerce, authorship, art worlds, corporate power (oligopoly), cultural labor, boundaryless career. |
 
-### **Theoretical Approaches**
-
-| Aspect | Towards a Cultural Political Economy (Sum & Jessop, 2013\) | Media Industry Studies, Media Production Studies (Hesmondhalgh, 2010\) |
-| :---- | :---- | :---- |
-| **Stance on Political Economy** | Aims to revitalize and reform political economy by integrating a cultural turn, creating a "third way" that avoids rigid structuralism. | Views traditional political economy as an established, but now conceptually stagnant, approach to media studies, focusing on ownership and power. |
-| **Stance on Cultural Studies** | Engages with cultural studies to borrow the focus on meaning-making but criticizes its tendency to ignore material structures (the "constructivist" trap). | Identifies a wing of cultural studies as an emergent and important approach to media production, especially its focus on the everyday practices and discourses of producers. |
-| **Other Fields Discussed** | Engages with philosophy (Critical Realism), sociology, and evolutionary theory to build its framework. | Discusses mainstream organizational sociology, management/business studies, cultural policy, and arts management as key approaches to understanding media industries. |
-| **Intellectual Goal** | To build a comprehensive, transdisciplinary research program (CPE) applicable to any socio-economic phenomenon. | To map the existing and emerging theoretical fields that are used to study the specific domain of media production. |
-
-### **Analytical Focus: Power, Structure, and Agency**
+## Theoretical Approaches
 
 | Aspect | Towards a Cultural Political Economy (Sum & Jessop, 2013\) | Media Industry Studies, Media Production Studies (Hesmondhalgh, 2010\) |
 | :---- | :---- | :---- |
-| **Analysis of Structure** | Analyzes broad "structural selectivities" (how institutions favor certain outcomes) and "structural fixes" that provide stability to a system. | Analyzes concrete industry structures, such as market oligopolies, corporate strategies (e.g., vertical integration), and the organization of production (creation vs. circulation). |
-| **Analysis of Culture/ Meaning** | Analyzes "discursive selectivities" (how language shapes what can be thought/said) and "economic imaginaries" (stories that legitimize economic systems). | Analyzes the "culture" of production worlds, including the codes, rituals, and discourses of producers (e.g., "war stories"), and persistent individualist notions of authorship. |
-| **Analysis of Power** | Theorizes power through four selectivities (structural, discursive, technological, agential) and aims to critique ideology and domination. | Examines power primarily through the lens of corporate ownership, asymmetrical communication (producers vs. audience), and the control and exploitation of creative labor. |
-| **Analysis of Work/ Labor** | Focuses on "agential selectivity"â€”the capacity of actors to navigate structures. Learning and strategy in response to crises are key. | Provides a detailed focus on "media work," analyzing the "boundaryless career," the exploitation of cultural labor through ideals of self-expression, and the resilience of craft values. |
+| Stance on Political Economy | Aims to revitalize and reform political economy by integrating a cultural turn, creating a "third way" that avoids rigid structuralism. | Views traditional political economy as an established, but now conceptually stagnant, approach to media studies, focusing on ownership and power. |
+| Stance on Cultural Studies | Engages with cultural studies to borrow the focus on meaning-making but criticizes its tendency to ignore material structures (the "constructivist" trap). | Identifies a wing of cultural studies as an emergent and important approach to media production, especially its focus on the everyday practices and discourses of producers. |
+| Other Fields Discussed | Engages with philosophy (Critical Realism), sociology, and evolutionary theory to build its framework. | Discusses mainstream organizational sociology, management/business studies, cultural policy, and arts management as key approaches to understanding media industries. |
+| Intellectual Goal | To build a comprehensive, transdisciplinary research program (CPE) applicable to any socio-economic phenomenon. | To map the existing and emerging theoretical fields that are used to study the specific domain of media production. |
 
-### **Methodology and Critique**
+## Analytical Focus: Power, Structure, and Agency
 
 | Aspect | Towards a Cultural Political Economy (Sum & Jessop, 2013\) | Media Industry Studies, Media Production Studies (Hesmondhalgh, 2010\) |
 | :---- | :---- | :---- |
-| **Methodological Approach** | Proposes a pluralistic, logical-historical method based on Critical Realism, moving from abstract mechanisms to concrete historical events. | Describes the methods used by different approaches, from the neutral, descriptive tone of organizational sociology to the theory-heavy approach of political economy. |
-| **Ultimate Critical Goal** | To "denaturalize" dominant economic and political ideas, performing a critique of ideology to expose how power and domination are legitimized. | To critically assess the implications of corporate power (e.g., homogenization of content), and to challenge complacent views about "creative industries" by highlighting worker exploitation. |
-| **View of Production & Consumption** | Does not directly address the production/consumption divide, as its framework is broader than media. | Explicitly dismisses the idea that the production/consumption divide is obsolete, arguing professional production remains dominant over user-generated content ("prosumers"). |
+| Analysis of Structure | Analyzes broad "structural selectivities" (how institutions favor certain outcomes) and "structural fixes" that provide stability to a system. | Analyzes concrete industry structures, such as market oligopolies, corporate strategies (e.g., vertical integration), and the organization of production (creation vs. circulation). |
+| Analysis of Culture/ Meaning | Analyzes "discursive selectivities" (how language shapes what can be thought/said) and "economic imaginaries" (stories that legitimize economic systems). | Analyzes the "culture" of production worlds, including the codes, rituals, and discourses of producers (e.g., "war stories"), and persistent individualist notions of authorship. |
+| Analysis of Power | Theorizes power through four selectivities (structural, discursive, technological, agential) and aims to critique ideology and domination. | Examines power primarily through the lens of corporate ownership, asymmetrical communication (producers vs. audience), and the control and exploitation of creative labor. |
+| Analysis of Work/ Labor | Focuses on "agential selectivity” the capacity of actors to navigate structures. Learning and strategy in response to crises are key. | Provides a detailed focus on "media work," analyzing the "boundaryless career," the exploitation of cultural labor through ideals of self-expression, and the resilience of craft values. |
+
+## Methodology and Critique
+
+| Aspect | Towards a Cultural Political Economy (Sum & Jessop, 2013\) | Media Industry Studies, Media Production Studies (Hesmondhalgh, 2010\) |
+| :---- | :---- | :---- |
+| Methodological Approach | Proposes a pluralistic, logical-historical method based on Critical Realism, moving from abstract mechanisms to concrete historical events. | Describes the methods used by different approaches, from the neutral, descriptive tone of organizational sociology to the theory-heavy approach of political economy. |
+| Ultimate Critical Goal | To "denaturalize" dominant economic and political ideas, performing a critique of ideology to expose how power and domination are legitimized. | To critically assess the implications of corporate power (e.g., homogenization of content), and to challenge complacent views about "creative industries" by highlighting worker exploitation. |
+| View of Production & Consumption | Does not directly address the production/consumption divide, as its framework is broader than media. | Explicitly dismisses the idea that the production/consumption divide is obsolete, arguing professional production remains dominant over user-generated content ("prosumers"). |
 
 ---
 

@@ -220,17 +220,28 @@ table {
   font-family: var(--font-family-sans);
   font-size: 1.125em;
   margin: 2em 0;
+  width: 100%;
+  table-layout: fixed;
 }
 
 th {
   border-bottom: 2px solid #cccccc;
   padding: 0.4em 0.8em;
   word-break: break-word;
+  font-weight: normal;
 }
 
 td {
   padding: 0.4em 0.8em;
   word-break: break-word;
+  font-weight: normal;
+}
+
+/* Make the first column (Aspect) wider */
+th:first-child,
+td:first-child {
+  width: 24%;
+  min-width: 100px;
 }
 
 .container {
