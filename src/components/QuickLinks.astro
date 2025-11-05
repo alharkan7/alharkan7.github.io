@@ -1,0 +1,90 @@
+---
+import { Icon } from 'astro-icon/components';
+
+const links = [
+  {
+    name: "Twitter",
+    url: "https://x.com/alhrkn",
+    icon: "simple-icons:x"
+  },
+  {
+    name: "Apps",
+    url: "https://alhrkn.vercel.app",
+    icon: "lucide:monitor-smartphone"
+  },
+  {
+    name: "Email",
+    url: "mailto:alharkan7@gmail.com",
+    icon: "lucide:mail"
+  },
+  {
+    name: "LinkedIn",
+    url: "https://linkedin.com/in/alharkan",
+    icon: "simple-icons:linkedin"
+  }
+];
+---
+
+<style>
+  .quick-links {
+    display: flex;
+    gap: 1.5rem;
+    margin-top: 1.5rem;
+    flex-wrap: wrap;
+  }
+
+  .quick-link {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: var(--text-secondary);
+    text-decoration: none;
+    font-family: var(--font-family-serif);
+    font-weight: 800;
+    transition: all 0.2s ease;
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px;
+  }
+
+  .quick-link:hover {
+    color: var(--primary-color);
+    background-color: var(--background-elevated, rgba(0, 0, 0, 0.05));
+  }
+
+  .quick-link-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 16px;
+    height: 16px;
+    flex-shrink: 0;
+    color: currentColor;
+  }
+
+  @media screen and (max-width: 520px) {
+    .quick-links {
+      gap: 0rem;
+      margin-top: 1rem;
+    }
+
+    .quick-link {
+      font-size: 0.8rem;
+      padding: 0.2rem 0.4rem;
+      gap: 0.25rem;
+    }
+  }
+</style>
+
+<div class="quick-links">
+  {links.map((link) => (
+    <a
+      href={link.url}
+      target={link.url.startsWith('http') ? '_blank' : '_self'}
+      rel={link.url.startsWith('http') ? 'noopener noreferrer' : ''}
+      class="quick-link"
+    >
+      <Icon name={link.icon} class="quick-link-icon" />
+      <span>{link.name}</span>
+    </a>
+  ))}
+</div>

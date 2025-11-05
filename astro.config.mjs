@@ -62,7 +62,12 @@ export default defineConfig({
     //     theme: 'nord',
     //   },
     // }
-  ), react(), tailwind(), icon()],
+  ), react(), tailwind(), icon({
+    include: {
+      lucide: ['*'],
+      'simple-icons': ['*']
+    }
+  })],
   markdown: {
     shikiConfig: {
       theme: 'nord',
