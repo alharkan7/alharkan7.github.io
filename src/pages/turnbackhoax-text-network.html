@@ -1,0 +1,4827 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Turnbackhoax Text Network Analysis</title>
+    <script src="https://unpkg.com/vis-network/standalone/umd/vis-network.min.js"></script>
+    <link href="https://unpkg.com/vis-network/styles/vis-network.min.css" rel="stylesheet" type="text/css" />
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            overflow: hidden;
+            background: #f8f9fa;
+        }
+
+        #header {
+            background: #ffffff;
+            color: #2c3e50;
+            padding: 15px 20px;
+            border-bottom: 1px solid #dee2e6;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        #header h1 {
+            font-size: 20px;
+            font-weight: 600;
+        }
+
+        #info-toggle-btn {
+            background: #3498db;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            padding: 8px 16px;
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-weight: 500;
+            width: auto;
+        }
+
+        #info-toggle-btn:hover {
+            background: #2980b9;
+            color: white;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 8px;
+            font-size: 12px;
+            color: #495057;
+        }
+
+        .legend-color {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-right: 8px;
+            flex-shrink: 0;
+        }
+
+        .tabs {
+            display: flex;
+            background: white;
+            border-bottom: 2px solid #dee2e6;
+            padding: 0 20px;
+        }
+
+        .tab {
+            padding: 12px 24px;
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+            transition: all 0.3s;
+            font-weight: 500;
+            color: #6c757d;
+        }
+
+        .tab:hover {
+            background: #f8f9fa;
+            color: #495057;
+        }
+
+        .tab.active {
+            color: #3498db;
+            border-bottom-color: #3498db;
+        }
+
+        .tab-label {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .tab-badge {
+            background: #e9ecef;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+
+        .tab.active .tab-badge {
+            background: #3498db;
+            color: white;
+        }
+
+        #container {
+            display: flex;
+            height: calc(100vh - 140px);
+            width: 100%;
+        }
+
+        #controls {
+            width: 320px;
+            background: #f8f9fa;
+            border-right: 1px solid #dee2e6;
+            overflow-y: auto;
+            padding: 20px;
+            flex-shrink: 0;
+        }
+
+        .tab-content {
+            flex: 1;
+            display: none;
+            position: relative;
+            height: 100%;
+            width: 100%;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .network-canvas {
+            width: 100%;
+            height: 100%;
+            background: white;
+            position: absolute;
+            top: 0;
+            left: 0;
+        }
+
+        .control-section {
+            background: white;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 15px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        }
+
+        .control-section h3 {
+            font-size: 14px;
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 12px;
+            padding-bottom: 8px;
+            border-bottom: 2px solid #e9ecef;
+        }
+
+        .control-group {
+            margin-bottom: 12px;
+        }
+
+        .control-group label {
+            display: block;
+            font-size: 12px;
+            font-weight: 500;
+            color: #495057;
+            margin-bottom: 5px;
+        }
+
+        .control-group input[type="range"] {
+            width: 100%;
+            height: 6px;
+            border-radius: 3px;
+            background: #e9ecef;
+            outline: none;
+            -webkit-appearance: none;
+            appearance: none;
+        }
+
+        .control-group input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background: #3498db;
+            cursor: pointer;
+        }
+
+        .control-group select {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #dee2e6;
+            border-radius: 4px;
+            font-size: 12px;
+            background: white;
+        }
+
+        .value-display {
+            float: right;
+            font-size: 12px;
+            font-weight: 600;
+            color: #3498db;
+        }
+
+        button {
+            width: 100%;
+            padding: 10px;
+            background: #3498db;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 5px;
+            transition: background 0.2s;
+        }
+
+        button:hover {
+            background: #2980b9;
+        }
+
+        button.secondary {
+            background: #6c757d;
+        }
+
+        button.secondary:hover {
+            background: #5a6268;
+        }
+
+        .stats {
+            font-size: 11px;
+            color: #6c757d;
+            margin-top: 10px;
+        }
+
+        #info-panel {
+            position: absolute;
+            bottom: 20px;
+            right: 20px;
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            max-width: 300px;
+            display: none;
+            z-index: 100;
+        }
+
+        /* Info Drawer Styles */
+        #info-drawer {
+            position: fixed;
+            right: -700px;
+            top: 0;
+            width: 700px;
+            height: 100vh;
+            background: white;
+            box-shadow: -4px 0 12px rgba(0, 0, 0, 0.15);
+            transition: right 0.3s ease-in-out;
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+        }
+
+        #info-drawer.open {
+            right: 0;
+        }
+
+        #info-drawer-header {
+            background: #ffffff;
+            color: #2c3e50;
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #dee2e6;
+        }
+
+        #info-drawer-header h2 {
+            margin: 0;
+            font-size: 18px;
+        }
+
+        #info-drawer-close {
+            background: transparent;
+            border: none;
+            color: #95a5a6;
+            font-size: 24px;
+            cursor: pointer;
+            padding: 5px;
+            transition: color 0.2s;
+            width: auto;
+            margin: 0;
+        }
+
+        #info-drawer-close:hover {
+            background: transparent;
+            color: #7f8c8d;
+        }
+
+        /* Drawer Tabs */
+        .drawer-tabs {
+            display: flex;
+            background: #f8f9fa;
+            border-bottom: 2px solid #dee2e6;
+            padding: 0 20px;
+        }
+
+        .drawer-tab {
+            padding: 10px 20px;
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+            transition: all 0.3s;
+            font-weight: 500;
+            color: #6c757d;
+            font-size: 13px;
+        }
+
+        .drawer-tab:hover {
+            background: white;
+            color: #495057;
+        }
+
+        .drawer-tab.active {
+            color: #3498db;
+            border-bottom-color: #3498db;
+            background: white;
+        }
+
+        #info-drawer-content {
+            flex: 1;
+            overflow-y: auto;
+        }
+
+        .drawer-content {
+            padding: 30px;
+            font-size: 14px;
+            line-height: 1.6;
+            color: #2c3e50;
+            display: none;
+        }
+
+        .drawer-content.active {
+            display: block;
+        }
+
+        #info-drawer-content h1 {
+            font-size: 24px;
+            margin: 20px 0 15px 0;
+            color: #2c3e50;
+        }
+
+        #info-drawer-content h2 {
+            font-size: 20px;
+            margin: 25px 0 12px 0;
+            color: #2c3e50;
+            padding-bottom: 8px;
+            border-bottom: 2px solid #3498db;
+        }
+
+        #info-drawer-content h3 {
+            font-size: 16px;
+            margin: 20px 0 10px 0;
+            color: #34495e;
+        }
+
+        #info-drawer-content h4 {
+            font-size: 14px;
+            margin: 15px 0 8px 0;
+            color: #4a5568;
+        }
+
+        #info-drawer-content p {
+            margin: 10px 0;
+            color: #495057;
+        }
+
+        #info-drawer-content ul,
+        #info-drawer-content ol {
+            margin: 10px 0;
+            padding-left: 25px;
+        }
+
+        #info-drawer-content li {
+            margin: 5px 0;
+        }
+
+        #info-drawer-content table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 15px 0;
+            font-size: 13px;
+        }
+
+        #info-drawer-content thead {
+            background: #f8f9fa;
+        }
+
+        #info-drawer-content th {
+            padding: 10px;
+            text-align: left;
+            border: 1px solid #dee2e6;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+
+        #info-drawer-content td {
+            padding: 8px 10px;
+            border: 1px solid #dee2e6;
+        }
+
+        #info-drawer-content tr:nth-child(even) {
+            background: #f8f9fa;
+        }
+
+        #info-drawer-content hr {
+            border: none;
+            border-top: 2px solid #dee2e6;
+            margin: 25px 0;
+        }
+
+        #info-drawer-content strong {
+            font-weight: 600;
+            color: #2c3e50;
+        }
+
+        #info-drawer-content code {
+            background: #f8f9fa;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-family: 'Monaco', 'Menlo', monospace;
+            font-size: 12px;
+            color: #e83e8c;
+        }
+
+        #footer {
+            background: #ffffff;
+            color: #6c757d;
+            padding: 5px 20px;
+            text-align: center;
+            font-size: 11px;
+            border-top: 1px solid #dee2e6;
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+            z-index: 50;
+        }
+
+        #footer a {
+            color: #3498db;
+            text-decoration: none;
+        }
+
+        #footer a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="header">
+        <h1>Turnbackhoax Text Network Analysis</h1>
+        <button id="info-toggle-btn" onclick="toggleInfoDrawer()">Analysis Report</button>
+    </div>
+
+    <div class="tabs" id="main-tabs">
+        <div class="tab active" data-category="politics" onclick="switchMainTab('politics')">
+            <div class="tab-label">
+                <span>Politics</span>
+                <span class="tab-badge">38 entities</span>
+            </div>
+        </div>
+        <div class="tab" data-category="scam" onclick="switchMainTab('scam')">
+            <div class="tab-label">
+                <span>Scam</span>
+                <span class="tab-badge">37 entities</span>
+            </div>
+        </div>
+        <div class="tab" data-category="others" onclick="switchMainTab('others')">
+            <div class="tab-label">
+                <span>Others</span>
+                <span class="tab-badge">29 entities</span>
+            </div>
+        </div>
+    </div>
+
+    <div id="container">
+        <div id="controls">
+            <div class="control-section">
+                <h3>Physics Settings</h3>
+                <div class="control-group">
+                    <label>Solver Algorithm</label>
+                    <select id="solver">
+                        <option value="barnesHut">Barnes-Hut (Fast)</option>
+                        <option value="forceAtlas2Based" selected>Force Atlas 2 (Balanced)</option>
+                        <option value="repulsion">Repulsion (Spread)</option>
+                    </select>
+                </div>
+                <div class="control-group">
+                    <label>Spring Length <span class="value-display" id="spring-val">150</span></label>
+                    <input type="range" id="springLength" min="50" max="500" value="150">
+                </div>
+                <div class="control-group">
+                    <label>Repulsion <span class="value-display" id="repulsion-val">-2000</span></label>
+                    <input type="range" id="gravitationalConstant" min="-10000" max="-500" step="100" value="-2000">
+                </div>
+            </div>
+            <div class="control-section">
+                <h3>Display Options</h3>
+                <div class="control-group">
+                    <label>Node Size By</label>
+                    <select id="nodeSizing">
+                        <option value="count">Mention Count</option>
+                        <option value="betweenness">Betweenness Centrality</option>
+                        <option value="uniform">Uniform</option>
+                    </select>
+                </div>
+                <div class="control-group">
+                    <label>Min Node Size <span class="value-display" id="min-size-val">10</span></label>
+                    <input type="range" id="minNodeSize" min="5" max="30" value="10">
+                </div>
+            </div>
+            <button onclick="updateNetwork()">Apply Changes</button>
+            <button onclick="togglePhysics()" id="physics-toggle">Pause Physics</button>
+            <button onclick="fitNetwork()" class="secondary">Fit to Screen</button>
+            <div class="control-section">
+                <h3>Statistics</h3>
+                <div class="stats" id="current-stats"></div>
+            </div>
+            <div class="control-section">
+                <h3>Legend</h3>
+                <div id="legend-container"></div>
+            </div>
+        </div>
+
+        <div id="politics-content" class="tab-content active">
+            <div id="network-politics" class="network-canvas"></div>
+        </div>
+        <div id="scam-content" class="tab-content">
+            <div id="network-scam" class="network-canvas"></div>
+        </div>
+        <div id="others-content" class="tab-content">
+            <div id="network-others" class="network-canvas"></div>
+        </div>
+    </div>
+
+    <div id="info-panel">
+        <h4 id="info-title"></h4>
+        <div id="info-content"></div>
+    </div>
+
+    <!-- Info Drawer -->
+    <div id="info-drawer">
+        <div id="info-drawer-header">
+            <h2>Analysis Report</h2>
+            <button id="info-drawer-close" onclick="toggleInfoDrawer()">✕</button>
+        </div>
+
+        <div class="drawer-tabs">
+            <div class="drawer-tab active" data-category="politics" onclick="switchDrawerTab('politics')">Politics</div>
+            <div class="drawer-tab" data-category="scam" onclick="switchDrawerTab('scam')">Scam</div>
+            <div class="drawer-tab" data-category="others" onclick="switchDrawerTab('others')">Others</div>
+            <div class="drawer-tab" data-category="comparison" onclick="switchDrawerTab('comparison')">Comparison</div>
+        </div>
+
+        <div id="info-drawer-content">
+            <div id="drawer-politics" class="drawer-content active"></div>
+            <div id="drawer-scam" class="drawer-content"></div>
+            <div id="drawer-others" class="drawer-content"></div>
+            <div id="drawer-comparison" class="drawer-content"></div>
+        </div>
+    </div>
+
+    </div>
+
+    <div id="footer">
+        &copy; 2025 <a href="https://raihankalla.id" target="_blank">Ali Al Harkan</a> | Universitas Indonesia
+    </div>
+
+    <script>
+        const networkData = {
+            "politics": {
+                "nodes": [
+                    {
+                        "id": "prabowo",
+                        "label": "prabowo",
+                        "count": 258,
+                        "betweenness": 0.14087777114092903,
+                        "degree": 0.8108108108108109,
+                        "community": 2,
+                        "color": "#2ecc71"
+                    },
+                    {
+                        "id": "cawapres",
+                        "label": "cawapres",
+                        "count": 26,
+                        "betweenness": 0.0058476766810100144,
+                        "degree": 0.4594594594594595,
+                        "community": 1,
+                        "color": "#3498db"
+                    },
+                    {
+                        "id": "debat",
+                        "label": "debat",
+                        "count": 14,
+                        "betweenness": 0.0002866502866502867,
+                        "degree": 0.2702702702702703,
+                        "community": 1,
+                        "color": "#3498db"
+                    },
+                    {
+                        "id": "bahlil",
+                        "label": "bahlil",
+                        "count": 6,
+                        "betweenness": 0.0,
+                        "degree": 0.08108108108108109,
+                        "community": 0,
+                        "color": "#e74c3c"
+                    },
+                    {
+                        "id": "najwa shihab",
+                        "label": "najwa shihab",
+                        "count": 3,
+                        "betweenness": 0.0,
+                        "degree": 0.02702702702702703,
+                        "community": 2,
+                        "color": "#2ecc71"
+                    },
+                    {
+                        "id": "gibran",
+                        "label": "gibran",
+                        "count": 150,
+                        "betweenness": 0.034285150951817604,
+                        "degree": 0.6756756756756757,
+                        "community": 1,
+                        "color": "#3498db"
+                    },
+                    {
+                        "id": "mahfud",
+                        "label": "mahfud",
+                        "count": 25,
+                        "betweenness": 0.0020550853884187216,
+                        "degree": 0.35135135135135137,
+                        "community": 1,
+                        "color": "#3498db"
+                    },
+                    {
+                        "id": "jokowi",
+                        "label": "jokowi",
+                        "count": 267,
+                        "betweenness": 0.056629236892394776,
+                        "degree": 0.6756756756756757,
+                        "community": 0,
+                        "color": "#e74c3c"
+                    },
+                    {
+                        "id": "cak imin",
+                        "label": "cak imin",
+                        "count": 16,
+                        "betweenness": 0.0007161923828590495,
+                        "degree": 0.2972972972972973,
+                        "community": 1,
+                        "color": "#3498db"
+                    },
+                    {
+                        "id": "anies",
+                        "label": "anies",
+                        "count": 162,
+                        "betweenness": 0.1476194909308944,
+                        "degree": 0.8378378378378379,
+                        "community": 3,
+                        "color": "#f39c12"
+                    },
+                    {
+                        "id": "koalisi",
+                        "label": "koalisi",
+                        "count": 16,
+                        "betweenness": 0.008864329697663029,
+                        "degree": 0.3783783783783784,
+                        "community": 0,
+                        "color": "#e74c3c"
+                    },
+                    {
+                        "id": "sby",
+                        "label": "sby",
+                        "count": 9,
+                        "betweenness": 0.0005482456140350876,
+                        "degree": 0.10810810810810811,
+                        "community": 3,
+                        "color": "#f39c12"
+                    },
+                    {
+                        "id": "ganjar",
+                        "label": "ganjar",
+                        "count": 58,
+                        "betweenness": 0.05974966764440449,
+                        "degree": 0.5945945945945946,
+                        "community": 3,
+                        "color": "#f39c12"
+                    },
+                    {
+                        "id": "pdip",
+                        "label": "pdip",
+                        "count": 36,
+                        "betweenness": 0.007756635936460498,
+                        "degree": 0.35135135135135137,
+                        "community": 0,
+                        "color": "#e74c3c"
+                    },
+                    {
+                        "id": "demokrat",
+                        "label": "demokrat",
+                        "count": 11,
+                        "betweenness": 0.0012780637780637778,
+                        "degree": 0.13513513513513514,
+                        "community": 3,
+                        "color": "#f39c12"
+                    },
+                    {
+                        "id": "nasdem",
+                        "label": "nasdem",
+                        "count": 14,
+                        "betweenness": 0.001001001001001001,
+                        "degree": 0.21621621621621623,
+                        "community": 0,
+                        "color": "#e74c3c"
+                    },
+                    {
+                        "id": "pilpres",
+                        "label": "pilpres",
+                        "count": 52,
+                        "betweenness": 0.018526237276237277,
+                        "degree": 0.5675675675675675,
+                        "community": 0,
+                        "color": "#e74c3c"
+                    },
+                    {
+                        "id": "kpu",
+                        "label": "kpu",
+                        "count": 70,
+                        "betweenness": 0.027439741803776892,
+                        "degree": 0.5675675675675675,
+                        "community": 2,
+                        "color": "#2ecc71"
+                    },
+                    {
+                        "id": "bawaslu",
+                        "label": "bawaslu",
+                        "count": 13,
+                        "betweenness": 0.0,
+                        "degree": 0.16216216216216217,
+                        "community": 2,
+                        "color": "#2ecc71"
+                    },
+                    {
+                        "id": "pemilu",
+                        "label": "pemilu",
+                        "count": 90,
+                        "betweenness": 0.11534807477789935,
+                        "degree": 0.7567567567567568,
+                        "community": 1,
+                        "color": "#3498db"
+                    },
+                    {
+                        "id": "kecurangan",
+                        "label": "kecurangan",
+                        "count": 41,
+                        "betweenness": 0.003052018183597131,
+                        "degree": 0.32432432432432434,
+                        "community": 2,
+                        "color": "#2ecc71"
+                    },
+                    {
+                        "id": "kampanye",
+                        "label": "kampanye",
+                        "count": 36,
+                        "betweenness": 0.000273000273000273,
+                        "degree": 0.2702702702702703,
+                        "community": 0,
+                        "color": "#e74c3c"
+                    },
+                    {
+                        "id": "muhaimin iskandar",
+                        "label": "muhaimin iskandar",
+                        "count": 11,
+                        "betweenness": 0.000822359155692489,
+                        "degree": 0.32432432432432434,
+                        "community": 1,
+                        "color": "#3498db"
+                    },
+                    {
+                        "id": "capres",
+                        "label": "capres",
+                        "count": 37,
+                        "betweenness": 0.004167912501245835,
+                        "degree": 0.40540540540540543,
+                        "community": 0,
+                        "color": "#e74c3c"
+                    },
+                    {
+                        "id": "pan",
+                        "label": "pan",
+                        "count": 5,
+                        "betweenness": 0.00040040040040040036,
+                        "degree": 0.13513513513513514,
+                        "community": 3,
+                        "color": "#f39c12"
+                    },
+                    {
+                        "id": "roy suryo",
+                        "label": "roy suryo",
+                        "count": 1,
+                        "betweenness": 0.0,
+                        "degree": 0.0,
+                        "community": 4,
+                        "color": "#9b59b6"
+                    },
+                    {
+                        "id": "curang",
+                        "label": "curang",
+                        "count": 23,
+                        "betweenness": 0.0016470417786207258,
+                        "degree": 0.2702702702702703,
+                        "community": 2,
+                        "color": "#2ecc71"
+                    },
+                    {
+                        "id": "gerindra",
+                        "label": "gerindra",
+                        "count": 11,
+                        "betweenness": 0.0,
+                        "degree": 0.21621621621621623,
+                        "community": 1,
+                        "color": "#3498db"
+                    },
+                    {
+                        "id": "golkar",
+                        "label": "golkar",
+                        "count": 10,
+                        "betweenness": 0.011265886814132427,
+                        "degree": 0.24324324324324326,
+                        "community": 3,
+                        "color": "#f39c12"
+                    },
+                    {
+                        "id": "partai",
+                        "label": "partai",
+                        "count": 52,
+                        "betweenness": 0.0363166467333134,
+                        "degree": 0.5675675675675675,
+                        "community": 0,
+                        "color": "#e74c3c"
+                    },
+                    {
+                        "id": "surat suara",
+                        "label": "surat suara",
+                        "count": 6,
+                        "betweenness": 0.0,
+                        "degree": 0.1891891891891892,
+                        "community": 1,
+                        "color": "#3498db"
+                    },
+                    {
+                        "id": "mk",
+                        "label": "mk",
+                        "count": 42,
+                        "betweenness": 0.005229986479986481,
+                        "degree": 0.35135135135135137,
+                        "community": 0,
+                        "color": "#e74c3c"
+                    },
+                    {
+                        "id": "pks",
+                        "label": "pks",
+                        "count": 8,
+                        "betweenness": 0.00018768768768768769,
+                        "degree": 0.16216216216216217,
+                        "community": 0,
+                        "color": "#e74c3c"
+                    },
+                    {
+                        "id": "tps",
+                        "label": "tps",
+                        "count": 4,
+                        "betweenness": 0.0,
+                        "degree": 0.05405405405405406,
+                        "community": 1,
+                        "color": "#3498db"
+                    },
+                    {
+                        "id": "quick count",
+                        "label": "quick count",
+                        "count": 4,
+                        "betweenness": 0.0,
+                        "degree": 0.05405405405405406,
+                        "community": 3,
+                        "color": "#f39c12"
+                    },
+                    {
+                        "id": "hak angket",
+                        "label": "hak angket",
+                        "count": 18,
+                        "betweenness": 0.0,
+                        "degree": 0.21621621621621623,
+                        "community": 2,
+                        "color": "#2ecc71"
+                    },
+                    {
+                        "id": "sirekap",
+                        "label": "sirekap",
+                        "count": 2,
+                        "betweenness": 0.0,
+                        "degree": 0.02702702702702703,
+                        "community": 1,
+                        "color": "#3498db"
+                    },
+                    {
+                        "id": "mahkamah konstitusi",
+                        "label": "mahkamah konstitusi",
+                        "count": 6,
+                        "betweenness": 0.0,
+                        "degree": 0.13513513513513514,
+                        "community": 0,
+                        "color": "#e74c3c"
+                    }
+                ],
+                "edges": [
+                    {
+                        "from": "prabowo",
+                        "to": "najwa shihab",
+                        "value": 2
+                    },
+                    {
+                        "from": "prabowo",
+                        "to": "cawapres",
+                        "value": 9
+                    },
+                    {
+                        "from": "prabowo",
+                        "to": "bahlil",
+                        "value": 2
+                    },
+                    {
+                        "from": "prabowo",
+                        "to": "debat",
+                        "value": 5
+                    },
+                    {
+                        "from": "prabowo",
+                        "to": "mahfud",
+                        "value": 8
+                    },
+                    {
+                        "from": "prabowo",
+                        "to": "cak imin",
+                        "value": 8
+                    },
+                    {
+                        "from": "prabowo",
+                        "to": "jokowi",
+                        "value": 54
+                    },
+                    {
+                        "from": "prabowo",
+                        "to": "gibran",
+                        "value": 76
+                    },
+                    {
+                        "from": "prabowo",
+                        "to": "kpu",
+                        "value": 14
+                    },
+                    {
+                        "from": "prabowo",
+                        "to": "pemilu",
+                        "value": 24
+                    },
+                    {
+                        "from": "prabowo",
+                        "to": "ganjar",
+                        "value": 20
+                    },
+                    {
+                        "from": "prabowo",
+                        "to": "muhaimin iskandar",
+                        "value": 6
+                    },
+                    {
+                        "from": "prabowo",
+                        "to": "anies",
+                        "value": 34
+                    },
+                    {
+                        "from": "prabowo",
+                        "to": "capres",
+                        "value": 14
+                    },
+                    {
+                        "from": "prabowo",
+                        "to": "kampanye",
+                        "value": 9
+                    },
+                    {
+                        "from": "prabowo",
+                        "to": "pilpres",
+                        "value": 16
+                    },
+                    {
+                        "from": "prabowo",
+                        "to": "pan",
+                        "value": 2
+                    },
+                    {
+                        "from": "prabowo",
+                        "to": "surat suara",
+                        "value": 3
+                    },
+                    {
+                        "from": "prabowo",
+                        "to": "gerindra",
+                        "value": 9
+                    },
+                    {
+                        "from": "prabowo",
+                        "to": "partai",
+                        "value": 12
+                    },
+                    {
+                        "from": "prabowo",
+                        "to": "golkar",
+                        "value": 3
+                    },
+                    {
+                        "from": "prabowo",
+                        "to": "koalisi",
+                        "value": 10
+                    },
+                    {
+                        "from": "prabowo",
+                        "to": "bawaslu",
+                        "value": 4
+                    },
+                    {
+                        "from": "prabowo",
+                        "to": "pdip",
+                        "value": 5
+                    },
+                    {
+                        "from": "prabowo",
+                        "to": "nasdem",
+                        "value": 2
+                    },
+                    {
+                        "from": "prabowo",
+                        "to": "pks",
+                        "value": 4
+                    },
+                    {
+                        "from": "prabowo",
+                        "to": "kecurangan",
+                        "value": 5
+                    },
+                    {
+                        "from": "prabowo",
+                        "to": "hak angket",
+                        "value": 7
+                    },
+                    {
+                        "from": "prabowo",
+                        "to": "curang",
+                        "value": 5
+                    },
+                    {
+                        "from": "prabowo",
+                        "to": "mk",
+                        "value": 3
+                    },
+                    {
+                        "from": "cawapres",
+                        "to": "debat",
+                        "value": 7
+                    },
+                    {
+                        "from": "cawapres",
+                        "to": "mahfud",
+                        "value": 3
+                    },
+                    {
+                        "from": "cawapres",
+                        "to": "cak imin",
+                        "value": 3
+                    },
+                    {
+                        "from": "cawapres",
+                        "to": "pilpres",
+                        "value": 7
+                    },
+                    {
+                        "from": "cawapres",
+                        "to": "gibran",
+                        "value": 15
+                    },
+                    {
+                        "from": "cawapres",
+                        "to": "jokowi",
+                        "value": 4
+                    },
+                    {
+                        "from": "cawapres",
+                        "to": "kpu",
+                        "value": 4
+                    },
+                    {
+                        "from": "cawapres",
+                        "to": "anies",
+                        "value": 6
+                    },
+                    {
+                        "from": "cawapres",
+                        "to": "partai",
+                        "value": 3
+                    },
+                    {
+                        "from": "cawapres",
+                        "to": "capres",
+                        "value": 8
+                    },
+                    {
+                        "from": "cawapres",
+                        "to": "koalisi",
+                        "value": 4
+                    },
+                    {
+                        "from": "cawapres",
+                        "to": "kampanye",
+                        "value": 3
+                    },
+                    {
+                        "from": "cawapres",
+                        "to": "pemilu",
+                        "value": 5
+                    },
+                    {
+                        "from": "cawapres",
+                        "to": "mk",
+                        "value": 2
+                    },
+                    {
+                        "from": "cawapres",
+                        "to": "muhaimin iskandar",
+                        "value": 2
+                    },
+                    {
+                        "from": "cawapres",
+                        "to": "gerindra",
+                        "value": 2
+                    },
+                    {
+                        "from": "debat",
+                        "to": "cak imin",
+                        "value": 2
+                    },
+                    {
+                        "from": "debat",
+                        "to": "pilpres",
+                        "value": 3
+                    },
+                    {
+                        "from": "debat",
+                        "to": "gibran",
+                        "value": 7
+                    },
+                    {
+                        "from": "debat",
+                        "to": "jokowi",
+                        "value": 3
+                    },
+                    {
+                        "from": "debat",
+                        "to": "pemilu",
+                        "value": 2
+                    },
+                    {
+                        "from": "debat",
+                        "to": "capres",
+                        "value": 2
+                    },
+                    {
+                        "from": "debat",
+                        "to": "anies",
+                        "value": 2
+                    },
+                    {
+                        "from": "debat",
+                        "to": "kpu",
+                        "value": 2
+                    },
+                    {
+                        "from": "bahlil",
+                        "to": "golkar",
+                        "value": 3
+                    },
+                    {
+                        "from": "bahlil",
+                        "to": "partai",
+                        "value": 2
+                    },
+                    {
+                        "from": "gibran",
+                        "to": "mahfud",
+                        "value": 8
+                    },
+                    {
+                        "from": "gibran",
+                        "to": "cak imin",
+                        "value": 8
+                    },
+                    {
+                        "from": "gibran",
+                        "to": "jokowi",
+                        "value": 31
+                    },
+                    {
+                        "from": "gibran",
+                        "to": "pilpres",
+                        "value": 10
+                    },
+                    {
+                        "from": "gibran",
+                        "to": "kpu",
+                        "value": 16
+                    },
+                    {
+                        "from": "gibran",
+                        "to": "pemilu",
+                        "value": 17
+                    },
+                    {
+                        "from": "gibran",
+                        "to": "ganjar",
+                        "value": 10
+                    },
+                    {
+                        "from": "gibran",
+                        "to": "muhaimin iskandar",
+                        "value": 4
+                    },
+                    {
+                        "from": "gibran",
+                        "to": "anies",
+                        "value": 17
+                    },
+                    {
+                        "from": "gibran",
+                        "to": "kecurangan",
+                        "value": 6
+                    },
+                    {
+                        "from": "gibran",
+                        "to": "kampanye",
+                        "value": 7
+                    },
+                    {
+                        "from": "gibran",
+                        "to": "surat suara",
+                        "value": 2
+                    },
+                    {
+                        "from": "gibran",
+                        "to": "gerindra",
+                        "value": 4
+                    },
+                    {
+                        "from": "gibran",
+                        "to": "partai",
+                        "value": 7
+                    },
+                    {
+                        "from": "gibran",
+                        "to": "golkar",
+                        "value": 2
+                    },
+                    {
+                        "from": "gibran",
+                        "to": "capres",
+                        "value": 7
+                    },
+                    {
+                        "from": "gibran",
+                        "to": "koalisi",
+                        "value": 7
+                    },
+                    {
+                        "from": "gibran",
+                        "to": "mk",
+                        "value": 3
+                    },
+                    {
+                        "from": "gibran",
+                        "to": "pks",
+                        "value": 3
+                    },
+                    {
+                        "from": "gibran",
+                        "to": "curang",
+                        "value": 2
+                    },
+                    {
+                        "from": "gibran",
+                        "to": "hak angket",
+                        "value": 3
+                    },
+                    {
+                        "from": "gibran",
+                        "to": "pdip",
+                        "value": 9
+                    },
+                    {
+                        "from": "mahfud",
+                        "to": "cak imin",
+                        "value": 5
+                    },
+                    {
+                        "from": "mahfud",
+                        "to": "jokowi",
+                        "value": 7
+                    },
+                    {
+                        "from": "mahfud",
+                        "to": "pilpres",
+                        "value": 4
+                    },
+                    {
+                        "from": "mahfud",
+                        "to": "kpu",
+                        "value": 5
+                    },
+                    {
+                        "from": "mahfud",
+                        "to": "pemilu",
+                        "value": 8
+                    },
+                    {
+                        "from": "mahfud",
+                        "to": "ganjar",
+                        "value": 12
+                    },
+                    {
+                        "from": "mahfud",
+                        "to": "muhaimin iskandar",
+                        "value": 2
+                    },
+                    {
+                        "from": "mahfud",
+                        "to": "anies",
+                        "value": 7
+                    },
+                    {
+                        "from": "mahfud",
+                        "to": "surat suara",
+                        "value": 2
+                    },
+                    {
+                        "from": "mahfud",
+                        "to": "partai",
+                        "value": 2
+                    },
+                    {
+                        "from": "jokowi",
+                        "to": "cak imin",
+                        "value": 4
+                    },
+                    {
+                        "from": "jokowi",
+                        "to": "sby",
+                        "value": 2
+                    },
+                    {
+                        "from": "jokowi",
+                        "to": "koalisi",
+                        "value": 4
+                    },
+                    {
+                        "from": "jokowi",
+                        "to": "anies",
+                        "value": 18
+                    },
+                    {
+                        "from": "jokowi",
+                        "to": "kampanye",
+                        "value": 11
+                    },
+                    {
+                        "from": "jokowi",
+                        "to": "mk",
+                        "value": 5
+                    },
+                    {
+                        "from": "jokowi",
+                        "to": "ganjar",
+                        "value": 8
+                    },
+                    {
+                        "from": "jokowi",
+                        "to": "pilpres",
+                        "value": 11
+                    },
+                    {
+                        "from": "jokowi",
+                        "to": "capres",
+                        "value": 5
+                    },
+                    {
+                        "from": "jokowi",
+                        "to": "kpu",
+                        "value": 10
+                    },
+                    {
+                        "from": "jokowi",
+                        "to": "pemilu",
+                        "value": 19
+                    },
+                    {
+                        "from": "jokowi",
+                        "to": "gerindra",
+                        "value": 4
+                    },
+                    {
+                        "from": "jokowi",
+                        "to": "partai",
+                        "value": 15
+                    },
+                    {
+                        "from": "jokowi",
+                        "to": "nasdem",
+                        "value": 3
+                    },
+                    {
+                        "from": "jokowi",
+                        "to": "pks",
+                        "value": 3
+                    },
+                    {
+                        "from": "jokowi",
+                        "to": "curang",
+                        "value": 3
+                    },
+                    {
+                        "from": "jokowi",
+                        "to": "pdip",
+                        "value": 8
+                    },
+                    {
+                        "from": "jokowi",
+                        "to": "bawaslu",
+                        "value": 2
+                    },
+                    {
+                        "from": "jokowi",
+                        "to": "kecurangan",
+                        "value": 3
+                    },
+                    {
+                        "from": "jokowi",
+                        "to": "mahkamah konstitusi",
+                        "value": 2
+                    },
+                    {
+                        "from": "cak imin",
+                        "to": "pilpres",
+                        "value": 3
+                    },
+                    {
+                        "from": "cak imin",
+                        "to": "partai",
+                        "value": 2
+                    },
+                    {
+                        "from": "cak imin",
+                        "to": "anies",
+                        "value": 5
+                    },
+                    {
+                        "from": "cak imin",
+                        "to": "pemilu",
+                        "value": 2
+                    },
+                    {
+                        "from": "cak imin",
+                        "to": "ganjar",
+                        "value": 2
+                    },
+                    {
+                        "from": "anies",
+                        "to": "sby",
+                        "value": 5
+                    },
+                    {
+                        "from": "anies",
+                        "to": "koalisi",
+                        "value": 6
+                    },
+                    {
+                        "from": "anies",
+                        "to": "pdip",
+                        "value": 9
+                    },
+                    {
+                        "from": "anies",
+                        "to": "demokrat",
+                        "value": 6
+                    },
+                    {
+                        "from": "anies",
+                        "to": "ganjar",
+                        "value": 24
+                    },
+                    {
+                        "from": "anies",
+                        "to": "kpu",
+                        "value": 19
+                    },
+                    {
+                        "from": "anies",
+                        "to": "pemilu",
+                        "value": 20
+                    },
+                    {
+                        "from": "anies",
+                        "to": "muhaimin iskandar",
+                        "value": 10
+                    },
+                    {
+                        "from": "anies",
+                        "to": "capres",
+                        "value": 11
+                    },
+                    {
+                        "from": "anies",
+                        "to": "pilpres",
+                        "value": 16
+                    },
+                    {
+                        "from": "anies",
+                        "to": "pan",
+                        "value": 3
+                    },
+                    {
+                        "from": "anies",
+                        "to": "surat suara",
+                        "value": 2
+                    },
+                    {
+                        "from": "anies",
+                        "to": "gerindra",
+                        "value": 3
+                    },
+                    {
+                        "from": "anies",
+                        "to": "partai",
+                        "value": 17
+                    },
+                    {
+                        "from": "anies",
+                        "to": "golkar",
+                        "value": 4
+                    },
+                    {
+                        "from": "anies",
+                        "to": "kampanye",
+                        "value": 6
+                    },
+                    {
+                        "from": "anies",
+                        "to": "nasdem",
+                        "value": 8
+                    },
+                    {
+                        "from": "anies",
+                        "to": "pks",
+                        "value": 3
+                    },
+                    {
+                        "from": "anies",
+                        "to": "kecurangan",
+                        "value": 5
+                    },
+                    {
+                        "from": "anies",
+                        "to": "tps",
+                        "value": 2
+                    },
+                    {
+                        "from": "anies",
+                        "to": "curang",
+                        "value": 4
+                    },
+                    {
+                        "from": "anies",
+                        "to": "quick count",
+                        "value": 2
+                    },
+                    {
+                        "from": "anies",
+                        "to": "hak angket",
+                        "value": 2
+                    },
+                    {
+                        "from": "anies",
+                        "to": "mk",
+                        "value": 4
+                    },
+                    {
+                        "from": "koalisi",
+                        "to": "pan",
+                        "value": 2
+                    },
+                    {
+                        "from": "koalisi",
+                        "to": "partai",
+                        "value": 5
+                    },
+                    {
+                        "from": "koalisi",
+                        "to": "capres",
+                        "value": 2
+                    },
+                    {
+                        "from": "koalisi",
+                        "to": "nasdem",
+                        "value": 2
+                    },
+                    {
+                        "from": "koalisi",
+                        "to": "pks",
+                        "value": 2
+                    },
+                    {
+                        "from": "koalisi",
+                        "to": "muhaimin iskandar",
+                        "value": 2
+                    },
+                    {
+                        "from": "koalisi",
+                        "to": "pemilu",
+                        "value": 5
+                    },
+                    {
+                        "from": "koalisi",
+                        "to": "pilpres",
+                        "value": 2
+                    },
+                    {
+                        "from": "koalisi",
+                        "to": "pdip",
+                        "value": 2
+                    },
+                    {
+                        "from": "sby",
+                        "to": "demokrat",
+                        "value": 5
+                    },
+                    {
+                        "from": "sby",
+                        "to": "ganjar",
+                        "value": 3
+                    },
+                    {
+                        "from": "ganjar",
+                        "to": "pdip",
+                        "value": 3
+                    },
+                    {
+                        "from": "ganjar",
+                        "to": "demokrat",
+                        "value": 4
+                    },
+                    {
+                        "from": "ganjar",
+                        "to": "kpu",
+                        "value": 8
+                    },
+                    {
+                        "from": "ganjar",
+                        "to": "pemilu",
+                        "value": 12
+                    },
+                    {
+                        "from": "ganjar",
+                        "to": "muhaimin iskandar",
+                        "value": 2
+                    },
+                    {
+                        "from": "ganjar",
+                        "to": "capres",
+                        "value": 13
+                    },
+                    {
+                        "from": "ganjar",
+                        "to": "pan",
+                        "value": 2
+                    },
+                    {
+                        "from": "ganjar",
+                        "to": "pilpres",
+                        "value": 4
+                    },
+                    {
+                        "from": "ganjar",
+                        "to": "surat suara",
+                        "value": 2
+                    },
+                    {
+                        "from": "ganjar",
+                        "to": "golkar",
+                        "value": 2
+                    },
+                    {
+                        "from": "ganjar",
+                        "to": "kecurangan",
+                        "value": 2
+                    },
+                    {
+                        "from": "ganjar",
+                        "to": "quick count",
+                        "value": 2
+                    },
+                    {
+                        "from": "ganjar",
+                        "to": "curang",
+                        "value": 3
+                    },
+                    {
+                        "from": "ganjar",
+                        "to": "hak angket",
+                        "value": 2
+                    },
+                    {
+                        "from": "ganjar",
+                        "to": "mk",
+                        "value": 2
+                    },
+                    {
+                        "from": "pdip",
+                        "to": "demokrat",
+                        "value": 2
+                    },
+                    {
+                        "from": "pdip",
+                        "to": "kampanye",
+                        "value": 4
+                    },
+                    {
+                        "from": "pdip",
+                        "to": "kpu",
+                        "value": 4
+                    },
+                    {
+                        "from": "pdip",
+                        "to": "pemilu",
+                        "value": 6
+                    },
+                    {
+                        "from": "pdip",
+                        "to": "partai",
+                        "value": 7
+                    },
+                    {
+                        "from": "pdip",
+                        "to": "mk",
+                        "value": 2
+                    },
+                    {
+                        "from": "pdip",
+                        "to": "pilpres",
+                        "value": 2
+                    },
+                    {
+                        "from": "demokrat",
+                        "to": "golkar",
+                        "value": 2
+                    },
+                    {
+                        "from": "nasdem",
+                        "to": "partai",
+                        "value": 6
+                    },
+                    {
+                        "from": "nasdem",
+                        "to": "pks",
+                        "value": 2
+                    },
+                    {
+                        "from": "nasdem",
+                        "to": "pemilu",
+                        "value": 3
+                    },
+                    {
+                        "from": "nasdem",
+                        "to": "capres",
+                        "value": 2
+                    },
+                    {
+                        "from": "pilpres",
+                        "to": "kpu",
+                        "value": 5
+                    },
+                    {
+                        "from": "pilpres",
+                        "to": "capres",
+                        "value": 8
+                    },
+                    {
+                        "from": "pilpres",
+                        "to": "pemilu",
+                        "value": 15
+                    },
+                    {
+                        "from": "pilpres",
+                        "to": "kampanye",
+                        "value": 3
+                    },
+                    {
+                        "from": "pilpres",
+                        "to": "partai",
+                        "value": 5
+                    },
+                    {
+                        "from": "pilpres",
+                        "to": "muhaimin iskandar",
+                        "value": 3
+                    },
+                    {
+                        "from": "pilpres",
+                        "to": "gerindra",
+                        "value": 3
+                    },
+                    {
+                        "from": "pilpres",
+                        "to": "kecurangan",
+                        "value": 5
+                    },
+                    {
+                        "from": "pilpres",
+                        "to": "mk",
+                        "value": 7
+                    },
+                    {
+                        "from": "pilpres",
+                        "to": "mahkamah konstitusi",
+                        "value": 2
+                    },
+                    {
+                        "from": "kpu",
+                        "to": "pemilu",
+                        "value": 25
+                    },
+                    {
+                        "from": "kpu",
+                        "to": "muhaimin iskandar",
+                        "value": 3
+                    },
+                    {
+                        "from": "kpu",
+                        "to": "kecurangan",
+                        "value": 14
+                    },
+                    {
+                        "from": "kpu",
+                        "to": "curang",
+                        "value": 10
+                    },
+                    {
+                        "from": "kpu",
+                        "to": "surat suara",
+                        "value": 2
+                    },
+                    {
+                        "from": "kpu",
+                        "to": "partai",
+                        "value": 2
+                    },
+                    {
+                        "from": "kpu",
+                        "to": "capres",
+                        "value": 2
+                    },
+                    {
+                        "from": "kpu",
+                        "to": "bawaslu",
+                        "value": 4
+                    },
+                    {
+                        "from": "kpu",
+                        "to": "hak angket",
+                        "value": 4
+                    },
+                    {
+                        "from": "kpu",
+                        "to": "mahkamah konstitusi",
+                        "value": 2
+                    },
+                    {
+                        "from": "kpu",
+                        "to": "mk",
+                        "value": 5
+                    },
+                    {
+                        "from": "bawaslu",
+                        "to": "kecurangan",
+                        "value": 4
+                    },
+                    {
+                        "from": "bawaslu",
+                        "to": "pemilu",
+                        "value": 4
+                    },
+                    {
+                        "from": "bawaslu",
+                        "to": "curang",
+                        "value": 3
+                    },
+                    {
+                        "from": "pemilu",
+                        "to": "kecurangan",
+                        "value": 21
+                    },
+                    {
+                        "from": "pemilu",
+                        "to": "muhaimin iskandar",
+                        "value": 2
+                    },
+                    {
+                        "from": "pemilu",
+                        "to": "capres",
+                        "value": 6
+                    },
+                    {
+                        "from": "pemilu",
+                        "to": "curang",
+                        "value": 12
+                    },
+                    {
+                        "from": "pemilu",
+                        "to": "surat suara",
+                        "value": 3
+                    },
+                    {
+                        "from": "pemilu",
+                        "to": "gerindra",
+                        "value": 2
+                    },
+                    {
+                        "from": "pemilu",
+                        "to": "partai",
+                        "value": 11
+                    },
+                    {
+                        "from": "pemilu",
+                        "to": "golkar",
+                        "value": 3
+                    },
+                    {
+                        "from": "pemilu",
+                        "to": "tps",
+                        "value": 3
+                    },
+                    {
+                        "from": "pemilu",
+                        "to": "hak angket",
+                        "value": 4
+                    },
+                    {
+                        "from": "pemilu",
+                        "to": "sirekap",
+                        "value": 2
+                    },
+                    {
+                        "from": "pemilu",
+                        "to": "kampanye",
+                        "value": 2
+                    },
+                    {
+                        "from": "pemilu",
+                        "to": "mk",
+                        "value": 4
+                    },
+                    {
+                        "from": "kecurangan",
+                        "to": "curang",
+                        "value": 7
+                    },
+                    {
+                        "from": "kecurangan",
+                        "to": "mk",
+                        "value": 6
+                    },
+                    {
+                        "from": "kecurangan",
+                        "to": "hak angket",
+                        "value": 3
+                    },
+                    {
+                        "from": "kampanye",
+                        "to": "capres",
+                        "value": 3
+                    },
+                    {
+                        "from": "kampanye",
+                        "to": "partai",
+                        "value": 2
+                    },
+                    {
+                        "from": "muhaimin iskandar",
+                        "to": "partai",
+                        "value": 2
+                    },
+                    {
+                        "from": "muhaimin iskandar",
+                        "to": "capres",
+                        "value": 3
+                    },
+                    {
+                        "from": "capres",
+                        "to": "partai",
+                        "value": 6
+                    },
+                    {
+                        "from": "pan",
+                        "to": "golkar",
+                        "value": 2
+                    },
+                    {
+                        "from": "curang",
+                        "to": "hak angket",
+                        "value": 5
+                    },
+                    {
+                        "from": "gerindra",
+                        "to": "partai",
+                        "value": 4
+                    },
+                    {
+                        "from": "golkar",
+                        "to": "partai",
+                        "value": 4
+                    },
+                    {
+                        "from": "partai",
+                        "to": "mk",
+                        "value": 2
+                    },
+                    {
+                        "from": "partai",
+                        "to": "mahkamah konstitusi",
+                        "value": 3
+                    },
+                    {
+                        "from": "mk",
+                        "to": "mahkamah konstitusi",
+                        "value": 4
+                    }
+                ],
+                "stats": {
+                    "total_documents": 1358,
+                    "documents_with_entities": 814,
+                    "unique_entities": 38,
+                    "total_edges": 227,
+                    "network_density": 0.3229018492176387,
+                    "num_communities": 5
+                }
+            },
+            "scam": {
+                "nodes": [
+                    {
+                        "id": "transfer",
+                        "label": "transfer",
+                        "count": 53,
+                        "betweenness": 0.0026723541009255293,
+                        "degree": 0.38888888888888884,
+                        "community": 0,
+                        "color": "#e74c3c"
+                    },
+                    {
+                        "id": "facebook",
+                        "label": "facebook",
+                        "count": 134,
+                        "betweenness": 0.06850850486188834,
+                        "degree": 0.8055555555555555,
+                        "community": 0,
+                        "color": "#e74c3c"
+                    },
+                    {
+                        "id": "bank",
+                        "label": "bank",
+                        "count": 108,
+                        "betweenness": 0.011685802362494089,
+                        "degree": 0.5833333333333333,
+                        "community": 0,
+                        "color": "#e74c3c"
+                    },
+                    {
+                        "id": "bni",
+                        "label": "bni",
+                        "count": 27,
+                        "betweenness": 0.00678908532291991,
+                        "degree": 0.4722222222222222,
+                        "community": 0,
+                        "color": "#e74c3c"
+                    },
+                    {
+                        "id": "undian",
+                        "label": "undian",
+                        "count": 79,
+                        "betweenness": 0.004841820437058533,
+                        "degree": 0.4722222222222222,
+                        "community": 0,
+                        "color": "#e74c3c"
+                    },
+                    {
+                        "id": "gratis",
+                        "label": "gratis",
+                        "count": 86,
+                        "betweenness": 0.06080196745610279,
+                        "degree": 0.6944444444444444,
+                        "community": 1,
+                        "color": "#3498db"
+                    },
+                    {
+                        "id": "promo",
+                        "label": "promo",
+                        "count": 14,
+                        "betweenness": 0.00035757892900750043,
+                        "degree": 0.2777777777777778,
+                        "community": 0,
+                        "color": "#e74c3c"
+                    },
+                    {
+                        "id": "whatsapp",
+                        "label": "whatsapp",
+                        "count": 147,
+                        "betweenness": 0.027941060842063346,
+                        "degree": 0.6666666666666666,
+                        "community": 1,
+                        "color": "#3498db"
+                    },
+                    {
+                        "id": "instagram",
+                        "label": "instagram",
+                        "count": 78,
+                        "betweenness": 0.02582465872566123,
+                        "degree": 0.6388888888888888,
+                        "community": 2,
+                        "color": "#2ecc71"
+                    },
+                    {
+                        "id": "dana",
+                        "label": "dana",
+                        "count": 63,
+                        "betweenness": 0.013868897045588779,
+                        "degree": 0.5,
+                        "community": 2,
+                        "color": "#2ecc71"
+                    },
+                    {
+                        "id": "tiktok",
+                        "label": "tiktok",
+                        "count": 68,
+                        "betweenness": 0.018829233515950308,
+                        "degree": 0.5833333333333333,
+                        "community": 1,
+                        "color": "#3498db"
+                    },
+                    {
+                        "id": "loker",
+                        "label": "loker",
+                        "count": 32,
+                        "betweenness": 0.0006734006734006734,
+                        "degree": 0.3333333333333333,
+                        "community": 1,
+                        "color": "#3498db"
+                    },
+                    {
+                        "id": "pertamina",
+                        "label": "pertamina",
+                        "count": 18,
+                        "betweenness": 0.004377104377104376,
+                        "degree": 0.2777777777777778,
+                        "community": 1,
+                        "color": "#3498db"
+                    },
+                    {
+                        "id": "penipuan",
+                        "label": "penipuan",
+                        "count": 109,
+                        "betweenness": 0.11038681174019518,
+                        "degree": 0.861111111111111,
+                        "community": 2,
+                        "color": "#2ecc71"
+                    },
+                    {
+                        "id": "akun palsu",
+                        "label": "akun palsu",
+                        "count": 8,
+                        "betweenness": 0.0001221001221001221,
+                        "degree": 0.25,
+                        "community": 2,
+                        "color": "#2ecc71"
+                    },
+                    {
+                        "id": "modus",
+                        "label": "modus",
+                        "count": 84,
+                        "betweenness": 0.03851417379612868,
+                        "degree": 0.6944444444444444,
+                        "community": 1,
+                        "color": "#3498db"
+                    },
+                    {
+                        "id": "rekening",
+                        "label": "rekening",
+                        "count": 44,
+                        "betweenness": 0.010781292410365092,
+                        "degree": 0.5555555555555556,
+                        "community": 0,
+                        "color": "#e74c3c"
+                    },
+                    {
+                        "id": "hadiah",
+                        "label": "hadiah",
+                        "count": 115,
+                        "betweenness": 0.01496496587975285,
+                        "degree": 0.611111111111111,
+                        "community": 0,
+                        "color": "#e74c3c"
+                    },
+                    {
+                        "id": "lowongan",
+                        "label": "lowongan",
+                        "count": 71,
+                        "betweenness": 0.06472101972101972,
+                        "degree": 0.5,
+                        "community": 1,
+                        "color": "#3498db"
+                    },
+                    {
+                        "id": "giveaway",
+                        "label": "giveaway",
+                        "count": 17,
+                        "betweenness": 0.0,
+                        "degree": 0.25,
+                        "community": 2,
+                        "color": "#2ecc71"
+                    },
+                    {
+                        "id": "mandiri",
+                        "label": "mandiri",
+                        "count": 23,
+                        "betweenness": 0.00383934987318446,
+                        "degree": 0.4444444444444444,
+                        "community": 0,
+                        "color": "#e74c3c"
+                    },
+                    {
+                        "id": "kartu",
+                        "label": "kartu",
+                        "count": 18,
+                        "betweenness": 0.008346578465626085,
+                        "degree": 0.5,
+                        "community": 0,
+                        "color": "#e74c3c"
+                    },
+                    {
+                        "id": "pulsa",
+                        "label": "pulsa",
+                        "count": 6,
+                        "betweenness": 0.0,
+                        "degree": 0.08333333333333333,
+                        "community": 1,
+                        "color": "#3498db"
+                    },
+                    {
+                        "id": "bri",
+                        "label": "bri",
+                        "count": 34,
+                        "betweenness": 0.005435452183572485,
+                        "degree": 0.41666666666666663,
+                        "community": 0,
+                        "color": "#e74c3c"
+                    },
+                    {
+                        "id": "saldo",
+                        "label": "saldo",
+                        "count": 8,
+                        "betweenness": 0.0,
+                        "degree": 0.25,
+                        "community": 0,
+                        "color": "#e74c3c"
+                    },
+                    {
+                        "id": "bpjs",
+                        "label": "bpjs",
+                        "count": 28,
+                        "betweenness": 0.007408094550951694,
+                        "degree": 0.4722222222222222,
+                        "community": 1,
+                        "color": "#3498db"
+                    },
+                    {
+                        "id": "rekrutmen",
+                        "label": "rekrutmen",
+                        "count": 28,
+                        "betweenness": 0.014657898956144569,
+                        "degree": 0.3611111111111111,
+                        "community": 1,
+                        "color": "#3498db"
+                    },
+                    {
+                        "id": "bumn",
+                        "label": "bumn",
+                        "count": 23,
+                        "betweenness": 0.0005291005291005291,
+                        "degree": 0.3055555555555555,
+                        "community": 1,
+                        "color": "#3498db"
+                    },
+                    {
+                        "id": "pln",
+                        "label": "pln",
+                        "count": 7,
+                        "betweenness": 0.0,
+                        "degree": 0.05555555555555555,
+                        "community": 1,
+                        "color": "#3498db"
+                    },
+                    {
+                        "id": "bca",
+                        "label": "bca",
+                        "count": 9,
+                        "betweenness": 0.0,
+                        "degree": 0.19444444444444442,
+                        "community": 0,
+                        "color": "#e74c3c"
+                    },
+                    {
+                        "id": "gopay",
+                        "label": "gopay",
+                        "count": 1,
+                        "betweenness": 0.0,
+                        "degree": 0.0,
+                        "community": 3,
+                        "color": "#f39c12"
+                    },
+                    {
+                        "id": "ovo",
+                        "label": "ovo",
+                        "count": 1,
+                        "betweenness": 0.0,
+                        "degree": 0.0,
+                        "community": 4,
+                        "color": "#9b59b6"
+                    },
+                    {
+                        "id": "penipu",
+                        "label": "penipu",
+                        "count": 3,
+                        "betweenness": 0.0,
+                        "degree": 0.1388888888888889,
+                        "community": 2,
+                        "color": "#2ecc71"
+                    },
+                    {
+                        "id": "kuota",
+                        "label": "kuota",
+                        "count": 5,
+                        "betweenness": 0.0,
+                        "degree": 0.1111111111111111,
+                        "community": 2,
+                        "color": "#2ecc71"
+                    },
+                    {
+                        "id": "bansos",
+                        "label": "bansos",
+                        "count": 9,
+                        "betweenness": 0.00010582010582010582,
+                        "degree": 0.16666666666666666,
+                        "community": 2,
+                        "color": "#2ecc71"
+                    },
+                    {
+                        "id": "blt",
+                        "label": "blt",
+                        "count": 2,
+                        "betweenness": 0.0,
+                        "degree": 0.0,
+                        "community": 5,
+                        "color": "#1abc9c"
+                    },
+                    {
+                        "id": "cpns",
+                        "label": "cpns",
+                        "count": 3,
+                        "betweenness": 0.0,
+                        "degree": 0.027777777777777776,
+                        "community": 1,
+                        "color": "#3498db"
+                    }
+                ],
+                "edges": [
+                    {
+                        "from": "transfer",
+                        "to": "instagram",
+                        "value": 10
+                    },
+                    {
+                        "from": "transfer",
+                        "to": "penipuan",
+                        "value": 11
+                    },
+                    {
+                        "from": "transfer",
+                        "to": "whatsapp",
+                        "value": 13
+                    },
+                    {
+                        "from": "transfer",
+                        "to": "modus",
+                        "value": 10
+                    },
+                    {
+                        "from": "transfer",
+                        "to": "rekening",
+                        "value": 10
+                    },
+                    {
+                        "from": "transfer",
+                        "to": "bri",
+                        "value": 6
+                    },
+                    {
+                        "from": "transfer",
+                        "to": "bank",
+                        "value": 8
+                    },
+                    {
+                        "from": "transfer",
+                        "to": "bca",
+                        "value": 4
+                    },
+                    {
+                        "from": "transfer",
+                        "to": "mandiri",
+                        "value": 3
+                    },
+                    {
+                        "from": "transfer",
+                        "to": "dana",
+                        "value": 5
+                    },
+                    {
+                        "from": "transfer",
+                        "to": "facebook",
+                        "value": 9
+                    },
+                    {
+                        "from": "transfer",
+                        "to": "hadiah",
+                        "value": 4
+                    },
+                    {
+                        "from": "transfer",
+                        "to": "bni",
+                        "value": 4
+                    },
+                    {
+                        "from": "transfer",
+                        "to": "tiktok",
+                        "value": 8
+                    },
+                    {
+                        "from": "facebook",
+                        "to": "instagram",
+                        "value": 39
+                    },
+                    {
+                        "from": "facebook",
+                        "to": "dana",
+                        "value": 21
+                    },
+                    {
+                        "from": "facebook",
+                        "to": "tiktok",
+                        "value": 8
+                    },
+                    {
+                        "from": "facebook",
+                        "to": "modus",
+                        "value": 39
+                    },
+                    {
+                        "from": "facebook",
+                        "to": "akun palsu",
+                        "value": 8
+                    },
+                    {
+                        "from": "facebook",
+                        "to": "penipuan",
+                        "value": 61
+                    },
+                    {
+                        "from": "facebook",
+                        "to": "rekening",
+                        "value": 10
+                    },
+                    {
+                        "from": "facebook",
+                        "to": "whatsapp",
+                        "value": 38
+                    },
+                    {
+                        "from": "facebook",
+                        "to": "lowongan",
+                        "value": 27
+                    },
+                    {
+                        "from": "facebook",
+                        "to": "bank",
+                        "value": 19
+                    },
+                    {
+                        "from": "facebook",
+                        "to": "hadiah",
+                        "value": 27
+                    },
+                    {
+                        "from": "facebook",
+                        "to": "undian",
+                        "value": 17
+                    },
+                    {
+                        "from": "facebook",
+                        "to": "gratis",
+                        "value": 19
+                    },
+                    {
+                        "from": "facebook",
+                        "to": "kartu",
+                        "value": 11
+                    },
+                    {
+                        "from": "facebook",
+                        "to": "mandiri",
+                        "value": 3
+                    },
+                    {
+                        "from": "facebook",
+                        "to": "saldo",
+                        "value": 3
+                    },
+                    {
+                        "from": "facebook",
+                        "to": "bpjs",
+                        "value": 12
+                    },
+                    {
+                        "from": "facebook",
+                        "to": "loker",
+                        "value": 9
+                    },
+                    {
+                        "from": "facebook",
+                        "to": "bumn",
+                        "value": 4
+                    },
+                    {
+                        "from": "facebook",
+                        "to": "rekrutmen",
+                        "value": 13
+                    },
+                    {
+                        "from": "facebook",
+                        "to": "penipu",
+                        "value": 2
+                    },
+                    {
+                        "from": "facebook",
+                        "to": "bri",
+                        "value": 6
+                    },
+                    {
+                        "from": "facebook",
+                        "to": "giveaway",
+                        "value": 2
+                    },
+                    {
+                        "from": "facebook",
+                        "to": "bansos",
+                        "value": 4
+                    },
+                    {
+                        "from": "facebook",
+                        "to": "promo",
+                        "value": 5
+                    },
+                    {
+                        "from": "facebook",
+                        "to": "bni",
+                        "value": 2
+                    },
+                    {
+                        "from": "facebook",
+                        "to": "bca",
+                        "value": 2
+                    },
+                    {
+                        "from": "facebook",
+                        "to": "kuota",
+                        "value": 2
+                    },
+                    {
+                        "from": "bank",
+                        "to": "gratis",
+                        "value": 44
+                    },
+                    {
+                        "from": "bank",
+                        "to": "bni",
+                        "value": 17
+                    },
+                    {
+                        "from": "bank",
+                        "to": "undian",
+                        "value": 53
+                    },
+                    {
+                        "from": "bank",
+                        "to": "promo",
+                        "value": 9
+                    },
+                    {
+                        "from": "bank",
+                        "to": "whatsapp",
+                        "value": 11
+                    },
+                    {
+                        "from": "bank",
+                        "to": "instagram",
+                        "value": 8
+                    },
+                    {
+                        "from": "bank",
+                        "to": "hadiah",
+                        "value": 42
+                    },
+                    {
+                        "from": "bank",
+                        "to": "penipuan",
+                        "value": 16
+                    },
+                    {
+                        "from": "bank",
+                        "to": "mandiri",
+                        "value": 14
+                    },
+                    {
+                        "from": "bank",
+                        "to": "kartu",
+                        "value": 7
+                    },
+                    {
+                        "from": "bank",
+                        "to": "saldo",
+                        "value": 7
+                    },
+                    {
+                        "from": "bank",
+                        "to": "rekening",
+                        "value": 16
+                    },
+                    {
+                        "from": "bank",
+                        "to": "bri",
+                        "value": 16
+                    },
+                    {
+                        "from": "bank",
+                        "to": "tiktok",
+                        "value": 7
+                    },
+                    {
+                        "from": "bank",
+                        "to": "dana",
+                        "value": 6
+                    },
+                    {
+                        "from": "bank",
+                        "to": "modus",
+                        "value": 10
+                    },
+                    {
+                        "from": "bank",
+                        "to": "akun palsu",
+                        "value": 2
+                    },
+                    {
+                        "from": "bank",
+                        "to": "bpjs",
+                        "value": 2
+                    },
+                    {
+                        "from": "bank",
+                        "to": "lowongan",
+                        "value": 2
+                    },
+                    {
+                        "from": "bni",
+                        "to": "gratis",
+                        "value": 5
+                    },
+                    {
+                        "from": "bni",
+                        "to": "undian",
+                        "value": 9
+                    },
+                    {
+                        "from": "bni",
+                        "to": "promo",
+                        "value": 3
+                    },
+                    {
+                        "from": "bni",
+                        "to": "whatsapp",
+                        "value": 6
+                    },
+                    {
+                        "from": "bni",
+                        "to": "hadiah",
+                        "value": 4
+                    },
+                    {
+                        "from": "bni",
+                        "to": "rekening",
+                        "value": 7
+                    },
+                    {
+                        "from": "bni",
+                        "to": "bca",
+                        "value": 6
+                    },
+                    {
+                        "from": "bni",
+                        "to": "bri",
+                        "value": 6
+                    },
+                    {
+                        "from": "bni",
+                        "to": "mandiri",
+                        "value": 4
+                    },
+                    {
+                        "from": "bni",
+                        "to": "tiktok",
+                        "value": 2
+                    },
+                    {
+                        "from": "bni",
+                        "to": "dana",
+                        "value": 2
+                    },
+                    {
+                        "from": "bni",
+                        "to": "kartu",
+                        "value": 2
+                    },
+                    {
+                        "from": "bni",
+                        "to": "saldo",
+                        "value": 2
+                    },
+                    {
+                        "from": "bni",
+                        "to": "penipuan",
+                        "value": 2
+                    },
+                    {
+                        "from": "undian",
+                        "to": "gratis",
+                        "value": 45
+                    },
+                    {
+                        "from": "undian",
+                        "to": "promo",
+                        "value": 9
+                    },
+                    {
+                        "from": "undian",
+                        "to": "instagram",
+                        "value": 7
+                    },
+                    {
+                        "from": "undian",
+                        "to": "hadiah",
+                        "value": 43
+                    },
+                    {
+                        "from": "undian",
+                        "to": "mandiri",
+                        "value": 10
+                    },
+                    {
+                        "from": "undian",
+                        "to": "penipuan",
+                        "value": 11
+                    },
+                    {
+                        "from": "undian",
+                        "to": "kartu",
+                        "value": 5
+                    },
+                    {
+                        "from": "undian",
+                        "to": "saldo",
+                        "value": 6
+                    },
+                    {
+                        "from": "undian",
+                        "to": "bri",
+                        "value": 14
+                    },
+                    {
+                        "from": "undian",
+                        "to": "giveaway",
+                        "value": 2
+                    },
+                    {
+                        "from": "undian",
+                        "to": "whatsapp",
+                        "value": 5
+                    },
+                    {
+                        "from": "undian",
+                        "to": "rekening",
+                        "value": 2
+                    },
+                    {
+                        "from": "undian",
+                        "to": "modus",
+                        "value": 5
+                    },
+                    {
+                        "from": "undian",
+                        "to": "tiktok",
+                        "value": 2
+                    },
+                    {
+                        "from": "gratis",
+                        "to": "promo",
+                        "value": 8
+                    },
+                    {
+                        "from": "gratis",
+                        "to": "whatsapp",
+                        "value": 8
+                    },
+                    {
+                        "from": "gratis",
+                        "to": "mandiri",
+                        "value": 10
+                    },
+                    {
+                        "from": "gratis",
+                        "to": "kartu",
+                        "value": 5
+                    },
+                    {
+                        "from": "gratis",
+                        "to": "penipuan",
+                        "value": 15
+                    },
+                    {
+                        "from": "gratis",
+                        "to": "hadiah",
+                        "value": 30
+                    },
+                    {
+                        "from": "gratis",
+                        "to": "saldo",
+                        "value": 2
+                    },
+                    {
+                        "from": "gratis",
+                        "to": "bumn",
+                        "value": 4
+                    },
+                    {
+                        "from": "gratis",
+                        "to": "bri",
+                        "value": 10
+                    },
+                    {
+                        "from": "gratis",
+                        "to": "instagram",
+                        "value": 11
+                    },
+                    {
+                        "from": "gratis",
+                        "to": "rekening",
+                        "value": 3
+                    },
+                    {
+                        "from": "gratis",
+                        "to": "tiktok",
+                        "value": 5
+                    },
+                    {
+                        "from": "gratis",
+                        "to": "dana",
+                        "value": 2
+                    },
+                    {
+                        "from": "gratis",
+                        "to": "akun palsu",
+                        "value": 4
+                    },
+                    {
+                        "from": "gratis",
+                        "to": "bpjs",
+                        "value": 6
+                    },
+                    {
+                        "from": "gratis",
+                        "to": "pln",
+                        "value": 3
+                    },
+                    {
+                        "from": "gratis",
+                        "to": "rekrutmen",
+                        "value": 4
+                    },
+                    {
+                        "from": "gratis",
+                        "to": "modus",
+                        "value": 8
+                    },
+                    {
+                        "from": "gratis",
+                        "to": "loker",
+                        "value": 2
+                    },
+                    {
+                        "from": "gratis",
+                        "to": "lowongan",
+                        "value": 3
+                    },
+                    {
+                        "from": "gratis",
+                        "to": "pertamina",
+                        "value": 2
+                    },
+                    {
+                        "from": "promo",
+                        "to": "hadiah",
+                        "value": 8
+                    },
+                    {
+                        "from": "promo",
+                        "to": "bri",
+                        "value": 2
+                    },
+                    {
+                        "from": "promo",
+                        "to": "penipuan",
+                        "value": 4
+                    },
+                    {
+                        "from": "promo",
+                        "to": "whatsapp",
+                        "value": 4
+                    },
+                    {
+                        "from": "promo",
+                        "to": "instagram",
+                        "value": 3
+                    },
+                    {
+                        "from": "whatsapp",
+                        "to": "instagram",
+                        "value": 34
+                    },
+                    {
+                        "from": "whatsapp",
+                        "to": "penipuan",
+                        "value": 48
+                    },
+                    {
+                        "from": "whatsapp",
+                        "to": "modus",
+                        "value": 37
+                    },
+                    {
+                        "from": "whatsapp",
+                        "to": "rekening",
+                        "value": 10
+                    },
+                    {
+                        "from": "whatsapp",
+                        "to": "hadiah",
+                        "value": 25
+                    },
+                    {
+                        "from": "whatsapp",
+                        "to": "dana",
+                        "value": 17
+                    },
+                    {
+                        "from": "whatsapp",
+                        "to": "giveaway",
+                        "value": 8
+                    },
+                    {
+                        "from": "whatsapp",
+                        "to": "mandiri",
+                        "value": 5
+                    },
+                    {
+                        "from": "whatsapp",
+                        "to": "loker",
+                        "value": 4
+                    },
+                    {
+                        "from": "whatsapp",
+                        "to": "lowongan",
+                        "value": 14
+                    },
+                    {
+                        "from": "whatsapp",
+                        "to": "bumn",
+                        "value": 4
+                    },
+                    {
+                        "from": "whatsapp",
+                        "to": "rekrutmen",
+                        "value": 3
+                    },
+                    {
+                        "from": "whatsapp",
+                        "to": "bpjs",
+                        "value": 9
+                    },
+                    {
+                        "from": "whatsapp",
+                        "to": "tiktok",
+                        "value": 11
+                    },
+                    {
+                        "from": "whatsapp",
+                        "to": "penipu",
+                        "value": 2
+                    },
+                    {
+                        "from": "whatsapp",
+                        "to": "kartu",
+                        "value": 2
+                    },
+                    {
+                        "from": "whatsapp",
+                        "to": "pertamina",
+                        "value": 2
+                    },
+                    {
+                        "from": "instagram",
+                        "to": "dana",
+                        "value": 9
+                    },
+                    {
+                        "from": "instagram",
+                        "to": "tiktok",
+                        "value": 13
+                    },
+                    {
+                        "from": "instagram",
+                        "to": "penipuan",
+                        "value": 37
+                    },
+                    {
+                        "from": "instagram",
+                        "to": "modus",
+                        "value": 24
+                    },
+                    {
+                        "from": "instagram",
+                        "to": "rekening",
+                        "value": 10
+                    },
+                    {
+                        "from": "instagram",
+                        "to": "lowongan",
+                        "value": 13
+                    },
+                    {
+                        "from": "instagram",
+                        "to": "hadiah",
+                        "value": 19
+                    },
+                    {
+                        "from": "instagram",
+                        "to": "bpjs",
+                        "value": 3
+                    },
+                    {
+                        "from": "instagram",
+                        "to": "akun palsu",
+                        "value": 3
+                    },
+                    {
+                        "from": "instagram",
+                        "to": "kartu",
+                        "value": 3
+                    },
+                    {
+                        "from": "instagram",
+                        "to": "bumn",
+                        "value": 3
+                    },
+                    {
+                        "from": "instagram",
+                        "to": "rekrutmen",
+                        "value": 7
+                    },
+                    {
+                        "from": "instagram",
+                        "to": "loker",
+                        "value": 3
+                    },
+                    {
+                        "from": "instagram",
+                        "to": "giveaway",
+                        "value": 2
+                    },
+                    {
+                        "from": "instagram",
+                        "to": "mandiri",
+                        "value": 2
+                    },
+                    {
+                        "from": "instagram",
+                        "to": "kuota",
+                        "value": 2
+                    },
+                    {
+                        "from": "dana",
+                        "to": "akun palsu",
+                        "value": 2
+                    },
+                    {
+                        "from": "dana",
+                        "to": "rekening",
+                        "value": 14
+                    },
+                    {
+                        "from": "dana",
+                        "to": "hadiah",
+                        "value": 8
+                    },
+                    {
+                        "from": "dana",
+                        "to": "bri",
+                        "value": 5
+                    },
+                    {
+                        "from": "dana",
+                        "to": "bpjs",
+                        "value": 12
+                    },
+                    {
+                        "from": "dana",
+                        "to": "kartu",
+                        "value": 4
+                    },
+                    {
+                        "from": "dana",
+                        "to": "modus",
+                        "value": 12
+                    },
+                    {
+                        "from": "dana",
+                        "to": "penipuan",
+                        "value": 15
+                    },
+                    {
+                        "from": "dana",
+                        "to": "bansos",
+                        "value": 3
+                    },
+                    {
+                        "from": "dana",
+                        "to": "penipu",
+                        "value": 2
+                    },
+                    {
+                        "from": "dana",
+                        "to": "lowongan",
+                        "value": 2
+                    },
+                    {
+                        "from": "tiktok",
+                        "to": "mandiri",
+                        "value": 5
+                    },
+                    {
+                        "from": "tiktok",
+                        "to": "rekening",
+                        "value": 2
+                    },
+                    {
+                        "from": "tiktok",
+                        "to": "hadiah",
+                        "value": 6
+                    },
+                    {
+                        "from": "tiktok",
+                        "to": "penipuan",
+                        "value": 19
+                    },
+                    {
+                        "from": "tiktok",
+                        "to": "modus",
+                        "value": 18
+                    },
+                    {
+                        "from": "tiktok",
+                        "to": "giveaway",
+                        "value": 4
+                    },
+                    {
+                        "from": "tiktok",
+                        "to": "loker",
+                        "value": 6
+                    },
+                    {
+                        "from": "tiktok",
+                        "to": "bpjs",
+                        "value": 4
+                    },
+                    {
+                        "from": "tiktok",
+                        "to": "lowongan",
+                        "value": 6
+                    },
+                    {
+                        "from": "tiktok",
+                        "to": "rekrutmen",
+                        "value": 4
+                    },
+                    {
+                        "from": "tiktok",
+                        "to": "pertamina",
+                        "value": 2
+                    },
+                    {
+                        "from": "tiktok",
+                        "to": "kartu",
+                        "value": 3
+                    },
+                    {
+                        "from": "tiktok",
+                        "to": "bansos",
+                        "value": 3
+                    },
+                    {
+                        "from": "loker",
+                        "to": "pertamina",
+                        "value": 4
+                    },
+                    {
+                        "from": "loker",
+                        "to": "lowongan",
+                        "value": 16
+                    },
+                    {
+                        "from": "loker",
+                        "to": "penipuan",
+                        "value": 5
+                    },
+                    {
+                        "from": "loker",
+                        "to": "bumn",
+                        "value": 2
+                    },
+                    {
+                        "from": "loker",
+                        "to": "rekrutmen",
+                        "value": 9
+                    },
+                    {
+                        "from": "loker",
+                        "to": "modus",
+                        "value": 5
+                    },
+                    {
+                        "from": "loker",
+                        "to": "bpjs",
+                        "value": 2
+                    },
+                    {
+                        "from": "pertamina",
+                        "to": "lowongan",
+                        "value": 8
+                    },
+                    {
+                        "from": "pertamina",
+                        "to": "pulsa",
+                        "value": 2
+                    },
+                    {
+                        "from": "pertamina",
+                        "to": "bumn",
+                        "value": 2
+                    },
+                    {
+                        "from": "pertamina",
+                        "to": "rekrutmen",
+                        "value": 2
+                    },
+                    {
+                        "from": "pertamina",
+                        "to": "modus",
+                        "value": 2
+                    },
+                    {
+                        "from": "pertamina",
+                        "to": "penipuan",
+                        "value": 2
+                    },
+                    {
+                        "from": "penipuan",
+                        "to": "modus",
+                        "value": 76
+                    },
+                    {
+                        "from": "penipuan",
+                        "to": "akun palsu",
+                        "value": 5
+                    },
+                    {
+                        "from": "penipuan",
+                        "to": "kartu",
+                        "value": 11
+                    },
+                    {
+                        "from": "penipuan",
+                        "to": "mandiri",
+                        "value": 4
+                    },
+                    {
+                        "from": "penipuan",
+                        "to": "hadiah",
+                        "value": 24
+                    },
+                    {
+                        "from": "penipuan",
+                        "to": "saldo",
+                        "value": 2
+                    },
+                    {
+                        "from": "penipuan",
+                        "to": "lowongan",
+                        "value": 16
+                    },
+                    {
+                        "from": "penipuan",
+                        "to": "bumn",
+                        "value": 5
+                    },
+                    {
+                        "from": "penipuan",
+                        "to": "rekrutmen",
+                        "value": 10
+                    },
+                    {
+                        "from": "penipuan",
+                        "to": "penipu",
+                        "value": 3
+                    },
+                    {
+                        "from": "penipuan",
+                        "to": "bpjs",
+                        "value": 8
+                    },
+                    {
+                        "from": "penipuan",
+                        "to": "rekening",
+                        "value": 11
+                    },
+                    {
+                        "from": "penipuan",
+                        "to": "bri",
+                        "value": 4
+                    },
+                    {
+                        "from": "penipuan",
+                        "to": "giveaway",
+                        "value": 2
+                    },
+                    {
+                        "from": "penipuan",
+                        "to": "pulsa",
+                        "value": 2
+                    },
+                    {
+                        "from": "penipuan",
+                        "to": "bansos",
+                        "value": 2
+                    },
+                    {
+                        "from": "penipuan",
+                        "to": "bca",
+                        "value": 2
+                    },
+                    {
+                        "from": "penipuan",
+                        "to": "kuota",
+                        "value": 2
+                    },
+                    {
+                        "from": "akun palsu",
+                        "to": "modus",
+                        "value": 3
+                    },
+                    {
+                        "from": "akun palsu",
+                        "to": "bri",
+                        "value": 2
+                    },
+                    {
+                        "from": "akun palsu",
+                        "to": "hadiah",
+                        "value": 2
+                    },
+                    {
+                        "from": "modus",
+                        "to": "lowongan",
+                        "value": 13
+                    },
+                    {
+                        "from": "modus",
+                        "to": "bumn",
+                        "value": 5
+                    },
+                    {
+                        "from": "modus",
+                        "to": "rekrutmen",
+                        "value": 9
+                    },
+                    {
+                        "from": "modus",
+                        "to": "rekening",
+                        "value": 9
+                    },
+                    {
+                        "from": "modus",
+                        "to": "hadiah",
+                        "value": 15
+                    },
+                    {
+                        "from": "modus",
+                        "to": "bri",
+                        "value": 3
+                    },
+                    {
+                        "from": "modus",
+                        "to": "kartu",
+                        "value": 7
+                    },
+                    {
+                        "from": "modus",
+                        "to": "giveaway",
+                        "value": 2
+                    },
+                    {
+                        "from": "modus",
+                        "to": "bpjs",
+                        "value": 6
+                    },
+                    {
+                        "from": "modus",
+                        "to": "penipu",
+                        "value": 2
+                    },
+                    {
+                        "from": "modus",
+                        "to": "mandiri",
+                        "value": 2
+                    },
+                    {
+                        "from": "modus",
+                        "to": "kuota",
+                        "value": 2
+                    },
+                    {
+                        "from": "rekening",
+                        "to": "hadiah",
+                        "value": 7
+                    },
+                    {
+                        "from": "rekening",
+                        "to": "giveaway",
+                        "value": 2
+                    },
+                    {
+                        "from": "rekening",
+                        "to": "bri",
+                        "value": 8
+                    },
+                    {
+                        "from": "rekening",
+                        "to": "bca",
+                        "value": 5
+                    },
+                    {
+                        "from": "rekening",
+                        "to": "mandiri",
+                        "value": 4
+                    },
+                    {
+                        "from": "rekening",
+                        "to": "saldo",
+                        "value": 2
+                    },
+                    {
+                        "from": "rekening",
+                        "to": "bpjs",
+                        "value": 2
+                    },
+                    {
+                        "from": "rekening",
+                        "to": "kartu",
+                        "value": 2
+                    },
+                    {
+                        "from": "hadiah",
+                        "to": "giveaway",
+                        "value": 9
+                    },
+                    {
+                        "from": "hadiah",
+                        "to": "mandiri",
+                        "value": 8
+                    },
+                    {
+                        "from": "hadiah",
+                        "to": "kartu",
+                        "value": 6
+                    },
+                    {
+                        "from": "hadiah",
+                        "to": "saldo",
+                        "value": 7
+                    },
+                    {
+                        "from": "hadiah",
+                        "to": "bri",
+                        "value": 12
+                    },
+                    {
+                        "from": "hadiah",
+                        "to": "bpjs",
+                        "value": 2
+                    },
+                    {
+                        "from": "hadiah",
+                        "to": "lowongan",
+                        "value": 2
+                    },
+                    {
+                        "from": "lowongan",
+                        "to": "pulsa",
+                        "value": 2
+                    },
+                    {
+                        "from": "lowongan",
+                        "to": "bumn",
+                        "value": 12
+                    },
+                    {
+                        "from": "lowongan",
+                        "to": "rekrutmen",
+                        "value": 20
+                    },
+                    {
+                        "from": "lowongan",
+                        "to": "bpjs",
+                        "value": 6
+                    },
+                    {
+                        "from": "lowongan",
+                        "to": "kartu",
+                        "value": 2
+                    },
+                    {
+                        "from": "lowongan",
+                        "to": "cpns",
+                        "value": 2
+                    },
+                    {
+                        "from": "mandiri",
+                        "to": "kartu",
+                        "value": 2
+                    },
+                    {
+                        "from": "mandiri",
+                        "to": "bca",
+                        "value": 5
+                    },
+                    {
+                        "from": "mandiri",
+                        "to": "bri",
+                        "value": 5
+                    },
+                    {
+                        "from": "kartu",
+                        "to": "saldo",
+                        "value": 3
+                    },
+                    {
+                        "from": "kartu",
+                        "to": "bpjs",
+                        "value": 7
+                    },
+                    {
+                        "from": "kartu",
+                        "to": "bansos",
+                        "value": 3
+                    },
+                    {
+                        "from": "bri",
+                        "to": "bca",
+                        "value": 7
+                    },
+                    {
+                        "from": "bpjs",
+                        "to": "bumn",
+                        "value": 2
+                    },
+                    {
+                        "from": "bpjs",
+                        "to": "bansos",
+                        "value": 4
+                    },
+                    {
+                        "from": "bpjs",
+                        "to": "rekrutmen",
+                        "value": 3
+                    },
+                    {
+                        "from": "rekrutmen",
+                        "to": "bumn",
+                        "value": 7
+                    },
+                    {
+                        "from": "rekrutmen",
+                        "to": "pln",
+                        "value": 2
+                    }
+                ],
+                "stats": {
+                    "total_documents": 939,
+                    "documents_with_entities": 578,
+                    "unique_entities": 37,
+                    "total_edges": 251,
+                    "network_density": 0.3768768768768769,
+                    "num_communities": 6
+                }
+            },
+            "others": {
+                "nodes": [
+                    {
+                        "id": "tsunami",
+                        "label": "tsunami",
+                        "count": 32,
+                        "betweenness": 0.0006613756613756613,
+                        "degree": 0.14285714285714285,
+                        "community": 2,
+                        "color": "#2ecc71"
+                    },
+                    {
+                        "id": "gempa",
+                        "label": "gempa",
+                        "count": 97,
+                        "betweenness": 0.004409171075837742,
+                        "degree": 0.21428571428571427,
+                        "community": 2,
+                        "color": "#2ecc71"
+                    },
+                    {
+                        "id": "rusia",
+                        "label": "rusia",
+                        "count": 16,
+                        "betweenness": 0.007848324514991182,
+                        "degree": 0.17857142857142855,
+                        "community": 0,
+                        "color": "#e74c3c"
+                    },
+                    {
+                        "id": "longsor",
+                        "label": "longsor",
+                        "count": 10,
+                        "betweenness": 0.0,
+                        "degree": 0.10714285714285714,
+                        "community": 2,
+                        "color": "#2ecc71"
+                    },
+                    {
+                        "id": "banjir",
+                        "label": "banjir",
+                        "count": 50,
+                        "betweenness": 0.0024250440917107582,
+                        "degree": 0.17857142857142855,
+                        "community": 2,
+                        "color": "#2ecc71"
+                    },
+                    {
+                        "id": "bmkg",
+                        "label": "bmkg",
+                        "count": 13,
+                        "betweenness": 0.0006613756613756613,
+                        "degree": 0.14285714285714285,
+                        "community": 2,
+                        "color": "#2ecc71"
+                    },
+                    {
+                        "id": "vaksin",
+                        "label": "vaksin",
+                        "count": 56,
+                        "betweenness": 0.009166017697763729,
+                        "degree": 0.3571428571428571,
+                        "community": 1,
+                        "color": "#3498db"
+                    },
+                    {
+                        "id": "ukraina",
+                        "label": "ukraina",
+                        "count": 9,
+                        "betweenness": 0.0,
+                        "degree": 0.10714285714285714,
+                        "community": 0,
+                        "color": "#e74c3c"
+                    },
+                    {
+                        "id": "perang",
+                        "label": "perang",
+                        "count": 14,
+                        "betweenness": 0.026041785962420873,
+                        "degree": 0.2857142857142857,
+                        "community": 0,
+                        "color": "#e74c3c"
+                    },
+                    {
+                        "id": "amerika",
+                        "label": "amerika",
+                        "count": 47,
+                        "betweenness": 0.10352218328408803,
+                        "degree": 0.5,
+                        "community": 0,
+                        "color": "#e74c3c"
+                    },
+                    {
+                        "id": "israel",
+                        "label": "israel",
+                        "count": 64,
+                        "betweenness": 0.0512749375844614,
+                        "degree": 0.3571428571428571,
+                        "community": 0,
+                        "color": "#e74c3c"
+                    },
+                    {
+                        "id": "hamas",
+                        "label": "hamas",
+                        "count": 9,
+                        "betweenness": 0.00170087114531559,
+                        "degree": 0.17857142857142855,
+                        "community": 0,
+                        "color": "#e74c3c"
+                    },
+                    {
+                        "id": "rumah sakit",
+                        "label": "rumah sakit",
+                        "count": 25,
+                        "betweenness": 0.04259593287371064,
+                        "degree": 0.2857142857142857,
+                        "community": 0,
+                        "color": "#e74c3c"
+                    },
+                    {
+                        "id": "palestina",
+                        "label": "palestina",
+                        "count": 38,
+                        "betweenness": 0.00170087114531559,
+                        "degree": 0.17857142857142855,
+                        "community": 0,
+                        "color": "#e74c3c"
+                    },
+                    {
+                        "id": "gaza",
+                        "label": "gaza",
+                        "count": 20,
+                        "betweenness": 0.005943028165250387,
+                        "degree": 0.17857142857142855,
+                        "community": 0,
+                        "color": "#e74c3c"
+                    },
+                    {
+                        "id": "virus",
+                        "label": "virus",
+                        "count": 32,
+                        "betweenness": 0.008356715301159744,
+                        "degree": 0.3571428571428571,
+                        "community": 1,
+                        "color": "#3498db"
+                    },
+                    {
+                        "id": "obat",
+                        "label": "obat",
+                        "count": 41,
+                        "betweenness": 0.005637726471059803,
+                        "degree": 0.3214285714285714,
+                        "community": 1,
+                        "color": "#3498db"
+                    },
+                    {
+                        "id": "covid",
+                        "label": "covid",
+                        "count": 47,
+                        "betweenness": 0.009166017697763729,
+                        "degree": 0.3571428571428571,
+                        "community": 1,
+                        "color": "#3498db"
+                    },
+                    {
+                        "id": "bencana",
+                        "label": "bencana",
+                        "count": 90,
+                        "betweenness": 0.013668430335097,
+                        "degree": 0.25,
+                        "community": 2,
+                        "color": "#2ecc71"
+                    },
+                    {
+                        "id": "pandemi",
+                        "label": "pandemi",
+                        "count": 17,
+                        "betweenness": 0.0009700176366843033,
+                        "degree": 0.25,
+                        "community": 1,
+                        "color": "#3498db"
+                    },
+                    {
+                        "id": "as",
+                        "label": "as",
+                        "count": 18,
+                        "betweenness": 0.0640673553371966,
+                        "degree": 0.3571428571428571,
+                        "community": 0,
+                        "color": "#e74c3c"
+                    },
+                    {
+                        "id": "kemenkes",
+                        "label": "kemenkes",
+                        "count": 9,
+                        "betweenness": 0.0,
+                        "degree": 0.25,
+                        "community": 1,
+                        "color": "#3498db"
+                    },
+                    {
+                        "id": "kesehatan",
+                        "label": "kesehatan",
+                        "count": 72,
+                        "betweenness": 0.014791051100574909,
+                        "degree": 0.39285714285714285,
+                        "community": 1,
+                        "color": "#3498db"
+                    },
+                    {
+                        "id": "who",
+                        "label": "who",
+                        "count": 29,
+                        "betweenness": 0.004253800285546317,
+                        "degree": 0.3214285714285714,
+                        "community": 1,
+                        "color": "#3498db"
+                    },
+                    {
+                        "id": "gunung",
+                        "label": "gunung",
+                        "count": 28,
+                        "betweenness": 0.004629629629629629,
+                        "degree": 0.17857142857142855,
+                        "community": 2,
+                        "color": "#2ecc71"
+                    },
+                    {
+                        "id": "erupsi",
+                        "label": "erupsi",
+                        "count": 9,
+                        "betweenness": 0.0,
+                        "degree": 0.07142857142857142,
+                        "community": 2,
+                        "color": "#2ecc71"
+                    },
+                    {
+                        "id": "ivermectin",
+                        "label": "ivermectin",
+                        "count": 2,
+                        "betweenness": 0.0,
+                        "degree": 0.0,
+                        "community": 3,
+                        "color": "#f39c12"
+                    },
+                    {
+                        "id": "china",
+                        "label": "china",
+                        "count": 31,
+                        "betweenness": 0.0012125220458553791,
+                        "degree": 0.14285714285714285,
+                        "community": 0,
+                        "color": "#e74c3c"
+                    },
+                    {
+                        "id": "rs",
+                        "label": "rs",
+                        "count": 18,
+                        "betweenness": 0.0015392015392015391,
+                        "degree": 0.21428571428571427,
+                        "community": 1,
+                        "color": "#3498db"
+                    }
+                ],
+                "edges": [
+                    {
+                        "from": "tsunami",
+                        "to": "gempa",
+                        "value": 5
+                    },
+                    {
+                        "from": "tsunami",
+                        "to": "banjir",
+                        "value": 7
+                    },
+                    {
+                        "from": "tsunami",
+                        "to": "bencana",
+                        "value": 10
+                    },
+                    {
+                        "from": "tsunami",
+                        "to": "bmkg",
+                        "value": 3
+                    },
+                    {
+                        "from": "gempa",
+                        "to": "longsor",
+                        "value": 3
+                    },
+                    {
+                        "from": "gempa",
+                        "to": "banjir",
+                        "value": 4
+                    },
+                    {
+                        "from": "gempa",
+                        "to": "bencana",
+                        "value": 14
+                    },
+                    {
+                        "from": "gempa",
+                        "to": "bmkg",
+                        "value": 2
+                    },
+                    {
+                        "from": "gempa",
+                        "to": "gunung",
+                        "value": 3
+                    },
+                    {
+                        "from": "rusia",
+                        "to": "perang",
+                        "value": 2
+                    },
+                    {
+                        "from": "rusia",
+                        "to": "ukraina",
+                        "value": 5
+                    },
+                    {
+                        "from": "rusia",
+                        "to": "amerika",
+                        "value": 4
+                    },
+                    {
+                        "from": "rusia",
+                        "to": "israel",
+                        "value": 2
+                    },
+                    {
+                        "from": "rusia",
+                        "to": "china",
+                        "value": 2
+                    },
+                    {
+                        "from": "longsor",
+                        "to": "banjir",
+                        "value": 4
+                    },
+                    {
+                        "from": "longsor",
+                        "to": "bencana",
+                        "value": 3
+                    },
+                    {
+                        "from": "banjir",
+                        "to": "bencana",
+                        "value": 12
+                    },
+                    {
+                        "from": "banjir",
+                        "to": "gunung",
+                        "value": 2
+                    },
+                    {
+                        "from": "bmkg",
+                        "to": "bencana",
+                        "value": 5
+                    },
+                    {
+                        "from": "bmkg",
+                        "to": "gunung",
+                        "value": 3
+                    },
+                    {
+                        "from": "vaksin",
+                        "to": "covid",
+                        "value": 34
+                    },
+                    {
+                        "from": "vaksin",
+                        "to": "as",
+                        "value": 2
+                    },
+                    {
+                        "from": "vaksin",
+                        "to": "pandemi",
+                        "value": 9
+                    },
+                    {
+                        "from": "vaksin",
+                        "to": "kemenkes",
+                        "value": 6
+                    },
+                    {
+                        "from": "vaksin",
+                        "to": "obat",
+                        "value": 7
+                    },
+                    {
+                        "from": "vaksin",
+                        "to": "who",
+                        "value": 15
+                    },
+                    {
+                        "from": "vaksin",
+                        "to": "kesehatan",
+                        "value": 19
+                    },
+                    {
+                        "from": "vaksin",
+                        "to": "virus",
+                        "value": 13
+                    },
+                    {
+                        "from": "vaksin",
+                        "to": "amerika",
+                        "value": 5
+                    },
+                    {
+                        "from": "vaksin",
+                        "to": "rs",
+                        "value": 2
+                    },
+                    {
+                        "from": "ukraina",
+                        "to": "perang",
+                        "value": 3
+                    },
+                    {
+                        "from": "ukraina",
+                        "to": "israel",
+                        "value": 2
+                    },
+                    {
+                        "from": "perang",
+                        "to": "amerika",
+                        "value": 4
+                    },
+                    {
+                        "from": "perang",
+                        "to": "gaza",
+                        "value": 3
+                    },
+                    {
+                        "from": "perang",
+                        "to": "as",
+                        "value": 3
+                    },
+                    {
+                        "from": "perang",
+                        "to": "palestina",
+                        "value": 5
+                    },
+                    {
+                        "from": "perang",
+                        "to": "israel",
+                        "value": 5
+                    },
+                    {
+                        "from": "perang",
+                        "to": "hamas",
+                        "value": 2
+                    },
+                    {
+                        "from": "amerika",
+                        "to": "obat",
+                        "value": 4
+                    },
+                    {
+                        "from": "amerika",
+                        "to": "as",
+                        "value": 5
+                    },
+                    {
+                        "from": "amerika",
+                        "to": "rumah sakit",
+                        "value": 3
+                    },
+                    {
+                        "from": "amerika",
+                        "to": "israel",
+                        "value": 3
+                    },
+                    {
+                        "from": "amerika",
+                        "to": "covid",
+                        "value": 6
+                    },
+                    {
+                        "from": "amerika",
+                        "to": "who",
+                        "value": 4
+                    },
+                    {
+                        "from": "amerika",
+                        "to": "china",
+                        "value": 2
+                    },
+                    {
+                        "from": "amerika",
+                        "to": "virus",
+                        "value": 6
+                    },
+                    {
+                        "from": "amerika",
+                        "to": "kesehatan",
+                        "value": 7
+                    },
+                    {
+                        "from": "amerika",
+                        "to": "kemenkes",
+                        "value": 2
+                    },
+                    {
+                        "from": "amerika",
+                        "to": "pandemi",
+                        "value": 4
+                    },
+                    {
+                        "from": "israel",
+                        "to": "hamas",
+                        "value": 7
+                    },
+                    {
+                        "from": "israel",
+                        "to": "gaza",
+                        "value": 10
+                    },
+                    {
+                        "from": "israel",
+                        "to": "palestina",
+                        "value": 19
+                    },
+                    {
+                        "from": "israel",
+                        "to": "rumah sakit",
+                        "value": 2
+                    },
+                    {
+                        "from": "israel",
+                        "to": "as",
+                        "value": 4
+                    },
+                    {
+                        "from": "israel",
+                        "to": "china",
+                        "value": 2
+                    },
+                    {
+                        "from": "hamas",
+                        "to": "as",
+                        "value": 2
+                    },
+                    {
+                        "from": "hamas",
+                        "to": "palestina",
+                        "value": 4
+                    },
+                    {
+                        "from": "hamas",
+                        "to": "gaza",
+                        "value": 2
+                    },
+                    {
+                        "from": "rumah sakit",
+                        "to": "gaza",
+                        "value": 2
+                    },
+                    {
+                        "from": "rumah sakit",
+                        "to": "kesehatan",
+                        "value": 6
+                    },
+                    {
+                        "from": "rumah sakit",
+                        "to": "china",
+                        "value": 2
+                    },
+                    {
+                        "from": "rumah sakit",
+                        "to": "rs",
+                        "value": 3
+                    },
+                    {
+                        "from": "rumah sakit",
+                        "to": "obat",
+                        "value": 2
+                    },
+                    {
+                        "from": "rumah sakit",
+                        "to": "virus",
+                        "value": 2
+                    },
+                    {
+                        "from": "palestina",
+                        "to": "gaza",
+                        "value": 8
+                    },
+                    {
+                        "from": "palestina",
+                        "to": "as",
+                        "value": 2
+                    },
+                    {
+                        "from": "virus",
+                        "to": "obat",
+                        "value": 5
+                    },
+                    {
+                        "from": "virus",
+                        "to": "kesehatan",
+                        "value": 18
+                    },
+                    {
+                        "from": "virus",
+                        "to": "kemenkes",
+                        "value": 2
+                    },
+                    {
+                        "from": "virus",
+                        "to": "pandemi",
+                        "value": 7
+                    },
+                    {
+                        "from": "virus",
+                        "to": "covid",
+                        "value": 14
+                    },
+                    {
+                        "from": "virus",
+                        "to": "who",
+                        "value": 11
+                    },
+                    {
+                        "from": "virus",
+                        "to": "rs",
+                        "value": 3
+                    },
+                    {
+                        "from": "obat",
+                        "to": "who",
+                        "value": 5
+                    },
+                    {
+                        "from": "obat",
+                        "to": "kesehatan",
+                        "value": 15
+                    },
+                    {
+                        "from": "obat",
+                        "to": "covid",
+                        "value": 4
+                    },
+                    {
+                        "from": "obat",
+                        "to": "rs",
+                        "value": 2
+                    },
+                    {
+                        "from": "obat",
+                        "to": "kemenkes",
+                        "value": 2
+                    },
+                    {
+                        "from": "covid",
+                        "to": "as",
+                        "value": 2
+                    },
+                    {
+                        "from": "covid",
+                        "to": "pandemi",
+                        "value": 11
+                    },
+                    {
+                        "from": "covid",
+                        "to": "kesehatan",
+                        "value": 13
+                    },
+                    {
+                        "from": "covid",
+                        "to": "who",
+                        "value": 13
+                    },
+                    {
+                        "from": "covid",
+                        "to": "kemenkes",
+                        "value": 3
+                    },
+                    {
+                        "from": "covid",
+                        "to": "rs",
+                        "value": 3
+                    },
+                    {
+                        "from": "bencana",
+                        "to": "gunung",
+                        "value": 12
+                    },
+                    {
+                        "from": "bencana",
+                        "to": "erupsi",
+                        "value": 3
+                    },
+                    {
+                        "from": "pandemi",
+                        "to": "as",
+                        "value": 2
+                    },
+                    {
+                        "from": "pandemi",
+                        "to": "kesehatan",
+                        "value": 10
+                    },
+                    {
+                        "from": "pandemi",
+                        "to": "who",
+                        "value": 11
+                    },
+                    {
+                        "from": "as",
+                        "to": "who",
+                        "value": 2
+                    },
+                    {
+                        "from": "as",
+                        "to": "kesehatan",
+                        "value": 2
+                    },
+                    {
+                        "from": "kemenkes",
+                        "to": "kesehatan",
+                        "value": 6
+                    },
+                    {
+                        "from": "kemenkes",
+                        "to": "who",
+                        "value": 2
+                    },
+                    {
+                        "from": "kesehatan",
+                        "to": "who",
+                        "value": 17
+                    },
+                    {
+                        "from": "kesehatan",
+                        "to": "rs",
+                        "value": 5
+                    },
+                    {
+                        "from": "gunung",
+                        "to": "erupsi",
+                        "value": 7
+                    }
+                ],
+                "stats": {
+                    "total_documents": 1449,
+                    "documents_with_entities": 590,
+                    "unique_entities": 29,
+                    "total_edges": 96,
+                    "network_density": 0.23645320197044334,
+                    "num_communities": 4
+                }
+            }
+        };
+        const readmeContent = { "overview": "# Text Network Analysis Summary\n\n## Overview\nThis analysis examined **hoax documents from 2024** across three categories to identify key entities, relationships, and narrative structures through co-occurrence network analysis:\n- **Politics**: 1,358 documents\n- **Scam**: 939 documents\n- **Others**: 1,449 documents\n\n---", "politics": "# Politics Network Analysis\n\n\n## Network Statistics\n- **Total Documents Analyzed**: 1,358\n- **Unique Entities**: 38\n- **Total Connections (Edges)**: 227\n- **Network Density**: 0.323 (highly connected)\n- **Communities Detected**: 5\n- **Average Clustering**: 0.722 (strong local clustering)\n\n### Top 10 Bridge Words (Betweenness Centrality)\n\nThese entities act as \"bridges\" connecting different hoax narratives:\n\n| Rank | Entity | Betweenness | Mentions | Role |\n|------|--------|-------------|----------|------|\n| 1 | **Anies** | 0.148 | 162 | Primary bridge between opposition narratives |\n| 2 | **Prabowo** | 0.141 | 258 | Most mentioned, bridges election and government themes |\n| 3 | **Pemilu** (Election) | 0.115 | 90 | Central theme connecting all narratives |\n| 4 | **Ganjar** | 0.060 | 58 | Bridges PDIP and opposition narratives |\n| 5 | **Jokowi** | 0.057 | 267 | Second most mentioned, connects government narratives |\n| 6 | **Partai** (Party) | 0.036 | 52 | Bridges political party discussions |\n| 7 | **Gibran** | 0.034 | 150 | Connects dynastic politics and nepotism themes |\n| 8 | **KPU** | 0.027 | 70 | Bridges election fraud allegations |\n| 9 | **Pilpres** (Presidential Election) | 0.019 | 52 | Electoral process narratives |\n| 10 | **Golkar** | 0.011 | 10 | Coalition building narratives |\n\n### Most Mentioned Entities\n\n| Entity | Count | Context |\n|--------|-------|---------|\n| Jokowi | 267 | President, government policies, influence |\n| Prabowo | 258 | Presidential candidate, military background |\n| Anies | 162 | Presidential candidate, opposition figure |\n| Gibran | 150 | Vice presidential candidate, nepotism allegations |\n| Pemilu | 90 | Election process, fraud allegations |\n\n## Community Structure\n\nThe network reveals **5 distinct narrative communities**:\n\n### **Community 0: Government & Institutional Politics** (12 entities)\nCore entities: `Jokowi`, `Capres`, `PDIP`, `MK`, `Partai`, `Koalisi`\n\n**Narrative Focus**: Government influence, institutional manipulation, coalition politics, constitutional court decisions\n\n### **Community 1: Electoral Process & Debate** (11 entities)\nCore entities: `Gibran`, `Pemilu`, `Cawapres`, `Debat`, `TPS`, `Surat Suara`, `Sirekap`\n\n**Narrative Focus**: Election mechanics, debate controversies, vote counting, electoral fraud allegations\n\n### **Community 2: Election Fraud & Oversight** (7 entities)\nCore entities: `Prabowo`, `KPU`, `Bawaslu`, `Kecurangan`, `Curang`\n\n**Narrative Focus**: Electoral fraud allegations, oversight body failures, cheating claims\n\n### **Community 3: Opposition Candidates** (7 entities)\nCore entities: `Anies`, `Ganjar`, `Demokrat`, `SBY`, `Quick Count`\n\n**Narrative Focus**: Opposition candidates, coalition shifts, polling data\n\n### **Community 4: Media Critics** (1 entity)\nCore entity: `Roy Suryo`\n\n**Narrative Focus**: Media criticism, technical analysis controversies\n\n## Key Insights\n\n### 1. **Central Figures in Hoax Narratives**\n- **Prabowo** and **Jokowi** are the most mentioned (258 and 267 respectively)\n- **Anies** has the highest betweenness centrality (0.148), making him the primary \"bridge\" between different hoax themes\n\n### 2. **Narrative Bridges**\nThe analysis identifies terms that connect disparate hoax themes:\n- **\"Pemilu\"** bridges election fraud and candidate attack narratives\n- **\"Anies\"** connects opposition politics with electoral fraud claims\n- **\"Gibran\"** links nepotism allegations with government influence narratives\n\n### 3. **Distinct Narrative Communities**\n- Government influence narratives (Jokowi, institutions)\n- Electoral process controversies (debates, vote counting)\n- Fraud allegations (KPU, Bawaslu failures)\n- Opposition candidate attacks\n- Media criticism\n\n### 4. **Network Density**\n- Very high network density (0.323) indicates highly interconnected narratives\n- Average clustering of 0.722 shows strong local clustering within communities\n- Suggests coordinated messaging patterns across political hoax themes\n\n## Research Questions Answered\n\n### Q1: What are the most central entities?\n**Answer**: Jokowi (267 mentions) and Prabowo (258) are most frequently mentioned, but **Anies** (betweenness: 0.148) serves as the primary structural bridge.\n\n### Q2: Which terms act as \"bridges\"?\n**Answer**: \n- **Anies**: Bridges opposition and fraud narratives\n- **Prabowo**: Connects election and government themes\n- **Pemilu**: Central hub for all electoral narratives\n\n### Q3: Are there distinct narrative communities?\n**Answer**: Yes, 5 communities detected:\n1. Government influence\n2. Electoral process\n3. Fraud allegations\n4. Opposition candidates\n5. Media criticism\n\n### Q4: What bigrams reveal coordinated patterns?\n**Answer**: Key political bigrams identified:\n- \"Surat Suara\" (ballot papers)\n- \"Cak Imin\" (VP candidate)\n- \"Quick Count\" (polling)\n- \"Hak Angket\" (parliamentary inquiry)\n- \"Mahkamah Konstitusi\" (Constitutional Court)\n\n## Implications\n\n1. **Hoax narratives are highly interconnected**, suggesting coordinated messaging\n2. **Anies serves as the focal point** for opposition-related hoaxes despite not being the most mentioned\n3. **Electoral fraud allegations** form a distinct but connected narrative cluster\n4. **Gibran's inclusion** created a new sub-theme around dynastic politics and nepotism\n\n---\n", "scam": "# Scam Network Analysis\n\n\n## Network Statistics\n- **Total Documents Analyzed**: 939\n- **Documents with Entities**: 578\n- **Unique Entities**: 37\n- **Total Connections (Edges)**: 251 (highest among all categories)\n- **Network Density**: 0.378 (very highly connected)\n- **Communities Detected**: 6\n- **Average Clustering**: 0.784\n\n## Top 10 Bridge Words (Betweenness Centrality)\n\n| Rank | Entity | Betweenness | Mentions | Role |\n|------|--------|-------------|----------|------|\n| 1 | **Penipuan** (Scam) | 0.110 | 109 | Primary bridge connecting all scam types |\n| 2 | **Facebook** | 0.069 | 134 | Most mentioned, bridges social media scams |\n| 3 | **Lowongan** (Job Vacancy) | 0.065 | 71 | Bridges employment scams |\n| 4 | **Gratis** (Free) | 0.061 | 86 | Connects giveaway and promotion scams |\n| 5 | **Modus** (Method) | 0.039 | 84 | Bridges scam methodologies |\n| 6 | **WhatsApp** | 0.028 | 147 | Most mentioned platform, connects messaging scams |\n| 7 | **Instagram** | 0.026 | 78 | Bridges visual platform scams |\n| 8 | **TikTok** | 0.019 | 68 | Connects video platform scams |\n| 9 | **Hadiah** (Prize) | 0.015 | 115 | Bridges prize/lottery scams |\n| 10 | **Rekrutmen** (Recruitment) | 0.015 | 28 | Connects fake recruitment scams |\n\n## Most Mentioned Entities\n\n| Entity | Count | Context |\n|--------|-------|---------|\n| WhatsApp | 147 | Messaging platform for scams |\n| Facebook | 134 | Social media scam distribution |\n| Hadiah (Prize) | 115 | Lottery/prize scams |\n| Penipuan (Scam) | 109 | General scam term |\n| Bank | 108 | Banking-related scams |\n\n## Community Structure (6 Communities)\n\n### **Community 0: Banking & Financial Scams** (11 entities)\nCore entities: `Facebook`, `Hadiah`, `Bank`, `Rekening`, `BNI`, `BRI`, `Mandiri`, `Undian`, `Transfer`\n\n**Narrative Focus**: Bank account scams, fake lotteries, fund transfers, prize giveaways through social media\n\n### **Community 1: Employment & Promotion Scams** (13 entities)\nCore entities: `Lowongan`, `Gratis`, `Modus`, `WhatsApp`, `TikTok`, `Rekrutmen`, `BPJS`, `Loker`, `BUMN`, `Pulsa`, `PLN`\n\n**Narrative Focus**: Fake job vacancies, recruitment scams, free promotions, utility company impersonation\n\n### **Community 2: Social Media Impersonation** (6 entities)\nCore entities: `Penipuan`, `Instagram`, `Dana`, `Akun Palsu`, `Bansos`, `Penipu`\n\n**Narrative Focus**: Fake accounts, social assistance scams, e-wallet fraud\n\n### **Community 3-5: Isolated Scam Types**\n- GoPay scams (1 entity)\n- OVO scams (1 entity)\n- BLT (cash assistance) scams (1 entity)\n\n## Key Insights - Scam Network\n\n### 1. **Platform Centrality**\n- **WhatsApp** (147) and **Facebook** (134) dominate as scam distribution channels\n- Social media platforms form interconnected network of scam distribution\n- **Penipuan** acts as central hub connecting all scam categories\n\n### 2. **Scam Themes**\n- **Banking scams**: Focus on fake accounts, lottery, and fund transfers\n- **Employment scams**: Fake job vacancies in government agencies (BUMN, PLN, Pertamina)\n- **Social assistance scams**: Impersonation for BPJS, Bansos, BLT\n\n### 3. **Network Characteristics**\n- **Highest edge count** (251) shows complex interconnections between scam types\n- Very high density (0.378) indicates scams often combine multiple themes\n- 6 communities show diverse but connected scam methodologies\n\n### 4. **Scam Evolution**\n- Traditional banking scams (BRI, BNI, Mandiri) still prevalent\n- E-wallet scams emerging (Dana, GoPay, OVO) but less connected\n- Job recruitment scams heavily target government agencies\n\n---\n", "others": "# Others Network Analysis\n\n\n## Network Statistics\n- **Total Documents Analyzed**: 1,449\n- **Documents with Entities**: 590\n- **Unique Entities**: 29\n- **Total Connections (Edges)**: 96\n- **Network Density**: 0.237 (moderate connectivity)\n- **Communities Detected**: 4\n- **Average Clustering**: 0.618\n\n## Top 10 Bridge Words (Betweenness Centrality)\n\n| Rank | Entity | Betweenness | Mentions | Role |\n|------|--------|-------------|----------|------|\n| 1 | **Amerika** (America) | 0.104 | 47 | Primary bridge in international news |\n| 2 | **AS** (USA) | 0.064 | 18 | Connects geopolitical narratives |\n| 3 | **Israel** | 0.051 | 64 | Bridges Middle East conflict narratives |\n| 4 | **Rumah Sakit** (Hospital) | 0.043 | 25 | Connects health and disaster narratives |\n| 5 | **Perang** (War) | 0.026 | 14 | Bridges conflict narratives |\n| 6 | **Kesehatan** (Health) | 0.015 | 72 | Most mentioned, connects health topics |\n| 7 | **Bencana** (Disaster) | 0.014 | 90 | Most mentioned overall, disaster narratives |\n| 8 | **Vaksin** (Vaccine) | 0.009 | 56 | Bridges COVID-related narratives |\n| 9 | **COVID** | 0.009 | 47 | Pandemic-related hoaxes |\n| 10 | **Virus** | 0.008 | 32 | Disease narratives |\n\n## Most Mentioned Entities\n\n| Entity | Count | Context |\n|--------|-------|---------|\n| Gempa (Earthquake) | 97 | Natural disaster hoaxes |\n| Bencana (Disaster) | 90 | General disaster narratives |\n| Kesehatan (Health) | 72 | Health misinformation |\n| Israel | 64 | Middle East conflict |\n| Vaksin (Vaccine) | 56 | Vaccination misinformation |\n\n## Community Structure (4 Communities)\n\n### **Community 0: International Conflicts & Geopolitics** (11 entities)\nCore entities: `Amerika`, `AS`, `Israel`, `Rumah Sakit`, `Perang`, `Rusia`, `Gaza`, `Hamas`, `Palestina`, `China`, `Ukraina`\n\n**Narrative Focus**: Middle East conflict (Israel-Palestine), Russia-Ukraine war, US-China relations, war crimes, hospital attacks\n\n### **Community 1: Health & Pandemic** (9 entities)\nCore entities: `Kesehatan`, `Vaksin`, `COVID`, `Virus`, `WHO`, `Obat`, `RS`, `Pandemi`, `Kemenkes`\n\n**Narrative Focus**: COVID-19 misinformation, vaccine hesitancy, alternative medicine, WHO conspiracy theories\n\n### **Community 2: Natural Disasters** (8 entities)\nCore entities: `Bencana`, `Gunung`, `Gempa`, `Banjir`, `BMKG`, `Tsunami`, `Longsor`, `Erupsi`\n\n**Narrative Focus**: Earthquake predictions, tsunami warnings, volcanic eruptions, flooding, landslides\n\n### **Community 3: Isolated Health Topics**\nCore entity: `Ivermectin`\n\n**Narrative Focus**: COVID alternative treatment misinformation\n\n## Key Insights - Others Network\n\n### 1. **Dual Focus: International & Domestic**\n- **International**: Israel-Palestine conflict dominates geopolitical hoaxes\n- **Domestic**: Natural disasters (earthquakes, floods) most frequently mentioned\n- **Amerika** serves as bridge between international narratives\n\n### 2. **Health Misinformation**\n- COVID-19 and vaccine skepticism remain prevalent\n- WHO conspiracy theories connect to broader health misinformation\n- Ivermectin narratives isolated from main health cluster\n\n### 3. **Network Characteristics**\n- **Lower density** (0.237) compared to politics and scam\n- Reflects more diverse, less coordinated hoax themes\n- 4 communities show distinct topic separation\n\n### 4. **Disaster Hoaxes**\n- Natural disaster predictions most common (gempa: 97 mentions)\n- BMKG frequently mentioned in false disaster warnings\n- Disaster hoaxes often combine multiple natural events\n", "comparison": "# Cross-Category Comparison\n\n## Cross-Category Comparison\n\n| Metric | Politics | Scam | Others |\n|--------|----------|------|--------|\n| Documents | 1,358 | 939 | 1,449 |\n| Entities | 38 | 37 | 29 |\n| Edges | 227 | 251 | 96 |\n| Density | 0.323 | 0.378 | 0.237 |\n| Communities | 5 | 6 | 4 |\n| Theme | Elections, candidates | Financial fraud | Health, disasters, conflicts |\n| Coordination | High | Very High | Moderate |\n\n**Key Observation**: Scam networks show highest interconnectedness, suggesting scammers use multiple platforms and methods simultaneously. Politics shows coordinated messaging. Others category is more fragmented with distinct topic clusters.\n", "methodology": "# Methodology\n\n\n- **Data Source**: 1,358 political hoax articles from 2024\n- **Entity Extraction**: Predefined political entities matched in NARASI text\n- **Network Construction**: Co-occurrence within same document\n- **Minimum Co-occurrence**: 2 (edge threshold)\n- **Centrality Metrics**: Degree, Betweenness, Eigenvector, PageRank\n- **Community Detection**: Greedy Modularity algorithm\n\n## Next Steps for Analysis\n\n1. \u2705 Temporal analysis of entity mentions over time\n2. \u2705 Bigram analysis for key political phrases\n3. \u2b1c Sentiment analysis correlation with centrality\n4. \u2b1c Cross-reference with topic modeling results\n5. \u2b1c Investigate narrative evolution across communities" };
+
+        let networks = {};
+        let currentCategory = 'politics';
+        let networksFitted = {}; // Track which networks have been fitted to screen
+
+        const communityColors = {
+            0: '#e74c3c', 1: '#3498db', 2: '#2ecc71',
+            3: '#f39c12', 4: '#9b59b6', 5: '#1abc9c',
+            6: '#e67e22', 7: '#34495e'
+        };
+
+        const communityLabels = {
+            'politics': {
+                0: 'Government & Institutional',
+                1: 'Electoral Process',
+                2: 'Fraud & Oversight',
+                3: 'Opposition Candidates',
+                4: 'Media Critics'
+            },
+            'scam': {
+                0: 'Banking & Finance',
+                1: 'Recruitment & Impersonation',
+                2: 'Social Media Fraud',
+                3: 'Digital Wallets (Gopay)',
+                4: 'Digital Wallets (OVO)',
+                5: 'Social Aid'
+            },
+            'others': {
+                0: 'International Conflict',
+                1: 'Health & Pandemic',
+                2: 'Natural Disasters',
+                3: 'Health Misinformation'
+            }
+        };
+
+        // Render markdown for each section
+        document.addEventListener('DOMContentLoaded', function () {
+            if (typeof marked !== 'undefined') {
+                marked.setOptions({
+                    breaks: true,
+                    gfm: true
+                });
+
+                // Render each category section
+                Object.keys(readmeContent).forEach(key => {
+                    const elementId = 'drawer-' + key;
+                    const element = document.getElementById(elementId);
+                    if (element && readmeContent[key]) {
+                        element.innerHTML = marked.parse(readmeContent[key]);
+                    }
+                });
+            }
+        });
+
+        function initAllNetworks() {
+            const options = {
+                nodes: {
+                    shape: 'dot',
+                    font: { size: 14, face: 'Arial' },
+                    borderWidth: 2
+                },
+                edges: {
+                    smooth: { type: 'continuous' },
+                    color: { color: '#cccccc', highlight: '#667eea' }
+                },
+                physics: {
+                    enabled: true,
+                    forceAtlas2Based: {
+                        gravitationalConstant: -2000,
+                        centralGravity: 0.01,
+                        springLength: 150,
+                        springConstant: 0.05,
+                        damping: 0.4,
+                        avoidOverlap: 0.5
+                    },
+                    solver: 'forceAtlas2Based',
+                    stabilization: {
+                        enabled: true,
+                        iterations: 1500,
+                        updateInterval: 50,
+                        fit: true
+                    }
+                },
+                interaction: {
+                    hover: true,
+                    navigationButtons: true
+                }
+            };
+
+            ['politics', 'scam', 'others'].forEach(category => {
+                const container = document.getElementById('network-' + category);
+                const data = prepareNetworkData(category);
+                networks[category] = new vis.Network(container, data, options);
+                networksFitted[category] = false; // Initially not fitted
+
+                networks[category].once("stabilizationIterationsDone", function () {
+                    networks[category].setOptions({ physics: false });
+                    // Fit only the default visible network (politics)
+                    if (category === 'politics') {
+                        setTimeout(() => {
+                            networks[category].fit({ animation: false });
+                            networksFitted[category] = true;
+                        }, 100);
+                    }
+                    if (category === currentCategory) {
+                        updatePhysicsButton(false);
+                    }
+                });
+
+                // Fallback: ensure fit is called even if stabilization event is missed or delayed
+                if (category === 'politics') {
+                    setTimeout(() => {
+                        if (!networksFitted[category]) {
+                            networks[category].fit({ animation: false });
+                            networksFitted[category] = true;
+                        }
+                    }, 2000);
+                }
+
+                networks[category].on("click", function (params) {
+                    if (params.nodes.length > 0) {
+                        showNodeInfo(params.nodes[0], category);
+                    }
+                });
+            });
+
+            updateStats();
+            createLegend();
+        }
+
+        function prepareNetworkData(category) {
+            const data = networkData[category];
+            const nodes = data.nodes.map(node => ({
+                id: node.id,
+                label: node.label,
+                size: 10 + (node.count * 1.5),
+                color: node.color,
+                title: `${node.label}\nMentions: ${node.count}\nBetweenness: ${node.betweenness.toFixed(3)}`,
+                ...node
+            }));
+
+            const edges = data.edges.map(edge => ({
+                from: edge.from,
+                to: edge.to,
+                width: edge.value
+            }));
+
+            return {
+                nodes: new vis.DataSet(nodes),
+                edges: new vis.DataSet(edges)
+            };
+        }
+
+        function switchMainTab(category) {
+            currentCategory = category;
+
+            // Update main tabs
+            document.querySelectorAll('#main-tabs .tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            document.querySelector(`#main-tabs .tab[data-category="${category}"]`).classList.add('active');
+
+            // Update tab content
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.remove('active');
+            });
+            document.getElementById(category + '-content').classList.add('active');
+
+            // Fit network to screen if not done yet
+            if (!networksFitted[category]) {
+                setTimeout(() => {
+                    networks[category].fit({ animation: false });
+                    networksFitted[category] = true;
+                }, 150);
+            }
+
+            // Sync drawer tabs
+            syncDrawerTab(category);
+
+            updateStats();
+            createLegend();
+            updatePhysicsButton(networks[category].physics.physicsEnabled);
+        }
+
+        function switchDrawerTab(category) {
+            // Update drawer tabs
+            document.querySelectorAll('.drawer-tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            document.querySelector(`.drawer-tab[data-category="${category}"]`).classList.add('active');
+
+            // Update drawer content
+            document.querySelectorAll('.drawer-content').forEach(content => {
+                content.classList.remove('active');
+            });
+            document.getElementById('drawer-' + category).classList.add('active');
+
+            // Sync main tabs if it's a network category
+            if (['politics', 'scam', 'others'].includes(category)) {
+                syncMainTab(category);
+            }
+        }
+
+        function syncDrawerTab(category) {
+            document.querySelectorAll('.drawer-tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            const drawerTab = document.querySelector(`.drawer-tab[data-category="${category}"]`);
+            if (drawerTab) {
+                drawerTab.classList.add('active');
+
+                document.querySelectorAll('.drawer-content').forEach(content => {
+                    content.classList.remove('active');
+                });
+                document.getElementById('drawer-' + category).classList.add('active');
+            }
+        }
+
+        function syncMainTab(category) {
+            currentCategory = category;
+
+            document.querySelectorAll('#main-tabs .tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            document.querySelector(`#main-tabs .tab[data-category="${category}"]`).classList.add('active');
+
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.remove('active');
+            });
+            document.getElementById(category + '-content').classList.add('active');
+
+            updateStats();
+            createLegend();
+            updatePhysicsButton(networks[category].physics.physicsEnabled);
+        }
+
+        function updateNetwork() {
+            const nodeSizing = document.getElementById('nodeSizing').value;
+            const minSize = parseInt(document.getElementById('minNodeSize').value);
+
+            const data = networkData[currentCategory];
+            const nodes = data.nodes.map(node => {
+                let size;
+                if (nodeSizing === 'count') {
+                    size = minSize + (node.count * 1.5);
+                } else if (nodeSizing === 'betweenness') {
+                    size = minSize + (node.betweenness * 200);
+                } else {
+                    size = 20;
+                }
+
+                return {
+                    id: node.id,
+                    label: node.label,
+                    size: Math.max(size, minSize),
+                    color: node.color,
+                    title: `${node.label}\nMentions: ${node.count}\nBetweenness: ${node.betweenness.toFixed(3)}`,
+                    ...node
+                };
+            });
+
+            networks[currentCategory].setData({
+                nodes: new vis.DataSet(nodes),
+                edges: networks[currentCategory].body.data.edges
+            });
+
+            updatePhysics();
+        }
+
+        function updatePhysics() {
+            const solver = document.getElementById('solver').value;
+            const springLength = parseInt(document.getElementById('springLength').value);
+            const gravitationalConstant = parseInt(document.getElementById('gravitationalConstant').value);
+
+            let physicsOptions = { enabled: true, solver: solver };
+
+            if (solver === 'forceAtlas2Based') {
+                physicsOptions.forceAtlas2Based = {
+                    gravitationalConstant: gravitationalConstant,
+                    springLength: springLength,
+                    springConstant: 0.05,
+                    damping: 0.4,
+                    avoidOverlap: 0.5
+                };
+            } else if (solver === 'barnesHut') {
+                physicsOptions.barnesHut = {
+                    gravitationalConstant: gravitationalConstant,
+                    springLength: springLength,
+                    springConstant: 0.05,
+                    damping: 0.09,
+                    avoidOverlap: 0.5
+                };
+            }
+
+            networks[currentCategory].setOptions({ physics: physicsOptions });
+        }
+
+        function togglePhysics() {
+            const enabled = networks[currentCategory].physics.physicsEnabled;
+            networks[currentCategory].setOptions({ physics: !enabled });
+            updatePhysicsButton(!enabled);
+        }
+
+        function updatePhysicsButton(enabled) {
+            const button = document.getElementById('physics-toggle');
+            button.textContent = enabled ? 'Pause Physics' : 'Resume Physics';
+            button.style.background = enabled ? '#667eea' : '#2ecc71';
+        }
+
+        function fitNetwork() {
+            networks[currentCategory].fit({ animation: { duration: 1000 } });
+        }
+
+        function showNodeInfo(nodeId, category) {
+            const node = networkData[category].nodes.find(n => n.id === nodeId);
+            if (!node) return;
+
+            document.getElementById('info-title').textContent = node.label;
+            document.getElementById('info-content').innerHTML = `
+                <div><b>Mentions:</b> ${node.count}</div>
+                <div><b>Betweenness:</b> ${node.betweenness.toFixed(4)}</div>
+                <div><b>Degree:</b> ${node.degree.toFixed(4)}</div>
+                <div><b>Community:</b> ${node.community}</div>
+            `;
+            document.getElementById('info-panel').style.display = 'block';
+        }
+
+        function updateStats() {
+            const stats = networkData[currentCategory].stats;
+            document.getElementById('current-stats').innerHTML = `
+                <div><b>Documents:</b> ${stats.total_documents}</div>
+                <div><b>With Entities:</b> ${stats.documents_with_entities}</div>
+                <div><b>Unique Entities:</b> ${stats.unique_entities}</div>
+                <div><b>Connections:</b> ${stats.total_edges}</div>
+                <div><b>Communities:</b> ${stats.num_communities}</div>
+                <div><b>Density:</b> ${stats.network_density.toFixed(3)}</div>
+            `;
+        }
+
+        function createLegend() {
+            const container = document.getElementById('legend-container');
+            container.innerHTML = '';
+
+            // Get active communities in current network
+            const activeCommunities = new Set();
+            networkData[currentCategory].nodes.forEach(node => activeCommunities.add(node.community));
+
+            Array.from(activeCommunities).sort((a, b) => a - b).forEach(commId => {
+                const color = communityColors[commId] || '#95a5a6';
+                const label = (communityLabels[currentCategory] && communityLabels[currentCategory][commId])
+                    ? communityLabels[currentCategory][commId]
+                    : `Community ${commId}`;
+
+                const item = document.createElement('div');
+                item.className = 'legend-item';
+                item.innerHTML = `
+                    <div class="legend-color" style="background: ${color}"></div>
+                    <span>${label}</span>
+                `;
+                container.appendChild(item);
+            });
+        }
+
+        function toggleInfoDrawer() {
+            const drawer = document.getElementById('info-drawer');
+            drawer.classList.toggle('open');
+        }
+
+        // Range displays
+        document.getElementById('springLength').oninput = function () {
+            document.getElementById('spring-val').textContent = this.value;
+        };
+        document.getElementById('gravitationalConstant').oninput = function () {
+            document.getElementById('repulsion-val').textContent = this.value;
+        };
+        document.getElementById('minNodeSize').oninput = function () {
+            document.getElementById('min-size-val').textContent = this.value;
+        };
+
+        // Initialize
+        initAllNetworks();
+    </script>
+</body>
+
+</html>
