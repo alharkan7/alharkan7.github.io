@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="utf-8">
-    <title>LDA Topic Modeling: 2024 Indonesian Election Misinformation Analysis</title>
+    <title>Indonesian Hoaxes Analysis: LDA Topic Modeling on 2024 TurnBackHoax.id Data</title>
     <link rel="stylesheet" type="text/css"
         href="https://cdn.jsdelivr.net/gh/bmabey/pyLDAvis@3.4.0/pyLDAvis/js/ldavis.v3.0.0.css">
     <style>
@@ -40,7 +40,7 @@
         .cover-content {
             text-align: center;
             color: #2c3e50;
-            max-width: 900px;
+            max-width: 1200px;
         }
 
         .cover-title {
@@ -92,7 +92,7 @@
             font-size: 3.5em;
             font-weight: 700;
             margin-bottom: 8px;
-            color: #667eea;
+            color: #1e40af;
         }
 
         .cover-stat-label {
@@ -130,21 +130,21 @@
         }
 
         .cover-button.primary {
-            background: #667eea;
+            background: #1e40af;
             color: white;
-            box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
+            box-shadow: 0 2px 8px rgba(30, 64, 175, 0.25);
         }
 
         .cover-button.primary:hover {
-            background: #5568d3;
+            background: #1e3a8a;
             transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+            box-shadow: 0 4px 12px rgba(30, 64, 175, 0.35);
         }
 
         .cover-button.secondary {
             background: white;
-            color: #667eea;
-            border: 2px solid #667eea;
+            color: #1e40af;
+            border: 2px solid #1e40af;
         }
 
         .cover-button.secondary:hover {
@@ -190,22 +190,22 @@
 
         section h2 {
             font-size: 2.2em;
-            color: #667eea;
+            color: #1e40af;
             margin-bottom: 25px;
             padding-bottom: 15px;
-            border-bottom: 3px solid #667eea;
+            border-bottom: 3px solid #1e40af;
         }
 
         section h3 {
             font-size: 1.6em;
-            color: #764ba2;
+            color: #374151;
             margin-top: 35px;
             margin-bottom: 15px;
         }
 
         section h4 {
             font-size: 1.3em;
-            color: #667eea;
+            color: #1e40af;
             margin-top: 25px;
             margin-bottom: 12px;
             font-weight: 600;
@@ -226,21 +226,21 @@
         }
 
         .stat-card {
-            background: linear-gradient(135deg, #f6f8fb 0%, #ffffff 100%);
+            background: #f9fafb;
             padding: 25px;
             border-radius: 10px;
-            border-left: 5px solid #667eea;
+            border-left: 5px solid #1e40af;
             transition: transform 0.3s ease, box-shadow 0.3s ease;
         }
 
         .stat-card:hover {
             transform: translateY(-5px);
-            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.2);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
         }
 
         .stat-label {
             font-size: 0.95em;
-            color: #666;
+            color: #6b7280;
             margin-bottom: 8px;
             font-weight: 500;
         }
@@ -248,7 +248,7 @@
         .stat-value {
             font-size: 2.2em;
             font-weight: 700;
-            color: #667eea;
+            color: #1e40af;
         }
 
         /* Alert Boxes */
@@ -286,7 +286,7 @@
         }
 
         table thead {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: #1e40af;
             color: white;
         }
 
@@ -334,7 +334,7 @@
         }
 
         .main-tabs-container::-webkit-scrollbar-thumb {
-            background: #667eea;
+            background: #1e40af;
             border-radius: 2px;
         }
 
@@ -345,7 +345,7 @@
             cursor: pointer;
             font-size: 14px;
             font-weight: 600;
-            color: #666;
+            color: #6b7280;
             border-bottom: 3px solid transparent;
             transition: all 0.3s ease;
             white-space: nowrap;
@@ -353,14 +353,14 @@
         }
 
         .main-tab-button:hover {
-            color: #667eea;
-            background-color: #f8f9fa;
+            color: #1e40af;
+            background-color: #f9fafb;
         }
 
         .main-tab-button.active {
-            color: #667eea;
-            border-bottom-color: #667eea;
-            background-color: #f8f9fa;
+            color: #1e40af;
+            border-bottom-color: #1e40af;
+            background-color: #f9fafb;
         }
 
         .main-tab-content {
@@ -399,21 +399,21 @@
             cursor: pointer;
             font-size: 15px;
             font-weight: 600;
-            color: #666;
+            color: #6b7280;
             border-bottom: 3px solid transparent;
             transition: all 0.3s ease;
             border-radius: 4px 4px 0 0;
         }
 
         .sub-tab-button:hover {
-            background-color: #f8f9fa;
-            color: #333;
+            background-color: #f9fafb;
+            color: #374151;
         }
 
         .sub-tab-button.active {
-            color: #667eea;
-            border-bottom-color: #667eea;
-            background-color: #f8f9fa;
+            color: #1e40af;
+            border-bottom-color: #1e40af;
+            background-color: #f9fafb;
         }
 
         .sub-tab-content {
@@ -492,15 +492,15 @@
 
         /* Highlight boxes */
         .highlight {
-            background: linear-gradient(135deg, #fff3e0 0%, #ffe0b2 100%);
-            border-left: 5px solid #ff9800;
+            background: #fef3c7;
+            border-left: 5px solid #f59e0b;
             padding: 20px;
             margin: 25px 0;
             border-radius: 8px;
         }
 
         .highlight h4 {
-            color: #e65100;
+            color: #b45309;
             margin-bottom: 10px;
             font-size: 1.2em;
         }
@@ -515,7 +515,7 @@
 
         .nav-pill {
             padding: 12px 24px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: #1e40af;
             color: white;
             text-decoration: none;
             border-radius: 25px;
@@ -526,20 +526,27 @@
 
         .nav-pill:hover {
             transform: translateY(-3px);
-            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.3);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
         }
 
         /* Footer */
         .footer {
-            background-color: #2c3e50;
-            color: white;
-            padding: 40px 20px;
+            background-color: #f9fafb;
+            color: #374151;
+            padding: 20px 15px;
             text-align: center;
-            margin-top: 60px;
+            border-top: 1px solid #e5e7eb;
         }
 
         .footer a {
-            color: #667eea;
+            color: #1e40af;
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s ease;
+        }
+
+        .footer a:hover {
+            color: #1e3a8a;
         }
 
         /* Back to Top Button */
@@ -547,7 +554,7 @@
             position: fixed;
             bottom: 30px;
             right: 30px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: #1e40af;
             color: white;
             width: 50px;
             height: 50px;
@@ -558,18 +565,63 @@
             align-items: center;
             justify-content: center;
             font-size: 20px;
-            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
             transition: all 0.3s ease;
             z-index: 99;
         }
 
         .back-to-top:hover {
             transform: translateY(-5px);
-            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
         }
 
         .back-to-top.show {
             display: flex;
+        }
+
+        /* Tab Navigation */
+        .tab-navigation {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 20px;
+            margin: 40px 0 20px 0;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 12px;
+            border: 1px solid #e0e0e0;
+        }
+
+        .nav-button {
+            background: #1e40af;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 14px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+        }
+
+        .nav-button:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        .nav-button:disabled {
+            background: #bdc3c7;
+            cursor: not-allowed;
+            box-shadow: none;
+            transform: none;
+        }
+
+        .nav-indicator {
+            font-weight: 600;
+            color: #2c3e50;
+            font-size: 14px;
+            white-space: nowrap;
         }
 
         /* Responsive */
@@ -636,6 +688,23 @@
                 padding: 10px 16px;
                 font-size: 14px;
             }
+
+            .tab-navigation {
+                flex-direction: column;
+                gap: 15px;
+                padding: 15px;
+                margin: 30px 0 15px 0;
+            }
+
+            .nav-button {
+                padding: 10px 16px;
+                font-size: 13px;
+            }
+
+            .nav-indicator {
+                font-size: 13px;
+                margin: 5px 0;
+            }
         }
 
         /* Topic card */
@@ -643,13 +712,13 @@
             background: white;
             padding: 20px;
             border-radius: 8px;
-            border-left: 4px solid #667eea;
+            border-left: 4px solid #1e40af;
             margin: 15px 0;
             box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
         }
 
         .topic-card h4 {
-            color: #667eea;
+            color: #1e40af;
             margin-bottom: 10px;
         }
 
@@ -686,9 +755,8 @@
                     <h1 class="cover-title">The Dynamics of Hoaxes in Indonesia</h1>
                     <p class="cover-subtitle">Topic Modeling Analysis of TurnBackHoax.id Data in 2024</p>
                     <div class="cover-project-info">
-                        <p><strong>Course:</strong> Digital Research Methods</p>
-                        <p><strong>Instructor:</strong> Dr. Eriyanto</p>
                         <p><strong>By:</strong> Ali Al Harkan (2406480304)</p>
+                        <p><strong>Course:</strong> Digital Research Methods | <strong>Instructor:</strong> Dr. Eriyanto</p>
                     </div>
                     <div class="cover-stats">
                         <div class="cover-stat-item">
@@ -703,11 +771,6 @@
                             <div class="cover-stat-number">3</div>
                             <div class="cover-stat-label">Categories</div>
                         </div>
-                    </div>
-                    <div class="cover-meta">
-                        <p>Data Source: <strong>TurnBackHoax.id</strong></p>
-                        <p>Analysis Period: <strong>2024 Indonesian Presidential Election</strong></p>
-                        <p>Date: <strong>November 2025</strong></p>
                     </div>
                     <div class="cover-actions">
                         <button class="cover-button primary" onclick="switchToTab('summary')">
@@ -734,7 +797,7 @@
                     class="badge badge-others">Others</span>.</p>
 
             <div class="alert alert-success">
-                <strong>✅ Key Achievement:</strong> Successfully identified <strong>22 distinct misinformation narrative
+                <strong>Key Achievement:</strong> Successfully identified <strong>22 distinct misinformation narrative
                     themes</strong> across all categories, providing quantitative evidence of hoax patterns during
                 Indonesia's democratic process.
             </div>
@@ -769,13 +832,24 @@
                 narratives.</p>
 
             <div class="highlight">
-                <h4>🎯 Main Finding</h4>
+                <h4>Main Finding</h4>
                 <p><strong>44% of political hoaxes are candidate-specific character attacks</strong>, with narratives
                     predominantly targeting Anies Baswedan (33%) and promoting the Jokowi-Prabowo-Gibran coalition
                     (11%). This reveals a highly polarized information environment where personal attacks dominate over
                     policy discussions.</p>
             </div>
         </section>
+
+        <!-- Tab Navigation -->
+        <div class="tab-navigation">
+            <button class="nav-button prev-button" onclick="navigateTab('prev')">
+                ← Start
+            </button>
+            <span class="nav-indicator">1 of 10</span>
+            <button class="nav-button next-button" onclick="navigateTab('next')">
+                Methodology →
+            </button>
+        </div>
         </div>
 
         <!-- Tab 2: Methodology -->
@@ -845,12 +919,23 @@
             </ul>
 
             <div class="alert alert-info">
-                <strong>💡 Why different topic numbers?</strong> Political narratives are diverse and creative
+                <strong>Why different topic numbers?</strong> Political narratives are diverse and creative
                 (requiring 10 topics), while scam patterns follow 5 basic templates. The Others category's higher
                 coherence (0.461) suggests these topics follow more stereotypical patterns than creative political
                 attacks.
             </div>
         </section>
+
+        <!-- Tab Navigation -->
+        <div class="tab-navigation">
+            <button class="nav-button prev-button" onclick="navigateTab('prev')">
+                ← Summary
+            </button>
+            <span class="nav-indicator">2 of 10</span>
+            <button class="nav-button next-button" onclick="navigateTab('next')">
+                Model →
+            </button>
+        </div>
         </div>
 
         <!-- Tab 3: Model -->
@@ -896,7 +981,7 @@
             </table>
 
             <div class="alert alert-info">
-                <strong>💡 Why different topic numbers?</strong> Political narratives are diverse and creative
+                <strong>Why different topic numbers?</strong> Political narratives are diverse and creative
                 (requiring 10 topics), while scam patterns follow 5 basic templates. The Others category's higher
                 coherence (0.461) suggests these topics follow more stereotypical patterns than creative political
                 attacks.
@@ -925,6 +1010,17 @@
                     languages</li>
             </ul>
         </section>
+
+        <!-- Tab Navigation -->
+        <div class="tab-navigation">
+            <button class="nav-button prev-button" onclick="navigateTab('prev')">
+                ← Methodology
+            </button>
+            <span class="nav-indicator">3 of 10</span>
+            <button class="nav-button next-button" onclick="navigateTab('next')">
+                Topics →
+            </button>
+        </div>
         </div>
 
         <!-- Tab 4: Topics Overview -->
@@ -935,13 +1031,13 @@
 
             <div class="sub-tabs">
                 <button class="sub-tab-button active" onclick="openSubTab(event, 'politics-topics', 'topics')">
-                    🏛️ Politics (10 Topics)
+                    Politics (10 Topics)
                 </button>
                 <button class="sub-tab-button" onclick="openSubTab(event, 'scam-topics', 'topics')">
-                    ⚠️ Scam (5 Topics)
+                    Scam (5 Topics)
                 </button>
                 <button class="sub-tab-button" onclick="openSubTab(event, 'others-topics', 'topics')">
-                    📰 Others (7 Topics)
+                    Others (7 Topics)
                 </button>
             </div>
 
@@ -1175,6 +1271,17 @@
                 </div>
             </div>
         </section>
+
+        <!-- Tab Navigation -->
+        <div class="tab-navigation">
+            <button class="nav-button prev-button" onclick="navigateTab('prev')">
+                ← Model
+            </button>
+            <span class="nav-indicator">4 of 10</span>
+            <button class="nav-button next-button" onclick="navigateTab('next')">
+                Visualization →
+            </button>
+        </div>
         </div>
 
         <!-- Tab 5: Interactive Exploration -->
@@ -1194,13 +1301,13 @@
 
             <div class="sub-tabs">
                 <button class="sub-tab-button active" onclick="openSubTab(event, 'politics-viz', 'interactive')">
-                    🏛️ Politics (10 Topics)
+                    Politics (10 Topics)
                 </button>
                 <button class="sub-tab-button" onclick="openSubTab(event, 'scam-viz', 'interactive')">
-                    ⚠️ Scam (5 Topics)
+                    Scam (5 Topics)
                 </button>
                 <button class="sub-tab-button" onclick="openSubTab(event, 'others-viz', 'interactive')">
-                    📰 Others (7 Topics)
+                    Others (7 Topics)
                 </button>
             </div>
 
@@ -1289,6 +1396,17 @@
                 <div id="ldavis-others"></div>
             </div>
         </section>
+
+        <!-- Tab Navigation -->
+        <div class="tab-navigation">
+            <button class="nav-button prev-button" onclick="navigateTab('prev')">
+                ← Topics
+            </button>
+            <span class="nav-indicator">5 of 10</span>
+            <button class="nav-button next-button" onclick="navigateTab('next')">
+                Results →
+            </button>
+        </div>
         </div>
 
         <!-- Tab 6: Detailed Results -->
@@ -1299,20 +1417,20 @@
 
             <div class="sub-tabs">
                 <button class="sub-tab-button active" onclick="openSubTab(event, 'politics-results', 'results')">
-                    🏛️ Politics
+                    Politics
                 </button>
                 <button class="sub-tab-button" onclick="openSubTab(event, 'scam-results', 'results')">
-                    ⚠️ Scam
+                    Scam
                 </button>
                 <button class="sub-tab-button" onclick="openSubTab(event, 'others-results', 'results')">
-                    📰 Others
+                    Others
                 </button>
             </div>
 
             <!-- Politics Results Sub-Tab -->
             <div id="politics-results" class="sub-tab-content active">
             <div>
-            <h2>🏛️ Politics Category: Detailed Results</h2>
+            <h2>Politics Category: Detailed Results</h2>
 
             <p>The political hoax landscape is dominated by <strong>candidate-specific character attacks (44%)</strong>,
                 revealing a highly polarized campaign environment. Topic 5 (Anies Baswedan attacks) and Topic 8 (Jokowi
@@ -1357,7 +1475,7 @@
             </div>
 
             <div class="highlight">
-                <h4>🔍 Key Insight: Institutional Trust Erosion</h4>
+                <h4>Key Insight: Institutional Trust Erosion</h4>
                 <p>Beyond candidate attacks, topics targeting <strong>KPU (election commission)</strong>, <strong>KPK
                         (anti-corruption commission)</strong>, and <strong>DPR (parliament)</strong> collectively
                     represent systematic efforts to undermine institutional legitimacy - a dangerous pattern for
@@ -1368,22 +1486,22 @@
             <div class="viz-grid">
                 <div class="viz-container">
                     <h4>Topic Distribution</h4>
-                    <img src="visualizations/topic_distribution.png" alt="Politics Topic Distribution">
+                    <img src="/viz/politics/topic-distribution.png" alt="Politics Topic Distribution">
                 </div>
                 <div class="viz-container">
                     <h4>Coherence Comparison</h4>
-                    <img src="visualizations/coherence_comparison.png" alt="Politics Coherence">
+                    <img src="/viz/politics/coherence-comparison.png" alt="Politics Coherence">
                 </div>
             </div>
 
             <div class="viz-container">
                 <h4>Top Terms per Topic</h4>
-                <img src="visualizations/top_terms_per_topic.png" alt="Politics Top Terms">
+                <img src="/viz/politics/top-terms-per-topic.png" alt="Politics Top Terms">
             </div>
 
             <div class="viz-container">
                 <h4>Topic Word Clouds</h4>
-                <img src="visualizations/wordclouds.png" alt="Politics Word Clouds">
+                <img src="/viz/politics/wordclouds.png" alt="Politics Word Clouds">
             </div>
             </div>
             </div>
@@ -1391,7 +1509,7 @@
             <!-- Scam Results Sub-Tab -->
             <div id="scam-results" class="sub-tab-content">
             <div>
-            <h2>⚠️ Scam Category: Detailed Results</h2>
+            <h2>Scam Category: Detailed Results</h2>
 
             <p>Scam hoaxes overwhelmingly target <strong>job seekers (60%)</strong> through fake recruitment and
                 employment offers. The economic vulnerability of Indonesia's unemployment-affected population makes them
@@ -1435,7 +1553,7 @@
             </div>
 
             <div class="highlight">
-                <h4>🎯 Exploitation Pattern</h4>
+                <h4>Exploitation Pattern</h4>
                 <p><strong>82% of scam topics (0+2+3)</strong> exploit economic vulnerability by targeting job seekers
                     and those seeking financial opportunities. This reveals scammers' sophisticated understanding of
                     Indonesia's unemployment challenges.</p>
@@ -1445,22 +1563,22 @@
             <div class="viz-grid">
                 <div class="viz-container">
                     <h4>Topic Distribution</h4>
-                    <img src="scam_category/visualizations/topic_distribution.png" alt="Scam Topic Distribution">
+                    <img src="/viz/scam/topic-distribution.png" alt="Scam Topic Distribution">
                 </div>
                 <div class="viz-container">
                     <h4>Coherence Comparison</h4>
-                    <img src="scam_category/visualizations/coherence_comparison.png" alt="Scam Coherence">
+                    <img src="/viz/scam/coherence-comparison.png" alt="Scam Coherence">
                 </div>
             </div>
 
             <div class="viz-container">
                 <h4>Top Terms per Topic</h4>
-                <img src="scam_category/visualizations/top_terms_per_topic.png" alt="Scam Top Terms">
+                <img src="/viz/scam/top-terms-per-topic.png" alt="Scam Top Terms">
             </div>
 
             <div class="viz-container">
                 <h4>Topic Word Clouds</h4>
-                <img src="scam_category/visualizations/wordclouds.png" alt="Scam Word Clouds">
+                <img src="/viz/scam/wordclouds.png" alt="Scam Word Clouds">
             </div>
             </div>
             </div>
@@ -1468,7 +1586,7 @@
             <!-- Others Results Sub-Tab -->
             <div id="others-results" class="sub-tab-content">
             <div>
-            <h2>📰 Others Category: Detailed Results</h2>
+            <h2>Others Category: Detailed Results</h2>
 
             <p>The Others category achieved the <strong>highest coherence score (0.461)</strong>, indicating these
                 topics are most distinct and interpretable. Health misinformation (31% combined) and disaster-related
@@ -1508,7 +1626,7 @@
             </div>
 
             <div class="highlight">
-                <h4>💉 Health Misinformation Legacy</h4>
+                <h4>Health Misinformation Legacy</h4>
                 <p><strong>COVID-19 and vaccine narratives persist</strong> even beyond the pandemic peak. Combined
                     health topics (0+6) represent 31% of Others category, showing lasting impact of pandemic-era
                     misinformation on public health discourse.</p>
@@ -1518,26 +1636,37 @@
             <div class="viz-grid">
                 <div class="viz-container">
                     <h4>Topic Distribution</h4>
-                    <img src="others_category/visualizations/topic_distribution.png" alt="Others Topic Distribution">
+                    <img src="/viz/others/topic-distribution.png" alt="Others Topic Distribution">
                 </div>
                 <div class="viz-container">
                     <h4>Coherence Comparison</h4>
-                    <img src="others_category/visualizations/coherence_comparison.png" alt="Others Coherence">
+                    <img src="/viz/others/coherence-comparison.png" alt="Others Coherence">
                 </div>
             </div>
 
             <div class="viz-container">
                 <h4>Top Terms per Topic</h4>
-                <img src="others_category/visualizations/top_terms_per_topic.png" alt="Others Top Terms">
+                <img src="/viz/others/top-terms-per-topic.png" alt="Others Top Terms">
             </div>
 
             <div class="viz-container">
                 <h4>Topic Word Clouds</h4>
-                <img src="others_category/visualizations/wordclouds.png" alt="Others Word Clouds">
+                <img src="/viz/others/wordclouds.png" alt="Others Word Clouds">
             </div>
             </div>
             </div>
         </section>
+
+        <!-- Tab Navigation -->
+        <div class="tab-navigation">
+            <button class="nav-button prev-button" onclick="navigateTab('prev')">
+                ← Visualization
+            </button>
+            <span class="nav-indicator">6 of 10</span>
+            <button class="nav-button next-button" onclick="navigateTab('next')">
+                Findings →
+            </button>
+        </div>
         </div>
 
         <!-- Tab 7: Key Findings & Implications -->
@@ -1582,6 +1711,17 @@
                 Indonesian democracy: candidate delegitimization, institutional erosion, and nationalist mobilization.
             </div>
         </section>
+
+        <!-- Tab Navigation -->
+        <div class="tab-navigation">
+            <button class="nav-button prev-button" onclick="navigateTab('prev')">
+                ← Results
+            </button>
+            <span class="nav-indicator">7 of 10</span>
+            <button class="nav-button next-button" onclick="navigateTab('next')">
+                Recommendations →
+            </button>
+        </div>
         </div>
 
         <!-- Tab 8: Recommendations & Next Steps -->
@@ -1626,6 +1766,17 @@
             </ol>
 
         </section>
+
+        <!-- Tab Navigation -->
+        <div class="tab-navigation">
+            <button class="nav-button prev-button" onclick="navigateTab('prev')">
+                ← Findings
+            </button>
+            <span class="nav-indicator">8 of 10</span>
+            <button class="nav-button next-button" onclick="navigateTab('next')">
+                Appendix →
+            </button>
+        </div>
         </div>
 
         <!-- Tab 9: Appendix -->
@@ -1683,10 +1834,21 @@
             </p>
 
             <div class="alert alert-info">
-                <strong>📧 Contact:</strong> For questions or collaboration opportunities regarding this analysis,
+                <strong>Contact:</strong> For questions or collaboration opportunities regarding this analysis,
                 please reach out through the course instructor.
             </div>
         </section>
+
+        <!-- Tab Navigation -->
+        <div class="tab-navigation">
+            <button class="nav-button prev-button" onclick="navigateTab('prev')">
+                ← Recommendations
+            </button>
+            <span class="nav-indicator">9 of 10</span>
+            <button class="nav-button next-button" onclick="navigateTab('next')" disabled>
+                End →
+            </button>
+        </div>
         </div>
     </div>
 
@@ -1695,9 +1857,8 @@
 
     <!-- Footer -->
     <div class="footer">
-        <p>&copy; 2025 Ali Al Harkan | Indonesian Election Misinformation Analysis | Data from <a href="https://turnbackhoax.id"
-                target="_blank">TurnBackHoax.id</a></p>
-        <p>Digital Research Methods - Final Exam Research Project | Instructor: Dr. Eriyanto</p>
+        <p>&copy; 2025 <a href="https://raihankalla.id" target="_blank">Ali Al Harkan</a> | Indonesian Hoaxes Analysis (<a href="https://turnbackhoax.id" target="_blank">TurnBackHoax.id</a>)</p>
+        <p>Digital Research Methods Course Project</p>
     </div>
 
     <!-- Scripts -->
@@ -1804,6 +1965,96 @@
                 }
             });
         });
+
+        // Tab Navigation functionality
+        const tabOrder = ['cover', 'summary', 'methodology', 'model-data', 'topics', 'interactive', 'results', 'findings', 'recommendations', 'appendix'];
+
+        function navigateTab(direction) {
+            // Find current active tab
+            const activeTab = document.querySelector('.main-tab-content.active');
+            if (!activeTab) return;
+
+            const currentTabId = activeTab.id;
+            const currentIndex = tabOrder.indexOf(currentTabId);
+
+            let newIndex;
+            if (direction === 'next' && currentIndex < tabOrder.length - 1) {
+                newIndex = currentIndex + 1;
+            } else if (direction === 'prev') {
+                if (currentIndex > 0) {
+                    newIndex = currentIndex - 1;
+                } else if (currentTabId === 'summary') {
+                    // Allow navigation from summary back to cover
+                    switchToTab('cover');
+                    return;
+                } else {
+                    return; // Can't navigate further
+                }
+            } else {
+                return; // Can't navigate further
+            }
+
+            const newTabId = tabOrder[newIndex];
+
+            // Switch to the new tab programmatically
+            switchToTab(newTabId);
+
+            // Update navigation buttons
+            updateNavigationButtons(newIndex);
+        }
+
+        function updateNavigationButtons(currentIndex) {
+            const prevButton = document.getElementById('prevButton');
+            const nextButton = document.getElementById('nextButton');
+            const navIndicator = document.getElementById('navIndicator');
+
+            // Update button states - all navigable tabs can go back (summary goes to cover)
+            prevButton.disabled = false; // Always enabled for navigable tabs
+            nextButton.disabled = currentIndex === tabOrder.length - 1;
+
+            // Update indicator
+            navIndicator.textContent = `${currentIndex + 1} of 10`;
+
+            // Update button text based on tab names
+            if (currentIndex > 0) {
+                const prevTabName = tabOrder[currentIndex - 1];
+                prevButton.innerHTML = `← ${getTabDisplayName(prevTabName)}`;
+            }
+
+            if (currentIndex < tabOrder.length - 1) {
+                const nextTabName = tabOrder[currentIndex + 1];
+                nextButton.innerHTML = `${getTabDisplayName(nextTabName)} →`;
+            }
+        }
+
+        function getTabDisplayName(tabId) {
+            const nameMap = {
+                'cover': 'Start',
+                'summary': 'Summary',
+                'methodology': 'Methodology',
+                'model-data': 'Model',
+                'topics': 'Topics',
+                'interactive': 'Visualization',
+                'results': 'Results',
+                'findings': 'Findings',
+                'recommendations': 'Recommendations',
+                'appendix': 'Appendix'
+            };
+            return nameMap[tabId] || tabId;
+        }
+
+        // Initialize navigation on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            // Find initial active tab
+            const initialActiveTab = document.querySelector('.main-tab-content.active');
+            if (initialActiveTab) {
+                const initialIndex = tabOrder.indexOf(initialActiveTab.id);
+                if (initialIndex !== -1) {
+                    updateNavigationButtons(initialIndex);
+                }
+            }
+        });
+
     </script>
 
     <script>
