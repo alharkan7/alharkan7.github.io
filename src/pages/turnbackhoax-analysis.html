@@ -3,6 +3,7 @@
 
 <head>
     <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
     <title>Indonesian Hoaxes Analysis: LDA Topic Modeling on 2024 TurnBackHoax.id Data</title>
     <link rel="stylesheet" type="text/css"
         href="https://cdn.jsdelivr.net/gh/bmabey/pyLDAvis@3.4.0/pyLDAvis/js/ldavis.v3.0.0.css">
@@ -627,6 +628,8 @@
 
         /* Responsive */
         @media (max-width: 768px) {
+
+            /* Cover page */
             .cover-title {
                 font-size: 2em;
             }
@@ -666,30 +669,80 @@
             .cover-button {
                 padding: 14px 24px;
                 font-size: 1em;
+                width: 100%;
             }
 
+            .cover-actions {
+                flex-direction: column;
+                width: 100%;
+            }
+
+            /* Sections */
             section {
-                padding: 30px 20px;
+                padding: 20px 15px;
             }
 
+            section h2 {
+                font-size: 1.6em;
+            }
+
+            section h3 {
+                font-size: 1.3em;
+                margin-top: 25px;
+            }
+
+            section h4 {
+                font-size: 1.1em;
+                margin-top: 20px;
+            }
+
+            /* Stats */
             .stats-grid {
                 grid-template-columns: 1fr;
+                gap: 15px;
             }
 
+            .stat-card {
+                padding: 20px;
+            }
+
+            .stat-value {
+                font-size: 1.8em;
+            }
+
+            /* Visualizations */
             .viz-grid {
                 grid-template-columns: 1fr;
+                gap: 20px;
+            }
+
+            /* Main tabs - Make scrollable on mobile */
+            .main-tabs-container {
+                justify-content: flex-start;
+                padding: 0 10px;
             }
 
             .main-tab-button {
                 padding: 14px 16px;
-                font-size: 13px;
+                font-size: 12px;
+                min-width: auto;
+            }
+
+            /* Sub tabs - Wrap properly on mobile */
+            .sub-tabs {
+                flex-wrap: wrap;
+                gap: 8px;
+                margin: 20px 0 15px 0;
             }
 
             .sub-tab-button {
-                padding: 10px 16px;
-                font-size: 14px;
+                padding: 10px 14px;
+                font-size: 13px;
+                flex: 1 1 auto;
+                min-width: fit-content;
             }
 
+            /* Tab navigation */
             .tab-navigation {
                 flex-direction: column;
                 gap: 15px;
@@ -700,11 +753,147 @@
             .nav-button {
                 padding: 10px 16px;
                 font-size: 13px;
+                width: 100%;
             }
 
             .nav-indicator {
                 font-size: 13px;
                 margin: 5px 0;
+            }
+
+            /* Tables - Horizontal scroll */
+            table {
+                display: block;
+                overflow-x: auto;
+                -webkit-overflow-scrolling: touch;
+                font-size: 0.9em;
+            }
+
+            table thead,
+            table tbody {
+                display: table;
+                width: 100%;
+            }
+
+            table tr {
+                display: table-row;
+            }
+
+            table th,
+            table td {
+                padding: 10px 8px;
+            }
+
+            /* Lists */
+            ul,
+            ol {
+                margin-left: 20px;
+            }
+
+            /* Alert boxes */
+            .alert {
+                padding: 15px;
+                margin: 20px 0;
+                font-size: 0.95em;
+            }
+
+            /* Highlight boxes */
+            .highlight {
+                padding: 15px;
+                margin: 20px 0;
+            }
+
+            /* Topic cards */
+            .topic-card {
+                padding: 15px;
+                margin: 12px 0;
+            }
+
+            /* Back to top button */
+            .back-to-top {
+                bottom: 20px;
+                right: 20px;
+                width: 45px;
+                height: 45px;
+                font-size: 18px;
+            }
+
+            /* Content padding */
+            .main-tab-content:not(#cover) {
+                padding: 30px 15px 50px 15px;
+            }
+
+            /* pyLDAvis container */
+            #ldavis-politics,
+            #ldavis-scam,
+            #ldavis-others {
+                width: 100% !important;
+                overflow-x: auto;
+            }
+        }
+
+        /* Extra small devices */
+        @media (max-width: 480px) {
+            .cover-title {
+                font-size: 1.6em;
+            }
+
+            .cover-subtitle {
+                font-size: 1em;
+            }
+
+            .cover-stat-number {
+                font-size: 2em;
+            }
+
+            .cover-stat-label {
+                font-size: 0.85em;
+            }
+
+            section h2 {
+                font-size: 1.4em;
+            }
+
+            section h3 {
+                font-size: 1.15em;
+            }
+
+            .main-tab-button {
+                font-size: 11px;
+                padding: 12px 12px;
+            }
+
+            .sub-tab-button {
+                font-size: 12px;
+                padding: 8px 10px;
+            }
+
+            .stat-value {
+                font-size: 1.5em;
+            }
+
+            section {
+                padding: 15px 10px;
+            }
+
+            table {
+                font-size: 0.85em;
+            }
+
+            .main-tab-content:not(#cover) {
+                padding: 20px 10px 40px 10px;
+            }
+        }
+
+        /* Landscape mobile */
+        @media (max-width: 768px) and (orientation: landscape) {
+            .cover-page {
+                min-height: auto;
+                padding: 30px 20px;
+            }
+
+            .cover-stat-number {
+                font-size: 2em;
             }
         }
 
