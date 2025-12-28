@@ -13,32 +13,40 @@
     "astro": "astro"
   },
   "dependencies": {
-    "@astrojs/mdx": "^2.3.1",
-    "@astrojs/react": "^4.2.4",
-    "@astrojs/svelte": "^5.0.0",
+    "@astrojs/mdx": "^4.3.13",
+    "@astrojs/react": "^4.4.2",
+    "@astrojs/svelte": "^7.2.4",
     "@astrojs/tailwind": "^6.0.2",
-    "@astrojs/vercel": "^7.8.2",
-    "@iconify-json/heroicons": "^1.2.2",
-    "@iconify-json/lucide": "^1.2.72",
-    "@iconify-json/simple-icons": "^1.2.33",
-    "@supabase/supabase-js": "^2.49.4",
-    "astro": "^4.16.13",
+    "@astrojs/vercel": "^9.0.2",
+    "@iconify-json/heroicons": "^1.2.3",
+    "@iconify-json/lucide": "^1.2.82",
+    "@iconify-json/simple-icons": "^1.2.63",
+    "@supabase/supabase-js": "^2.89.0",
+    "astro": "^5.16.6",
     "astro-icon": "^1.1.5",
-    "firebase": "^11.2.0",
-    "firebase-admin": "^13.0.2",
-    "lucide-react": "^0.503.0",
-    "mermaid": "^11.10.1",
+    "firebase": "^12.7.0",
+    "firebase-admin": "^13.6.0",
+    "lucide-react": "^0.562.0",
+    "mermaid": "^11.12.2",
     "reading-time": "^1.5.0",
     "rehype-external-links": "^3.0.0",
     "remark-gfm": "^4.0.0",
-    "remark-smartypants": "^2.0.0",
-    "tailwindcss": "^3.4.17",
+    "remark-smartypants": "^3.0.2",
+    "tailwindcss": "^3.4.19",
     "tocbot": "^4.36.4"
   },
   "devDependencies": {
-    "@astrojs/ts-plugin": "^1.10.4",
-    "@types/node": "^22.10.7",
+    "@astrojs/ts-plugin": "^1.10.6",
+    "@types/node": "^25.0.3",
     "glob": "^10.3.10",
-    "typescript": "^5.7.3"
+    "typescript": "^5.9.3"
+  },
+  "pnpm": {
+    "overrides": {
+      "axios": "^1.12.0",
+      "form-data": "^4.0.4",
+      "glob": "^10.5.0",
+      "brace-expansion": "^2.0.2"
+    }
   }
 }
