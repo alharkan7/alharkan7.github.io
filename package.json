@@ -2,7 +2,7 @@
   "name": "raihankalla.id",
   "version": "1.0.0",
   "private": true,
-  "packageManager": "pnpm@8.15.1",
+  "packageManager": "pnpm@10.26.2",
   "type": "module",
   "scripts": {
     "dev": "astro dev",
