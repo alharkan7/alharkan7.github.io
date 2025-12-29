@@ -3,8 +3,7 @@ import BaseLayout from "../layouts/BaseLayout.astro";
 import QuickLinks from "../components/QuickLinks.astro";
 
 const title = "Al Harkan's Blog";
-const description =
-  "My Written Thoughts on Media, Technology, and Everything in Between";
+const description = "On Media, Technology, and Everything in Between";
 const permalink = Astro?.site?.href;
 
 const postsPerPage = 10;
@@ -51,12 +50,9 @@ const paginatedPosts = sortedPosts.slice(0, postsPerPage);
               </div>
             </div>
           </div>
-         
         );
       })
     }
-
-
 
     <div class="pagination">
       {
@@ -74,16 +70,20 @@ const paginatedPosts = sortedPosts.slice(0, postsPerPage);
       margin-bottom: 0.5rem;
     }
 
-    h2,
+    h2 {
+      font-family: var(--font-family-serif);
+      font-weight: 600;
+    }
+
     .post-item-footer {
       font-family: var(--font-family-sans);
-      font-weight: 700;
+      font-weight: 500;
     }
 
     .post-item-date {
       color: var(--text-secondary);
       text-align: left;
-      text-transform: uppercase;
+      font-size: 0.9em;
       margin-right: 16px;
     }
 
@@ -111,8 +111,12 @@ const paginatedPosts = sortedPosts.slice(0, postsPerPage);
       font-weight: 700;
       text-decoration: none;
       box-shadow: inset 0 -0.12em 0 var(--primary-color);
-      -webkit-transition: box-shadow 0.2s ease-in-out, color 0.2s ease-in-out;
-      transition: box-shadow 0.2s ease-in-out, color 0.2s ease-in-out;
+      -webkit-transition:
+        box-shadow 0.2s ease-in-out,
+        color 0.2s ease-in-out;
+      transition:
+        box-shadow 0.2s ease-in-out,
+        color 0.2s ease-in-out;
     }
 
     .pagination-prev:hover,

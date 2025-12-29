@@ -1,27 +1,27 @@
 ---
-import { Icon } from 'astro-icon/components';
+import { Icon } from "astro-icon/components";
 
 const links = [
   {
     name: "Twitter",
     url: "https://x.com/alhrkn",
-    icon: "simple-icons:x"
+    icon: "simple-icons:x",
   },
   {
     name: "Apps",
     url: "https://alhrkn.vercel.app",
-    icon: "lucide:monitor-smartphone"
+    icon: "lucide:monitor-smartphone",
   },
   {
     name: "Email",
     url: "mailto:alharkan7@gmail.com",
-    icon: "lucide:mail"
+    icon: "lucide:mail",
   },
   {
     name: "LinkedIn",
     url: "https://linkedin.com/in/alharkan",
-    icon: "simple-icons:linkedin"
-  }
+    icon: "simple-icons:linkedin",
+  },
 ];
 ---
 
@@ -39,8 +39,8 @@ const links = [
     gap: 0.5rem;
     color: var(--text-secondary);
     text-decoration: none;
-    font-family: var(--font-family-serif);
-    font-weight: 800;
+    font-family: var(--font-family-sans);
+    font-weight: 600;
     transition: all 0.2s ease;
     padding: 0.25rem 0.5rem;
     border-radius: 4px;
@@ -76,15 +76,17 @@ const links = [
 </style>
 
 <div class="quick-links">
-  {links.map((link) => (
-    <a
-      href={link.url}
-      target={link.url.startsWith('http') ? '_blank' : '_self'}
-      rel={link.url.startsWith('http') ? 'noopener noreferrer' : ''}
-      class="quick-link"
-    >
-      <Icon name={link.icon} class="quick-link-icon" />
-      <span>{link.name}</span>
-    </a>
-  ))}
+  {
+    links.map((link) => (
+      <a
+        href={link.url}
+        target={link.url.startsWith("http") ? "_blank" : "_self"}
+        rel={link.url.startsWith("http") ? "noopener noreferrer" : ""}
+        class="quick-link"
+      >
+        <Icon name={link.icon} class="quick-link-icon" />
+        <span>{link.name}</span>
+      </a>
+    ))
+  }
 </div>

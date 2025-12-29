@@ -18,9 +18,7 @@ export async function getStaticPaths() {
   const uncategorizedPosts: any = await Astro.glob(
     "../data/blog-posts/uncategorized/*.{md,mdx}",
   );
-  const ptmPosts: any = await Astro.glob(
-    "../data/blog-posts/ptm/*.{md,mdx}",
-  );
+  const ptmPosts: any = await Astro.glob("../data/blog-posts/ptm/*.{md,mdx}");
   const allPosts = [
     ...blogPosts,
     ...storyPosts,
@@ -49,7 +47,7 @@ const { slug } = Astro.params;
 // Check if post exists in props
 if (!Astro.props.post) {
   console.error(`Post not found for slug: ${slug}`);
-  return Astro.redirect('/404');
+  return Astro.redirect("/404");
 }
 
 const { Content, frontmatter } = Astro.props.post;
@@ -83,9 +81,9 @@ const getRecommendedPosts = async () => {
     categoryPosts = await Astro.glob("../data/blog-posts/blog/*.{md,mdx}");
   } else if (category === "stories") {
     categoryPosts = await Astro.glob("../data/blog-posts/stories/*.{md,mdx}");
-  }  else if (category === "works") {
+  } else if (category === "works") {
     categoryPosts = await Astro.glob("../data/blog-posts/works/*.{md,mdx}");
-  } else if ( category === "ptm") {
+  } else if (category === "ptm") {
     categoryPosts = await Astro.glob("../data/blog-posts/ptm/*.{md,mdx}");
   } else {
     categoryPosts = await Astro.glob(
@@ -118,7 +116,7 @@ const recommendedPosts = await getRecommendedPosts();
 >
   <!-- Headings Map Component -->
   <HeadingsMap client:load />
-  
+
   <header>
     <!-- <p>{publishDate} ~ {readingTime}</p> -->
     <p>
@@ -139,7 +137,8 @@ const recommendedPosts = await getRecommendedPosts();
       recommendedPosts.length > 0 && (
         <div class="recommended-posts">
           <h3>
-            Read more posts in <a href={category === "blog" ? "/" : `/${category}`}>
+            Read more posts in{" "}
+            <a href={category === "blog" ? "/" : `/${category}`}>
               {category === "blog" ? "#featured" : `#${category}`}
             </a>
           </h3>
@@ -170,9 +169,8 @@ const recommendedPosts = await getRecommendedPosts();
 
   header p {
     color: var(--text-secondary);
-    text-transform: uppercase;
     font-family: var(--font-family-sans);
-    font-weight: 600;
+    font-weight: 500;
   }
 
   header hr {

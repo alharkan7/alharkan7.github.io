@@ -35,12 +35,11 @@ const { page } = Astro.props as Props;
 
 // Ensure page exists before proceeding
 if (!page || !page.data) {
-    return Astro.redirect('/404');
+    return Astro.redirect("/404");
 }
 
 const title = "Al Harkan's Blog";
-const description =
-    "My Written Thoughts on Media, Technology, and Everything in Between";
+const description = "On Media, Technology, and Everything in Between";
 const permalink = Astro?.site?.href;
 ---
 
@@ -100,10 +99,14 @@ const permalink = Astro?.site?.href;
             margin-bottom: 0.5rem;
         }
 
-        h2,
+        h2 {
+            font-family: var(--font-family-serif);
+            font-weight: 600;
+        }
+
         .post-item-footer {
             font-family: var(--font-family-sans);
-            font-weight: 700;
+            font-weight: 500;
         }
 
         .post-item-date {

@@ -1,8 +1,8 @@
 ---
-import BaseHead from '../components/BaseHead.astro';
-import Header from '../components/Header.astro';
-import Footer from '../components/Footer.astro';
-import { Analytics } from '@vercel/analytics/react';
+import BaseHead from "../components/BaseHead.astro";
+import Header from "../components/Header.astro";
+import Footer from "../components/Footer.astro";
+import { Analytics } from "@vercel/analytics/react";
 
 export interface Props {
   title: string;
@@ -10,42 +10,43 @@ export interface Props {
   permalink: string;
   current?: string;
   image?: string;
-  type?: 'website' | 'article';
+  type?: "website" | "article";
   publishDate?: string;
 }
-const { 
-  title, 
-  description, 
-  permalink, 
+const {
+  title,
+  description,
+  permalink,
   current,
   image,
-  type = 'website',
-  publishDate
+  type = "website",
+  publishDate,
 } = Astro.props;
 ---
+
 <html lang="en">
-<head>
-  <BaseHead 
-    title={title === "Al Harkan's Blog" ? title : `${title} - Al Harkan`}
-    description={description} 
-    permalink={permalink}
-    image={image}
-    type={type}
-    publishDate={publishDate}
-  />
-</head>
-<body>
-  <div class="layout">
-    <Header current={current} />
+  <head>
+    <BaseHead
+      title={title === "Al Harkan's Blog" ? title : `${title} - Al Harkan`}
+      description={description}
+      permalink={permalink}
+      image={image}
+      type={type}
+      publishDate={publishDate}
+    />
+  </head>
+  <body>
+    <div class="layout">
+      <Header current={current} />
 
-    <main>
-      <slot />
-    </main>
+      <main>
+        <slot />
+      </main>
 
-    <Footer />
-  </div>
-  <Analytics client:only="react" />
-</body>
+      <Footer />
+    </div>
+    <Analytics client:only="react" />
+  </body>
 </html>
 
 <style>
@@ -57,13 +58,16 @@ const {
   }
 
   /* Style the header to be sticky */
-  .layout > :global(header) { /* Target header rendered by Header component */
+  .layout > :global(header) {
+    /* Target header rendered by Header component */
     position: sticky;
     top: 0;
     z-index: 10; /* Ensure it stays on top */
     /* Add a background color to prevent content showing through */
     /* You might want to adjust this color to match your theme */
-    background-color: var(--background-body); 
+    background-color: var(--background-header);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
     /* Optional: Add a border or shadow for visual separation */
     /* border-bottom: 1px solid var(--color-border, #e0e0e0); */
   }
