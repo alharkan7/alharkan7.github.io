@@ -41,6 +41,9 @@ importers:
       '@supabase/supabase-js':
         specifier: ^2.89.0
         version: 2.89.0
+      '@vercel/analytics':
+        specifier: ^1.6.1
+        version: 1.6.1(react@19.2.3)(svelte@5.46.1)
       astro:
         specifier: ^5.16.6
         version: 5.16.6(@types/node@25.0.3)(@vercel/functions@2.2.13)(jiti@1.21.7)(rollup@4.54.0)(typescript@5.9.3)(yaml@2.8.2)
