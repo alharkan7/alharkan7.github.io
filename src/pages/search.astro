@@ -5,7 +5,10 @@ const title = "Search";
 const description = "Search Al Harkan's Blog Archives";
 const permalink = Astro?.site?.href;
 
-const allPosts = await Astro.glob("../data/blog-posts/*/*.{md,mdx}");
+const allPostsGlob = import.meta.glob("../data/blog-posts/*/*.{md,mdx}", {
+  eager: true,
+});
+const allPosts = Object.values(allPostsGlob) as any;
 
 const sortedPosts = allPosts.sort(
   (a, b) =>
@@ -14,12 +17,12 @@ const sortedPosts = allPosts.sort(
 );
 
 // Prepare posts data for client-side use
-const posts = sortedPosts.map(post => ({
+const posts = sortedPosts.map((post) => ({
   title: post.frontmatter.title,
   description: post.frontmatter.description,
   publishDate: post.frontmatter.publishDate,
-  slug: post.file.split("/").pop()?.split(".").shift() || '',
-  content: post.rawContent?.() || ''
+  slug: post.file.split("/").pop()?.split(".").shift() || "",
+  content: post.rawContent?.() || "",
 }));
 ---
 
@@ -31,18 +34,28 @@ const posts = sortedPosts.map(post => ({
 >
   <div class="container">
     <h1>Search</h1>
-   
+
     <div class="search-container">
       <div class="search-wrapper">
-        <input 
-          type="text" 
-          id="searchInput" 
+        <input
+          type="text"
+          id="searchInput"
           placeholder="Search posts..."
           class="search-input"
         />
         <button id="searchButton" class="search-button" aria-label="Search">
           <span class="search-icon">
-            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="20"
+              height="20"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
               <circle cx="11" cy="11" r="8"></circle>
               <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
             </svg>
@@ -58,29 +71,32 @@ const posts = sortedPosts.map(post => ({
 </BaseLayout>
 
 <script define:vars={{ posts }}>
-  const searchInput = document.getElementById('searchInput');
-  const searchButton = document.getElementById('searchButton');
-  const searchResults = document.getElementById('searchResults');
-  
+  const searchInput = document.getElementById("searchInput");
+  const searchButton = document.getElementById("searchButton");
+  const searchResults = document.getElementById("searchResults");
+
   if (!searchInput || !searchButton || !searchResults) {
-    console.error('Required DOM elements not found');
-    throw new Error('Required DOM elements not found');
+    console.error("Required DOM elements not found");
+    throw new Error("Required DOM elements not found");
   }
 
   function performSearch() {
     const query = searchInput.value.toLowerCase();
     if (!query) {
-      searchResults.innerHTML = '';
+      searchResults.innerHTML = "";
       return;
     }
 
-    const filteredPosts = posts.filter(post => 
-      post.title.toLowerCase().includes(query) ||
-      post.description.toLowerCase().includes(query) ||
-      post.content.toLowerCase().includes(query)
+    const filteredPosts = posts.filter(
+      (post) =>
+        post.title.toLowerCase().includes(query) ||
+        post.description.toLowerCase().includes(query) ||
+        post.content.toLowerCase().includes(query),
     );
 
-    searchResults.innerHTML = filteredPosts.map(post => `
+    searchResults.innerHTML = filteredPosts
+      .map(
+        (post) => `
       <div class="post-item">
         <h2>
           <a href="/${post.slug}">${post.title}</a>
@@ -91,17 +107,19 @@ const posts = sortedPosts.map(post => ({
         </div>
       </div>
       <hr />
-    `).join('');
+    `,
+      )
+      .join("");
 
     if (filteredPosts.length === 0) {
-      searchResults.innerHTML = '<p>No results found.</p>';
+      searchResults.innerHTML = "<p>No results found.</p>";
     }
   }
 
   // Event listeners
-  searchButton.addEventListener('click', performSearch);
-  searchInput.addEventListener('keypress', (e) => {
-    if (e.key === 'Enter') {
+  searchButton.addEventListener("click", performSearch);
+  searchInput.addEventListener("keypress", (e) => {
+    if (e.key === "Enter") {
       performSearch();
     }
   });

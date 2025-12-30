@@ -18,9 +18,11 @@ interface Props {
 }
 
 export const getStaticPaths: GetStaticPaths = async ({ paginate }) => {
-    const allPosts: BlogPost[] = await Astro.glob(
+    const allPostsGlob = import.meta.glob(
         "../../data/blog-posts/stories/*.{md,mdx}",
+        { eager: true },
     );
+    const allPosts: BlogPost[] = Object.values(allPostsGlob) as BlogPost[];
     const sortedPosts = allPosts.sort(
         (a: BlogPost, b: BlogPost) =>
             new Date(b.frontmatter.publishDate).valueOf() -
@@ -120,7 +122,7 @@ const permalink = Astro.site?.href ? `${Astro.site.href}stories` : "/stories";
             /* border: 1px solid var(--text-secondary); */
             /* border-radius: 4px; */
             /* text-decoration: none; */
-          color: var(--text-secondary);
+            color: var(--text-secondary);
             transition: all 0.2s ease;
             font-family: var(--font-family-sans);
             font-size: 1.8em;

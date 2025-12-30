@@ -138,6 +138,18 @@ const socialImageURL = image
       secondaryColor: "#f9f9f9",
       tertiaryColor: "#fff",
     },
+    gantt: {
+      titleTopMargin: 25,
+      barHeight: 30,
+      barGap: 4,
+      topPadding: 50,
+      leftPadding: 75,
+      gridLineStartPadding: 35,
+      fontSize: 12,
+      numberSectionStyles: 4,
+      axisFormat: "%b '%y", // Compact format: Jan '24, Feb '24, etc.
+      useMaxWidth: true,
+    },
   });
 
   // Function to render Mermaid diagrams
@@ -162,15 +174,32 @@ const socialImageURL = image
       }
     });
 
-    // Also check for any pre elements containing "graph TB" or "graph TD"
+    // Also check for any pre elements containing Mermaid diagram keywords
     const preElements = document.querySelectorAll("pre");
     preElements.forEach((pre) => {
       const text = pre.textContent || pre.innerText;
-      if (
-        text.includes("graph TB") ||
-        text.includes("graph TD") ||
-        text.includes("flowchart")
-      ) {
+      // Check for common Mermaid diagram types
+      const mermaidKeywords = [
+        "graph TB",
+        "graph TD",
+        "graph LR",
+        "graph RL",
+        "flowchart",
+        "sequenceDiagram",
+        "classDiagram",
+        "stateDiagram",
+        "erDiagram",
+        "gantt",
+        "pie title",
+        "pie ",
+        "journey",
+        "gitGraph",
+        "C4Context",
+        "mindmap",
+        "timeline",
+      ];
+
+      if (mermaidKeywords.some((keyword) => text.includes(keyword))) {
         mermaidElements.push(pre);
       }
     });

@@ -8,17 +8,28 @@ import { findRedirect } from "../utils/redirectHandler";
 export const prerender = true;
 
 export async function getStaticPaths() {
-  const blogPosts: any = await Astro.glob("../data/blog-posts/blog/*.{md,mdx}");
-  const storyPosts: any = await Astro.glob(
+  const blogPostsGlob = import.meta.glob("../data/blog-posts/blog/*.{md,mdx}", {
+    eager: true,
+  });
+  const blogPosts: any = Object.values(blogPostsGlob);
+  const storyPostsGlob = import.meta.glob(
     "../data/blog-posts/stories/*.{md,mdx}",
+    { eager: true },
   );
-  const workPosts: any = await Astro.glob(
-    "../data/blog-posts/misc/*.{md,mdx}",
-  );
-  const uncategorizedPosts: any = await Astro.glob(
+  const storyPosts: any = Object.values(storyPostsGlob);
+  const workPostsGlob = import.meta.glob("../data/blog-posts/misc/*.{md,mdx}", {
+    eager: true,
+  });
+  const workPosts: any = Object.values(workPostsGlob);
+  const uncategorizedPostsGlob = import.meta.glob(
     "../data/blog-posts/uncategorized/*.{md,mdx}",
+    { eager: true },
   );
-  const ptmPosts: any = await Astro.glob("../data/blog-posts/ptm/*.{md,mdx}");
+  const uncategorizedPosts: any = Object.values(uncategorizedPostsGlob);
+  const ptmPostsGlob = import.meta.glob("../data/blog-posts/ptm/*.{md,mdx}", {
+    eager: true,
+  });
+  const ptmPosts: any = Object.values(ptmPostsGlob);
   const allPosts = [
     ...blogPosts,
     ...storyPosts,
@@ -76,27 +87,41 @@ const category = isBlogPost
 
 // Get recommended posts from the same category
 const getRecommendedPosts = async () => {
-  let categoryPosts;
+  let categoryPosts: any;
   if (category === "blog") {
-    categoryPosts = await Astro.glob("../data/blog-posts/blog/*.{md,mdx}");
+    const glob = import.meta.glob("../data/blog-posts/blog/*.{md,mdx}", {
+      eager: true,
+    });
+    categoryPosts = Object.values(glob);
   } else if (category === "stories") {
-    categoryPosts = await Astro.glob("../data/blog-posts/stories/*.{md,mdx}");
+    const glob = import.meta.glob("../data/blog-posts/stories/*.{md,mdx}", {
+      eager: true,
+    });
+    categoryPosts = Object.values(glob);
   } else if (category === "misc") {
-    categoryPosts = await Astro.glob("../data/blog-posts/misc/*.{md,mdx}");
+    const glob = import.meta.glob("../data/blog-posts/misc/*.{md,mdx}", {
+      eager: true,
+    });
+    categoryPosts = Object.values(glob);
   } else if (category === "ptm") {
-    categoryPosts = await Astro.glob("../data/blog-posts/ptm/*.{md,mdx}");
+    const glob = import.meta.glob("../data/blog-posts/ptm/*.{md,mdx}", {
+      eager: true,
+    });
+    categoryPosts = Object.values(glob);
   } else {
-    categoryPosts = await Astro.glob(
+    const glob = import.meta.glob(
       "../data/blog-posts/uncategorized/*.{md,mdx}",
+      { eager: true },
     );
+    categoryPosts = Object.values(glob);
   }
 
   // Filter out current post and get 2 random posts
   return categoryPosts
-    .filter((post) => post.file !== Astro.props.post.file)
+    .filter((post: any) => post.file !== Astro.props.post.file)
     .sort(() => Math.random() - 0.5)
     .slice(0, 2)
-    .map((post) => ({
+    .map((post: any) => ({
       title: post.frontmatter.title,
       slug: post.file.split("/").pop().split(".").shift(),
     }));
@@ -143,7 +168,7 @@ const recommendedPosts = await getRecommendedPosts();
             </a>
           </h3>
           <div class="recommended-grid">
-            {recommendedPosts.map((post) => (
+            {recommendedPosts.map((post: any) => (
               <a href={`/${post.slug}`} class="recommended-post">
                 {post.title}
               </a>
