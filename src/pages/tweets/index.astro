@@ -2,28 +2,11 @@
 import BaseLayout from "../../layouts/BaseLayout.astro";
 import { tweetEmbeds } from "../../data/tweet-shorts.ts";
 
-export const prerender = true;
+const tweetsPerPage = 5;
+const currentPage = 1;
+const totalPages = Math.ceil(tweetEmbeds.length / tweetsPerPage);
+const tweets = tweetEmbeds.slice(0, tweetsPerPage);
 
-export async function getStaticPaths() {
-  const tweetsPerPage = 5;
-  const totalPages = Math.ceil(tweetEmbeds.length / tweetsPerPage);
-
-  // Generate paths for pages 2 onwards (page 1 is handled by index.astro)
-  return Array.from({ length: totalPages - 1 }, (_, i) => {
-    const page = i + 2; // Start from page 2
-    const startIndex = (page - 1) * tweetsPerPage;
-    return {
-      params: { page: String(page) },
-      props: {
-        tweets: tweetEmbeds.slice(startIndex, startIndex + tweetsPerPage),
-        currentPage: page,
-        totalPages,
-      },
-    };
-  });
-}
-
-const { tweets, currentPage, totalPages } = Astro.props;
 const title = "Short Threads";
 const description = "Collection of Short Threads by Al Harkan";
 const permalink = `${Astro?.site?.href}short`;
@@ -33,7 +16,7 @@ const permalink = `${Astro?.site?.href}short`;
   title={title}
   description={description}
   permalink={permalink}
-  current="shorts"
+  current="tweets"
 >
   <div class="container">
     <h1>Collection of Short Threads</h1>
@@ -54,14 +37,10 @@ const permalink = `${Astro?.site?.href}short`;
     </div>
 
     <div class="pagination">
-      <a
-        href={currentPage === 2 ? "/shorts" : `/shorts/${currentPage - 1}`}
-        class="prev-button">← Prev</a
-      >
       <!-- <span class="page-info">Page {currentPage} of {totalPages}</span> -->
       {
-        currentPage < totalPages && (
-          <a href={`/shorts/${currentPage + 1}`} class="next-button">
+        totalPages > 1 && (
+          <a href="/tweets/2" class="next-button">
             Next →
           </a>
         )

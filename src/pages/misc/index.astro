@@ -1,12 +1,18 @@
 ---
 import BaseLayout from "../../layouts/BaseLayout.astro";
 
-const title = "Works";
-const description = "Works by Al Harkan";
-const permalink = Astro.site?.href ? `${Astro.site.href}works` : "/works";
+const title = "Miscellaneous";
+const description = "Miscellaneous Posts by Al Harkan";
+const permalink = Astro.site?.href ? `${Astro.site.href}misc` : "/misc";
 
 const postsPerPage = 10;
-const allPosts = await Astro.glob("../../data/blog-posts/works/*.{md,mdx}");
+const matches = import.meta.glob("../../data/blog-posts/misc/*.{md,mdx}", {
+  eager: true,
+});
+const allPosts = Object.entries(matches).map(([path, module]) => ({
+  ...(module as any),
+  file: path,
+}));
 
 const sortedPosts = allPosts.sort(
   (a, b) =>
@@ -24,14 +30,14 @@ const paginatedPosts = sortedPosts.slice(0, postsPerPage);
   title={title}
   description={description}
   permalink={permalink ?? "/"}
-  current="works"
+  current="misc"
 >
   <div class="container">
-    <h1>Works</h1>
+    <h1>Miscellaneous</h1>
     <hr />
     {
       paginatedPosts.map((post, index) => {
-        const href = `/${post.file.split("/works/").pop().split(".").shift()}`;
+        const href = `/${post.file.split("/misc/").pop().split(".").shift()}`;
         return (
           <div>
             {index !== 0 && <hr />}
@@ -54,7 +60,7 @@ const paginatedPosts = sortedPosts.slice(0, postsPerPage);
     <div class="pagination">
       {
         totalPages > 1 && (
-          <a href="/works/2" class="pagination-next">
+          <a href="/misc/2" class="pagination-next">
             Next →
           </a>
         )
@@ -104,8 +110,12 @@ const paginatedPosts = sortedPosts.slice(0, postsPerPage);
       font-weight: 700;
       text-decoration: none;
       box-shadow: inset 0 -0.12em 0 var(--primary-color);
-      -webkit-transition: box-shadow 0.2s ease-in-out, color 0.2s ease-in-out;
-      transition: box-shadow 0.2s ease-in-out, color 0.2s ease-in-out;
+      -webkit-transition:
+        box-shadow 0.2s ease-in-out,
+        color 0.2s ease-in-out;
+      transition:
+        box-shadow 0.2s ease-in-out,
+        color 0.2s ease-in-out;
     }
 
     .pagination-prev:hover,

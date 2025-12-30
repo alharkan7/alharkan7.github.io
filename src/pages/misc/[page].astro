@@ -18,9 +18,16 @@ interface Props {
 }
 
 export const getStaticPaths: GetStaticPaths = async ({ paginate }) => {
-    const allPosts: BlogPost[] = await Astro.glob(
-        "../../data/blog-posts/works/*.{md,mdx}",
+    const matches = import.meta.glob("../../data/blog-posts/misc/*.{md,mdx}", {
+        eager: true,
+    });
+    const allPosts: BlogPost[] = Object.entries(matches).map(
+        ([path, module]) => ({
+            ...(module as any),
+            file: path,
+        }),
     );
+
     const sortedPosts = allPosts.sort(
         (a: BlogPost, b: BlogPost) =>
             new Date(b.frontmatter.publishDate).valueOf() -
@@ -31,23 +38,23 @@ export const getStaticPaths: GetStaticPaths = async ({ paginate }) => {
 };
 
 const { page } = Astro.props as Props;
-const title = "Works";
-const description = "Works by Al Harkan";
-const permalink = Astro.site?.href ? `${Astro.site.href}works` : "/works";
+const title = "Miscellaneous";
+const description = "Miscellaneous Posts by Al Harkan";
+const permalink = Astro.site?.href ? `${Astro.site.href}misc` : "/misc";
 ---
 
 <BaseLayout
     title={title}
     description={description}
     permalink={permalink ?? "/"}
-    current="works"
+    current="misc"
 >
     <div class="container">
         <h1>{title}</h1>
         <hr />
         {
             page.data.map((post: BlogPost, index: number) => {
-                const href = `/${post.file.split("/works/").pop()?.split(".").shift()}`;
+                const href = `/${post.file.split("/misc/").pop()?.split(".").shift()}`;
                 return (
                     <div>
                         {index !== 0 && <hr />}
@@ -120,7 +127,7 @@ const permalink = Astro.site?.href ? `${Astro.site.href}works` : "/works";
             /* border: 1px solid var(--text-secondary); */
             /* border-radius: 4px; */
             /* text-decoration: none; */
-          color: var(--text-secondary);
+            color: var(--text-secondary);
             transition: all 0.2s ease;
             font-family: var(--font-family-sans);
             font-size: 1.8em;

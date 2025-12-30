@@ -13,7 +13,7 @@ export async function getStaticPaths() {
     "../data/blog-posts/stories/*.{md,mdx}",
   );
   const workPosts: any = await Astro.glob(
-    "../data/blog-posts/works/*.{md,mdx}",
+    "../data/blog-posts/misc/*.{md,mdx}",
   );
   const uncategorizedPosts: any = await Astro.glob(
     "../data/blog-posts/uncategorized/*.{md,mdx}",
@@ -65,7 +65,7 @@ const { slug: postSlug, readingTime } = getPostData(Astro.props.post);
 const permalink = `${Astro?.site?.href}${postSlug}`;
 
 // Check if this is a blog post or other category
-const possiblePaths = ["blog", "stories", "uncategorized", "works", "ptm"];
+const possiblePaths = ["blog", "stories", "uncategorized", "misc", "ptm"];
 const isBlogPost = possiblePaths.some((path) =>
   Astro.props.post.file.includes(`blog-posts/${path}`),
 );
@@ -81,8 +81,8 @@ const getRecommendedPosts = async () => {
     categoryPosts = await Astro.glob("../data/blog-posts/blog/*.{md,mdx}");
   } else if (category === "stories") {
     categoryPosts = await Astro.glob("../data/blog-posts/stories/*.{md,mdx}");
-  } else if (category === "works") {
-    categoryPosts = await Astro.glob("../data/blog-posts/works/*.{md,mdx}");
+  } else if (category === "misc") {
+    categoryPosts = await Astro.glob("../data/blog-posts/misc/*.{md,mdx}");
   } else if (category === "ptm") {
     categoryPosts = await Astro.glob("../data/blog-posts/ptm/*.{md,mdx}");
   } else {

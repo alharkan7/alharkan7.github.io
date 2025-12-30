@@ -210,7 +210,8 @@ const { current = "" } = Astro.props;
       <a
         class={current === "bookmarks" ||
         current === "videos" ||
-        current === "stars"
+        current === "stars" ||
+        current === "tweets"
           ? "selected"
           : ""}
         data-dropdown-toggle
@@ -222,14 +223,14 @@ const { current = "" } = Astro.props;
         <a href="/videos">Videos</a>
         <a href="/bookmarks">Bookmarks</a>
         <a href="/stars">Repos</a>
+        <a href="/tweets">Tweets</a>
       </div>
     </div>
 
     <div class="dropdown-container">
       <a
-        class={current === "shorts" ||
-        current === "stories" ||
-        current === "works" ||
+        class={current === "stories" ||
+        current === "misc" ||
         current === "search" ||
         current === "uncategorized" ||
         current === "ptm" ||
@@ -242,10 +243,10 @@ const { current = "" } = Astro.props;
         class="dropdown-button">Others</a
       >
       <div class="dropdown-content">
-        <a href="/shorts">Shorts</a>
-        <a href="/stories">Stories</a>
-        <a href="/works">Works</a>
         <a href="/bio">Profile</a>
+        <a href="/ptm">Theories</a>
+        <a href="/stories">Stories</a>
+        <a href="/misc">Misc.</a>
         <!-- <a href="/uncategorized">Uncategorized</a> -->
       </div>
     </div>
