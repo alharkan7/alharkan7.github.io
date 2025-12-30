@@ -1,25 +1,35 @@
 ---
-const { current = '' } = Astro.props;
+const { current = "" } = Astro.props;
 ---
 
 <footer>
   <span>
-    &copy; {new Date().getFullYear()} Al Harkan | 
+    &copy; {new Date().getFullYear()} Al Harkan
+    <span class="separator">|</span>
     <a href="/bio" class="underline hover:font-bold">Contact</a>
-    | 
-    <a href="https://github.com/alharkan7/alharkan7.github.io" target="_blank" rel="noopener" class="underline hover:font-bold">Source Code</a>
-
+    <span class="separator">|</span>
+    <a
+      href="https://github.com/alharkan7/alharkan7.github.io"
+      target="_blank"
+      rel="noopener"
+      class="underline hover:font-bold">Source Code</a
+    >
   </span>
 </footer>
 
 <style>
   footer {
     color: var(--text-secondary);
-    font-size: .8em;
+    font-size: 0.9em;
     margin: 1em auto;
     max-width: 1400px;
     padding: 1em 2em;
     text-align: center;
     width: 100%;
+  }
+
+  .separator {
+    margin: 0 0.8em;
+    opacity: 0.6;
   }
 </style>

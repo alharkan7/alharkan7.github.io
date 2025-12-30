@@ -67,6 +67,7 @@ const { current = "" } = Astro.props;
   /* Profile link specific styling */
   a[href="/bio"] {
     color: var(--primary-color) !important;
+    font-weight: 900;
   }
 
   a {
@@ -201,7 +202,9 @@ const { current = "" } = Astro.props;
 
 <div class="nav-container">
   <nav>
-    <a class={current === "" ? "selected" : ""} href="/">Home</a>
+    <a class={current === "" || current === "blog" ? "selected" : ""} href="/"
+      >Home</a
+    >
 
     <div class="dropdown-container">
       <a
@@ -259,22 +262,22 @@ const { current = "" } = Astro.props;
         <a
           href="https://alhrkn.vercel.app/papermap"
           target="_blank"
-          rel="noopener noreferrer">Papermap</a
+          rel="noopener noreferrer">Papermap ↗</a
         >
         <a
           href="https://alhrkn.vercel.app/outliner"
           target="_blank"
-          rel="noopener noreferrer">Outliner</a
+          rel="noopener noreferrer">Outliner ↗</a
         >
         <a
           href="https://alhrkn.vercel.app/inztagram"
           target="_blank"
-          rel="noopener noreferrer">Inztagram</a
+          rel="noopener noreferrer">Inztagram ↗</a
         >
         <a
           href="https://alhrkn.vercel.app"
           target="_blank"
-          rel="noopener noreferrer">All Apps</a
+          rel="noopener noreferrer">All Apps ↗</a
         >
       </div>
     </div>
