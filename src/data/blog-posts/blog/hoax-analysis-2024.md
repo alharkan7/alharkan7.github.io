@@ -1,6 +1,6 @@
 ---
 title: 'Indonesian Hoaxes: 2024 Wrapped'
-description: "Analysis of 3,760 hoax articles reveals Indonesia's 2024 election disinformation crisis: Anies faced 3x more attacks than government coalition, exposing strategic misinformation tactics."
+description: "In 2024, Indonesia held what was described as the world's largest single-day election. But alongside the democratic process, another battle was raging: the fight against hoaxes."
 publishDate: '30 Dec 2025'
 ---
 
