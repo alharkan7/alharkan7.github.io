@@ -11,6 +11,8 @@ With 185.3 million Indonesians online (66.5% of the population) and 46% getting 
 > Important URLs:
 > - [Source Code ↗](https://github.com/alharkan7/turnbackhoax-analysis)
 > - [Topic Modeling Explorer ↗](https://www.raihankalla.id/turnbackhoax-analysis)
+> - [Raw Data ↗](https://docs.google.com/spreadsheets/d/1uDFRbWFzMJjYxs1D13o79g726uROOVcJj41B4axGmWU)
+> - [Web Scraper ↗](https://colab.research.google.com/drive/1U-oBI_jJHBdmZX0rJA6S3IIMNausLU_m)
 > - [Network Analysis ↗](https://www.raihankalla.id/turnbackhoax-text-network)
 > - [Sentiment Analysis ↗](https://www.raihankalla.id/turnbackhoax-sentiment-analysis)
 
