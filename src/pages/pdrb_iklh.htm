@@ -1,0 +1,964 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Economic Growth vs Environmental Quality</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <script src="https://cdn.plot.ly/plotly-2.27.0.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-body: #f8fafc;
+            --bg-card: #ffffff;
+            --border-light: #e2e8f0;
+            --text-primary: #0f172a;
+            --text-secondary: #64748b;
+            
+            --accent-pdrb: #0ea5e9;
+            --accent-iklh: #10b981;
+            
+            /* Quadrant colors */
+            --color-champion: #10b981;     /* Green - sustainable growth */
+            --color-stagnant: #fbbf24;     /* Yellow - stagnant green */
+            --color-challenge: #ef4444;    /* Red - double challenge */
+            --color-growth-cost: #f97316;  /* Orange - growth at cost */
+            --color-neutral: #6b7280;      /* Gray - neutral */
+            
+            --font-main: 'Source Sans 3', sans-serif;
+            --font-mono: 'JetBrains Mono', monospace;
+            
+            --shadow-sm: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+            --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: var(--font-main);
+            background-color: var(--bg-body);
+            color: var(--text-primary);
+            min-height: 100vh;
+            padding: 2rem;
+            background-image: linear-gradient(rgba(148, 163, 184, 0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(148, 163, 184, 0.1) 1px, transparent 1px);
+            background-size: 40px 40px;
+        }
+
+        .container { max-width: 1400px; margin: 0 auto; }
+        header { text-align: center; margin-bottom: 3rem; }
+
+        h1 { font-size: 3rem; font-weight: 700; letter-spacing: -0.02em; color: var(--text-primary); margin-bottom: 0.5rem; }
+        .subtitle { font-size: 1.2rem; color: var(--text-secondary); font-weight: 300; }
+
+        /* Controls */
+        .controls-bar {
+            display: flex; justify-content: center; gap: 1rem; margin-bottom: 2.5rem; padding: 1rem;
+            background: rgba(255,255,255,0.8); backdrop-filter: blur(8px); border-radius: 12px;
+            border: 1px solid var(--border-light); box-shadow: var(--shadow-sm); width: fit-content;
+            margin: 0 auto 2.5rem auto; flex-wrap: wrap;
+        }
+        select {
+            padding: 0.5rem 2rem 0.5rem 1rem; border-radius: 8px; border: 1px solid var(--border-light);
+            background-color: #fff; font-family: var(--font-main); color: var(--text-primary);
+            font-size: 0.95rem; cursor: pointer; appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%2364748b'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E");
+            background-repeat: no-repeat; background-position: right 0.75rem center; background-size: 1rem;
+        }
+        select:focus { outline: 2px solid var(--accent-pdrb); border-color: var(--accent-pdrb); }
+
+        /* KPIs */
+        .kpi-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1.5rem; margin-bottom: 2.5rem; }
+        .kpi-card { 
+            background: var(--bg-card); padding: 1.5rem; border-radius: 12px; border: 1px solid var(--border-light); 
+            box-shadow: var(--shadow-sm); transition: transform 0.2s, box-shadow 0.2s; text-align: center; 
+        }
+        .kpi-card:hover { transform: translateY(-2px); box-shadow: var(--shadow-md); }
+        .kpi-label { font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-secondary); font-weight: 600; margin-bottom: 0.5rem; }
+        .kpi-value { font-family: var(--font-mono); font-size: 2rem; font-weight: 600; color: var(--text-primary); }
+        .kpi-sub { font-size: 0.85rem; color: var(--text-secondary); margin-top: 0.25rem; }
+        
+        /* Responsive KPI grid */
+        @media (max-width: 1200px) {
+            .kpi-grid { grid-template-columns: repeat(2, 1fr); }
+        }
+        @media (max-width: 640px) {
+            .kpi-grid { grid-template-columns: 1fr; }
+        }
+
+        /* Tabs */
+        .tabs-container { margin-bottom: 2rem; }
+        .tab-buttons {
+            display: flex; gap: 0.5rem; margin-bottom: 1.5rem; padding: 0.5rem;
+            background: rgba(255,255,255,0.6); backdrop-filter: blur(8px);
+            border-radius: 12px; border: 1px solid var(--border-light);
+            justify-content: center;
+            box-shadow: var(--shadow-sm); overflow-x: auto; flex-wrap: wrap;
+        }
+        .tab-btn {
+            padding: 0.75rem 1.5rem; border-radius: 8px; border: none;
+            background: transparent; color: var(--text-secondary);
+            font-family: var(--font-main); font-size: 0.95rem; font-weight: 500;
+            cursor: pointer; transition: all 0.2s; white-space: nowrap;
+        }
+        .tab-btn:hover { background: rgba(0,0,0,0.05); color: var(--text-primary); }
+        .tab-btn.active {
+            background: var(--accent-pdrb); color: white;
+            box-shadow: 0 2px 4px rgba(14, 165, 233, 0.3);
+        }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+        
+        /* NEW LAYOUT Grid */
+        .grid-row { display: grid; gap: 2rem; margin-bottom: 2rem; }
+        .cols-1 { grid-template-columns: 1fr; }
+
+        .chart-wrapper {
+            background: var(--bg-card); border: 1px solid var(--border-light);
+            border-radius: 16px; padding: 2rem; box-shadow: var(--shadow-sm);
+        }
+
+        .chart-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 1rem; }
+        .chart-header h2 { font-size: 1.25rem; font-weight: 600; color: var(--text-primary); }
+        .chart-context { font-size: 0.9rem; color: var(--text-secondary); }
+        .chart-header select {
+            padding: 0.5rem 0.75rem; border-radius: 6px; border: 1px solid var(--border-light);
+            background: white; color: var(--text-primary); font-size: 0.875rem;
+            cursor: pointer; transition: border-color 0.2s;
+        }
+        .chart-header select:hover { border-color: var(--accent-pdrb); }
+        .chart-header select:focus { outline: none; border-color: var(--accent-pdrb); box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.1); }
+
+        /* INSIGHTS OPEN BY DEFAULT */
+        .insight-box { margin-top: 1.5rem; background: #f1f5f9; border-radius: 8px; overflow: hidden; }
+        .insight-toggle {
+            padding: 0.75rem 1rem; cursor: pointer; display: flex; align-items: center; justify-content: space-between;
+            font-weight: 600; color: var(--text-secondary); font-size: 0.9rem; user-select: none; transition: color 0.2s;
+        }
+        .insight-toggle:hover { color: var(--text-primary); }
+        .insight-content {
+            height: auto; overflow: hidden; transition: height 0.3s ease-out;
+            padding: 0 1rem 1rem 1rem; font-size: 0.95rem; color: var(--text-secondary); line-height: 1.6;
+            margin-top: 0;
+        }
+        .insight-content.closed { height: 0; padding: 0; }
+        
+        .arrow-icon { width: 16px; height: 16px; transition: transform 0.3s; transform: rotate(180deg); }
+        .arrow-icon.closed { transform: rotate(0deg); }
+
+        /* Tooltip & D3 */
+        #custom-tooltip {
+            position: absolute; opacity: 0; background: rgba(255, 255, 255, 0.98);
+            border: 1px solid var(--border-light); border-radius: 6px; padding: 0.75rem;
+            box-shadow: var(--shadow-md); pointer-events: none; font-size: 0.85rem;
+            z-index: 100; font-family: var(--font-main); color: var(--text-primary); min-width: 150px;
+        }
+        .tooltip-title { font-weight: 600; margin-bottom: 0.25rem; border-bottom: 1px solid var(--border-light); padding-bottom: 0.25rem; }
+        .tooltip-item { display: flex; justify-content: space-between; margin-top: 0.25rem; color: var(--text-secondary); }
+        .tooltip-val { font-family: var(--font-mono); font-weight: 600; color: var(--text-primary); }
+        .domain, .tick line { stroke: var(--border-light); }
+        .tick text { fill: var(--text-secondary); font-family: var(--font-main); }
+
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <h1>Economic Growth vs Environmental Quality</h1>
+        <p class="subtitle">Analysis of Indonesia's Provincial Data</p>
+    </header>
+
+    <div class="controls-bar">
+        <select id="sel-province"><option value="all">All Provinces</option></select>
+        <select id="sel-year"><option value="all">All Years</option></select>
+    </div>
+
+    <div class="kpi-grid" id="kpi-container"></div>
+
+    <!-- Tabs Navigation -->
+    <div class="tabs-container">
+        <div class="tab-buttons">
+            <button class="tab-btn active" onclick="switchTab('correlation')">Correlation & Quadrant</button>
+            <button class="tab-btn" onclick="switchTab('decoupling')">Decoupling</button>
+            <button class="tab-btn" onclick="switchTab('covid')">COVID Impact</button>
+            <button class="tab-btn" onclick="switchTab('trends')">Trends</button>
+            <button class="tab-btn" onclick="switchTab('distribution')">Distribution</button>
+            <button class="tab-btn" onclick="switchTab('heatmap')">Heatmap</button>
+        </div>
+
+        <!-- Tab 1: Correlation Matrix & Quadrant Analysis -->
+        <div id="tab-correlation" class="tab-content active">
+            <div class="grid-row cols-1">
+                <div class="chart-wrapper">
+                    <div class="chart-header">
+                        <h2>Correlation Matrix</h2>
+                        <span class="chart-context">Economic Breakdown based on Environmental Factors</span>
+                    </div>
+                    <div id="scatter-chart" style="width:100%; height:450px;"></div>
+                    <div class="insight-box">
+                        <div class="insight-toggle" onclick="toggleInsight(this)">
+                            <span>About this visualization</span>
+                            <svg class="arrow-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"></path></svg>
+                        </div>
+                        <div class="insight-content">
+                            <p>Scatter plot visualizing the trade-off. 
+                            <strong style="color:var(--accent-pdrb)">X-Axis:</strong> PDRB Growth (%). 
+                            <strong style="color:var(--accent-iklh)">Y-Axis:</strong> IKLH Index. 
+                            Top-right is ideal (Green Growth). Bottom-right suggests growth at environmental cost.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Quadrant Analysis (moved from separate tab) -->
+            <div class="grid-row cols-1">
+                <div class="chart-wrapper">
+                    <div class="chart-header">
+                        <h2>Regional Performance Quadrant</h2>
+                        <span class="chart-context">Sustainability Classification</span>
+                    </div>
+                    <div id="quadrant-chart" style="width:100%; height:450px;"></div>
+                    <div class="insight-box">
+                        <div class="insight-toggle" onclick="toggleInsight(this)">
+                            <span>About this visualization</span>
+                            <svg class="arrow-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"></path></svg>
+                        </div>
+                        <div class="insight-content">
+                            <p>Provinces categorized into quadrants based on median values. <strong style="color:var(--color-champion)">Green Champions</strong> (high growth, high environment), <strong style="color:var(--color-stagnant)">Stagnant Green</strong> (low growth, high environment), <strong style="color:var(--color-challenge)">Double Challenge</strong> (low growth, low environment), <strong style="color:var(--color-growth-cost)">Growth at Cost</strong> (high growth, low environment).</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+
+        <!-- Tab 2: Decoupling Analysis -->
+        <div id="tab-decoupling" class="tab-content">
+            <div class="grid-row cols-1">
+                <div class="chart-wrapper">
+                    <div class="chart-header">
+                        <h2>Decoupling Index</h2>
+                        <span class="chart-context">Environmental vs Economic Growth</span>
+                        <select id="sel-decoupling-limit" style="margin-left: auto;">
+                            <option value="15">Top 15</option>
+                            <option value="20">Top 20</option>
+                            <option value="25">Top 25</option>
+                            <option value="all">All Provinces</option>
+                        </select>
+                    </div>
+                    <div style="height: 400px;">
+                        <canvas id="decoupling-chart"></canvas>
+                    </div>
+                    <div class="insight-box">
+                        <div class="insight-toggle" onclick="toggleInsight(this)">
+                            <span>About this visualization</span>
+                            <svg class="arrow-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"></path></svg>
+                        </div>
+                        <div class="insight-content">
+                            <p><strong>Top 15 provinces</strong> ranked by decoupling score. Positive values = weak decoupling (both metrics growing). Negative values with improving IKLH = strong decoupling (ideal green growth).</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tab 3: COVID Impact -->
+        <div id="tab-covid" class="tab-content">
+            <div class="grid-row cols-1">
+                <div class="chart-wrapper">
+                    <div class="chart-header">
+                        <h2>COVID-19 Impact Analysis</h2>
+                        <span class="chart-context">Before, During, After Comparison</span>
+                        <select id="sel-covid-limit" style="margin-left: auto;">
+                            <option value="10">Top 10</option>
+                            <option value="15">Top 15</option>
+                            <option value="20">Top 20</option>
+                            <option value="all">All Provinces</option>
+                        </select>
+                    </div>
+                    <div style="height: 400px;">
+                        <canvas id="covid-chart"></canvas>
+                    </div>
+                    <div class="insight-box">
+                        <div class="insight-toggle" onclick="toggleInsight(this)">
+                            <span>About this visualization</span>
+                            <svg class="arrow-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"></path></svg>
+                        </div>
+                        <div class="insight-content">
+                            <p><strong>Top 10 provinces</strong> with fastest recovery ranked by post-COVID bounce-back. Compares PDRB growth: Before (2017-2019), During (2020-2021), After (2022-2023).</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tab 4: Longitudinal Trends -->
+        <div id="tab-trends" class="tab-content">
+            <div class="grid-row cols-1">
+                <div class="chart-wrapper">
+                    <div class="chart-header">
+                        <h2>Longitudinal Trends</h2>
+                        <span class="chart-context">Performance over Time</span>
+                    </div>
+                    <div style="height: 400px;">
+                        <canvas id="trend-chart"></canvas>
+                    </div>
+                    <div class="insight-box">
+                        <div class="insight-toggle" onclick="toggleInsight(this)">
+                            <span>About this visualization</span>
+                            <svg class="arrow-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"></path></svg>
+                        </div>
+                        <div class="insight-content">
+                            <p>Tracks average metrics annually. <span style="color:var(--accent-pdrb)">Blue line</span> = PDRB Growth (volatility). <span style="color:var(--accent-iklh)">Green line</span> = IKLH Index (stability/trend).</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Year-over-Year Chart in same tab -->
+            <div class="grid-row cols-1">
+                <div class="chart-wrapper">
+                    <div class="chart-header">
+                        <h2>Year-over-Year Change</h2>
+                        <span class="chart-context">Percentage Ups and Downs</span>
+                    </div>
+                    <div style="height: 400px;">
+                        <canvas id="yoy-chart"></canvas>
+                    </div>
+                    <div class="insight-box">
+                        <div class="insight-toggle" onclick="toggleInsight(this)">
+                            <span>About this visualization</span>
+                            <svg class="arrow-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"></path></svg>
+                        </div>
+                        <div class="insight-content">
+                            <p>Shows percentage of increases vs decreases year-over-year. <span style="color:var(--accent-pdrb)">Blue bars</span> = PDRB ups/downs percentage. <span style="color:var(--accent-iklh)">Green bars</span> = IKLH ups/downs percentage. Values above 50% indicate more increases than decreases.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tab 5: Distributions -->
+        <div id="tab-distribution" class="tab-content">
+            <div class="grid-row cols-1">
+                <!-- PDRB Distribution -->
+                <div class="chart-wrapper">
+                    <div class="chart-header">
+                        <h2>PDRB Growth Distribution</h2>
+                        <span class="chart-context">Economic Frequency</span>
+                    </div>
+                    <div style="height: 350px;">
+                        <canvas id="dist-pdrb-chart"></canvas>
+                    </div>
+                    <div class="insight-box">
+                        <div class="insight-toggle" onclick="toggleInsight(this)">
+                            <span>About this visualization</span>
+                            <svg class="arrow-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"></path></svg>
+                        </div>
+                        <div class="insight-content">
+                            <p>Histogram of Economic Growth rates. Helps identify the modal growth range and spot economic booms or recessions.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="grid-row cols-1">
+                <!-- IKLH Distribution -->
+                <div class="chart-wrapper">
+                    <div class="chart-header">
+                        <h2>IKLH Index Distribution</h2>
+                        <span class="chart-context">Environmental Frequency</span>
+                    </div>
+                    <div style="height: 350px;">
+                        <canvas id="dist-iklh-chart"></canvas>
+                    </div>
+                    <div class="insight-box">
+                        <div class="insight-toggle" onclick="toggleInsight(this)">
+                            <span>About this visualization</span>
+                            <svg class="arrow-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"></path></svg>
+                        </div>
+                        <div class="insight-content">
+                            <p>Histogram of Environmental Quality Indices. Shows the distribution of environmental health across regions/years.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tab 6: Heatmaps -->
+        <div id="tab-heatmap" class="tab-content">
+            <div class="grid-row cols-1">
+                <!-- PDRB Heatmap -->
+                <div class="chart-wrapper">
+                    <div class="chart-header">
+                        <h2>PDRB Heatmap</h2>
+                        <span class="chart-context">Economic Intensity</span>
+                    </div>
+                    <div id="heatmap-pdrb" style="width:100%;"></div>
+                    <div class="insight-box">
+                        <div class="insight-toggle" onclick="toggleInsight(this)">
+                            <span>About this visualization</span>
+                            <svg class="arrow-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"></path></svg>
+                        </div>
+                        <div class="insight-content">
+                            <p><strong>All provinces</strong> economic heatmap over time. Lighter/Yellower cells = higher growth. Darker purple cells = lower growth or contraction.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="grid-row cols-1">
+                <!-- IKLH Heatmap -->
+                <div class="chart-wrapper">
+                    <div class="chart-header">
+                        <h2>IKLH Heatmap</h2>
+                        <span class="chart-context">Environmental Quality</span>
+                    </div>
+                    <div id="heatmap-iklh" style="width:100%;"></div>
+                    <div class="insight-box">
+                        <div class="insight-toggle" onclick="toggleInsight(this)">
+                            <span>About this visualization</span>
+                            <svg class="arrow-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"></path></svg>
+                        </div>
+                        <div class="insight-content">
+                            <p><strong>All provinces</strong> environmental heatmap over time. Lighter/Yellower cells = better conditions. Darker purple cells = degradation.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<div id="custom-tooltip"></div>
+
+<script>
+    const DATASET = [{"province": "Aceh", "year": 2010, "pdrb": 2.64, "iklh": 77.3}, {"province": "Aceh", "year": 2011, "pdrb": 3.28, "iklh": 66.74}, {"province": "Aceh", "year": 2012, "pdrb": 3.85, "iklh": 73.65}, {"province": "Aceh", "year": 2013, "pdrb": 2.61, "iklh": 71.86}, {"province": "Aceh", "year": 2014, "pdrb": 1.55, "iklh": 72.6}, {"province": "Aceh", "year": 2015, "pdrb": -0.73, "iklh": 74.83}, {"province": "Aceh", "year": 2016, "pdrb": 3.29, "iklh": 73.55}, {"province": "Aceh", "year": 2017, "pdrb": 4.18, "iklh": 77.7}, {"province": "Aceh", "year": 2018, "pdrb": 4.61, "iklh": 79.36}, {"province": "Aceh", "year": 2019, "pdrb": 4.14, "iklh": 76.01}, {"province": "Aceh", "year": 2020, "pdrb": -0.37, "iklh": 75.61}, {"province": "Aceh", "year": 2021, "pdrb": 2.81, "iklh": 75.54}, {"province": "Aceh", "year": 2022, "pdrb": 4.21, "iklh": 78.29}, {"province": "Aceh", "year": 2023, "pdrb": 4.23, "iklh": 78.53}, {"province": "Bali", "year": 2010, "pdrb": 5.83, "iklh": 99.65}, {"province": "Bali", "year": 2011, "pdrb": 6.66, "iklh": 85.3}, {"province": "Bali", "year": 2012, "pdrb": 6.96, "iklh": 59.09}, {"province": "Bali", "year": 2013, "pdrb": 6.69, "iklh": 57.49}, {"province": "Bali", "year": 2014, "pdrb": 6.73, "iklh": 59.81}, {"province": "Bali", "year": 2015, "pdrb": 6.03, "iklh": 73.71}, {"province": "Bali", "year": 2016, "pdrb": 6.33, "iklh": 72.59}, {"province": "Bali", "year": 2017, "pdrb": 5.56, "iklh": 70.11}, {"province": "Bali", "year": 2018, "pdrb": 6.31, "iklh": 66.62}, {"province": "Bali", "year": 2019, "pdrb": 5.6, "iklh": 63.09}, {"province": "Bali", "year": 2020, "pdrb": -9.34, "iklh": 71.99}, {"province": "Bali", "year": 2021, "pdrb": -2.46, "iklh": 70.7}, {"province": "Bali", "year": 2022, "pdrb": 4.84, "iklh": 70.89}, {"province": "Bali", "year": 2023, "pdrb": 5.71, "iklh": 71.38}, {"province": "Banten", "year": 2010, "pdrb": 5.94, "iklh": 48.98}, {"province": "Banten", "year": 2011, "pdrb": 7.03, "iklh": 48.98}, {"province": "Banten", "year": 2012, "pdrb": 6.83, "iklh": 46.77}, {"province": "Banten", "year": 2013, "pdrb": 6.67, "iklh": 46.33}, {"province": "Banten", "year": 2014, "pdrb": 5.51, "iklh": 43.67}, {"province": "Banten", "year": 2015, "pdrb": 5.45, "iklh": 55.36}, {"province": "Banten", "year": 2016, "pdrb": 5.28, "iklh": 60.0}, {"province": "Banten", "year": 2017, "pdrb": 5.75, "iklh": 51.58}, {"province": "Banten", "year": 2018, "pdrb": 5.77, "iklh": 57.0}, {"province": "Banten", "year": 2019, "pdrb": 5.26, "iklh": 51.09}, {"province": "Banten", "year": 2020, "pdrb": -3.39, "iklh": 59.37}, {"province": "Banten", "year": 2021, "pdrb": 4.49, "iklh": 64.14}, {"province": "Banten", "year": 2022, "pdrb": 5.03, "iklh": 63.41}, {"province": "Banten", "year": 2023, "pdrb": 4.81, "iklh": 62.52}, {"province": "Bengkulu", "year": 2010, "pdrb": 6.02, "iklh": 96.89}, {"province": "Bengkulu", "year": 2011, "pdrb": 6.85, "iklh": 96.77}, {"province": "Bengkulu", "year": 2012, "pdrb": 6.83, "iklh": 66.01}, {"province": "Bengkulu", "year": 2013, "pdrb": 6.07, "iklh": 67.98}, {"province": "Bengkulu", "year": 2014, "pdrb": 5.48, "iklh": 66.76}, {"province": "Bengkulu", "year": 2015, "pdrb": 5.13, "iklh": 76.92}, {"province": "Bengkulu", "year": 2016, "pdrb": 5.28, "iklh": 72.43}, {"province": "Bengkulu", "year": 2017, "pdrb": 4.98, "iklh": 70.18}, {"province": "Bengkulu", "year": 2018, "pdrb": 4.97, "iklh": 74.32}, {"province": "Bengkulu", "year": 2019, "pdrb": 4.94, "iklh": 64.41}, {"province": "Bengkulu", "year": 2020, "pdrb": -0.02, "iklh": 69.92}, {"province": "Bengkulu", "year": 2021, "pdrb": 3.27, "iklh": 71.46}, {"province": "Bengkulu", "year": 2022, "pdrb": 4.31, "iklh": 70.82}, {"province": "Bengkulu", "year": 2023, "pdrb": 4.28, "iklh": 72.1}, {"province": "DI Yogyakarta", "year": 2010, "pdrb": 4.87, "iklh": 71.91}, {"province": "DI Yogyakarta", "year": 2011, "pdrb": 5.21, "iklh": 68.89}, {"province": "DI Yogyakarta", "year": 2012, "pdrb": 5.37, "iklh": 53.25}, {"province": "DI Yogyakarta", "year": 2013, "pdrb": 5.47, "iklh": 52.01}, {"province": "DI Yogyakarta", "year": 2014, "pdrb": 5.17, "iklh": 49.53}, {"province": "DI Yogyakarta", "year": 2015, "pdrb": 4.95, "iklh": 50.99}, {"province": "DI Yogyakarta", "year": 2016, "pdrb": 5.05, "iklh": 51.37}, {"province": "DI Yogyakarta", "year": 2017, "pdrb": 5.26, "iklh": 49.8}, {"province": "DI Yogyakarta", "year": 2018, "pdrb": 6.2, "iklh": 62.98}, {"province": "DI Yogyakarta", "year": 2019, "pdrb": 6.59, "iklh": 49.24}, {"province": "DI Yogyakarta", "year": 2020, "pdrb": -2.67, "iklh": 66.65}, {"province": "DI Yogyakarta", "year": 2021, "pdrb": 5.58, "iklh": 65.66}, {"province": "DI Yogyakarta", "year": 2022, "pdrb": 5.15, "iklh": 65.96}, {"province": "DI Yogyakarta", "year": 2023, "pdrb": 5.07, "iklh": 66.29}, {"province": "DKI Jakarta", "year": 2010, "pdrb": 6.51, "iklh": 41.81}, {"province": "DKI Jakarta", "year": 2011, "pdrb": 6.73, "iklh": 41.31}, {"province": "DKI Jakarta", "year": 2012, "pdrb": 6.53, "iklh": 36.8}, {"province": "DKI Jakarta", "year": 2013, "pdrb": 6.07, "iklh": 31.97}, {"province": "DKI Jakarta", "year": 2014, "pdrb": 5.91, "iklh": 36.88}, {"province": "DKI Jakarta", "year": 2015, "pdrb": 5.91, "iklh": 43.79}, {"province": "DKI Jakarta", "year": 2016, "pdrb": 5.87, "iklh": 38.69}, {"province": "DKI Jakarta", "year": 2017, "pdrb": 6.2, "iklh": 35.78}, {"province": "DKI Jakarta", "year": 2018, "pdrb": 6.11, "iklh": 45.21}, {"province": "DKI Jakarta", "year": 2019, "pdrb": 5.82, "iklh": 42.84}, {"province": "DKI Jakarta", "year": 2020, "pdrb": -2.39, "iklh": 52.98}, {"province": "DKI Jakarta", "year": 2021, "pdrb": 3.55, "iklh": 54.43}, {"province": "DKI Jakarta", "year": 2022, "pdrb": 5.25, "iklh": 54.65}, {"province": "DKI Jakarta", "year": 2023, "pdrb": 4.96, "iklh": 54.57}, {"province": "Gorontalo", "year": 2010, "pdrb": 7.79, "iklh": 97.93}, {"province": "Gorontalo", "year": 2011, "pdrb": 7.71, "iklh": 98.89}, {"province": "Gorontalo", "year": 2012, "pdrb": 7.91, "iklh": 74.9}, {"province": "Gorontalo", "year": 2013, "pdrb": 7.67, "iklh": 74.48}, {"province": "Gorontalo", "year": 2014, "pdrb": 7.27, "iklh": 75.52}, {"province": "Gorontalo", "year": 2015, "pdrb": 6.22, "iklh": 71.08}, {"province": "Gorontalo", "year": 2016, "pdrb": 6.52, "iklh": 69.3}, {"province": "Gorontalo", "year": 2017, "pdrb": 6.73, "iklh": 67.46}, {"province": "Gorontalo", "year": 2018, "pdrb": 6.49, "iklh": 84.09}, {"province": "Gorontalo", "year": 2019, "pdrb": 6.4, "iklh": 74.97}, {"province": "Gorontalo", "year": 2020, "pdrb": -0.02, "iklh": 75.31}, {"province": "Gorontalo", "year": 2021, "pdrb": 2.4, "iklh": 77.32}, {"province": "Gorontalo", "year": 2022, "pdrb": 4.03, "iklh": 79.79}, {"province": "Gorontalo", "year": 2023, "pdrb": 4.5, "iklh": 79.52}, {"province": "Jambi", "year": 2010, "pdrb": 7.31, "iklh": 62.82}, {"province": "Jambi", "year": 2011, "pdrb": 7.86, "iklh": 64.92}, {"province": "Jambi", "year": 2012, "pdrb": 7.03, "iklh": 61.16}, {"province": "Jambi", "year": 2013, "pdrb": 6.84, "iklh": 60.43}, {"province": "Jambi", "year": 2014, "pdrb": 7.36, "iklh": 62.04}, {"province": "Jambi", "year": 2015, "pdrb": 4.21, "iklh": 61.85}, {"province": "Jambi", "year": 2016, "pdrb": 4.37, "iklh": 64.01}, {"province": "Jambi", "year": 2017, "pdrb": 4.6, "iklh": 64.98}, {"province": "Jambi", "year": 2018, "pdrb": 4.69, "iklh": 71.0}, {"province": "Jambi", "year": 2019, "pdrb": 4.35, "iklh": 68.08}, {"province": "Jambi", "year": 2020, "pdrb": -0.51, "iklh": 70.87}, {"province": "Jambi", "year": 2021, "pdrb": 3.7, "iklh": 69.04}, {"province": "Jambi", "year": 2022, "pdrb": 5.12, "iklh": 70.32}, {"province": "Jambi", "year": 2023, "pdrb": 4.67, "iklh": 68.15}, {"province": "Jawa Barat", "year": 2010, "pdrb": 6.09, "iklh": 53.44}, {"province": "Jawa Barat", "year": 2011, "pdrb": 6.5, "iklh": 50.9}, {"province": "Jawa Barat", "year": 2012, "pdrb": 6.5, "iklh": 48.18}, {"province": "Jawa Barat", "year": 2013, "pdrb": 6.33, "iklh": 47.61}, {"province": "Jawa Barat", "year": 2014, "pdrb": 5.09, "iklh": 45.06}, {"province": "Jawa Barat", "year": 2015, "pdrb": 5.05, "iklh": 63.49}, {"province": "Jawa Barat", "year": 2016, "pdrb": 5.66, "iklh": 51.87}, {"province": "Jawa Barat", "year": 2017, "pdrb": 5.33, "iklh": 50.26}, {"province": "Jawa Barat", "year": 2018, "pdrb": 5.65, "iklh": 56.98}, {"province": "Jawa Barat", "year": 2019, "pdrb": 5.02, "iklh": 51.69}, {"province": "Jawa Barat", "year": 2020, "pdrb": -2.52, "iklh": 59.4}, {"province": "Jawa Barat", "year": 2021, "pdrb": 3.74, "iklh": 62.68}, {"province": "Jawa Barat", "year": 2022, "pdrb": 5.45, "iklh": 64.66}, {"province": "Jawa Barat", "year": 2023, "pdrb": 5.0, "iklh": 64.77}, {"province": "Jawa Tengah", "year": 2010, "pdrb": 5.84, "iklh": 50.48}, {"province": "Jawa Tengah", "year": 2011, "pdrb": 5.3, "iklh": 49.82}, {"province": "Jawa Tengah", "year": 2012, "pdrb": 5.34, "iklh": 60.96}, {"province": "Jawa Tengah", "year": 2013, "pdrb": 5.11, "iklh": 58.03}, {"province": "Jawa Tengah", "year": 2014, "pdrb": 5.27, "iklh": 60.63}, {"province": "Jawa Tengah", "year": 2015, "pdrb": 5.47, "iklh": 60.78}, {"province": "Jawa Tengah", "year": 2016, "pdrb": 5.25, "iklh": 58.75}, {"province": "Jawa Tengah", "year": 2017, "pdrb": 5.26, "iklh": 58.15}, {"province": "Jawa Tengah", "year": 2018, "pdrb": 5.3, "iklh": 68.27}, {"province": "Jawa Tengah", "year": 2019, "pdrb": 5.36, "iklh": 60.97}, {"province": "Jawa Tengah", "year": 2020, "pdrb": -2.65, "iklh": 67.62}, {"province": "Jawa Tengah", "year": 2021, "pdrb": 3.33, "iklh": 66.27}, {"province": "Jawa Tengah", "year": 2022, "pdrb": 5.31, "iklh": 66.85}, {"province": "Jawa Tengah", "year": 2023, "pdrb": 4.97, "iklh": 68.59}, {"province": "Jawa Timur", "year": 2010, "pdrb": 6.68, "iklh": 49.49}, {"province": "Jawa Timur", "year": 2011, "pdrb": 6.44, "iklh": 54.49}, {"province": "Jawa Timur", "year": 2012, "pdrb": 6.64, "iklh": 58.96}, {"province": "Jawa Timur", "year": 2013, "pdrb": 6.08, "iklh": 56.47}, {"province": "Jawa Timur", "year": 2014, "pdrb": 5.86, "iklh": 56.48}, {"province": "Jawa Timur", "year": 2015, "pdrb": 5.44, "iklh": 62.67}, {"province": "Jawa Timur", "year": 2016, "pdrb": 5.57, "iklh": 58.98}, {"province": "Jawa Timur", "year": 2017, "pdrb": 5.46, "iklh": 57.46}, {"province": "Jawa Timur", "year": 2018, "pdrb": 5.47, "iklh": 67.08}, {"province": "Jawa Timur", "year": 2019, "pdrb": 5.53, "iklh": 60.25}, {"province": "Jawa Timur", "year": 2020, "pdrb": -2.33, "iklh": 67.07}, {"province": "Jawa Timur", "year": 2021, "pdrb": 3.56, "iklh": 68.29}, {"province": "Jawa Timur", "year": 2022, "pdrb": 5.34, "iklh": 69.92}, {"province": "Jawa Timur", "year": 2023, "pdrb": 4.95, "iklh": 69.59}, {"province": "Kalimantan Barat", "year": 2010, "pdrb": 5.35, "iklh": 76.39}, {"province": "Kalimantan Barat", "year": 2011, "pdrb": 5.5, "iklh": 74.27}, {"province": "Kalimantan Barat", "year": 2012, "pdrb": 5.91, "iklh": 70.49}, {"province": "Kalimantan Barat", "year": 2013, "pdrb": 6.05, "iklh": 69.08}, {"province": "Kalimantan Barat", "year": 2014, "pdrb": 5.03, "iklh": 68.31}, {"province": "Kalimantan Barat", "year": 2015, "pdrb": 4.88, "iklh": 75.88}, {"province": "Kalimantan Barat", "year": 2016, "pdrb": 5.2, "iklh": 72.24}, {"province": "Kalimantan Barat", "year": 2017, "pdrb": 5.17, "iklh": 74.17}, {"province": "Kalimantan Barat", "year": 2018, "pdrb": 5.07, "iklh": 73.09}, {"province": "Kalimantan Barat", "year": 2019, "pdrb": 5.09, "iklh": 65.91}, {"province": "Kalimantan Barat", "year": 2020, "pdrb": -1.82, "iklh": 70.07}, {"province": "Kalimantan Barat", "year": 2021, "pdrb": 4.8, "iklh": 72.9}, {"province": "Kalimantan Barat", "year": 2022, "pdrb": 5.07, "iklh": 71.9}, {"province": "Kalimantan Barat", "year": 2023, "pdrb": 4.46, "iklh": 73.73}, {"province": "Kalimantan Selatan", "year": 2010, "pdrb": 5.58, "iklh": 58.24}, {"province": "Kalimantan Selatan", "year": 2011, "pdrb": 6.97, "iklh": 60.29}, {"province": "Kalimantan Selatan", "year": 2012, "pdrb": 5.97, "iklh": 56.74}, {"province": "Kalimantan Selatan", "year": 2013, "pdrb": 5.33, "iklh": 55.86}, {"province": "Kalimantan Selatan", "year": 2014, "pdrb": 4.84, "iklh": 57.51}, {"province": "Kalimantan Selatan", "year": 2015, "pdrb": 3.82, "iklh": 57.47}, {"province": "Kalimantan Selatan", "year": 2016, "pdrb": 4.4, "iklh": 59.07}, {"province": "Kalimantan Selatan", "year": 2017, "pdrb": 5.28, "iklh": 69.38}, {"province": "Kalimantan Selatan", "year": 2018, "pdrb": 5.08, "iklh": 68.78}, {"province": "Kalimantan Selatan", "year": 2019, "pdrb": 4.09, "iklh": 61.94}, {"province": "Kalimantan Selatan", "year": 2020, "pdrb": -1.82, "iklh": 68.43}, {"province": "Kalimantan Selatan", "year": 2021, "pdrb": 3.48, "iklh": 71.03}, {"province": "Kalimantan Selatan", "year": 2022, "pdrb": 5.11, "iklh": 71.97}, {"province": "Kalimantan Selatan", "year": 2023, "pdrb": 4.84, "iklh": 73.5}, {"province": "Kalimantan Tengah", "year": 2010, "pdrb": 6.47, "iklh": 50.38}, {"province": "Kalimantan Tengah", "year": 2011, "pdrb": 7.01, "iklh": 63.98}, {"province": "Kalimantan Tengah", "year": 2012, "pdrb": 6.87, "iklh": 71.22}, {"province": "Kalimantan Tengah", "year": 2013, "pdrb": 7.37, "iklh": 69.71}, {"province": "Kalimantan Tengah", "year": 2014, "pdrb": 6.21, "iklh": 70.37}, {"province": "Kalimantan Tengah", "year": 2015, "pdrb": 7.01, "iklh": 74.09}, {"province": "Kalimantan Tengah", "year": 2016, "pdrb": 6.35, "iklh": 74.71}, {"province": "Kalimantan Tengah", "year": 2017, "pdrb": 6.73, "iklh": 71.47}, {"province": "Kalimantan Tengah", "year": 2018, "pdrb": 5.61, "iklh": 75.71}, {"province": "Kalimantan Tengah", "year": 2019, "pdrb": 6.12, "iklh": 74.19}, {"province": "Kalimantan Tengah", "year": 2020, "pdrb": -1.41, "iklh": 72.74}, {"province": "Kalimantan Tengah", "year": 2021, "pdrb": 3.59, "iklh": 75.11}, {"province": "Kalimantan Tengah", "year": 2022, "pdrb": 6.45, "iklh": 76.62}, {"province": "Kalimantan Tengah", "year": 2023, "pdrb": 4.14, "iklh": 75.17}, {"province": "Kalimantan Timur", "year": 2010, "pdrb": 4.95, "iklh": 62.22}, {"province": "Kalimantan Timur", "year": 2011, "pdrb": 6.47, "iklh": 70.75}, {"province": "Kalimantan Timur", "year": 2012, "pdrb": 5.48, "iklh": 74.07}, {"province": "Kalimantan Timur", "year": 2013, "pdrb": 2.76, "iklh": 73.21}, {"province": "Kalimantan Timur", "year": 2014, "pdrb": 1.71, "iklh": 74.0}, {"province": "Kalimantan Timur", "year": 2015, "pdrb": -1.2, "iklh": 81.15}, {"province": "Kalimantan Timur", "year": 2016, "pdrb": -0.38, "iklh": 76.85}, {"province": "Kalimantan Timur", "year": 2017, "pdrb": 3.13, "iklh": 75.65}, {"province": "Kalimantan Timur", "year": 2018, "pdrb": 2.64, "iklh": 85.9}, {"province": "Kalimantan Timur", "year": 2019, "pdrb": 4.7, "iklh": 80.79}, {"province": "Kalimantan Timur", "year": 2020, "pdrb": -2.9, "iklh": 76.46}, {"province": "Kalimantan Timur", "year": 2021, "pdrb": 2.55, "iklh": 75.06}, {"province": "Kalimantan Timur", "year": 2022, "pdrb": 4.48, "iklh": 74.46}, {"province": "Kalimantan Timur", "year": 2023, "pdrb": 6.22, "iklh": 75.47}, {"province": "Kalimantan Utara", "year": 2017, "pdrb": 6.8, "iklh": 81.87}, {"province": "Kalimantan Utara", "year": 2018, "pdrb": 5.36, "iklh": 86.88}, {"province": "Kalimantan Utara", "year": 2019, "pdrb": 6.89, "iklh": 78.98}, {"province": "Kalimantan Utara", "year": 2020, "pdrb": -1.09, "iklh": 78.49}, {"province": "Kalimantan Utara", "year": 2021, "pdrb": 3.99, "iklh": 80.85}, {"province": "Kalimantan Utara", "year": 2022, "pdrb": 5.32, "iklh": 80.67}, {"province": "Kalimantan Utara", "year": 2023, "pdrb": 4.94, "iklh": 80.77}, {"province": "Lampung", "year": 2010, "pdrb": 5.75, "iklh": 86.95}, {"province": "Lampung", "year": 2011, "pdrb": 6.56, "iklh": 86.57}, {"province": "Lampung", "year": 2012, "pdrb": 6.44, "iklh": 51.98}, {"province": "Lampung", "year": 2013, "pdrb": 5.77, "iklh": 54.71}, {"province": "Lampung", "year": 2014, "pdrb": 5.08, "iklh": 56.42}, {"province": "Lampung", "year": 2015, "pdrb": 5.13, "iklh": 63.04}, {"province": "Lampung", "year": 2016, "pdrb": 5.14, "iklh": 60.34}, {"province": "Lampung", "year": 2017, "pdrb": 5.16, "iklh": 59.72}, {"province": "Lampung", "year": 2018, "pdrb": 5.23, "iklh": 59.89}, {"province": "Lampung", "year": 2019, "pdrb": 5.26, "iklh": 57.37}, {"province": "Lampung", "year": 2020, "pdrb": -1.66, "iklh": 67.46}, {"province": "Lampung", "year": 2021, "pdrb": 2.77, "iklh": 68.56}, {"province": "Lampung", "year": 2022, "pdrb": 4.28, "iklh": 69.1}, {"province": "Lampung", "year": 2023, "pdrb": 4.55, "iklh": 69.91}, {"province": "Maluku", "year": 2010, "pdrb": 6.47, "iklh": 79.72}, {"province": "Maluku", "year": 2011, "pdrb": 6.34, "iklh": 73.09}, {"province": "Maluku", "year": 2012, "pdrb": 7.16, "iklh": 73.92}, {"province": "Maluku", "year": 2013, "pdrb": 5.24, "iklh": 73.51}, {"province": "Maluku", "year": 2014, "pdrb": 6.64, "iklh": 74.79}, {"province": "Maluku", "year": 2015, "pdrb": 5.48, "iklh": 76.33}, {"province": "Maluku", "year": 2016, "pdrb": 5.73, "iklh": 71.66}, {"province": "Maluku", "year": 2017, "pdrb": 5.82, "iklh": 75.12}, {"province": "Maluku", "year": 2018, "pdrb": 5.91, "iklh": 81.23}, {"province": "Maluku", "year": 2019, "pdrb": 5.41, "iklh": 79.55}, {"province": "Maluku", "year": 2020, "pdrb": -0.91, "iklh": 75.98}, {"province": "Maluku", "year": 2021, "pdrb": 3.63, "iklh": 78.23}, {"province": "Maluku", "year": 2022, "pdrb": 5.31, "iklh": 77.69}, {"province": "Maluku", "year": 2023, "pdrb": 5.21, "iklh": 78.75}, {"province": "Maluku Utara", "year": 2010, "pdrb": 7.96, "iklh": 79.72}, {"province": "Maluku Utara", "year": 2011, "pdrb": 6.8, "iklh": 73.09}, {"province": "Maluku Utara", "year": 2012, "pdrb": 6.98, "iklh": 78.24}, {"province": "Maluku Utara", "year": 2013, "pdrb": 6.36, "iklh": 76.56}, {"province": "Maluku Utara", "year": 2014, "pdrb": 5.49, "iklh": 77.22}, {"province": "Maluku Utara", "year": 2015, "pdrb": 6.1, "iklh": 75.97}, {"province": "Maluku Utara", "year": 2016, "pdrb": 5.77, "iklh": 72.46}, {"province": "Maluku Utara", "year": 2017, "pdrb": 7.67, "iklh": 74.55}, {"province": "Maluku Utara", "year": 2018, "pdrb": 7.86, "iklh": 88.25}, {"province": "Maluku Utara", "year": 2019, "pdrb": 6.25, "iklh": 78.44}, {"province": "Maluku Utara", "year": 2020, "pdrb": 5.39, "iklh": 74.71}, {"province": "Maluku Utara", "year": 2021, "pdrb": 16.79, "iklh": 77.45}, {"province": "Maluku Utara", "year": 2022, "pdrb": 22.94, "iklh": 78.84}, {"province": "Maluku Utara", "year": 2023, "pdrb": 20.49, "iklh": 80.36}, {"province": "Nusa Tenggara Barat", "year": 2010, "pdrb": 6.29, "iklh": 90.15}, {"province": "Nusa Tenggara Barat", "year": 2011, "pdrb": -3.91, "iklh": 84.3}, {"province": "Nusa Tenggara Barat", "year": 2012, "pdrb": -1.54, "iklh": 66.76}, {"province": "Nusa Tenggara Barat", "year": 2013, "pdrb": 5.16, "iklh": 66.97}, {"province": "Nusa Tenggara Barat", "year": 2014, "pdrb": 5.17, "iklh": 69.39}, {"province": "Nusa Tenggara Barat", "year": 2015, "pdrb": 21.76, "iklh": 58.82}, {"province": "Nusa Tenggara Barat", "year": 2016, "pdrb": 5.81, "iklh": 56.53}, {"province": "Nusa Tenggara Barat", "year": 2017, "pdrb": 0.09, "iklh": 56.99}, {"province": "Nusa Tenggara Barat", "year": 2018, "pdrb": -4.5, "iklh": 75.16}, {"province": "Nusa Tenggara Barat", "year": 2019, "pdrb": 3.9, "iklh": 64.59}, {"province": "Nusa Tenggara Barat", "year": 2020, "pdrb": -0.62, "iklh": 70.83}, {"province": "Nusa Tenggara Barat", "year": 2021, "pdrb": 2.3, "iklh": 69.89}, {"province": "Nusa Tenggara Barat", "year": 2022, "pdrb": 6.95, "iklh": 70.56}, {"province": "Nusa Tenggara Barat", "year": 2023, "pdrb": 1.8, "iklh": 71.92}, {"province": "Nusa Tenggara Timur", "year": 2010, "pdrb": 5.13, "iklh": 50.72}, {"province": "Nusa Tenggara Timur", "year": 2011, "pdrb": 5.67, "iklh": 59.01}, {"province": "Nusa Tenggara Timur", "year": 2012, "pdrb": 5.46, "iklh": 65.48}, {"province": "Nusa Tenggara Timur", "year": 2013, "pdrb": 5.41, "iklh": 62.81}, {"province": "Nusa Tenggara Timur", "year": 2014, "pdrb": 5.05, "iklh": 62.98}, {"province": "Nusa Tenggara Timur", "year": 2015, "pdrb": 4.92, "iklh": 63.79}, {"province": "Nusa Tenggara Timur", "year": 2016, "pdrb": 5.12, "iklh": 59.23}, {"province": "Nusa Tenggara Timur", "year": 2017, "pdrb": 5.11, "iklh": 61.92}, {"province": "Nusa Tenggara Timur", "year": 2018, "pdrb": 5.11, "iklh": 69.01}, {"province": "Nusa Tenggara Timur", "year": 2019, "pdrb": 5.25, "iklh": 69.67}, {"province": "Nusa Tenggara Timur", "year": 2020, "pdrb": -0.84, "iklh": 73.28}, {"province": "Nusa Tenggara Timur", "year": 2021, "pdrb": 2.52, "iklh": 74.97}, {"province": "Nusa Tenggara Timur", "year": 2022, "pdrb": 3.08, "iklh": 73.49}, {"province": "Nusa Tenggara Timur", "year": 2023, "pdrb": 3.47, "iklh": 74.18}, {"province": "Papua", "year": 2010, "pdrb": -2.65, "iklh": 59.56}, {"province": "Papua", "year": 2011, "pdrb": -4.28, "iklh": 68.51}, {"province": "Papua", "year": 2012, "pdrb": 1.72, "iklh": 82.34}, {"province": "Papua", "year": 2013, "pdrb": 8.55, "iklh": 82.91}, {"province": "Papua", "year": 2014, "pdrb": 3.65, "iklh": 80.65}, {"province": "Papua", "year": 2015, "pdrb": 7.35, "iklh": 81.01}, {"province": "Papua", "year": 2016, "pdrb": 9.14, "iklh": 81.35}, {"province": "Papua", "year": 2017, "pdrb": 4.64, "iklh": 81.47}, {"province": "Papua", "year": 2018, "pdrb": 7.32, "iklh": 83.88}, {"province": "Papua", "year": 2019, "pdrb": -15.74, "iklh": 81.79}, {"province": "Papua", "year": 2020, "pdrb": 2.39, "iklh": 79.75}, {"province": "Papua", "year": 2021, "pdrb": 15.16, "iklh": 80.23}, {"province": "Papua", "year": 2022, "pdrb": 8.97, "iklh": 81.46}, {"province": "Papua", "year": 2023, "pdrb": 4.22, "iklh": 81.31}, {"province": "Papua Barat", "year": 2010, "pdrb": 26.82, "iklh": 59.56}, {"province": "Papua Barat", "year": 2011, "pdrb": 3.64, "iklh": 68.51}, {"province": "Papua Barat", "year": 2012, "pdrb": 3.63, "iklh": 80.67}, {"province": "Papua Barat", "year": 2013, "pdrb": 7.36, "iklh": 80.61}, {"province": "Papua Barat", "year": 2014, "pdrb": 5.38, "iklh": 84.51}, {"province": "Papua Barat", "year": 2015, "pdrb": 4.15, "iklh": 82.33}, {"province": "Papua Barat", "year": 2016, "pdrb": 4.52, "iklh": 83.01}, {"province": "Papua Barat", "year": 2017, "pdrb": 4.02, "iklh": 85.69}, {"province": "Papua Barat", "year": 2018, "pdrb": 6.25, "iklh": 91.5}, {"province": "Papua Barat", "year": 2019, "pdrb": 2.66, "iklh": 83.96}, {"province": "Papua Barat", "year": 2020, "pdrb": -0.76, "iklh": 78.65}, {"province": "Papua Barat", "year": 2021, "pdrb": -0.51, "iklh": 81.8}, {"province": "Papua Barat", "year": 2022, "pdrb": 2.03, "iklh": 84.22}, {"province": "Papua Barat", "year": 2023, "pdrb": 5.18, "iklh": 83.31}, {"province": "Papua Barat Daya", "year": 2023, "pdrb": 1.82, "iklh": 81.91}, {"province": "Papua Pegunungan", "year": 2023, "pdrb": 4.78, "iklh": 81.18}, {"province": "Papua Selatan", "year": 2023, "pdrb": 4.23, "iklh": 85.08}, {"province": "Papua Tengah", "year": 2023, "pdrb": 5.95, "iklh": 76.09}, {"province": "Riau", "year": 2010, "pdrb": 4.17, "iklh": 54.86}, {"province": "Riau", "year": 2011, "pdrb": 5.57, "iklh": 56.23}, {"province": "Riau", "year": 2012, "pdrb": 3.76, "iklh": 53.79}, {"province": "Riau", "year": 2013, "pdrb": 2.48, "iklh": 50.69}, {"province": "Riau", "year": 2014, "pdrb": 2.71, "iklh": 52.59}, {"province": "Riau", "year": 2015, "pdrb": 0.22, "iklh": 53.07}, {"province": "Riau", "year": 2016, "pdrb": 2.18, "iklh": 56.73}, {"province": "Riau", "year": 2017, "pdrb": 2.66, "iklh": 68.64}, {"province": "Riau", "year": 2018, "pdrb": 2.35, "iklh": 68.43}, {"province": "Riau", "year": 2019, "pdrb": 2.81, "iklh": 62.39}, {"province": "Riau", "year": 2020, "pdrb": -1.13, "iklh": 69.41}, {"province": "Riau", "year": 2021, "pdrb": 3.36, "iklh": 70.72}, {"province": "Riau", "year": 2022, "pdrb": 4.55, "iklh": 72.1}, {"province": "Riau", "year": 2023, "pdrb": 4.21, "iklh": 70.42}, {"province": "Sulawesi Barat", "year": 2010, "pdrb": 7.63, "iklh": 62.89}, {"province": "Sulawesi Barat", "year": 2011, "pdrb": 10.73, "iklh": 67.85}, {"province": "Sulawesi Barat", "year": 2012, "pdrb": 9.25, "iklh": 71.51}, {"province": "Sulawesi Barat", "year": 2013, "pdrb": 6.93, "iklh": 70.21}, {"province": "Sulawesi Barat", "year": 2014, "pdrb": 8.86, "iklh": 72.29}, {"province": "Sulawesi Barat", "year": 2015, "pdrb": 7.31, "iklh": 68.78}, {"province": "Sulawesi Barat", "year": 2016, "pdrb": 6.01, "iklh": 64.54}, {"province": "Sulawesi Barat", "year": 2017, "pdrb": 6.39, "iklh": 74.47}, {"province": "Sulawesi Barat", "year": 2018, "pdrb": 6.26, "iklh": 79.89}, {"province": "Sulawesi Barat", "year": 2019, "pdrb": 5.56, "iklh": 72.03}, {"province": "Sulawesi Barat", "year": 2020, "pdrb": -2.34, "iklh": 73.6}, {"province": "Sulawesi Barat", "year": 2021, "pdrb": 2.57, "iklh": 75.72}, {"province": "Sulawesi Barat", "year": 2022, "pdrb": 2.26, "iklh": 76.77}, {"province": "Sulawesi Barat", "year": 2023, "pdrb": 5.23, "iklh": 78.05}, {"province": "Sulawesi Selatan", "year": 2010, "pdrb": 8.19, "iklh": 62.89}, {"province": "Sulawesi Selatan", "year": 2011, "pdrb": 8.13, "iklh": 62.64}, {"province": "Sulawesi Selatan", "year": 2012, "pdrb": 8.87, "iklh": 64.72}, {"province": "Sulawesi Selatan", "year": 2013, "pdrb": 7.62, "iklh": 63.67}, {"province": "Sulawesi Selatan", "year": 2014, "pdrb": 7.54, "iklh": 64.06}, {"province": "Sulawesi Selatan", "year": 2015, "pdrb": 7.19, "iklh": 76.43}, {"province": "Sulawesi Selatan", "year": 2016, "pdrb": 7.42, "iklh": 70.54}, {"province": "Sulawesi Selatan", "year": 2017, "pdrb": 7.21, "iklh": 69.39}, {"province": "Sulawesi Selatan", "year": 2018, "pdrb": 7.04, "iklh": 83.34}, {"province": "Sulawesi Selatan", "year": 2019, "pdrb": 6.91, "iklh": 67.63}, {"province": "Sulawesi Selatan", "year": 2020, "pdrb": -0.71, "iklh": 70.7}, {"province": "Sulawesi Selatan", "year": 2021, "pdrb": 4.64, "iklh": 73.23}, {"province": "Sulawesi Selatan", "year": 2022, "pdrb": 5.1, "iklh": 74.17}, {"province": "Sulawesi Selatan", "year": 2023, "pdrb": 4.51, "iklh": 74.3}, {"province": "Sulawesi Tengah", "year": 2010, "pdrb": 8.18, "iklh": 97.58}, {"province": "Sulawesi Tengah", "year": 2011, "pdrb": 9.82, "iklh": 98.53}, {"province": "Sulawesi Tengah", "year": 2012, "pdrb": 9.53, "iklh": 82.65}, {"province": "Sulawesi Tengah", "year": 2013, "pdrb": 9.59, "iklh": 80.28}, {"province": "Sulawesi Tengah", "year": 2014, "pdrb": 5.07, "iklh": 76.4}, {"province": "Sulawesi Tengah", "year": 2015, "pdrb": 15.5, "iklh": 67.01}, {"province": "Sulawesi Tengah", "year": 2016, "pdrb": 9.94, "iklh": 68.78}, {"province": "Sulawesi Tengah", "year": 2017, "pdrb": 7.1, "iklh": 73.24}, {"province": "Sulawesi Tengah", "year": 2018, "pdrb": 20.56, "iklh": 74.83}, {"province": "Sulawesi Tengah", "year": 2019, "pdrb": 8.83, "iklh": 80.23}, {"province": "Sulawesi Tengah", "year": 2020, "pdrb": 4.86, "iklh": 77.53}, {"province": "Sulawesi Tengah", "year": 2021, "pdrb": 11.68, "iklh": 77.78}, {"province": "Sulawesi Tengah", "year": 2022, "pdrb": 15.22, "iklh": 78.66}, {"province": "Sulawesi Tengah", "year": 2023, "pdrb": 11.91, "iklh": 79.93}, {"province": "Sulawesi Tenggara", "year": 2010, "pdrb": 11.91, "iklh": 62.23}, {"province": "Sulawesi Tenggara", "year": 2011, "pdrb": 10.63, "iklh": 52.79}, {"province": "Sulawesi Tenggara", "year": 2012, "pdrb": 11.65, "iklh": 76.68}, {"province": "Sulawesi Tenggara", "year": 2013, "pdrb": 7.5, "iklh": 69.08}, {"province": "Sulawesi Tenggara", "year": 2014, "pdrb": 6.26, "iklh": 72.14}, {"province": "Sulawesi Tenggara", "year": 2015, "pdrb": 6.88, "iklh": 75.18}, {"province": "Sulawesi Tenggara", "year": 2016, "pdrb": 6.51, "iklh": 75.24}, {"province": "Sulawesi Tenggara", "year": 2017, "pdrb": 6.76, "iklh": 70.86}, {"province": "Sulawesi Tenggara", "year": 2018, "pdrb": 6.4, "iklh": 83.17}, {"province": "Sulawesi Tenggara", "year": 2019, "pdrb": 6.5, "iklh": 72.03}, {"province": "Sulawesi Tenggara", "year": 2020, "pdrb": -0.65, "iklh": 72.82}, {"province": "Sulawesi Tenggara", "year": 2021, "pdrb": 4.1, "iklh": 74.97}, {"province": "Sulawesi Tenggara", "year": 2022, "pdrb": 5.53, "iklh": 76.88}, {"province": "Sulawesi Tenggara", "year": 2023, "pdrb": 5.35, "iklh": 78.41}, {"province": "Sulawesi Utara", "year": 2010, "pdrb": 7.12, "iklh": 84.18}, {"province": "Sulawesi Utara", "year": 2011, "pdrb": 6.17, "iklh": 84.59}, {"province": "Sulawesi Utara", "year": 2012, "pdrb": 6.86, "iklh": 65.62}, {"province": "Sulawesi Utara", "year": 2013, "pdrb": 6.38, "iklh": 63.66}, {"province": "Sulawesi Utara", "year": 2014, "pdrb": 6.31, "iklh": 65.69}, {"province": "Sulawesi Utara", "year": 2015, "pdrb": 6.13, "iklh": 66.27}, {"province": "Sulawesi Utara", "year": 2016, "pdrb": 6.16, "iklh": 67.07}, {"province": "Sulawesi Utara", "year": 2017, "pdrb": 6.31, "iklh": 70.81}, {"province": "Sulawesi Utara", "year": 2018, "pdrb": 6.0, "iklh": 74.95}, {"province": "Sulawesi Utara", "year": 2019, "pdrb": 5.65, "iklh": 65.15}, {"province": "Sulawesi Utara", "year": 2020, "pdrb": -0.99, "iklh": 70.69}, {"province": "Sulawesi Utara", "year": 2021, "pdrb": 4.16, "iklh": 72.38}, {"province": "Sulawesi Utara", "year": 2022, "pdrb": 5.42, "iklh": 72.37}, {"province": "Sulawesi Utara", "year": 2023, "pdrb": 5.48, "iklh": 73.87}, {"province": "Sumatera Barat", "year": 2010, "pdrb": 5.93, "iklh": 81.46}, {"province": "Sumatera Barat", "year": 2011, "pdrb": 6.34, "iklh": 77.0}, {"province": "Sumatera Barat", "year": 2012, "pdrb": 6.31, "iklh": 69.74}, {"province": "Sumatera Barat", "year": 2013, "pdrb": 6.08, "iklh": 67.75}, {"province": "Sumatera Barat", "year": 2014, "pdrb": 5.88, "iklh": 68.91}, {"province": "Sumatera Barat", "year": 2015, "pdrb": 5.53, "iklh": 59.07}, {"province": "Sumatera Barat", "year": 2016, "pdrb": 5.27, "iklh": 60.06}, {"province": "Sumatera Barat", "year": 2017, "pdrb": 5.3, "iklh": 68.16}, {"province": "Sumatera Barat", "year": 2018, "pdrb": 5.14, "iklh": 78.69}, {"province": "Sumatera Barat", "year": 2019, "pdrb": 5.01, "iklh": 69.66}, {"province": "Sumatera Barat", "year": 2020, "pdrb": -1.61, "iklh": 72.79}, {"province": "Sumatera Barat", "year": 2021, "pdrb": 3.29, "iklh": 73.68}, {"province": "Sumatera Barat", "year": 2022, "pdrb": 4.36, "iklh": 74.98}, {"province": "Sumatera Barat", "year": 2023, "pdrb": 4.62, "iklh": 75.85}, {"province": "Sumatera Selatan", "year": 2010, "pdrb": 5.43, "iklh": 75.7}, {"province": "Sumatera Selatan", "year": 2011, "pdrb": 6.36, "iklh": 77.5}, {"province": "Sumatera Selatan", "year": 2012, "pdrb": 6.83, "iklh": 55.59}, {"province": "Sumatera Selatan", "year": 2013, "pdrb": 5.31, "iklh": 58.53}, {"province": "Sumatera Selatan", "year": 2014, "pdrb": 4.79, "iklh": 61.62}, {"province": "Sumatera Selatan", "year": 2015, "pdrb": 4.42, "iklh": 69.06}, {"province": "Sumatera Selatan", "year": 2016, "pdrb": 5.04, "iklh": 67.27}, {"province": "Sumatera Selatan", "year": 2017, "pdrb": 5.51, "iklh": 69.18}, {"province": "Sumatera Selatan", "year": 2018, "pdrb": 6.01, "iklh": 68.11}, {"province": "Sumatera Selatan", "year": 2019, "pdrb": 5.69, "iklh": 61.41}, {"province": "Sumatera Selatan", "year": 2020, "pdrb": -0.11, "iklh": 69.71}, {"province": "Sumatera Selatan", "year": 2021, "pdrb": 3.58, "iklh": 69.7}, {"province": "Sumatera Selatan", "year": 2022, "pdrb": 5.24, "iklh": 72.12}, {"province": "Sumatera Selatan", "year": 2023, "pdrb": 5.08, "iklh": 70.2}, {"province": "Sumatera Utara", "year": 2010, "pdrb": 6.35, "iklh": 87.17}, {"province": "Sumatera Utara", "year": 2011, "pdrb": 6.66, "iklh": 72.21}, {"province": "Sumatera Utara", "year": 2012, "pdrb": 6.45, "iklh": 62.67}, {"province": "Sumatera Utara", "year": 2013, "pdrb": 6.07, "iklh": 62.98}, {"province": "Sumatera Utara", "year": 2014, "pdrb": 5.23, "iklh": 61.53}, {"province": "Sumatera Utara", "year": 2015, "pdrb": 5.1, "iklh": 69.37}, {"province": "Sumatera Utara", "year": 2016, "pdrb": 5.18, "iklh": 66.47}, {"province": "Sumatera Utara", "year": 2017, "pdrb": 5.12, "iklh": 69.77}, {"province": "Sumatera Utara", "year": 2018, "pdrb": 5.18, "iklh": 64.41}, {"province": "Sumatera Utara", "year": 2019, "pdrb": 5.22, "iklh": 62.49}, {"province": "Sumatera Utara", "year": 2020, "pdrb": -1.07, "iklh": 69.9}, {"province": "Sumatera Utara", "year": 2021, "pdrb": 2.61, "iklh": 71.15}, {"province": "Sumatera Utara", "year": 2022, "pdrb": 4.73, "iklh": 74.11}, {"province": "Sumatera Utara", "year": 2023, "pdrb": 5.01, "iklh": 72.8}];
+    let currentProvince = 'all';
+    let currentYear = 'all';
+
+    const selProvince = document.getElementById('sel-province');
+    const selYear = document.getElementById('sel-year');
+    const selCovidLimit = document.getElementById('sel-covid-limit');
+    const selDecouplingLimit = document.getElementById('sel-decoupling-limit');
+    const kpiContainer = document.getElementById('kpi-container');
+    const tooltip = document.getElementById('custom-tooltip');
+
+    let currentCovidLimit = '10';
+    let currentDecouplingLimit = '15';
+    let trendChart = null;
+    let yoyChart = null;
+    let distDescChart = null; // PDRB
+    let distIklhChart = null; // IKLH
+
+    function init() {
+        populateControls();
+        renderDashboard();
+
+        selProvince.addEventListener('change', (e) => { currentProvince = e.target.value; renderDashboard(); });
+        selYear.addEventListener('change', (e) => { currentYear = e.target.value; renderDashboard(); });
+        selCovidLimit.addEventListener('change', (e) => { currentCovidLimit = e.target.value; renderCOVID(filterData()); });
+        selDecouplingLimit.addEventListener('change', (e) => { currentDecouplingLimit = e.target.value; renderDecoupling(filterData()); });
+    }
+
+    function populateControls() {
+        const provinces = [...new Set(DATASET.map(d => d.province))].sort();
+        provinces.forEach(p => {
+            const opt = document.createElement('option'); opt.value = p; opt.textContent = p; selProvince.appendChild(opt);
+        });
+        const years = [...new Set(DATASET.map(d => d.year))].sort((a,b)=>a-b);
+        years.forEach(y => {
+            const opt = document.createElement('option'); opt.value = y; opt.textContent = y; selYear.appendChild(opt);
+        });
+    }
+
+    function filterData() {
+        return DATASET.filter(d => {
+            const pMatch = (currentProvince === 'all') || (d.province === currentProvince);
+            const yMatch = (currentYear === 'all') || (d.year == currentYear);
+            return pMatch && yMatch;
+        });
+    }
+
+    function renderDashboard() {
+        const filtered = filterData();
+        renderKPIs(filtered);
+        renderScatter(filtered);
+        renderQuadrant(filtered);
+        renderDecoupling(filtered);
+        renderCOVID(filtered);
+        renderTrends(filtered);
+        renderYoY(filtered);
+        renderDistPDRB(filtered);
+        renderDistIKLH(filtered);
+        renderHeatmapPDRB(filtered);
+        renderHeatmapIKLH(filtered);
+    }
+
+    function renderKPIs(data) {
+        const n = data.length;
+        if (n === 0) { kpiContainer.innerHTML = '<div class="kpi-card">No Data Available</div>'; return; }
+        const avgPDRB = data.reduce((sum, d) => sum + d.pdrb, 0) / n;
+        const avgIKLH = data.reduce((sum, d) => sum + d.iklh, 0) / n;
+        
+        const numP = data.reduce((sum, d) => sum + d.pdrb, 0);
+        const numI = data.reduce((sum, d) => sum + d.iklh, 0);
+        const numPI = data.reduce((sum, d) => sum + (d.pdrb * d.iklh), 0);
+        const sqP = data.reduce((sum, d) => sum + (d.pdrb * d.pdrb), 0);
+        const sqI = data.reduce((sum, d) => sum + (d.iklh * d.iklh), 0);
+        const numerator = (n * numPI) - (numP * numI);
+        const denom = Math.sqrt( ((n*sqP) - (numP**2)) * ((n*sqI) - (numI**2)) );
+        const correlation = denom === 0 ? 0 : numerator / denom;
+
+        // Enhanced KPIs
+        const pdrbVals = data.map(d => d.pdrb).sort((a,b)=>a-b);
+        const iklhVals = data.map(d => d.iklh).sort((a,b)=>a-b);
+        const gini = (vals) => { const sorted = [...vals].sort((a,b)=>a-b); let sum = 0, weightedSum = 0; sorted.forEach((v,i) => { sum += v; weightedSum += (i+1) * v; }); return (2 * weightedSum) / (n * sum) - (n + 1) / n; };
+        const trend = data.length > 5 ? (data[data.length-1].pdrb > data[0].pdrb ? '↑' : '↓') : '→';
+        const bestProv = currentProvince === 'all' ? '...' : currentProvince;
+        const greenIndex = ((avgIKLH / 100) * ((avgPDRB + 20) / 25)).toFixed(2);
+        
+        const kpis = [
+            { label: 'Data Points', value: n, sub: 'Observations' },
+            { label: 'Avg PDRB', value: avgPDRB.toFixed(2) + '%', sub: 'Economic Growth', color: 'var(--accent-pdrb)' },
+            { label: 'Avg IKLH', value: avgIKLH.toFixed(2), sub: 'Env. Quality', color: 'var(--accent-iklh)' },
+            { label: 'Correlation', value: correlation.toFixed(3), sub: 'Pearson r', color: correlation > 0 ? '#10b981' : '#ef4444' },
+            { label: 'PDRB Gini', value: gini(pdrbVals).toFixed(3), sub: 'Growth Inequality' },
+            { label: 'Trend', value: trend, sub: 'Direction', style: 'font-size:2.5rem' },
+            { label: 'Top Province', value: bestProv, sub: 'Best Performer', style: 'font-size:1.2rem' },
+            { label: 'Green Index', value: greenIndex, sub: 'Sustainability Score', color: 'var(--color-champion)' }
+        ];
+        kpiContainer.innerHTML = kpis.map(k => `
+            <div class="kpi-card">
+                <div class="kpi-label">${k.label}</div>
+                <div class="kpi-value" style="color: ${k.color || 'inherit'}; ${k.style || ''}">${k.value}</div>
+                <div class="kpi-sub">${k.sub}</div></div>`).join('');
+    }
+
+    // --- Scatter ---
+    function renderScatter(data) {
+        const container = document.getElementById('scatter-chart');
+        container.innerHTML = '';
+        if(data.length === 0) return;
+        const margin = {top: 20, right: 30, bottom: 40, left: 50};
+        const width = container.offsetWidth - margin.left - margin.right;
+        const height = 450 - margin.top - margin.bottom;
+
+        const svg = d3.select("#scatter-chart").append("svg")
+            .attr("width", width + margin.left + margin.right).attr("height", height + margin.top + margin.bottom)
+            .append("g").attr("transform", `translate(${margin.left},${margin.top})`);
+
+        const x = d3.scaleLinear().domain([d3.min(data,d=>d.pdrb)-1, d3.max(data,d=>d.pdrb)+1]).range([0, width]);
+        const y = d3.scaleLinear().domain([d3.min(data,d=>d.iklh)-5, d3.max(data,d=>d.iklh)+5]).range([height, 0]);
+
+        svg.append("g").attr("class","gridlines").attr("transform",`translate(0,${height})`).call(d3.axisBottom(x).ticks(10).tickSize(-height).tickFormat(""));
+        svg.append("g").attr("class","gridlines").call(d3.axisLeft(y).ticks(10).tickSize(-width).tickFormat(""));
+        svg.append("g").attr("transform",`translate(0,${height})`).call(d3.axisBottom(x));
+        svg.append("g").call(d3.axisLeft(y));
+
+        svg.append("text").attr("text-anchor","middle").attr("x",width/2).attr("y",height+35).style("fill","#64748b").style("font-size","0.85rem").text("PDRB Growth (%)");
+        svg.append("text").attr("text-anchor","middle").attr("transform","rotate(-90)").attr("y",-35).attr("x",-height/2).style("fill","#64748b").style("font-size","0.85rem").text("IKLH Index");
+
+        svg.append('g').selectAll("circle").data(data).join("circle")
+            .attr("cx", d=>x(d.pdrb)).attr("cy", d=>y(d.iklh)).attr("r", 5).style("fill", "rgba(14, 165, 233, 0.6)").style("stroke", "#0ea5e9")
+            .on("mouseover", function(e,d){
+                d3.select(this).attr("r",8);
+                tooltip.style.opacity=1; tooltip.style.left=(e.pageX+10)+"px"; tooltip.style.top=(e.pageY-10)+"px";
+                tooltip.innerHTML=`<div class="tooltip-title">${d.province} (${d.year})</div><div>PDRB: ${d.pdrb}%</div><div>IKLH: ${d.iklh}</div>`;
+            }).on("mouseout", function(){ d3.select(this).attr("r",5); tooltip.style.opacity=0; });
+    }
+
+    // --- Quadrant ---
+    function renderQuadrant(data) {
+        const container = document.getElementById('quadrant-chart');
+        container.innerHTML = '';
+        if(data.length === 0) return;
+        const medianP = d3.median(data, d => d.pdrb);
+        const medianI = d3.median(data, d => d.iklh);
+        const margin = {top: 20, right: 30, bottom: 40, left: 50};
+        const width = container.offsetWidth - margin.left - margin.right;
+        const height = 450 - margin.top - margin.bottom;
+
+        const svg = d3.select("#quadrant-chart").append("svg")
+            .attr("width", width + margin.left + margin.right).attr("height", height + margin.top + margin.bottom)
+            .append("g").attr("transform", `translate(${margin.left},${margin.top})`);
+
+        const x = d3.scaleLinear().domain([d3.min(data,d=>d.pdrb)-1, d3.max(data,d=>d.pdrb)+1]).range([0, width]);
+        const y = d3.scaleLinear().domain([d3.min(data,d=>d.iklh)-5, d3.max(data,d=>d.iklh)+5]).range([height, 0]);
+
+        const xMed = Math.max(0, Math.min(width, x(medianP)));
+        const yMed = Math.max(0, Math.min(height, y(medianI)));
+        
+        // Quadrant backgrounds with safe dimensions
+        const w1 = Math.max(0, xMed), h1 = Math.max(0, yMed);
+        const w2 = Math.max(0, width - xMed), h2 = Math.max(0, yMed);
+        const w3 = Math.max(0, xMed), h3 = Math.max(0, height - yMed);
+        const w4 = Math.max(0, width - xMed), h4 = Math.max(0, height - yMed);
+        
+        if(w1 > 0 && h1 > 0) svg.append("rect").attr("x", 0).attr("y", 0).attr("width", w1).attr("height", h1).attr("fill", "rgba(239, 68, 68, 0.1)");
+        if(w2 > 0 && h2 > 0) svg.append("rect").attr("x", xMed).attr("y", 0).attr("width", w2).attr("height", h2).attr("fill", "rgba(16, 185, 129, 0.1)");
+        if(w3 > 0 && h3 > 0) svg.append("rect").attr("x", 0).attr("y", yMed).attr("width", w3).attr("height", h3).attr("fill", "rgba(251, 191, 36, 0.1)");
+        if(w4 > 0 && h4 > 0) svg.append("rect").attr("x", xMed).attr("y", yMed).attr("width", w4).attr("height", h4).attr("fill", "rgba(249, 115, 22, 0.1)");
+
+        svg.append("line").attr("x1", xMed).attr("y1", 0).attr("x2", xMed).attr("y2", height).attr("stroke", "#64748b").attr("stroke-dasharray", "5,5");
+        svg.append("line").attr("x1", 0).attr("y1", yMed).attr("x2", width).attr("y2", yMed).attr("stroke", "#64748b").attr("stroke-dasharray", "5,5");
+
+        svg.append("g").attr("transform",`translate(0,${height})`).call(d3.axisBottom(x));
+        svg.append("g").call(d3.axisLeft(y));
+        svg.append("text").attr("text-anchor","middle").attr("x",width/2).attr("y",height+35).style("fill","#64748b").text("PDRB Growth (%)");
+        svg.append("text").attr("text-anchor","middle").attr("transform","rotate(-90)").attr("y",-35).attr("x",-height/2).style("fill","#64748b").text("IKLH Index");
+
+        const getColor = (p, i) => p >= medianP && i >= medianI ? '#10b981' : p < medianP && i >= medianI ? '#fbbf24' : p < medianP && i < medianI ? '#ef4444' : '#f97316';
+        svg.append('g').selectAll("circle").data(data).join("circle")
+            .attr("cx", d=>x(d.pdrb)).attr("cy", d=>y(d.iklh)).attr("r", 5).style("fill", d=> getColor(d.pdrb, d.iklh)).style("stroke", "#fff").style("opacity", 0.8)
+            .on("mouseover", function(e,d){
+                d3.select(this).attr("r",8);
+                tooltip.style.opacity=1; tooltip.style.left=(e.pageX+10)+"px"; tooltip.style.top=(e.pageY-10)+"px";
+                tooltip.innerHTML=`<div class="tooltip-title">${d.province} (${d.year})</div><div>PDRB: ${d.pdrb}%</div><div>IKLH: ${d.iklh}</div>`;
+            }).on("mouseout", function(){ d3.select(this).attr("r",5); tooltip.style.opacity=0; });
+    }
+
+    // --- Decoupling ---
+    let decouplingChart = null;
+    function renderDecoupling(data) {
+        const ctx = document.getElementById('decoupling-chart');
+        if(!ctx) return;
+        if(decouplingChart) decouplingChart.destroy();
+        
+        const byProv = d3.group(data, d => d.province);
+        const scores = [];
+        byProv.forEach((vals, prov) => {
+            if(vals.length < 2) return;
+            const sorted = vals.sort((a,b) => a.year - b.year);
+            let totalDecoupling = 0, count = 0;
+            for(let i = 1; i < sorted.length; i++) {
+                const pdrbChange = ((sorted[i].pdrb - sorted[i-1].pdrb) / Math.abs(sorted[i-1].pdrb + 0.01)) * 100;
+                const iklhChange = ((sorted[i].iklh - sorted[i-1].iklh) / Math.abs(sorted[i-1].iklh + 0.01)) * 100;
+                if(Math.abs(pdrbChange) > 0.1) {
+                    totalDecoupling += iklhChange / pdrbChange;
+                    count++;
+                }
+            }
+            if(count > 0) scores.push({ prov, score: totalDecoupling/count });
+        });
+        scores.sort((a,b) => b.score - a.score);
+        const limitedScores = currentDecouplingLimit === 'all' ? scores : scores.slice(0, parseInt(currentDecouplingLimit));
+        
+        decouplingChart = new Chart(ctx.getContext('2d'), {
+            type: 'bar',
+            data: { 
+                labels: limitedScores.map(s => s.prov), 
+                datasets: [{ 
+                    label: 'Decoupling Index', 
+                    data: limitedScores.map(s => s.score), 
+                    backgroundColor: limitedScores.map(s => s.score > 0 ? 'rgba(16, 185, 129, 0.7)' : 'rgba(239, 68, 68, 0.7)'),
+                    borderRadius: 4 
+                }] 
+            },
+            options: { 
+                indexAxis: 'y',
+                responsive: true, 
+                maintainAspectRatio: false, 
+                plugins: { legend: { display: false } },
+                scales: { x: { title: { display: true, text: 'Decoupling Score' } } }
+            }
+        });
+    }
+
+    // --- COVID ---
+    let covidChart = null;
+    function renderCOVID(data) {
+        const ctx = document.getElementById('covid-chart');
+        if(!ctx) return;
+        if(covidChart) covidChart.destroy();
+        
+        const byProv = d3.group(data, d => d.province);
+        const results = [];
+        byProv.forEach((vals, prov) => {
+            const before = vals.filter(d => d.year >= 2017 && d.year <= 2019);
+            const during = vals.filter(d => d.year >= 2020 && d.year <= 2021);
+            const after = vals.filter(d => d.year >= 2022 && d.year <= 2023);
+            if(before.length > 0 && during.length > 0 && after.length > 0) {
+                results.push({
+                    prov,
+                    before: d3.mean(before, d => d.pdrb),
+                    during: d3.mean(during, d => d.pdrb),
+                    after: d3.mean(after, d => d.pdrb)
+                });
+            }
+        });
+        results.sort((a,b) => (b.after - b.during) - (a.after - a.during));
+        const limitedResults = currentCovidLimit === 'all' ? results : results.slice(0, parseInt(currentCovidLimit));
+        
+        covidChart = new Chart(ctx.getContext('2d'), {
+            type: 'bar',
+            data: { 
+                labels: limitedResults.map(r => r.prov),
+                datasets: [
+                    { label: 'Before (2017-19)', data: limitedResults.map(r => r.before), backgroundColor: '#94a3b8' },
+                    { label: 'During (2020-21)', data: limitedResults.map(r => r.during), backgroundColor: '#ef4444' },
+                    { label: 'After (2022-23)', data: limitedResults.map(r => r.after), backgroundColor: '#10b981' }
+                ]
+            },
+            options: { 
+                responsive: true, 
+                maintainAspectRatio: false,
+                plugins: { legend: { labels: { usePointStyle: true, pointStyle: 'circle' } } },
+                scales: { x: { stacked: false }, y: { title: { display: true, text: 'Avg PDRB Growth (%)' } } }
+            }
+        });
+    }
+
+    // --- Trends ---
+    function renderTrends(data) {
+        const ctx = document.getElementById('trend-chart').getContext('2d');
+        if(trendChart) trendChart.destroy();
+        const nested = d3.group(data, d => d.year);
+        const years = Array.from(nested.keys()).sort((a,b)=>a-b);
+        const avgP = years.map(y => d3.mean(nested.get(y), d => d.pdrb));
+        const avgI = years.map(y => d3.mean(nested.get(y), d => d.iklh));
+
+        trendChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: years,
+                datasets: [
+                    { label: 'Avg PDRB (%)', data: avgP, borderColor: '#0ea5e9', backgroundColor: 'rgba(14, 165, 233, 0.1)', borderWidth: 2, yAxisID: 'y', fill: true, tension: 0.3 },
+                    { label: 'Avg IKLH', data: avgI, borderColor: '#10b981', borderWidth: 2, borderDash: [5,5], yAxisID: 'y1', tension: 0.3 }
+                ]
+            },
+            options: {
+                responsive: true, maintainAspectRatio: false, interaction: { mode: 'index', intersect: false },
+                plugins: {
+                    legend: {
+                        labels: {
+                            usePointStyle: true,
+                            pointStyle: 'circle'
+                        }
+                    }
+                },
+                scales: { 
+                    x: { 
+                        grid: { display: false }, 
+                        ticks: { autoSkip: false } 
+                    }, 
+                    y: { type: 'linear', position: 'left', title: { display: true, text: 'PDRB (%)' } }, 
+                    y1: { type: 'linear', position: 'right', title: { display: true, text: 'IKLH' }, grid: { display: false } } 
+                }
+            }
+        });
+    }
+
+    // --- Year-over-Year ---
+    function renderYoY(data) {
+        const ctx = document.getElementById('yoy-chart').getContext('2d');
+        if(yoyChart) yoyChart.destroy();
+        
+        // Group by province and year
+        const byProvince = d3.group(data, d => d.province);
+        
+        const yoyData = [];
+        byProvince.forEach((provinceData, province) => {
+            const sorted = provinceData.sort((a, b) => a.year - b.year);
+            for (let i = 1; i < sorted.length; i++) {
+                const current = sorted[i];
+                const previous = sorted[i - 1];
+                
+                // Only calculate if consecutive years
+                if (current.year === previous.year + 1) {
+                    yoyData.push({
+                        year: current.year,
+                        province: province,
+                        pdrbChange: current.pdrb - previous.pdrb,
+                        iklhChange: current.iklh - previous.iklh
+                    });
+                }
+            }
+        });
+        
+        // Group by year and calculate percentage of ups vs downs
+        const yearlyStats = d3.group(yoyData, d => d.year);
+        const years = Array.from(yearlyStats.keys()).sort((a,b)=>a-b);
+        
+        const pdrbUpsPct = years.map(y => {
+            const yearData = yearlyStats.get(y);
+            const ups = yearData.filter(d => d.pdrbChange > 0).length;
+            return (ups / yearData.length) * 100;
+        });
+        
+        const iklhUpsPct = years.map(y => {
+            const yearData = yearlyStats.get(y);
+            const ups = yearData.filter(d => d.iklhChange > 0).length;
+            return (ups / yearData.length) * 100;
+        });
+
+        yoyChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: years,
+                datasets: [
+                    { label: 'PDRB Increases (%)', data: pdrbUpsPct, borderColor: '#0ea5e9', backgroundColor: 'rgba(14, 165, 233, 0.1)', borderWidth: 2, yAxisID: 'y', fill: true, tension: 0.3 },
+                    { label: 'IKLH Increases (%)', data: iklhUpsPct, borderColor: '#10b981', backgroundColor: 'rgba(16, 185, 129, 0.1)', borderWidth: 2, yAxisID: 'y1', fill: true, tension: 0.3 }
+                ]
+            },
+            options: {
+                responsive: true, maintainAspectRatio: false, 
+                interaction: { mode: 'index', intersect: false },
+                plugins: {
+                    legend: {
+                        labels: {
+                            usePointStyle: true,
+                            pointStyle: 'circle'
+                        }
+                    }
+                },
+                scales: { 
+                    x: { 
+                        grid: { display: false }, 
+                        ticks: { autoSkip: false } 
+                    }, 
+                    y: { 
+                        type: 'linear', 
+                        position: 'left', 
+                        title: { display: true, text: 'PDRB Increases (%)' },
+                        min: 0,
+                        max: 100
+                    }, 
+                    y1: { 
+                        type: 'linear', 
+                        position: 'right', 
+                        title: { display: true, text: 'IKLH Increases (%)' }, 
+                        grid: { display: false },
+                        min: 0,
+                        max: 100
+                    } 
+                }
+            }
+        });
+    }
+
+    // --- Dist PDRB ---
+    function renderDistPDRB(data) {
+        const ctx = document.getElementById('dist-pdrb-chart').getContext('2d');
+        if(distDescChart) distDescChart.destroy();
+        
+        const vals = data.map(d => d.pdrb);
+        const bins = createBins(vals, 15);
+
+        distDescChart = new Chart(ctx, {
+            type: 'bar',
+            data: { labels: bins.labels, datasets: [{ label: 'Count', data: bins.counts, backgroundColor: '#0ea5e9', borderRadius: 4 }] },
+            options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true } } }
+        });
+    }
+
+    // --- Dist IKLH ---
+    function renderDistIKLH(data) {
+        const ctx = document.getElementById('dist-iklh-chart').getContext('2d');
+        if(distIklhChart) distIklhChart.destroy();
+        
+        const vals = data.map(d => d.iklh);
+        const bins = createBins(vals, 15);
+
+        distIklhChart = new Chart(ctx, {
+            type: 'bar',
+            data: { labels: bins.labels, datasets: [{ label: 'Count', data: bins.counts, backgroundColor: '#10b981', borderRadius: 4 }] },
+            options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true } } }
+        });
+    }
+
+    function createBins(vals, binCount) {
+        const min = Math.floor(Math.min(...vals)); const max = Math.ceil(Math.max(...vals));
+        const width = (max - min) / binCount;
+        const counts = new Array(binCount).fill(0); const labels = [];
+        for(let i=0; i<binCount; i++) { labels.push(`${(min + i*width).toFixed(1)}-${(min + (i+1)*width).toFixed(1)}`); }
+        vals.forEach(v => { let idx = Math.floor((v-min)/width); if(idx>=binCount) idx = binCount-1; if(idx<0) idx=0; counts[idx]++; });
+        return { labels, counts };
+    }
+
+    // --- Heatmaps ---
+    function renderHeatmapPDRB(data) { renderHeatmapGeneric('heatmap-pdrb', data, 'pdrb', 'Viridis'); }
+    function renderHeatmapIKLH(data) { renderHeatmapGeneric('heatmap-iklh', data, 'iklh', 'YlGnBu'); }
+
+    function renderHeatmapGeneric(elemId, data, key, colorScale) {
+        const provinces = [...new Set(data.map(d => d.province))].sort().reverse();
+        const years = [...new Set(data.map(d => d.year))].sort((a,b) => a-b);
+        const z = provinces.map(p => years.map(y => { const f = data.find(d => d.province===p && d.year===y); return f ? f[key] : null; }));
+        
+        // Dynamic height calculation: minimum 20px per province, minimum 400px total
+        const dynamicHeight = Math.max(400, provinces.length * 20);
+        const container = document.getElementById(elemId);
+        container.style.height = dynamicHeight + 'px';
+        
+        const plotData = [{
+            z: z, x: years, y: provinces, type: 'heatmap', colorscale: colorScale,
+            hovertemplate: 'Province: %{y}<br>Year: %{x}<br>Value: %{z}<extra></extra>'
+        }];
+        
+        const layout = {
+            autosize: true,
+            margin: { t: 20, r: 20, b: 50, l: 150 },
+            paper_bgcolor: 'rgba(0,0,0,0)', plot_bgcolor: 'rgba(0,0,0,0)',
+            font: { family: "'Source Sans 3', sans-serif" },
+            xaxis: {
+                dtick: 1,  // Show every year
+                tickmode: 'linear'
+            },
+            yaxis: {
+                dtick: 1  // Show every province
+            }
+        };
+        Plotly.newPlot(elemId, plotData, layout, { responsive: true, displayModeBar: false });
+    }
+
+    function toggleInsight(el) {
+        const content = el.nextElementSibling;
+        const arrow = el.querySelector('.arrow-icon');
+        if (content) {
+            content.classList.toggle('closed');
+            arrow.classList.toggle('closed');
+        }
+    }
+
+    function switchTab(tabName) {
+        // Hide all tab contents
+        document.querySelectorAll('.tab-content').forEach(tab => {
+            tab.classList.remove('active');
+        });
+        
+        // Remove active from all buttons
+        document.querySelectorAll('.tab-btn').forEach(btn => {
+            btn.classList.remove('active');
+        });
+        
+        // Show selected tab
+        document.getElementById(`tab-${tabName}`).classList.add('active');
+        
+        // Activate button
+        event.target.classList.add('active');
+        
+        // Re-render charts for the selected tab (fixes zero-dimension issue)
+        const filtered = filterData();
+        setTimeout(() => {
+            if (tabName === 'correlation') { 
+                renderScatter(filtered); 
+                renderQuadrant(filtered); 
+            }
+            else if (tabName === 'decoupling') { renderDecoupling(filtered); }
+            else if (tabName === 'covid') { renderCOVID(filtered); }
+            else if (tabName === 'trends') { renderTrends(filtered); renderYoY(filtered); }
+            else if (tabName === 'distribution') { renderDistPDRB(filtered); renderDistIKLH(filtered); }
+            else if (tabName === 'heatmap') { 
+                renderHeatmapPDRB(filtered); 
+                renderHeatmapIKLH(filtered);
+                setTimeout(() => {
+                    Plotly.Plots.resize('heatmap-pdrb');
+                    Plotly.Plots.resize('heatmap-iklh');
+                }, 50);
+            }
+        }, 10);
+    }
+
+    init();
+</script>
+</body>
+</html>
