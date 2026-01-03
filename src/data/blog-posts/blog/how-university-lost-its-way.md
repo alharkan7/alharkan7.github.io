@@ -28,8 +28,10 @@ The roots of higher education are intertwined with the very dawn of human civili
 
 In ancient Mesopotamia, the development of the complex cuneiform writing system necessitated formal training. Only a select few were chosen to become scribes, typically the sons of royalty and professionals like physicians and temple administrators.<sup>[2]</sup> These scribal schools, known as ***edubas***, were centers where literacy was disseminated among the elite from as early as 2000 BCE.<sup>[2]</sup> The curriculum was rigorous, involving the mastery of vocabularies, grammars, and the extinct Sumerian language. 
 
-![](/assets/how-university-lost-its-way/image-copy-0.png)
-<small>*Assyrian scribes (source: [Wikipedia](https://en.wikipedia.org/wiki/Eduba))*</small>
+<figure>
+  <img src="/assets/how-university-lost-its-way/image-copy-0.png" alt="Assyrian scribes" />
+  <figcaption>Assyrian scribes (source: <a href="https://en.wikipedia.org/wiki/Eduba">Wikipedia</a>)</figcaption>
+</figure>
 
 In ancient Egypt, a similar system prevailed. Literacy was concentrated within an educated elite of scribes who served pharaohs, temples, and the military.<sup>[2]</sup> The hieroglyphic system was deliberately kept difficult to learn, preserving the scribes' exclusive status. In these early societies, knowledge was not a public good but a carefully guarded instrument of state and religious power.
 
@@ -39,18 +41,24 @@ Long before the first European universities took shape, vibrant centers of highe
 
 In Asia, the Indian subcontinent was home to great Buddhist monastic universities, or ***mahaviharas***. Among the most famous were Nalanda and Taxila. Nalanda, a renowned center for Buddhist scholarship, attracted thousands of students and scholars from across Asia, including China, Persia, and the Middle East.<sup>[3]</sup> Taxila, which may date back to the 6th century BCE, offered a remarkably diverse curriculum. Students entering at age sixteen could study the sacred Vedas alongside the "Eighteen Arts," which included practical skills like archery, hunting, medicine, and military science.<sup>[3]</sup> This early blend of religious, liberal, and vocational training shows that the debate over the purpose of education is ancient indeed.
 
-![](/assets/how-university-lost-its-way/image-copy-1.png)
-<small>*The ruins of Nalanda Mahavihara (source: [Wikipedia](https://en.wikipedia.org/wiki/Mahavihara))*</small>
+<figure>
+  <img src="/assets/how-university-lost-its-way/image-copy-1.png" alt="The ruins of Nalanda Mahavihara" />
+  <figcaption>The ruins of Nalanda Mahavihara (source: <a href="https://en.wikipedia.org/wiki/Mahavihara">Wikipedia</a>)</figcaption>
+</figure>
 
 In the Middle East, Al-Azhar was established in Cairo in 970 CE by the Fatimid Caliphate.<sup>[5]</sup> Initially a *madrasa*, or Islamic school, it taught the Qur'an, Islamic law, theology, Arabic grammar, and logic.<sup>[5]</sup> For much of its early history, its structure was informal, with no entrance requirements, formal curriculum, or degrees, emphasizing a model of scholarly mentorship over credentialing.<sup>[5]</sup>
 
-![](/assets/how-university-lost-its-way/image-copy-2.png)
-<small>*al-Azhar University circa 1250 (source: [Madain Project](https://madainproject.com/al_azhar))*</small>
+<figure>
+  <img src="/assets/how-university-lost-its-way/image-copy-2.png" alt="al-Azhar University circa 1250" />
+  <figcaption>al-Azhar University circa 1250 (source: <a href="https://madainproject.com/al_azhar">Madain Project</a>)</figcaption>
+</figure>
 
 In classical Europe, Plato's Academy, founded in Athens around 387 BCE, served as a center for the study of philosophy and mathematics.<sup>[3]</sup> In Ptolemaic Egypt, the great Museum and Library of Alexandria functioned as premier organizations of higher learning, drawing scholars from across the Hellenistic world.<sup>[3]</sup>
 
-![](/assets/how-university-lost-its-way/image-copy-3.png)
-<small>*Platonic Academy, mosaic form Pompeii (source: [Wikipedia](https://en.wikipedia.org/wiki/Platonic_Academy))*</small>
+<figure>
+  <img src="/assets/how-university-lost-its-way/image-copy-3.png" alt="Platonic Academy, mosaic from Pompeii" />
+  <figcaption>Platonic Academy, mosaic from Pompeii (source: <a href="https://en.wikipedia.org/wiki/Platonic_Academy">Wikipedia</a>)</figcaption>
+</figure>
 
 ### **The Birth of the European University**
 
@@ -60,8 +68,10 @@ A pivotal development in this evolution was the rise of academic guilds. As the 
 
 The University of Oxford provides a clear case study of this new model's development and funding. Its growth accelerated dramatically after 1167, when King Henry II, in a political dispute with the Archbishop of Canterbury, banned English students from attending the University of Paris.<sup>[9]</sup> Many of these returning scholars and students settled in Oxford. Initially, the university was simply a collection of masters and students who lodged with the townspeople. This arrangement led to frequent and often violent clashes between "town and gown".<sup>[9]</sup> These riots hastened the establishment of endowed halls of residence, which evolved into the first colleges. University, Balliol, and Merton Colleges, established between 1249 and 1264, were founded not by the state, but by wealthy patrons and churchmen like William of Durham.<sup>[9]</sup> These colleges were self-governing entities with their own buildings and, crucially, their own endowments, primarily in the form of land and later, investments.<sup>[10]</sup> This established a funding model based on private wealth and patronage, one that allowed institutions like Oxford and Cambridge to operate for centuries without needing state aid or relying on mass tuition fees.<sup>[12]</sup>
 
-![](/assets/how-university-lost-its-way/image-copy-4.png)
-<small>*Representation of a university class, 1350s (source: [Wikipedia](https://en.wikipedia.org/wiki/History_of_European_universities))*</small>
+<figure>
+  <img src="/assets/how-university-lost-its-way/image-copy-4.png" alt="Representation of a university class, 1350s" />
+  <figcaption>Representation of a university class, 1350s (source: <a href="https://en.wikipedia.org/wiki/History_of_European_universities">Wikipedia</a>)</figcaption>
+</figure>
 
 The early curriculum was standardized around the seven liberal arts, grammar, rhetoric, logic, arithmetic, geometry, astronomy, and music, which formed the basis of the Arts faculty.<sup>[10]</sup> Students could then proceed to the higher faculties of Law (both Civil and Canon), Medicine, and Theology.<sup>[7]</sup>
 
@@ -77,13 +87,17 @@ The 18th-century intellectual movement known as the Enlightenment, or the Age of
 
 This intellectual shift had profound structural consequences. As national legal systems emerged and replaced feudal laws, the governance of universities began to move from the authority of the Church to the control of the state.<sup>[13]</sup> National ministries of education were formed to oversee university policies, creating a more centralized and secular system. The curriculum was modernized to reflect the new emphasis on empirical knowledge and critical inquiry. Subjects like mathematics, natural sciences, and modern philosophy gained prominence, pushing aside the singular focus on theology.<sup>[13]</sup>
 
-![](/assets/how-university-lost-its-way/image-copy-5.png)
-<small>*Académie des sciences in 1671 (source: [Wikipedia](https://en.wikipedia.org/wiki/Age_of_Enlightenment))*</small>
+<figure>
+  <img src="/assets/how-university-lost-its-way/image-copy-5.png" alt="Académie des sciences in 1671" />
+  <figcaption>Académie des sciences in 1671 (source: <a href="https://en.wikipedia.org/wiki/Age_of_Enlightenment">Wikipedia</a>)</figcaption>
+</figure>
 
 The most influential expression of this new ideal was the Humboldtian model of higher education, which emerged in Germany in the early 19th century.<sup>[14]</sup> Spearheaded by the philosopher and statesman Wilhelm von Humboldt, this model was revolutionary. Its core principle was the unity of research and teaching **(*Einheit von Forschung und Lehre*)**, arguing that students learn best when they are engaged with the process of discovery alongside their professors.<sup>[14]</sup> The Humboldtian ideal championed unconditional academic freedom, insisting that universities must be independent from the ideological, economic, and political influence of the state.<sup>[14]</sup> To ensure this independence, Humboldt even proposed that universities should possess their own assets and goods to finance themselves.<sup>[14]</sup> The ultimate goal was not merely to train students for a profession, but to cultivate them through a broad, humanistic education (***Bildung***) into autonomous individuals and critical-thinking "world citizens".<sup>[14]</sup> This powerful vision of the research-based, academically free university became the blueprint for modern higher education institutions across Europe and, eventually, the world.
 
-![](/assets/how-university-lost-its-way/image-copy-6.png)
-<small>*Humboldt University of Berlin, c. 1850 (source: [Wikipedia](https://en.wikipedia.org/wiki/Humboldtian_model_of_higher_education))*</small>
+<figure>
+  <img src="/assets/how-university-lost-its-way/image-copy-6.png" alt="Humboldt University of Berlin, c. 1850" />
+  <figcaption>Humboldt University of Berlin, c. 1850 (source: <a href="https://en.wikipedia.org/wiki/Humboldtian_model_of_higher_education">Wikipedia</a>)</figcaption>
+</figure>
 
 ### **The American Experiment: Democratizing the Ivory Tower**
 
@@ -93,8 +107,10 @@ A pivotal moment in this process was the passage of the **Morrill Land-Grant Act
 
 However, the single most transformative event in the history of American higher education was the Servicemen's Readjustment Act of 1944, universally known as the **G.I. Bill**. The Second World War had financially devastated many smaller private colleges, which saw their male student bodies vanish into the armed forces.<sup>[17]</sup> The G.I. Bill reversed this trend in a spectacular fashion. It provided federal funding to cover tuition and living expenses for over 2.2 million returning veterans to attend college.<sup>[18]</sup> The impact was immediate and staggering. Total college enrollment in the U.S. jumped by more than 50%, from 1.3 million in 1939 to over 2 million in 1946\.<sup>[18]</sup> An institution that had once been the exclusive domain of the wealthy elite was suddenly flooded with students from every social and economic background. The G.I. Bill single-handedly created the American middle class of the mid-20th century and firmly established the principle that the federal government had a vital role to play in ensuring access to higher education.
 
-![](/assets/how-university-lost-its-way/image-copy-7.png)
-<small>*A government poster informing soldiers about the G.I. Bill (source: [Wikipedia](https://en.wikipedia.org/wiki/G.I._Bill))*</small>
+<figure>
+  <img src="/assets/how-university-lost-its-way/image-copy-7.png" alt="A government poster informing soldiers about the G.I. Bill" />
+  <figcaption>A government poster informing soldiers about the G.I. Bill (source: <a href="https://en.wikipedia.org/wiki/G.I._Bill">Wikipedia</a>)</figcaption>
+</figure>
 
 Yet, embedded within this celebrated act of public investment was a mechanism that would have profound and unforeseen consequences decades later. The G.I. Bill did not provide block grants directly to universities to lower their costs for everyone. Instead, it operated as a massive voucher-like system, giving money directly to the veterans to spend at the institution of their choice. This approach, while noble in its goal of providing individual choice and opportunity, subtly but powerfully reframed the relationship between student and institution. It created, for the first time, a mass consumer market for higher education. Universities now had to compete for a huge new pool of customers who arrived with federal money in hand. This student-centric funding model, which treated federal aid as a portable subsidy that followed the individual, established the very market dynamics that would later be exploited. It laid the institutional and psychological groundwork for the loan-based system to come, a system where universities could raise prices with the knowledge that federal aid, in one form or another, would expand to help students meet the cost. The greatest act of public investment in higher education inadvertently planted the seeds of its future privatization.
 
@@ -128,8 +144,10 @@ While the exact mechanics are debated, research confirms the core of this dynami
 
 With declining state support and a new, seemingly endless revenue stream from federally backed student loans, universities began to compete for students not just as scholars, but as customers. This ignited what has been termed the "amenities arms race".<sup>[23]</sup> To attract the tuition dollars of 18-year-olds (and their parents), institutions began pouring money into lavish, non-academic facilities.
 
-![](/assets/how-university-lost-its-way/image-copy-8.png)
-<small>*Lazy river at a dorm at the University of North Florida (source: [Wikipedia](https://en.wikipedia.org/wiki/Higher_education_financing_issues_in_the_United_States))*</small>
+<figure>
+  <img src="/assets/how-university-lost-its-way/image-copy-8.png" alt="Lazy river at a dorm at the University of North Florida" />
+  <figcaption>Lazy river at a dorm at the University of North Florida (source: <a href="https://en.wikipedia.org/wiki/Higher_education_financing_issues_in_the_United_States">Wikipedia</a>)</figcaption>
+</figure>
 
 Campuses were transformed with resort-style dormitories, massive recreation centers with rock-climbing walls, and opulent student unions. North Carolina State University, for example, undertook a $120 million renovation of its Talley Student Union, funded by a new, mandatory student fee of nearly $300 per year.<sup>[23]</sup> High Point University, a small private school, has spent over $700 million since 2005 to refurbish its campus, financed largely by borrowing and student fees.<sup>[23]</sup> This spending extends to state-of-the-art gyms and ever-larger football stadiums, which serve more as marketing tools than educational facilities.<sup>[19]</sup> Research indicates that this focus on amenities is a direct response to market demand, particularly from wealthier students with lower academic aptitude, who show the strongest preference for recreational facilities over academic quality.<sup>[23]</sup> The immense cost of this arms race is passed directly on to all students in the form of higher tuition and fees.
 
@@ -137,8 +155,10 @@ Campuses were transformed with resort-style dormitories, massive recreation cent
 
 As universities began to operate more like businesses competing in a marketplace, their internal structures changed accordingly. The most dramatic shift was the explosion in the number of non-teaching administrative staff.<sup>[19]</sup> The ranks of fundraisers, marketers, admissions officers, alumni relations staff, wellness counselors, and diversity, equity, and inclusion (DEI) officers swelled, growing at a rate that far outpaced the growth of full-time faculty.<sup>[20]</sup>
 
-<small>![](/assets/how-university-lost-its-way/image-copy-9.png)
-*Comic illustration of an administrative bloat in a university (source: [College Planners of America](https://www.collegecost.org/))*</small>
+<figure>
+  <img src="/assets/how-university-lost-its-way/image-copy-9.png" alt="Comic illustration of an administrative bloat in a university" />
+  <figcaption>Comic illustration of an administrative bloat in a university (source: <a href="https://www.collegecost.org/">College Planners of America</a>)</figcaption>
+</figure>
 
 This "administrative bloat" reflects a fundamental change in institutional priorities. A significant portion of the university's budget is now dedicated to non-academic functions like student recruitment, brand management, and providing an ever-expanding array of student support services.<sup>[20]</sup> This shift towards a corporate management model has also been accompanied by a sharp rise in executive-level salaries for top administrators, adding to the immense overhead costs that are ultimately funded by student tuition.<sup>[19]</sup>
 
@@ -192,8 +212,10 @@ In March 2025, the unemployment rate for college graduates aged 22-27 hit 5.8%, 
 
 This complex reality reveals that the "value of a college degree" has fractured into distinct components. There is the **Economic Value**, which provides a direct and high return on investment, but as the data shows, is now largely confined to specific, high-demand majors. There is the **Credential Value**, which serves as the necessary "ticket to ride" but does not guarantee a good job or a commensurate salary. And there is the **Intrinsic Value**, the personal growth, critical thinking, and intellectual expansion that has always been a part of the university's promise.<sup>[51]</sup>
 
-![](/assets/how-university-lost-its-way/Venn-1.png)
-<small>*The current college degree crisis stems from a profound misalignment of these values.*</small>
+<figure>
+  <img src="/assets/how-university-lost-its-way/Venn-1.png" alt="The fractured value of a college degree" />
+  <figcaption>The current college degree crisis stems from a profound misalignment of these values.</figcaption>
+</figure>
 
 The current crisis stems from a profound misalignment of these values. Students are taking on unprecedented levels of debt with the expectation of receiving clear Economic Value. The university system, in its marketing and mission statements, often sells a combination of Economic and Intrinsic Value. However, for the 52% of graduates who find themselves underemployed, the labor market grants them only Credential Value, which is insufficient to justify the enormous financial risk they have undertaken. This disconnect between the price paid, the value promised, and the reality delivered is the very heart of the modern degree's diminishing worth.
 

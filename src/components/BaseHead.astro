@@ -691,4 +691,274 @@ const socialImageURL = image
       wrapWideTables();
     }, 250); // Debounce resize events
   });
+
+  // ===== Image Modal Preview =====
+
+  // Create and setup the image modal
+  function createImageModal() {
+    // Check if modal already exists
+    if (document.getElementById("image-modal")) {
+      return document.getElementById("image-modal");
+    }
+
+    // Lucide icons as SVG strings
+    const icons = {
+      zoomIn: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" x2="16.65" y1="21" y2="16.65"/><line x1="11" x2="11" y1="8" y2="14"/><line x1="8" x2="14" y1="11" y2="11"/></svg>`,
+      zoomOut: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" x2="16.65" y1="21" y2="16.65"/><line x1="8" x2="14" y1="11" y2="11"/></svg>`,
+      reset: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>`,
+      close: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>`,
+    };
+
+    const modal = document.createElement("div");
+    modal.id = "image-modal";
+    modal.className = "image-modal-overlay";
+    modal.innerHTML = `
+      <div class="image-modal-content">
+        <div class="image-modal-controls">
+          <button class="image-modal-btn" id="image-zoom-out" title="Zoom Out">${icons.zoomOut}</button>
+          <span class="image-modal-zoom-info" id="image-zoom-level">100%</span>
+          <button class="image-modal-btn" id="image-zoom-in" title="Zoom In">${icons.zoomIn}</button>
+          <div class="image-modal-divider"></div>
+          <button class="image-modal-btn" id="image-zoom-reset" title="Reset">${icons.reset}</button>
+          <button class="image-modal-btn" id="image-close" title="Close">${icons.close}</button>
+        </div>
+        <div class="image-modal-container" id="image-modal-container"></div>
+        <div class="image-modal-hint">Scroll to zoom • Drag to pan</div>
+      </div>
+    `;
+
+    document.body.appendChild(modal);
+
+    // Setup modal controls
+    let currentZoom = 1;
+    let isPanning = false;
+    let startX = 0,
+      startY = 0;
+    let scrollLeft = 0,
+      scrollTop = 0;
+
+    const container = modal.querySelector("#image-modal-container");
+    const zoomLevelDisplay = modal.querySelector("#image-zoom-level");
+
+    function updateZoom() {
+      const img = container.querySelector("img");
+      if (img) {
+        img.style.transform = `scale(${currentZoom})`;
+        img.style.transformOrigin = "center center";
+        zoomLevelDisplay.textContent = `${Math.round(currentZoom * 100)}%`;
+      }
+    }
+
+    function zoomIn() {
+      currentZoom = Math.min(currentZoom * 1.25, 5);
+      updateZoom();
+    }
+
+    function zoomOut() {
+      currentZoom = Math.max(currentZoom * 0.8, 0.25);
+      updateZoom();
+    }
+
+    function resetZoom() {
+      currentZoom = 1;
+      container.scrollLeft = 0;
+      container.scrollTop = 0;
+      updateZoom();
+    }
+
+    function closeModal() {
+      modal.classList.remove("active");
+      document.body.style.overflow = "";
+      currentZoom = 1;
+    }
+
+    // Button handlers
+    modal.querySelector("#image-zoom-in").addEventListener("click", zoomIn);
+    modal.querySelector("#image-zoom-out").addEventListener("click", zoomOut);
+    modal
+      .querySelector("#image-zoom-reset")
+      .addEventListener("click", resetZoom);
+    modal.querySelector("#image-close").addEventListener("click", closeModal);
+
+    // Close on overlay click
+    modal.addEventListener("click", (e) => {
+      if (e.target === modal) {
+        closeModal();
+      }
+    });
+
+    // Close on Escape key
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape" && modal.classList.contains("active")) {
+        closeModal();
+      }
+    });
+
+    // Mouse wheel zoom
+    container.addEventListener(
+      "wheel",
+      (e) => {
+        e.preventDefault();
+        if (e.deltaY < 0) {
+          zoomIn();
+        } else {
+          zoomOut();
+        }
+      },
+      { passive: false },
+    );
+
+    // Pan functionality (mouse)
+    container.addEventListener("mousedown", (e) => {
+      isPanning = true;
+      container.style.cursor = "grabbing";
+      startX = e.pageX - container.offsetLeft;
+      startY = e.pageY - container.offsetTop;
+      scrollLeft = container.scrollLeft;
+      scrollTop = container.scrollTop;
+    });
+
+    container.addEventListener("mousemove", (e) => {
+      if (!isPanning) return;
+      e.preventDefault();
+      const x = e.pageX - container.offsetLeft;
+      const y = e.pageY - container.offsetTop;
+      const walkX = (x - startX) * 1.5;
+      const walkY = (y - startY) * 1.5;
+      container.scrollLeft = scrollLeft - walkX;
+      container.scrollTop = scrollTop - walkY;
+    });
+
+    container.addEventListener("mouseup", () => {
+      isPanning = false;
+      container.style.cursor = "grab";
+    });
+
+    container.addEventListener("mouseleave", () => {
+      isPanning = false;
+      container.style.cursor = "grab";
+    });
+
+    // Touch support for mobile
+    let initialDistance = 0;
+    let lastTouchX = 0,
+      lastTouchY = 0;
+
+    container.addEventListener(
+      "touchstart",
+      (e) => {
+        if (e.touches.length === 2) {
+          // Pinch zoom start
+          initialDistance = Math.hypot(
+            e.touches[0].pageX - e.touches[1].pageX,
+            e.touches[0].pageY - e.touches[1].pageY,
+          );
+        } else if (e.touches.length === 1) {
+          // Pan start
+          isPanning = true;
+          lastTouchX = e.touches[0].pageX;
+          lastTouchY = e.touches[0].pageY;
+          scrollLeft = container.scrollLeft;
+          scrollTop = container.scrollTop;
+        }
+      },
+      { passive: false },
+    );
+
+    container.addEventListener(
+      "touchmove",
+      (e) => {
+        e.preventDefault();
+        if (e.touches.length === 2) {
+          // Pinch zoom
+          const newDistance = Math.hypot(
+            e.touches[0].pageX - e.touches[1].pageX,
+            e.touches[0].pageY - e.touches[1].pageY,
+          );
+          const delta = newDistance - initialDistance;
+          if (Math.abs(delta) > 10) {
+            if (delta > 0) {
+              currentZoom = Math.min(currentZoom * 1.05, 5);
+            } else {
+              currentZoom = Math.max(currentZoom * 0.95, 0.25);
+            }
+            updateZoom();
+            initialDistance = newDistance;
+          }
+        } else if (e.touches.length === 1 && isPanning) {
+          // Pan
+          const touchX = e.touches[0].pageX;
+          const touchY = e.touches[0].pageY;
+          const walkX = touchX - lastTouchX;
+          const walkY = touchY - lastTouchY;
+          container.scrollLeft = scrollLeft - walkX;
+          container.scrollTop = scrollTop - walkY;
+        }
+      },
+      { passive: false },
+    );
+
+    container.addEventListener("touchend", () => {
+      isPanning = false;
+      initialDistance = 0;
+    });
+
+    return modal;
+  }
+
+  // Open an image in the modal
+  function openImageModal(imgElement) {
+    const modal = createImageModal();
+    const container = modal.querySelector("#image-modal-container");
+
+    // Clone the image and put it in the modal
+    const clonedImg = imgElement.cloneNode(true);
+    clonedImg.style.transform = "scale(1)";
+    clonedImg.style.transformOrigin = "center center";
+    clonedImg.removeAttribute("class"); // Remove any classes that might interfere
+    clonedImg.classList.add("image-modal-img");
+    container.innerHTML = "";
+    container.appendChild(clonedImg);
+
+    // Reset zoom level display
+    modal.querySelector("#image-zoom-level").textContent = "100%";
+
+    // Show modal
+    modal.classList.add("active");
+    document.body.style.overflow = "hidden";
+  }
+
+  // Setup click handlers for images in content areas
+  function setupImageClickHandlers() {
+    // Select images within .content areas (blog posts)
+    const images = document.querySelectorAll(".content img");
+
+    images.forEach((img) => {
+      // Skip if already has click handler
+      if (img.dataset.hasModalHandler) return;
+
+      // Skip small images (likely icons) and images inside links
+      if (img.closest("a")) return;
+
+      img.dataset.hasModalHandler = "true";
+      img.style.cursor = "pointer";
+      img.title = "Click to expand image";
+      img.classList.add("image-expandable");
+
+      img.addEventListener("click", (e) => {
+        e.preventDefault();
+        openImageModal(img);
+      });
+    });
+  }
+
+  // Initialize image modal handlers
+  document.addEventListener("DOMContentLoaded", () => {
+    setupImageClickHandlers();
+  });
+
+  // Setup on Astro page transitions
+  document.addEventListener("astro:page-load", () => {
+    setupImageClickHandlers();
+  });
 </script>

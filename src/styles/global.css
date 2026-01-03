@@ -207,6 +207,19 @@ img {
   height: auto;
 }
 
+/* Center images in blog content */
+.content img {
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* Standalone images (rendered as paragraphs with just an image) */
+.content p>img:only-child {
+  display: block;
+  margin: 2rem auto;
+}
+
 hr {
   padding: 0;
   border: 0;
@@ -275,6 +288,7 @@ blockquote footer {
   text-align: right;
 }
 
+/* Figure and figcaption for image captions */
 figure {
   padding: 0;
   border: 0;
@@ -283,7 +297,40 @@ figure {
   vertical-align: baseline;
   -webkit-margin-start: 0;
   -webkit-margin-end: 0;
-  margin: 0 0 3em 0;
+  margin: 2rem 0;
+  text-align: center;
+}
+
+figure img {
+  display: block;
+  margin: 0 auto;
+  max-width: 100%;
+  height: auto;
+}
+
+figcaption {
+  margin-top: 0.75rem;
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  font-style: italic;
+  text-align: center;
+  line-height: 1.5;
+}
+
+figcaption a {
+  color: var(--primary-color);
+}
+
+/* Also style small tags used for captions (legacy support) */
+.content p+p>small:only-child,
+.content img+small,
+.content p>img+br+small {
+  display: block;
+  text-align: center;
+  margin-top: 0.5rem;
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  font-style: italic;
 }
 
 table {
@@ -765,6 +812,198 @@ input[name='theme-toggle'] {
 
   .mermaid-modal-diagram {
     padding: 1rem;
+  }
+}
+
+/* ===== Image Modal Styles ===== */
+
+/* Make expandable images visually indicate they're clickable */
+.content img.image-expandable {
+  cursor: pointer;
+  transition: box-shadow 0.2s ease, transform 0.2s ease;
+  position: relative;
+}
+
+.content img.image-expandable:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  transform: translateY(-2px);
+}
+
+:root.theme-dark .content img.image-expandable:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+}
+
+/* Image Modal Overlay */
+.image-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.9);
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.3s ease, visibility 0.3s ease;
+  backdrop-filter: blur(8px);
+}
+
+.image-modal-overlay.active {
+  opacity: 1;
+  visibility: visible;
+}
+
+.image-modal-content {
+  position: relative;
+  width: calc(100vw - 2rem);
+  height: calc(100vh - 2rem);
+  max-width: none;
+  max-height: none;
+  background: var(--background-body);
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 25px 80px rgba(0, 0, 0, 0.5);
+  transform: scale(0.95);
+  transition: transform 0.3s ease;
+}
+
+.image-modal-overlay.active .image-modal-content {
+  transform: scale(1);
+}
+
+.image-modal-controls {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+  z-index: 10;
+  background: var(--background-body);
+  padding: 0.5rem;
+  border-radius: 8px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.15);
+}
+
+.image-modal-btn {
+  background: transparent;
+  border: none;
+  border-radius: 6px;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  cursor: pointer;
+  color: var(--text-secondary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color 0.2s ease, background 0.2s ease;
+}
+
+.image-modal-btn:hover {
+  background: var(--background-alt);
+  color: var(--text-main);
+}
+
+.image-modal-btn svg {
+  width: 18px;
+  height: 18px;
+}
+
+.image-modal-zoom-info {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  min-width: 45px;
+  text-align: center;
+  font-weight: 500;
+}
+
+.image-modal-divider {
+  width: 1px;
+  height: 20px;
+  background: var(--border-color);
+  margin: 0 0.25rem;
+}
+
+.image-modal-container {
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+  cursor: grab;
+  touch-action: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+}
+
+.image-modal-container:active {
+  cursor: grabbing;
+}
+
+.image-modal-container img {
+  display: block;
+  max-width: none;
+  max-height: calc(100vh - 6rem);
+  transition: transform 0.1s ease-out;
+  transform-origin: center center;
+  object-fit: contain;
+}
+
+/* Modal hint text */
+.image-modal-hint {
+  position: absolute;
+  bottom: 1.5rem;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(0, 0, 0, 0.75);
+  color: white;
+  padding: 0.5rem 1rem;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  pointer-events: none;
+}
+
+.image-modal-overlay.active .image-modal-hint {
+  animation: fadeInOut 3s ease forwards;
+}
+
+/* Mobile adjustments for image modal */
+@media (max-width: 768px) {
+  .image-modal-content {
+    width: 100vw;
+    height: 100vh;
+    border-radius: 0;
+  }
+
+  .image-modal-controls {
+    top: 0.75rem;
+    right: 0.75rem;
+    padding: 0.35rem;
+    gap: 0.35rem;
+  }
+
+  .image-modal-btn {
+    width: 28px;
+    height: 28px;
+  }
+
+  .image-modal-btn svg {
+    width: 16px;
+    height: 16px;
+  }
+
+  .image-modal-container {
+    padding: 1rem;
+  }
+
+  .image-modal-container img {
+    max-height: calc(100vh - 4rem);
   }
 }
 
