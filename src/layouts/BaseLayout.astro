@@ -3,6 +3,7 @@ import BaseHead from "../components/BaseHead.astro";
 import Header from "../components/Header.astro";
 import Footer from "../components/Footer.astro";
 import { Analytics } from "@vercel/analytics/react";
+import { SpeedInsights } from "@vercel/speed-insights/react";
 
 export interface Props {
   title: string;
@@ -46,6 +47,7 @@ const {
       <Footer />
     </div>
     <Analytics client:only="react" />
+    <SpeedInsights client:only="react" />
   </body>
 </html>
 
