@@ -16,6 +16,7 @@
   /* Zinc 200 */
   --background-alt: #f4f4f5;
   /* Zinc 100 */
+  --hr-color: var(--border-color);
 }
 
 :root.theme-dark {
@@ -33,6 +34,8 @@
   /* Zinc 800 */
   --background-alt: #18181b;
   /* Zinc 900 */
+  --hr-color: #52525b;
+  /* Zinc 600 */
 }
 
 html {
@@ -212,7 +215,7 @@ hr {
   border: 0;
   height: 1px;
   margin: 3rem auto;
-  background-color: var(--border-color);
+  background-color: var(--hr-color);
 }
 
 code {
