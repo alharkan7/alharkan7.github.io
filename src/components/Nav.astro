@@ -211,7 +211,8 @@ const { current = "" } = Astro.props;
         class={current === "bookmarks" ||
         current === "videos" ||
         current === "stars" ||
-        current === "tweets"
+        current === "tweets" ||
+        current === "readings"
           ? "selected"
           : ""}
         data-dropdown-toggle
@@ -223,6 +224,7 @@ const { current = "" } = Astro.props;
         <a href="/videos">Videos</a>
         <a href="/bookmarks">Bookmarks</a>
         <a href="/stars">Repos</a>
+        <a href="/readings">Readings</a>
         <a href="/tweets">Tweets</a>
       </div>
     </div>

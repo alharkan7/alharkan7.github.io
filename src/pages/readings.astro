@@ -1,0 +1,988 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import { createClient } from "@supabase/supabase-js";
+
+// Define the TypeScript interface for a reading list item
+interface ReadingListItem {
+    id: number;
+    url: string;
+    title: string;
+    has_been_read: boolean;
+    creation_time: string;
+    last_update_time: string | null;
+    synced_at: string | null;
+    created_at: string;
+}
+
+// Initialize Supabase client
+const supabaseUrl = import.meta.env.SUPABASE_URL;
+const supabaseAnonKey = import.meta.env.SUPABASE_ANON_KEY;
+
+let errorMessage: string | null = null;
+
+if (!supabaseUrl || !supabaseAnonKey) {
+    errorMessage =
+        "Supabase URL or Anon Key is not set in environment variables.";
+    console.warn(errorMessage);
+}
+
+const supabase =
+    supabaseUrl && supabaseAnonKey
+        ? createClient(supabaseUrl, supabaseAnonKey)
+        : null;
+
+// Fetch reading list from Supabase
+async function getReadingListFromSupabase(): Promise<{
+    items: ReadingListItem[];
+    lastUpdatedAt: string | null;
+}> {
+    if (!supabase) {
+        console.error("Supabase client not initialized.");
+        return { items: [], lastUpdatedAt: null };
+    }
+
+    const CHUNK_SIZE = 1000;
+    let allData: ReadingListItem[] = [];
+    let offset = 0;
+    let keepFetching = true;
+    let totalCountFromQuery: number | null = null;
+
+    console.log(
+        "Starting to fetch reading list from Supabase with chunking...",
+    );
+
+    let lastUpdatedAt: string | null = null;
+    try {
+        const { data, error } = await supabase
+            .from("reading_list")
+            .select("created_at")
+            .order("created_at", { ascending: false })
+            .limit(1);
+
+        if (error) {
+            console.error("Error fetching last updated timestamp:", error);
+        } else if (data && data.length > 0) {
+            const date = new Date(data[0].created_at);
+            lastUpdatedAt = date.toLocaleDateString("en-GB", {
+                year: "numeric",
+                month: "short",
+                day: "numeric",
+            });
+        }
+    } catch (error) {
+        console.error("Exception fetching last updated timestamp:", error);
+    }
+
+    while (keepFetching) {
+        const {
+            data: chunkData,
+            error,
+            count,
+        } = await supabase
+            .from("reading_list")
+            .select(
+                "id, url, title, has_been_read, creation_time, last_update_time, synced_at, created_at",
+                { count: "exact" },
+            )
+            .order("creation_time", { ascending: false })
+            .range(offset, offset + CHUNK_SIZE - 1);
+
+        if (error) {
+            console.error(
+                "Error fetching reading list from Supabase (chunk):",
+                error,
+            );
+            return { items: [], lastUpdatedAt: null };
+        }
+
+        if (chunkData) {
+            allData = allData.concat(chunkData);
+            if (totalCountFromQuery === null && count !== null) {
+                totalCountFromQuery = count;
+            }
+        }
+
+        if (chunkData && chunkData.length < CHUNK_SIZE) {
+            keepFetching = false;
+        } else if (!chunkData || chunkData.length === 0) {
+            keepFetching = false;
+        } else {
+            offset += CHUNK_SIZE;
+        }
+
+        if (
+            totalCountFromQuery !== null &&
+            allData.length >= totalCountFromQuery
+        ) {
+            keepFetching = false;
+        }
+    }
+    console.log(
+        `Fetched a total of ${allData.length} reading list items from Supabase.`,
+    );
+
+    return { items: allData, lastUpdatedAt };
+}
+
+let allItems: ReadingListItem[] = [];
+let lastUpdateDate = "Unknown";
+let totalItems = 0;
+let unreadCount = 0;
+let readCount = 0;
+
+if (supabase) {
+    try {
+        const { items, lastUpdatedAt } = await getReadingListFromSupabase();
+        allItems = items;
+        if (lastUpdatedAt) {
+            lastUpdateDate = lastUpdatedAt;
+        }
+        totalItems = allItems.length;
+        unreadCount = allItems.filter((item) => !item.has_been_read).length;
+        readCount = allItems.filter((item) => item.has_been_read).length;
+    } catch (error) {
+        console.error("Error fetching reading list:", error);
+        errorMessage =
+            error instanceof Error
+                ? error.message
+                : "Failed to load reading list.";
+    }
+}
+
+// Helper function to format date
+function formatDate(dateString: string | null): string {
+    if (!dateString) return "N/A";
+    try {
+        return new Date(dateString).toLocaleDateString("en-US", {
+            year: "numeric",
+            month: "short",
+            day: "numeric",
+        });
+    } catch (e) {
+        console.error("Error formatting date:", e);
+        return "Invalid Date";
+    }
+}
+
+// Helper function to get domain from URL
+function getDomain(url: string): string {
+    try {
+        const urlObj = new URL(url);
+        return urlObj.hostname.replace("www.", "");
+    } catch {
+        return url;
+    }
+}
+
+// Helper function to get favicon URL
+function getFaviconUrl(url: string): string {
+    try {
+        const urlObj = new URL(url);
+        return `https://www.google.com/s2/favicons?domain=${urlObj.hostname}&sz=32`;
+    } catch {
+        return "";
+    }
+}
+
+const title = "My Reading List";
+const description = "My curated saved articles and web pages.";
+const permalink = Astro.site?.href ? `${Astro.site.href}readings` : "/readings";
+
+// Pass data to client
+const validLimits = [30, 60, 90];
+const requestUrl = new URL(Astro.request.url);
+const urlParams = requestUrl.searchParams;
+let initialLimit = parseInt(
+    urlParams.get("limit") || validLimits[0].toString(),
+);
+if (!validLimits.includes(initialLimit)) {
+    initialLimit = validLimits[0];
+}
+---
+
+<BaseLayout
+    title={title}
+    description={description}
+    permalink={permalink ?? "/"}
+    current="readings"
+>
+    <div class="container">
+        <h1>My Reading List</h1>
+        <p class="subtitle">My Curated Articles, Blogs, and Web Pages</p>
+        <hr />
+
+        <!-- Error Message Display -->
+        {
+            errorMessage && (
+                <div class="error-message">
+                    <p>
+                        <strong>Error:</strong> {errorMessage}
+                    </p>
+                </div>
+            )
+        }
+
+        <!-- Filter Controls -->
+        <div class="filter-controls">
+            <div class="filter-group">
+                <input
+                    type="text"
+                    id="search-input"
+                    class="search-input"
+                    placeholder="Search titles..."
+                    disabled={totalItems === 0}
+                />
+            </div>
+
+            <button
+                id="remove-filters-button"
+                class="remove-filters-button hidden"
+                disabled
+            >
+                Clear Filters
+            </button>
+
+            <div class="pagination-limit">
+                <select
+                    id="limit-select"
+                    class="filter-select"
+                    disabled={totalItems === 0}
+                >
+                    {
+                        validLimits.map((l) => (
+                            <option value={l} selected={l === initialLimit}>
+                                {l}
+                            </option>
+                        ))
+                    }
+                </select>
+                <span class="limit-label">per Page</span>
+            </div>
+        </div>
+
+        <!-- Reading List Grid -->
+        <div id="reading-list-grid" class="reading-list-grid">
+            {/* Loading Indicator */}
+            <div id="loading-indicator" class="loading-indicator">
+                <div class="spinner"></div>
+                <p>Loading reading list...</p>
+            </div>
+        </div>
+
+        <!-- Pagination Controls -->
+        {
+            totalItems > 0 && (
+                <div class="pagination-controls">
+                    <a
+                        id="prev-button"
+                        href="#"
+                        class="nav-button disabled"
+                        aria-disabled="true"
+                    >
+                        Prev
+                    </a>
+                    <div class="page-select-container">
+                        <span>Page</span>
+                        <select
+                            id="page-select"
+                            class="page-select"
+                            disabled
+                            aria-label="Select page number"
+                        >
+                            <option value="1">1</option>
+                        </select>
+                        <span id="page-total-span">of ?</span>
+                    </div>
+                    <a
+                        id="next-button"
+                        href="#"
+                        class="nav-button disabled"
+                        aria-disabled="true"
+                    >
+                        Next
+                    </a>
+                </div>
+            )
+        }
+
+        <hr />
+        <p class="footnote">
+            This reading list is automatically synced (last update: {
+                lastUpdateDate
+            }) from my Chrome Reading List.
+        </p>
+    </div>
+</BaseLayout>
+
+<script
+    define:vars={{
+        allItemsData: allItems,
+        initialTotalItems: totalItems,
+        validLimits,
+        fetchErrorMessage: errorMessage,
+    }}
+>
+    // Get elements
+    const gridContainer = document.getElementById("reading-list-grid");
+    const prevButton = document.getElementById("prev-button");
+    const nextButton = document.getElementById("next-button");
+    const pageSelect = document.getElementById("page-select");
+    const pageTotalSpan = document.getElementById("page-total-span");
+    const limitSelect = document.getElementById("limit-select");
+    const searchInput = document.getElementById("search-input");
+    const removeFiltersButton = document.getElementById(
+        "remove-filters-button",
+    );
+    const loadingIndicator = document.getElementById("loading-indicator");
+
+    // State variables
+    let allItems = allItemsData;
+    let isDataLoading = false;
+    let currentPage = 1;
+    let itemsPerPage = validLimits[0];
+    let totalPages = 1;
+    let selectedStatus = "all";
+    let searchQuery = "";
+    let isInitialLoad = true;
+
+    // Helper functions
+    function getDomain(url) {
+        try {
+            const urlObj = new URL(url);
+            return urlObj.hostname.replace("www.", "");
+        } catch {
+            return url;
+        }
+    }
+
+    function getFaviconUrl(url) {
+        try {
+            const urlObj = new URL(url);
+            return `https://www.google.com/s2/favicons?domain=${urlObj.hostname}&sz=32`;
+        } catch {
+            return "";
+        }
+    }
+
+    function formatDate(dateString) {
+        if (!dateString) return "N/A";
+        try {
+            const date = new Date(dateString);
+            const day = date.getDate();
+            const month = date.toLocaleDateString("en-US", { month: "short" });
+            const year = date.getFullYear();
+            return `${day} ${month} ${year}`;
+        } catch {
+            return "Invalid Date";
+        }
+    }
+
+    function updateUrl(replace = false) {
+        const url = new URL(window.location.href);
+        url.searchParams.set("page", currentPage.toString());
+        url.searchParams.set("limit", itemsPerPage.toString());
+        url.searchParams.set("status", selectedStatus);
+        if (searchQuery) {
+            url.searchParams.set("q", searchQuery);
+        } else {
+            url.searchParams.delete("q");
+        }
+
+        const state = {
+            page: currentPage,
+            limit: itemsPerPage,
+            status: selectedStatus,
+            q: searchQuery,
+        };
+
+        if (replace || isInitialLoad) {
+            history.replaceState(state, "", url.toString());
+            isInitialLoad = false;
+        } else {
+            history.pushState(state, "", url.toString());
+        }
+    }
+
+    function renderPage() {
+        if (
+            !gridContainer ||
+            !pageSelect ||
+            !pageTotalSpan ||
+            !prevButton ||
+            !nextButton ||
+            !limitSelect ||
+            !loadingIndicator
+        ) {
+            return;
+        }
+
+        if (loadingIndicator) {
+            loadingIndicator.classList.toggle("hidden", !isDataLoading);
+        }
+
+        if (isDataLoading) {
+            return;
+        }
+
+        // Handle no items
+        if (!allItems || allItems.length === 0) {
+            gridContainer.innerHTML = `
+                <div class="empty-state">
+                    <p>No reading list items available.</p>
+                </div>`;
+            return;
+        }
+
+        // Enable controls
+        if (limitSelect) limitSelect.disabled = false;
+        if (searchInput) searchInput.disabled = false;
+
+        // Apply filters
+        let filteredItems = [...allItems];
+
+        if (selectedStatus === "unread") {
+            filteredItems = filteredItems.filter((item) => !item.has_been_read);
+        } else if (selectedStatus === "read") {
+            filteredItems = filteredItems.filter((item) => item.has_been_read);
+        }
+
+        if (searchQuery) {
+            const query = searchQuery.toLowerCase();
+            filteredItems = filteredItems.filter(
+                (item) =>
+                    item.title?.toLowerCase().includes(query) ||
+                    item.url?.toLowerCase().includes(query),
+            );
+        }
+
+        const currentTotalItems = filteredItems.length;
+        totalPages = Math.ceil(currentTotalItems / itemsPerPage) || 1;
+
+        if (currentPage > totalPages) {
+            currentPage = totalPages;
+        }
+        currentPage = Math.max(1, currentPage);
+
+        const offset = (currentPage - 1) * itemsPerPage;
+        const itemsToShow = filteredItems.slice(
+            offset,
+            Math.min(offset + itemsPerPage, filteredItems.length),
+        );
+
+        // Generate grid HTML
+        if (itemsToShow.length > 0) {
+            gridContainer.innerHTML = itemsToShow
+                .map((item) => {
+                    const domain = getDomain(item.url);
+                    const faviconUrl = getFaviconUrl(item.url);
+                    const dateAdded = formatDate(item.creation_time);
+
+                    return `
+                        <a href="${item.url}" target="_blank" rel="noopener noreferrer" class="reading-item" title="${item.title}">
+                            <h3 class="reading-item-title">${item.title || "Untitled"}</h3>
+                            <div class="reading-item-source">
+                                <span class="icon-wrapper">
+                                    <img src="${faviconUrl}" alt="" class="favicon" width="16" height="16" loading="lazy" onerror="this.style.display='none'" />
+                                </span>
+                                <span class="domain">${domain}</span>
+                            </div>
+                            <div class="reading-item-footer">
+                                <span class="date-added">
+                                    <span class="icon-wrapper">
+                                        <svg class="calendar-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                            <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                                            <line x1="16" y1="2" x2="16" y2="6"></line>
+                                            <line x1="8" y1="2" x2="8" y2="6"></line>
+                                            <line x1="3" y1="10" x2="21" y2="10"></line>
+                                        </svg>
+                                    </span>
+                                    ${dateAdded}
+                                </span>
+                            </div>
+                        </a>
+                    `;
+                })
+                .join("");
+        } else {
+            gridContainer.innerHTML = `
+                <div class="empty-state">
+                    <p>No items match your filters.</p>
+                    ${selectedStatus !== "all" || searchQuery ? "<p>Try adjusting or clearing filters.</p>" : ""}
+                </div>`;
+        }
+
+        // Update pagination
+        if (pageTotalSpan) {
+            pageTotalSpan.textContent = `of ${totalPages}`;
+        }
+
+        if (pageSelect) {
+            pageSelect.innerHTML = "";
+            for (let i = 1; i <= totalPages; i++) {
+                const option = document.createElement("option");
+                option.value = i.toString();
+                option.textContent = i.toString();
+                pageSelect.appendChild(option);
+            }
+            pageSelect.value = currentPage.toString();
+            pageSelect.disabled = totalPages <= 1;
+        }
+
+        // Show/Hide Remove Filters Button
+        if (removeFiltersButton) {
+            const filtersActive = searchQuery !== "";
+            removeFiltersButton.classList.toggle("hidden", !filtersActive);
+            removeFiltersButton.disabled = !filtersActive;
+        }
+
+        // Update button states
+        const hasPrev = currentPage > 1;
+        const hasNext = currentPage < totalPages;
+
+        if (prevButton) {
+            prevButton.classList.toggle("disabled", !hasPrev);
+            prevButton.setAttribute("aria-disabled", (!hasPrev).toString());
+        }
+
+        if (nextButton) {
+            nextButton.classList.toggle("disabled", !hasNext);
+            nextButton.setAttribute("aria-disabled", (!hasNext).toString());
+        }
+
+        // Set form control values
+        if (limitSelect) limitSelect.value = itemsPerPage.toString();
+        if (searchInput) searchInput.value = searchQuery;
+    }
+
+    function loadParamsFromUrl() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const urlPage = parseInt(urlParams.get("page") || "1");
+        const urlLimit = parseInt(
+            urlParams.get("limit") || validLimits[0].toString(),
+        );
+        const urlStatus = urlParams.get("status") || "all";
+        const urlQuery = urlParams.get("q") || "";
+
+        itemsPerPage = validLimits.includes(urlLimit)
+            ? urlLimit
+            : validLimits[0];
+        selectedStatus = ["all", "unread", "read"].includes(urlStatus)
+            ? urlStatus
+            : "all";
+        searchQuery = urlQuery;
+        currentPage = urlPage;
+    }
+
+    function initialize() {
+        isDataLoading = true;
+
+        loadParamsFromUrl();
+
+        if (fetchErrorMessage) {
+            console.error("Error passed from server:", fetchErrorMessage);
+            isDataLoading = false;
+            if (loadingIndicator) loadingIndicator.classList.add("hidden");
+            if (gridContainer) {
+                gridContainer.innerHTML = `<div class="empty-state error"><p>Failed to load reading list. Please try refreshing.</p></div>`;
+            }
+            return;
+        }
+
+        isDataLoading = false;
+        renderPage();
+        setupEventListeners();
+        updateUrl(true);
+    }
+
+    function setupEventListeners() {
+        if (limitSelect) {
+            limitSelect.addEventListener("change", (e) => {
+                itemsPerPage = parseInt(e.target.value);
+                currentPage = 1;
+                updateUrl();
+                renderPage();
+            });
+        }
+
+        if (searchInput) {
+            let debounceTimeout;
+            searchInput.addEventListener("input", (e) => {
+                clearTimeout(debounceTimeout);
+                debounceTimeout = setTimeout(() => {
+                    searchQuery = e.target.value;
+                    currentPage = 1;
+                    updateUrl();
+                    renderPage();
+                }, 300);
+            });
+        }
+
+        if (removeFiltersButton) {
+            removeFiltersButton.addEventListener("click", () => {
+                searchQuery = "";
+                currentPage = 1;
+                if (searchInput) searchInput.value = "";
+                updateUrl();
+                renderPage();
+            });
+        }
+
+        if (prevButton) {
+            prevButton.addEventListener("click", (e) => {
+                e.preventDefault();
+                if (currentPage > 1) {
+                    currentPage--;
+                    updateUrl();
+                    renderPage();
+                }
+            });
+        }
+
+        if (nextButton) {
+            nextButton.addEventListener("click", (e) => {
+                e.preventDefault();
+                if (currentPage < totalPages) {
+                    currentPage++;
+                    updateUrl();
+                    renderPage();
+                }
+            });
+        }
+
+        if (pageSelect) {
+            pageSelect.addEventListener("change", (e) => {
+                currentPage = parseInt(e.target.value);
+                updateUrl();
+                renderPage();
+            });
+        }
+
+        window.addEventListener("popstate", () => {
+            loadParamsFromUrl();
+            renderPage();
+        });
+    }
+
+    // Initialize on load
+    initialize();
+</script>
+
+<style is:global>
+    .container h1 {
+        margin-block-start: 1em;
+        margin-block-end: 0.5em;
+    }
+
+    .subtitle {
+        color: var(--text-secondary);
+        margin-block-end: 1.5em;
+    }
+
+    .error-message {
+        margin: 1rem 0;
+        padding: 1rem;
+        background-color: rgba(239, 68, 68, 0.1);
+        border: 1px solid rgba(239, 68, 68, 0.3);
+        border-radius: 8px;
+        color: #ef4444;
+    }
+
+    .filter-controls {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        align-items: center;
+        gap: 1rem;
+        margin: 1.5rem 0;
+    }
+
+    .filter-group {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .filter-select {
+        padding: 0.5rem 0.75rem;
+        border: 1px solid var(--border-color);
+        border-radius: 6px;
+        background-color: var(--background-body);
+        color: var(--text-main);
+        font-size: 0.9rem;
+        cursor: pointer;
+    }
+
+    .filter-select:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+    }
+
+    .search-input {
+        padding: 0.5rem 0.75rem;
+        border: 1px solid var(--border-color);
+        border-radius: 6px;
+        background-color: var(--background-body);
+        color: var(--text-main);
+        font-size: 0.9rem;
+        min-width: 200px;
+    }
+
+    .search-input:focus {
+        outline: none;
+        border-color: var(--primary-color);
+    }
+
+    .remove-filters-button {
+        background: none;
+        border: none;
+        color: var(--primary-color);
+        cursor: pointer;
+        font-size: 0.9rem;
+        padding: 0.5rem;
+    }
+
+    .remove-filters-button:hover {
+        text-decoration: underline;
+    }
+
+    .remove-filters-button.hidden {
+        display: none;
+    }
+
+    .pagination-limit {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .limit-label {
+        font-size: 0.9rem;
+        color: var(--text-secondary);
+        white-space: nowrap;
+    }
+
+    .reading-list-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+        gap: 1.25rem;
+        margin: 2rem 0;
+        min-height: 200px;
+    }
+
+    .loading-indicator {
+        grid-column: 1 / -1;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        min-height: 200px;
+    }
+
+    .loading-indicator.hidden {
+        display: none;
+    }
+
+    .spinner {
+        width: 48px;
+        height: 48px;
+        border: 3px solid var(--border-color);
+        border-top-color: var(--primary-color);
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+        to {
+            transform: rotate(360deg);
+        }
+    }
+
+    .empty-state {
+        grid-column: 1 / -1;
+        text-align: center;
+        padding: 3rem;
+        color: var(--text-secondary);
+    }
+
+    .empty-state.error {
+        color: #ef4444;
+    }
+
+    .reading-item {
+        display: flex;
+        flex-direction: column;
+        padding: 1rem;
+        border: 1px solid var(--border-color);
+        border-radius: 10px;
+        background-color: var(--background-alt);
+        text-decoration: none;
+        color: inherit;
+        transition:
+            transform 0.2s ease,
+            box-shadow 0.2s ease,
+            border-color 0.2s ease;
+    }
+
+    .reading-item:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+        border-color: var(--primary-color);
+    }
+
+    .reading-item-source {
+        display: flex;
+        align-items: center;
+        gap: 0.4rem;
+        margin-top: 0.75rem;
+    }
+
+    .icon-wrapper {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 20px;
+        flex-shrink: 0;
+    }
+
+    .favicon {
+        width: 16px;
+        height: 16px;
+        border-radius: 2px;
+        flex-shrink: 0;
+    }
+
+    .domain {
+        font-size: 0.8rem;
+        color: var(--text-secondary);
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        flex-grow: 1;
+    }
+
+    .reading-item-title {
+        font-size: 0.95rem;
+        font-weight: 600;
+        line-height: 1.4;
+        margin: 0;
+        display: -webkit-box;
+        -webkit-line-clamp: 3;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+        flex-grow: 1;
+    }
+
+    .reading-item-footer {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-top: auto;
+    }
+
+    .date-added {
+        display: flex;
+        align-items: center;
+        gap: 0.4rem;
+        font-size: 0.75rem;
+        color: var(--text-secondary);
+    }
+
+    .calendar-icon {
+        width: 14px;
+        height: 14px;
+        flex-shrink: 0;
+    }
+
+    /* Pagination Styles */
+    .pagination-controls {
+        display: flex;
+        flex-wrap: nowrap;
+        justify-content: center;
+        align-items: center;
+        gap: 1rem;
+        margin: 2rem 0;
+        font-family: var(--font-family-sans);
+    }
+
+    .nav-button {
+        color: var(--text-secondary);
+        font-size: 0.9rem;
+        font-weight: bold;
+        text-decoration: none;
+        transition: all 0.2s ease-in-out;
+        box-shadow: inset 0 -0.12em 0 var(--primary-color);
+        padding: 0.2em 0.1em;
+    }
+
+    .nav-button:hover {
+        box-shadow: inset 0 -1.5em 0 var(--primary-color);
+        color: #fff;
+    }
+
+    .nav-button.disabled,
+    .nav-button[aria-disabled="true"] {
+        opacity: 0.5;
+        cursor: not-allowed;
+        pointer-events: none;
+        box-shadow: inset 0 -0.12em 0 var(--text-secondary);
+    }
+
+    .page-select-container {
+        display: flex;
+        align-items: center;
+        font-size: 0.9rem;
+        white-space: nowrap;
+        gap: 0.25rem;
+    }
+
+    .page-select {
+        padding: 0.25rem;
+        font-size: 0.9rem;
+        background-color: var(--background-body);
+        color: var(--text-main);
+        border: none;
+        outline: none;
+        border-radius: 4px;
+        text-align: center;
+    }
+
+    .page-select:disabled {
+        opacity: 0.7;
+        cursor: not-allowed;
+    }
+
+    #page-total-span {
+        margin-left: 0.25rem;
+    }
+
+    .footnote {
+        font-size: 0.85rem;
+        color: var(--text-secondary);
+        margin-top: 2rem;
+    }
+
+    /* Responsive adjustments */
+    @media (max-width: 640px) {
+        .filter-controls {
+            flex-direction: column;
+            align-items: stretch;
+        }
+
+        .filter-group {
+            width: 100%;
+        }
+
+        .filter-select,
+        .search-input {
+            width: 100%;
+        }
+
+        .pagination-limit {
+            justify-content: center;
+        }
+
+        .reading-list-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
