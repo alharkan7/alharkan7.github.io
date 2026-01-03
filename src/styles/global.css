@@ -215,6 +215,11 @@ hr {
   background-color: var(--border-color);
 }
 
+:root.theme-dark hr {
+  background-color: #52525b;
+  /* Zinc 600 */
+}
+
 code {
   font-family: 'SF Mono', menlo, inconsolata, monospace;
   font-size: calc(1em - 2px);
