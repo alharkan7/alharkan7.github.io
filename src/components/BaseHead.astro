@@ -128,12 +128,14 @@ const socialImageURL = image
 
   // Function to get current theme
   function getCurrentTheme() {
-    return document.documentElement.classList.contains('theme-dark') ? 'dark' : 'light';
+    return document.documentElement.classList.contains("theme-dark")
+      ? "dark"
+      : "light";
   }
 
   // Function to get Mermaid theme variables based on current theme
   function getMermaidThemeVariables(theme) {
-    if (theme === 'dark') {
+    if (theme === "dark") {
       return {
         primaryColor: "#ff6b6b",
         primaryTextColor: "#f4f4f5",
@@ -150,17 +152,34 @@ const socialImageURL = image
         nodeTextColor: "#f4f4f5",
         nodeLabelColor: "#f4f4f5",
         nodeLabelBackgroundColor: "#18181b",
+        labelTextColor: "#f4f4f5",
         // Grid and border colors
         gridColor: "#3f3f46",
         border1: "#3f3f46",
         border2: "#52525b",
         // Section colors
-        altSectionBkg: "#18181b",
+        altSectionBkg: "#27272a",
+        sectionBkg: "#18181b",
+        sectionBkgColor: "#18181b",
+        sectionBkgColor2: "#27272a",
         // Pie chart colors
         pieTitleTextColor: "#f4f4f5",
         pieOuterStrokeColor: "#f4f4f4",
         pieSectionTextColor: "#f4f4f4",
+        pieLegendTextColor: "#f4f4f5",
         pieOuterStrokeWidth: "2px",
+        // Gantt chart specific
+        taskTextColor: "#f4f4f5",
+        taskTextLightColor: "#f4f4f5",
+        taskTextDarkColor: "#18181b",
+        taskTextOutsideColor: "#f4f4f5",
+        sectionTitleColor: "#f4f4f5",
+        todayLineColor: "#ff6b6b",
+        // Flowchart
+        edgeLabelBackground: "#27272a",
+        clusterBkg: "#27272a",
+        clusterBorder: "#3f3f46",
+        titleColor: "#f4f4f5",
       };
     } else {
       return {
@@ -299,17 +318,273 @@ const socialImageURL = image
       mermaidDiv.classList.add("mermaid-processed");
     });
 
-    // Re-run mermaid on the new elements
+    // Re-run mermaid on the new elements and setup click handlers
     if (mermaidElements.length > 0) {
-      mermaid.run();
+      mermaid.run().then(() => {
+        setupMermaidClickHandlers();
+      });
+    } else {
+      setupMermaidClickHandlers();
     }
+  }
+
+  // Create and setup the mermaid modal
+  function createMermaidModal() {
+    // Check if modal already exists
+    if (document.getElementById("mermaid-modal")) {
+      return document.getElementById("mermaid-modal");
+    }
+
+    // Lucide icons as SVG strings
+    const icons = {
+      zoomIn: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" x2="16.65" y1="21" y2="16.65"/><line x1="11" x2="11" y1="8" y2="14"/><line x1="8" x2="14" y1="11" y2="11"/></svg>`,
+      zoomOut: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" x2="16.65" y1="21" y2="16.65"/><line x1="8" x2="14" y1="11" y2="11"/></svg>`,
+      reset: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>`,
+      close: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>`,
+    };
+
+    const modal = document.createElement("div");
+    modal.id = "mermaid-modal";
+    modal.className = "mermaid-modal-overlay";
+    modal.innerHTML = `
+      <div class="mermaid-modal-content">
+        <div class="mermaid-modal-controls">
+          <button class="mermaid-modal-btn" id="mermaid-zoom-out" title="Zoom Out">${icons.zoomOut}</button>
+          <span class="mermaid-modal-zoom-info" id="mermaid-zoom-level">100%</span>
+          <button class="mermaid-modal-btn" id="mermaid-zoom-in" title="Zoom In">${icons.zoomIn}</button>
+          <div class="mermaid-modal-divider"></div>
+          <button class="mermaid-modal-btn" id="mermaid-zoom-reset" title="Reset">${icons.reset}</button>
+          <button class="mermaid-modal-btn" id="mermaid-close" title="Close">${icons.close}</button>
+        </div>
+        <div class="mermaid-modal-diagram" id="mermaid-diagram-container"></div>
+        <div class="mermaid-modal-hint">Scroll to zoom • Drag to pan</div>
+      </div>
+    `;
+
+    document.body.appendChild(modal);
+
+    // Setup modal controls
+    let currentZoom = 1;
+    let isPanning = false;
+    let startX = 0,
+      startY = 0;
+    let scrollLeft = 0,
+      scrollTop = 0;
+
+    const container = modal.querySelector("#mermaid-diagram-container");
+    const zoomLevelDisplay = modal.querySelector("#mermaid-zoom-level");
+
+    function updateZoom() {
+      const svg = container.querySelector("svg");
+      if (svg) {
+        svg.style.transform = `scale(${currentZoom})`;
+        svg.style.transformOrigin = "center center";
+        zoomLevelDisplay.textContent = `${Math.round(currentZoom * 100)}%`;
+      }
+    }
+
+    function zoomIn() {
+      currentZoom = Math.min(currentZoom * 1.25, 5);
+      updateZoom();
+    }
+
+    function zoomOut() {
+      currentZoom = Math.max(currentZoom * 0.8, 0.25);
+      updateZoom();
+    }
+
+    function resetZoom() {
+      currentZoom = 1;
+      container.scrollLeft = 0;
+      container.scrollTop = 0;
+      updateZoom();
+    }
+
+    function closeModal() {
+      modal.classList.remove("active");
+      document.body.style.overflow = "";
+      currentZoom = 1;
+    }
+
+    // Button handlers
+    modal.querySelector("#mermaid-zoom-in").addEventListener("click", zoomIn);
+    modal.querySelector("#mermaid-zoom-out").addEventListener("click", zoomOut);
+    modal
+      .querySelector("#mermaid-zoom-reset")
+      .addEventListener("click", resetZoom);
+    modal.querySelector("#mermaid-close").addEventListener("click", closeModal);
+
+    // Close on overlay click
+    modal.addEventListener("click", (e) => {
+      if (e.target === modal) {
+        closeModal();
+      }
+    });
+
+    // Close on Escape key
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape" && modal.classList.contains("active")) {
+        closeModal();
+      }
+    });
+
+    // Mouse wheel zoom
+    container.addEventListener(
+      "wheel",
+      (e) => {
+        e.preventDefault();
+        if (e.deltaY < 0) {
+          zoomIn();
+        } else {
+          zoomOut();
+        }
+      },
+      { passive: false },
+    );
+
+    // Pan functionality (mouse)
+    container.addEventListener("mousedown", (e) => {
+      isPanning = true;
+      container.style.cursor = "grabbing";
+      startX = e.pageX - container.offsetLeft;
+      startY = e.pageY - container.offsetTop;
+      scrollLeft = container.scrollLeft;
+      scrollTop = container.scrollTop;
+    });
+
+    container.addEventListener("mousemove", (e) => {
+      if (!isPanning) return;
+      e.preventDefault();
+      const x = e.pageX - container.offsetLeft;
+      const y = e.pageY - container.offsetTop;
+      const walkX = (x - startX) * 1.5;
+      const walkY = (y - startY) * 1.5;
+      container.scrollLeft = scrollLeft - walkX;
+      container.scrollTop = scrollTop - walkY;
+    });
+
+    container.addEventListener("mouseup", () => {
+      isPanning = false;
+      container.style.cursor = "grab";
+    });
+
+    container.addEventListener("mouseleave", () => {
+      isPanning = false;
+      container.style.cursor = "grab";
+    });
+
+    // Touch support for mobile
+    let initialDistance = 0;
+    let lastTouchX = 0,
+      lastTouchY = 0;
+
+    container.addEventListener(
+      "touchstart",
+      (e) => {
+        if (e.touches.length === 2) {
+          // Pinch zoom start
+          initialDistance = Math.hypot(
+            e.touches[0].pageX - e.touches[1].pageX,
+            e.touches[0].pageY - e.touches[1].pageY,
+          );
+        } else if (e.touches.length === 1) {
+          // Pan start
+          isPanning = true;
+          lastTouchX = e.touches[0].pageX;
+          lastTouchY = e.touches[0].pageY;
+          scrollLeft = container.scrollLeft;
+          scrollTop = container.scrollTop;
+        }
+      },
+      { passive: false },
+    );
+
+    container.addEventListener(
+      "touchmove",
+      (e) => {
+        e.preventDefault();
+        if (e.touches.length === 2) {
+          // Pinch zoom
+          const newDistance = Math.hypot(
+            e.touches[0].pageX - e.touches[1].pageX,
+            e.touches[0].pageY - e.touches[1].pageY,
+          );
+          const delta = newDistance - initialDistance;
+          if (Math.abs(delta) > 10) {
+            if (delta > 0) {
+              currentZoom = Math.min(currentZoom * 1.05, 5);
+            } else {
+              currentZoom = Math.max(currentZoom * 0.95, 0.25);
+            }
+            updateZoom();
+            initialDistance = newDistance;
+          }
+        } else if (e.touches.length === 1 && isPanning) {
+          // Pan
+          const touchX = e.touches[0].pageX;
+          const touchY = e.touches[0].pageY;
+          const walkX = touchX - lastTouchX;
+          const walkY = touchY - lastTouchY;
+          container.scrollLeft = scrollLeft - walkX;
+          container.scrollTop = scrollTop - walkY;
+        }
+      },
+      { passive: false },
+    );
+
+    container.addEventListener("touchend", () => {
+      isPanning = false;
+      initialDistance = 0;
+    });
+
+    return modal;
+  }
+
+  // Open a diagram in the modal
+  function openMermaidModal(diagramElement) {
+    const modal = createMermaidModal();
+    const container = modal.querySelector("#mermaid-diagram-container");
+    const svg = diagramElement.querySelector("svg");
+
+    if (svg) {
+      // Clone the SVG and put it in the modal
+      const clonedSvg = svg.cloneNode(true);
+      clonedSvg.style.transform = "scale(1)";
+      clonedSvg.style.transformOrigin = "top left";
+      container.innerHTML = "";
+      container.appendChild(clonedSvg);
+
+      // Reset zoom level display
+      modal.querySelector("#mermaid-zoom-level").textContent = "100%";
+
+      // Show modal
+      modal.classList.add("active");
+      document.body.style.overflow = "hidden";
+    }
+  }
+
+  // Setup click handlers for all mermaid diagrams
+  function setupMermaidClickHandlers() {
+    const diagrams = document.querySelectorAll(".mermaid");
+    diagrams.forEach((diagram) => {
+      // Skip if already has click handler
+      if (diagram.dataset.hasClickHandler) return;
+
+      diagram.dataset.hasClickHandler = "true";
+      diagram.style.cursor = "pointer";
+      diagram.title = "Click to expand diagram";
+
+      diagram.addEventListener("click", () => {
+        openMermaidModal(diagram);
+      });
+    });
   }
 
   // Function to update Mermaid theme and re-render diagrams
   function updateMermaidTheme() {
     const currentTheme = getCurrentTheme();
     const newThemeVariables = getMermaidThemeVariables(currentTheme);
-    
+
     // Update Mermaid configuration with new theme variables
     mermaid.initialize({
       startOnLoad: false,
@@ -330,7 +605,7 @@ const socialImageURL = image
     });
 
     // Re-render all existing Mermaid diagrams with new theme
-    const existingMermaidDiagrams = document.querySelectorAll('.mermaid');
+    const existingMermaidDiagrams = document.querySelectorAll(".mermaid");
     if (existingMermaidDiagrams.length > 0) {
       mermaid.run();
     }
@@ -344,7 +619,10 @@ const socialImageURL = image
   // Listen for theme changes
   const themeObserver = new MutationObserver((mutations) => {
     mutations.forEach((mutation) => {
-      if (mutation.type === 'attributes' && mutation.attributeName === 'class') {
+      if (
+        mutation.type === "attributes" &&
+        mutation.attributeName === "class"
+      ) {
         const target = mutation.target;
         if (target === document.documentElement) {
           handleThemeChange();
@@ -356,7 +634,7 @@ const socialImageURL = image
   // Start observing theme changes
   themeObserver.observe(document.documentElement, {
     attributes: true,
-    attributeFilter: ['class']
+    attributeFilter: ["class"],
   });
 
   // Render on initial load
@@ -373,33 +651,33 @@ const socialImageURL = image
 
   // Function to wrap wide tables in scrollable containers
   function wrapWideTables() {
-    const tables = document.querySelectorAll('table');
-    
+    const tables = document.querySelectorAll("table");
+
     tables.forEach((table, index) => {
       // Skip if already wrapped
-      if (table.parentElement.classList.contains('table-scroll-container')) {
+      if (table.parentElement.classList.contains("table-scroll-container")) {
         return;
       }
-      
+
       // Check if table is wider than its container
       const tableRect = table.getBoundingClientRect();
       const containerRect = table.parentElement.getBoundingClientRect();
-      
+
       // If table is wider than container or if we're on mobile, wrap it
       const isOnMobile = window.innerWidth <= 768;
       const isTableTooWide = tableRect.width > containerRect.width;
-      
+
       if (isTableTooWide || isOnMobile) {
         // Create scrollable container
-        const scrollContainer = document.createElement('div');
-        scrollContainer.className = 'table-scroll-container';
-        
+        const scrollContainer = document.createElement("div");
+        scrollContainer.className = "table-scroll-container";
+
         // Insert container before table
         table.parentElement.insertBefore(scrollContainer, table);
-        
+
         // Move table into container
         scrollContainer.appendChild(table);
-        
+
         console.log(`Wrapped table ${index + 1} in scrollable container`);
       }
     });
@@ -407,7 +685,7 @@ const socialImageURL = image
 
   // Re-wrap tables on window resize
   let resizeTimeout;
-  window.addEventListener('resize', () => {
+  window.addEventListener("resize", () => {
     clearTimeout(resizeTimeout);
     resizeTimeout = setTimeout(() => {
       wrapWideTables();
