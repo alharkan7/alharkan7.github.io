@@ -288,6 +288,32 @@ blockquote footer {
   text-align: right;
 }
 
+/* Twitter Embed Centering */
+blockquote.twitter-tweet {
+  /* Remove regular blockquote styling for Twitter embeds */
+  background-color: transparent;
+  border-left: none;
+  border-radius: 0;
+  box-shadow: none;
+  padding: 0;
+
+  /* Center the Twitter embed */
+  margin-left: auto !important;
+  margin-right: auto !important;
+}
+
+/* Center the rendered Twitter widget (iframe) */
+.twitter-tweet-rendered,
+.twitter-tweet iframe,
+twitterwidget,
+twitter-widget {
+  margin-left: auto !important;
+  margin-right: auto !important;
+  display: block !important;
+  width: 550px !important;
+  max-width: 100% !important;
+}
+
 /* Figure and figcaption for image captions */
 figure {
   padding: 0;
