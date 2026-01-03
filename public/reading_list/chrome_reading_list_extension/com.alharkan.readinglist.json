@@ -1,9 +1,0 @@
-{
-    "name": "com.alharkan.readinglist",
-    "description": "Reading List Sync Native Host",
-    "path": "/Users/alharkan/Documents/Repositories/Archive/Git/chrome_reading_list_extension/native_host.py",
-    "type": "stdio",
-    "allowed_origins": [
-        "chrome-extension://EXTENSION_ID_PLACEHOLDER/"
-    ]
-}
