@@ -29,8 +29,8 @@
   --primary-color: #2dd4bf;
   /* Teal 400 - Soft Glowing Tosca */
   /* Custom variable overrides for dark theme */
-  --border-color: #27272a;
-  /* Zinc 800 */
+  --border-color: #3f3f46;
+  /* Zinc 700 - Improved contrast for dark mode */
   --background-alt: #18181b;
   /* Zinc 900 */
 }
