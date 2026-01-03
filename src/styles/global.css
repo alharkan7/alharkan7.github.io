@@ -315,6 +315,75 @@ td:first-child {
   min-width: 100px;
 }
 
+/* Container for scrollable tables */
+.table-scroll-container {
+  margin: 2em 0;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+}
+
+.table-scroll-container table {
+  margin: 0;
+  border: none;
+  border-radius: 0;
+}
+
+/* Mobile-specific table adjustments */
+@media (max-width: 768px) {
+  .table-scroll-container {
+    margin: 1em -1rem; /* Extend to edges on mobile */
+    border-left: none;
+    border-right: none;
+    border-radius: 0;
+  }
+  
+  .table-scroll-container table {
+    min-width: 600px; /* Ensure minimum width for content */
+  }
+  
+  /* Allow horizontal scrolling indicator */
+  .table-scroll-container::-webkit-scrollbar {
+    height: 8px;
+  }
+  
+  .table-scroll-container::-webkit-scrollbar-track {
+    background: var(--background-alt);
+  }
+  
+  .table-scroll-container::-webkit-scrollbar-thumb {
+    background: var(--border-color);
+    border-radius: 4px;
+  }
+}
+
+/* Dark mode table styles */
+:root.theme-dark table {
+  border-color: var(--border-color);
+}
+
+:root.theme-dark th {
+  border-bottom-color: var(--border-color);
+  color: var(--text-main);
+}
+
+:root.theme-dark td {
+  color: var(--text-main);
+}
+
+:root.theme-dark .table-scroll-container {
+  border-color: var(--border-color);
+}
+
+:root.theme-dark .table-scroll-container::-webkit-scrollbar-track {
+  background: var(--background-alt);
+}
+
+:root.theme-dark .table-scroll-container::-webkit-scrollbar-thumb {
+  background: var(--border-color);
+}
+
 .container {
   margin: 0 auto;
   max-width: 42em;

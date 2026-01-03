@@ -126,31 +126,98 @@ const socialImageURL = image
 <script type="module">
   import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs";
 
-  // Initialize Mermaid
-  mermaid.initialize({
-    startOnLoad: true,
-    theme: "default",
-    themeVariables: {
-      primaryColor: "#ff6b6b",
-      primaryTextColor: "#333",
-      primaryBorderColor: "#ff6b6b",
-      lineColor: "#666",
-      secondaryColor: "#f9f9f9",
-      tertiaryColor: "#fff",
-    },
-    gantt: {
-      titleTopMargin: 25,
-      barHeight: 30,
-      barGap: 4,
-      topPadding: 50,
-      leftPadding: 75,
-      gridLineStartPadding: 35,
-      fontSize: 12,
-      numberSectionStyles: 4,
-      axisFormat: "%b '%y", // Compact format: Jan '24, Feb '24, etc.
-      useMaxWidth: true,
-    },
-  });
+  // Function to get current theme
+  function getCurrentTheme() {
+    return document.documentElement.classList.contains('theme-dark') ? 'dark' : 'light';
+  }
+
+  // Function to get Mermaid theme variables based on current theme
+  function getMermaidThemeVariables(theme) {
+    if (theme === 'dark') {
+      return {
+        primaryColor: "#ff6b6b",
+        primaryTextColor: "#f4f4f5",
+        primaryBorderColor: "#ff6b6b",
+        lineColor: "#a1a1aa",
+        secondaryColor: "#18181b",
+        tertiaryColor: "#09090b",
+        background: "#09090b",
+        mainBkg: "#18181b",
+        secondBkg: "#27272a",
+        tertiaryBkg: "#3f3f46",
+        // Text colors for dark mode
+        textColor: "#f4f4f5",
+        nodeTextColor: "#f4f4f5",
+        nodeLabelColor: "#f4f4f5",
+        nodeLabelBackgroundColor: "#18181b",
+        // Grid and border colors
+        gridColor: "#3f3f46",
+        border1: "#3f3f46",
+        border2: "#52525b",
+        // Section colors
+        altSectionBkg: "#18181b",
+        // Pie chart colors
+        pieTitleTextColor: "#f4f4f5",
+        pieOuterStrokeColor: "#f4f4f4",
+        pieSectionTextColor: "#f4f4f4",
+        pieOuterStrokeWidth: "2px",
+      };
+    } else {
+      return {
+        primaryColor: "#ff6b6b",
+        primaryTextColor: "#333",
+        primaryBorderColor: "#ff6b6b",
+        lineColor: "#666",
+        secondaryColor: "#f9f9f9",
+        tertiaryColor: "#fff",
+        background: "#ffffff",
+        mainBkg: "#ffffff",
+        secondBkg: "#f9f9f9",
+        tertiaryBkg: "#f0f0f0",
+        // Text colors for light mode
+        textColor: "#333",
+        nodeTextColor: "#333",
+        nodeLabelColor: "#333",
+        nodeLabelBackgroundColor: "#ffffff",
+        // Grid and border colors
+        gridColor: "#cccccc",
+        border1: "#cccccc",
+        border2: "#999999",
+        // Section colors
+        altSectionBkg: "#f9f9f9",
+        // Pie chart colors
+        pieTitleTextColor: "#333",
+        pieOuterStrokeColor: "#333333",
+        pieSectionTextColor: "#333333",
+        pieOuterStrokeWidth: "2px",
+      };
+    }
+  }
+
+  // Initialize Mermaid with theme detection
+  function initializeMermaid() {
+    const currentTheme = getCurrentTheme();
+    mermaid.initialize({
+      startOnLoad: true,
+      theme: "default",
+      themeVariables: getMermaidThemeVariables(currentTheme),
+      gantt: {
+        titleTopMargin: 25,
+        barHeight: 30,
+        barGap: 4,
+        topPadding: 50,
+        leftPadding: 75,
+        gridLineStartPadding: 35,
+        fontSize: 12,
+        numberSectionStyles: 4,
+        axisFormat: "%b '%y", // Compact format: Jan '24, Feb '24, etc.
+        useMaxWidth: true,
+      },
+    });
+  }
+
+  // Initialize on load
+  initializeMermaid();
 
   // Function to render Mermaid diagrams
   function renderMermaidDiagrams() {
@@ -238,9 +305,112 @@ const socialImageURL = image
     }
   }
 
+  // Function to update Mermaid theme and re-render diagrams
+  function updateMermaidTheme() {
+    const currentTheme = getCurrentTheme();
+    const newThemeVariables = getMermaidThemeVariables(currentTheme);
+    
+    // Update Mermaid configuration with new theme variables
+    mermaid.initialize({
+      startOnLoad: false,
+      theme: "default",
+      themeVariables: newThemeVariables,
+      gantt: {
+        titleTopMargin: 25,
+        barHeight: 30,
+        barGap: 4,
+        topPadding: 50,
+        leftPadding: 75,
+        gridLineStartPadding: 35,
+        fontSize: 12,
+        numberSectionStyles: 4,
+        axisFormat: "%b '%y",
+        useMaxWidth: true,
+      },
+    });
+
+    // Re-render all existing Mermaid diagrams with new theme
+    const existingMermaidDiagrams = document.querySelectorAll('.mermaid');
+    if (existingMermaidDiagrams.length > 0) {
+      mermaid.run();
+    }
+  }
+
+  // Function to handle theme changes
+  function handleThemeChange() {
+    updateMermaidTheme();
+  }
+
+  // Listen for theme changes
+  const themeObserver = new MutationObserver((mutations) => {
+    mutations.forEach((mutation) => {
+      if (mutation.type === 'attributes' && mutation.attributeName === 'class') {
+        const target = mutation.target;
+        if (target === document.documentElement) {
+          handleThemeChange();
+        }
+      }
+    });
+  });
+
+  // Start observing theme changes
+  themeObserver.observe(document.documentElement, {
+    attributes: true,
+    attributeFilter: ['class']
+  });
+
   // Render on initial load
-  document.addEventListener("DOMContentLoaded", renderMermaidDiagrams);
+  document.addEventListener("DOMContentLoaded", () => {
+    renderMermaidDiagrams();
+    wrapWideTables();
+  });
 
   // Render on Astro page transitions
-  document.addEventListener("astro:page-load", renderMermaidDiagrams);
+  document.addEventListener("astro:page-load", () => {
+    renderMermaidDiagrams();
+    wrapWideTables();
+  });
+
+  // Function to wrap wide tables in scrollable containers
+  function wrapWideTables() {
+    const tables = document.querySelectorAll('table');
+    
+    tables.forEach((table, index) => {
+      // Skip if already wrapped
+      if (table.parentElement.classList.contains('table-scroll-container')) {
+        return;
+      }
+      
+      // Check if table is wider than its container
+      const tableRect = table.getBoundingClientRect();
+      const containerRect = table.parentElement.getBoundingClientRect();
+      
+      // If table is wider than container or if we're on mobile, wrap it
+      const isOnMobile = window.innerWidth <= 768;
+      const isTableTooWide = tableRect.width > containerRect.width;
+      
+      if (isTableTooWide || isOnMobile) {
+        // Create scrollable container
+        const scrollContainer = document.createElement('div');
+        scrollContainer.className = 'table-scroll-container';
+        
+        // Insert container before table
+        table.parentElement.insertBefore(scrollContainer, table);
+        
+        // Move table into container
+        scrollContainer.appendChild(table);
+        
+        console.log(`Wrapped table ${index + 1} in scrollable container`);
+      }
+    });
+  }
+
+  // Re-wrap tables on window resize
+  let resizeTimeout;
+  window.addEventListener('resize', () => {
+    clearTimeout(resizeTimeout);
+    resizeTimeout = setTimeout(() => {
+      wrapWideTables();
+    }, 250); // Debounce resize events
+  });
 </script>
