@@ -652,24 +652,6 @@ input[name='theme-toggle'] {
   .mermaid {
     padding: 0.5rem;
     margin: 1rem 0;
-    /* Use zoom to scale the entire diagram down proportionally */
-    zoom: 0.7;
-    /* Prevents horizontal scrolling */
-    max-width: 100%;
-    overflow-x: auto;
-  }
-
-  /* Even smaller on very small screens */
-  @media (max-width: 480px) {
-    .mermaid {
-      zoom: 0.6;
-    }
-  }
-
-  /* Keep the subtle expand icon but without animation or text */
-  .mermaid::after {
-    opacity: 0.5;
-    font-size: 14px;
   }
 }
 
