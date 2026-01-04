@@ -652,6 +652,15 @@ input[name='theme-toggle'] {
   .mermaid {
     padding: 0.5rem;
     margin: 1rem 0;
+    /* Scale down all diagrams on mobile to maintain desktop proportions */
+    zoom: 0.55;
+  }
+
+  /* Even smaller on very small screens */
+  @media (max-width: 480px) {
+    .mermaid {
+      zoom: 0.48;
+    }
   }
 }
 
