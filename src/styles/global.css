@@ -665,6 +665,8 @@ input[name='theme-toggle'] {
     /* Remove margin as wrapper handles it */
     transform-origin: top left;
     /* Default for mobile scaling */
+    /* Disable transform transition on mobile - scaling is programmatic and should be instant */
+    transition: box-shadow 0.2s ease;
   }
 
   .mermaid svg {
@@ -675,32 +677,40 @@ input[name='theme-toggle'] {
     display: block;
   }
 
-  /* "Tap to expand" indicator at top right */
+  /* "Tap to expand" indicator at top right - counter-scaled to stay normal size */
   .mermaid::after {
     content: '⤢';
     position: absolute;
     top: 0.5rem;
     right: 0.5rem;
-    width: 28px;
-    height: 28px;
-    background: rgba(255, 255, 255, 0.9);
-    border: 1px solid rgba(0, 0, 0, 0.1);
+    /* Compact size with larger icon */
+    width: 24px;
+    height: 24px;
+    background: rgba(255, 255, 255, 0.7);
+    border: 1px solid rgba(0, 0, 0, 0.08);
     border-radius: 6px;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 14px;
-    color: #18181b;
+    /* Icon fills most of the button */
+    font-size: 16px;
+    font-weight: 500;
+    /* Softer gray color */
+    color: #71717a;
     opacity: 1;
     z-index: 2;
     pointer-events: none;
+    /* Counter-scale to maintain size when parent is scaled down */
+    transform: scale(calc(1 / var(--mermaid-scale, 1)));
+    transform-origin: top right;
   }
 
   /* Dark theme: dark button on dark background */
   :root.theme-dark .mermaid::after {
-    background: rgba(0, 0, 0, 0.7);
-    border-color: rgba(255, 255, 255, 0.1);
-    color: white;
+    background: rgba(24, 24, 27, 0.9);
+    border-color: rgba(255, 255, 255, 0.2);
+    color: #f4f4f5;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
   }
 }
 
@@ -718,13 +728,23 @@ input[name='theme-toggle'] {
   justify-content: center;
   opacity: 0;
   visibility: hidden;
-  transition: opacity 0.3s ease, visibility 0.3s ease;
-  backdrop-filter: blur(8px);
+  transition: opacity 0.2s ease, visibility 0.2s ease, backdrop-filter 0s ease 0.2s;
+  backdrop-filter: blur(0px);
+  /* GPU optimization for smooth transitions */
+  will-change: opacity, visibility;
 }
 
 .mermaid-modal-overlay.active {
   opacity: 1;
   visibility: visible;
+  backdrop-filter: blur(8px);
+  transition: opacity 0.2s ease, visibility 0.2s ease, backdrop-filter 0.15s ease;
+}
+
+/* Fast close state - disables expensive transitions immediately */
+.mermaid-modal-overlay.closing {
+  backdrop-filter: blur(0px);
+  transition: opacity 0.15s ease, visibility 0.15s ease;
 }
 
 .mermaid-modal-content {
@@ -988,13 +1008,23 @@ input[name='theme-toggle'] {
   justify-content: center;
   opacity: 0;
   visibility: hidden;
-  transition: opacity 0.3s ease, visibility 0.3s ease;
-  backdrop-filter: blur(8px);
+  transition: opacity 0.2s ease, visibility 0.2s ease, backdrop-filter 0s ease 0.2s;
+  backdrop-filter: blur(0px);
+  /* GPU optimization for smooth transitions */
+  will-change: opacity, visibility;
 }
 
 .image-modal-overlay.active {
   opacity: 1;
   visibility: visible;
+  backdrop-filter: blur(8px);
+  transition: opacity 0.2s ease, visibility 0.2s ease, backdrop-filter 0.15s ease;
+}
+
+/* Fast close state - disables expensive transitions immediately */
+.image-modal-overlay.closing {
+  backdrop-filter: blur(0px);
+  transition: opacity 0.15s ease, visibility 0.15s ease;
 }
 
 .image-modal-content {

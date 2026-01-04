@@ -447,13 +447,15 @@ const socialImageURL = image
             diagram.dataset.cachedHeight = unscaledHeight;
           }
 
-          // Apply scale
+          // Apply scale and store as CSS variable for button counter-scaling
+          diagram.style.setProperty("--mermaid-scale", scale);
           diagram.style.transform = `scale(${scale})`;
 
           // Set wrapper height
           const scaledHeight = unscaledHeight * scale + 16;
           wrapper.style.height = `${scaledHeight}px`;
         } else {
+          diagram.style.setProperty("--mermaid-scale", scale);
           diagram.style.transform = `scale(${scale})`;
         }
       } else {
@@ -813,9 +815,19 @@ const socialImageURL = image
     }
 
     close(historyBack = true) {
+      // Add closing class first to trigger optimized exit animation
+      // This immediately disables the expensive backdrop-filter on mobile
+      this.modal.classList.add("closing");
       this.modal.classList.remove("active");
       document.body.style.overflow = "";
       this.currentZoom = 1;
+
+      // Remove closing class after transition completes
+      setTimeout(() => {
+        if (this.modal) {
+          this.modal.classList.remove("closing");
+        }
+      }, 200); // Match the CSS transition duration (0.15s + buffer)
 
       if (historyBack && window.location.hash === this.config.urlHash) {
         history.back();
