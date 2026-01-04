@@ -756,21 +756,38 @@ input[name='theme-toggle'] {
   overflow: auto;
   cursor: grab;
   touch-action: none;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 2rem;
+  /* Centering is handled dynamically via wrapper padding */
+  /* Prevent text selection and dragging during pan */
+  user-select: none;
+  -webkit-user-select: none;
 }
 
 .mermaid-modal-diagram:active {
   cursor: grabbing;
 }
 
+.mermaid-modal-diagram .mermaid-svg-wrapper {
+  display: inline-block;
+  box-sizing: border-box;
+  /* Padding is set dynamically via JS to center content */
+  /* Prevent selection and dragging */
+  pointer-events: none;
+}
+
 .mermaid-modal-diagram svg {
   display: block;
   max-width: none;
   transition: transform 0.1s ease-out;
-  transform-origin: center center;
+  transform-origin: top left;
+  /* Prevent SVG element dragging */
+  -webkit-user-drag: none;
+}
+
+.mermaid-modal-diagram svg * {
+  /* Prevent selection of SVG child elements */
+  user-select: none;
+  -webkit-user-select: none;
+  pointer-events: none;
 }
 
 /* Modal hint text */
@@ -960,23 +977,34 @@ input[name='theme-toggle'] {
   overflow: auto;
   cursor: grab;
   touch-action: none;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 2rem;
+  /* Centering is handled dynamically via wrapper padding */
+  /* Prevent text selection and dragging during pan */
+  user-select: none;
+  -webkit-user-select: none;
 }
 
 .image-modal-container:active {
   cursor: grabbing;
 }
 
+.image-modal-container .image-wrapper {
+  display: inline-block;
+  box-sizing: border-box;
+  /* Padding is set dynamically via JS to center content */
+  /* Prevent selection and dragging */
+  pointer-events: none;
+}
+
 .image-modal-container img {
   display: block;
   max-width: none;
-  max-height: calc(100vh - 6rem);
+  max-height: none;
   transition: transform 0.1s ease-out;
-  transform-origin: center center;
+  transform-origin: top left;
   object-fit: contain;
+  /* Prevent image dragging */
+  -webkit-user-drag: none;
+  pointer-events: none;
 }
 
 /* Modal hint text */

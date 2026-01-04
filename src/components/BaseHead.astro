@@ -374,30 +374,75 @@ const socialImageURL = image
     const container = modal.querySelector("#mermaid-diagram-container");
     const zoomLevelDisplay = modal.querySelector("#mermaid-zoom-level");
 
-    function updateZoom() {
+    function updateZoom(centerAfterZoom = true) {
+      const wrapper = container.querySelector(".mermaid-svg-wrapper");
       const svg = container.querySelector("svg");
-      if (svg) {
+      if (svg && wrapper) {
+        // Get original dimensions from stored data (set when modal opens)
+        const originalWidth =
+          parseFloat(container.dataset.originalWidth) ||
+          svg.getBoundingClientRect().width;
+        const originalHeight =
+          parseFloat(container.dataset.originalHeight) ||
+          svg.getBoundingClientRect().height;
+
+        // Calculate scaled dimensions
+        const scaledWidth = originalWidth * currentZoom;
+        const scaledHeight = originalHeight * currentZoom;
+
+        // Apply scale transform
         svg.style.transform = `scale(${currentZoom})`;
-        svg.style.transformOrigin = "center center";
+        svg.style.transformOrigin = "top left";
         zoomLevelDisplay.textContent = `${Math.round(currentZoom * 100)}%`;
+
+        // Get container dimensions
+        const containerWidth = container.clientWidth;
+        const containerHeight = container.clientHeight;
+
+        // Calculate padding to center the content
+        // When content is smaller than container, padding centers it
+        // When content is larger, padding allows scrolling to all edges
+        const paddingX = Math.max(containerWidth / 2, scaledWidth / 2);
+        const paddingY = Math.max(containerHeight / 2, scaledHeight / 2);
+
+        // Set wrapper size and padding for centering
+        wrapper.style.width = `${scaledWidth}px`;
+        wrapper.style.height = `${scaledHeight}px`;
+        wrapper.style.margin = `${paddingY}px ${paddingX}px`;
+
+        // Center the scroll position after zoom
+        if (centerAfterZoom) {
+          requestAnimationFrame(() => {
+            // Scroll to center the content
+            const totalWidth = scaledWidth + paddingX * 2;
+            const totalHeight = scaledHeight + paddingY * 2;
+
+            container.scrollLeft = (totalWidth - containerWidth) / 2;
+            container.scrollTop = (totalHeight - containerHeight) / 2;
+          });
+        }
       }
     }
 
     function zoomIn() {
       currentZoom = Math.min(currentZoom * 1.25, 5);
-      updateZoom();
+      updateZoom(true);
     }
 
     function zoomOut() {
       currentZoom = Math.max(currentZoom * 0.8, 0.25);
-      updateZoom();
+      updateZoom(true);
     }
 
     function resetZoom() {
       currentZoom = 1;
-      container.scrollLeft = 0;
-      container.scrollTop = 0;
-      updateZoom();
+      const wrapper = container.querySelector(".mermaid-svg-wrapper");
+      if (wrapper) {
+        wrapper.style.width = "";
+        wrapper.style.height = "";
+        wrapper.style.margin = "";
+      }
+      updateZoom(true);
     }
 
     function closeModal() {
@@ -444,6 +489,7 @@ const socialImageURL = image
 
     // Pan functionality (mouse)
     container.addEventListener("mousedown", (e) => {
+      e.preventDefault(); // Prevent default drag behavior
       isPanning = true;
       container.style.cursor = "grabbing";
       startX = e.pageX - container.offsetLeft;
@@ -537,6 +583,12 @@ const socialImageURL = image
       initialDistance = 0;
     });
 
+    // Store functions on modal for external access
+    modal._updateZoom = updateZoom;
+    modal._resetZoom = () => {
+      currentZoom = 1;
+    };
+
     return modal;
   }
 
@@ -547,19 +599,38 @@ const socialImageURL = image
     const svg = diagramElement.querySelector("svg");
 
     if (svg) {
-      // Clone the SVG and put it in the modal
+      // Get original dimensions before cloning
+      const originalRect = svg.getBoundingClientRect();
+
+      // Clone the SVG and put it in the modal with a wrapper
       const clonedSvg = svg.cloneNode(true);
       clonedSvg.style.transform = "scale(1)";
       clonedSvg.style.transformOrigin = "top left";
-      container.innerHTML = "";
-      container.appendChild(clonedSvg);
 
-      // Reset zoom level display
+      // Create wrapper for proper pan/zoom behavior
+      const wrapper = document.createElement("div");
+      wrapper.className = "mermaid-svg-wrapper";
+      wrapper.appendChild(clonedSvg);
+
+      container.innerHTML = "";
+      container.appendChild(wrapper);
+
+      // Store original dimensions for zoom calculations
+      container.dataset.originalWidth = originalRect.width;
+      container.dataset.originalHeight = originalRect.height;
+
+      // Reset zoom state and display
+      modal._resetZoom();
       modal.querySelector("#mermaid-zoom-level").textContent = "100%";
 
       // Show modal
       modal.classList.add("active");
       document.body.style.overflow = "hidden";
+
+      // Center the content after modal is visible
+      requestAnimationFrame(() => {
+        modal._updateZoom(true);
+      });
     }
   }
 
@@ -740,30 +811,75 @@ const socialImageURL = image
     const container = modal.querySelector("#image-modal-container");
     const zoomLevelDisplay = modal.querySelector("#image-zoom-level");
 
-    function updateZoom() {
+    function updateZoom(centerAfterZoom = true) {
+      const wrapper = container.querySelector(".image-wrapper");
       const img = container.querySelector("img");
-      if (img) {
+      if (img && wrapper) {
+        // Get original dimensions from stored data (set when modal opens)
+        const originalWidth =
+          parseFloat(container.dataset.originalWidth) ||
+          img.getBoundingClientRect().width;
+        const originalHeight =
+          parseFloat(container.dataset.originalHeight) ||
+          img.getBoundingClientRect().height;
+
+        // Calculate scaled dimensions
+        const scaledWidth = originalWidth * currentZoom;
+        const scaledHeight = originalHeight * currentZoom;
+
+        // Apply scale transform
         img.style.transform = `scale(${currentZoom})`;
-        img.style.transformOrigin = "center center";
+        img.style.transformOrigin = "top left";
         zoomLevelDisplay.textContent = `${Math.round(currentZoom * 100)}%`;
+
+        // Get container dimensions
+        const containerWidth = container.clientWidth;
+        const containerHeight = container.clientHeight;
+
+        // Calculate padding to center the content
+        // When content is smaller than container, padding centers it
+        // When content is larger, padding allows scrolling to all edges
+        const paddingX = Math.max(containerWidth / 2, scaledWidth / 2);
+        const paddingY = Math.max(containerHeight / 2, scaledHeight / 2);
+
+        // Set wrapper size and padding for centering
+        wrapper.style.width = `${scaledWidth}px`;
+        wrapper.style.height = `${scaledHeight}px`;
+        wrapper.style.margin = `${paddingY}px ${paddingX}px`;
+
+        // Center the scroll position after zoom
+        if (centerAfterZoom) {
+          requestAnimationFrame(() => {
+            // Scroll to center the content
+            const totalWidth = scaledWidth + paddingX * 2;
+            const totalHeight = scaledHeight + paddingY * 2;
+
+            container.scrollLeft = (totalWidth - containerWidth) / 2;
+            container.scrollTop = (totalHeight - containerHeight) / 2;
+          });
+        }
       }
     }
 
     function zoomIn() {
       currentZoom = Math.min(currentZoom * 1.25, 5);
-      updateZoom();
+      updateZoom(true);
     }
 
     function zoomOut() {
       currentZoom = Math.max(currentZoom * 0.8, 0.25);
-      updateZoom();
+      updateZoom(true);
     }
 
     function resetZoom() {
       currentZoom = 1;
-      container.scrollLeft = 0;
-      container.scrollTop = 0;
-      updateZoom();
+      const wrapper = container.querySelector(".image-wrapper");
+      if (wrapper) {
+        wrapper.style.width = "";
+        wrapper.style.height = "";
+        wrapper.style.margin = "";
+      }
+      updateZoom(true);
     }
 
     function closeModal() {
@@ -810,6 +926,7 @@ const socialImageURL = image
 
     // Pan functionality (mouse)
     container.addEventListener("mousedown", (e) => {
+      e.preventDefault(); // Prevent default drag behavior
       isPanning = true;
       container.style.cursor = "grabbing";
       startX = e.pageX - container.offsetLeft;
@@ -903,6 +1020,12 @@ const socialImageURL = image
       initialDistance = 0;
     });
 
+    // Store functions on modal for external access
+    modal._updateZoom = updateZoom;
+    modal._resetZoom = () => {
+      currentZoom = 1;
+    };
+
     return modal;
   }
 
@@ -911,21 +1034,40 @@ const socialImageURL = image
     const modal = createImageModal();
     const container = modal.querySelector("#image-modal-container");
 
-    // Clone the image and put it in the modal
+    // Get original dimensions before cloning
+    const originalRect = imgElement.getBoundingClientRect();
+
+    // Clone the image and put it in the modal with a wrapper
     const clonedImg = imgElement.cloneNode(true);
     clonedImg.style.transform = "scale(1)";
-    clonedImg.style.transformOrigin = "center center";
+    clonedImg.style.transformOrigin = "top left";
     clonedImg.removeAttribute("class"); // Remove any classes that might interfere
     clonedImg.classList.add("image-modal-img");
-    container.innerHTML = "";
-    container.appendChild(clonedImg);
 
-    // Reset zoom level display
+    // Create wrapper for proper pan/zoom behavior
+    const wrapper = document.createElement("div");
+    wrapper.className = "image-wrapper";
+    wrapper.appendChild(clonedImg);
+
+    container.innerHTML = "";
+    container.appendChild(wrapper);
+
+    // Store original dimensions for zoom calculations
+    container.dataset.originalWidth = originalRect.width;
+    container.dataset.originalHeight = originalRect.height;
+
+    // Reset zoom state and display
+    modal._resetZoom();
     modal.querySelector("#image-zoom-level").textContent = "100%";
 
     // Show modal
     modal.classList.add("active");
     document.body.style.overflow = "hidden";
+
+    // Center the content after modal is visible
+    requestAnimationFrame(() => {
+      modal._updateZoom(true);
+    });
   }
 
   // Setup click handlers for images in content areas
