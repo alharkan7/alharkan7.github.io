@@ -827,6 +827,10 @@ const socialImageURL = image
         if (this.modal) {
           this.modal.classList.remove("closing");
         }
+        // Call onClose callback if provided (e.g., to clear cached heights)
+        if (this.config.onClose) {
+          this.config.onClose();
+        }
       }, 200); // Match the CSS transition duration (0.15s + buffer)
 
       if (historyBack && window.location.hash === this.config.urlHash) {
@@ -842,6 +846,19 @@ const socialImageURL = image
     wrapperClass: "mermaid-svg-wrapper",
     paddingX: 40,
     paddingY: 40,
+    forceDimensions: true, // Fixes "double scaling" by ensuring SVG keeps its natural size in the modal
+    onClose: () => {
+      // Clear cached heights when modal closes to prevent stale dimension issues
+      document.querySelectorAll(".mermaid").forEach((d) => {
+        delete d.dataset.cachedHeight;
+      });
+      // Re-apply mobile scaling immediately
+      if (isMobile()) {
+        // Force layout read to ensure accurate clientWidth before scaling
+        document.body.offsetLeft;
+        requestAnimationFrame(() => scaleMermaidDiagramsForMobile());
+      }
+    },
   });
 
   const imageModal = new ZoomPanModal({
@@ -859,9 +876,40 @@ const socialImageURL = image
   function openMermaidModal(diagramElement) {
     const svg = diagramElement.querySelector("svg");
     if (svg) {
-      const rect = svg.getBoundingClientRect();
-      // For SVGs, we use getBoundingClientRect as reliable source of 'natural' size
-      mermaidModal.open(svg, rect.width, rect.height);
+      // Get ACTUAL SVG dimensions, not the scaled bounding rect
+      // On mobile, getBoundingClientRect returns scaled dimensions which causes incorrect zoom
+      let width, height;
+
+      // Try viewBox first (most reliable for actual dimensions)
+      const viewBox = svg.getAttribute("viewBox");
+      if (viewBox) {
+        const parts = viewBox.split(/[\s,]+/);
+        width = parseFloat(parts[2]) || 0;
+        height = parseFloat(parts[3]) || 0;
+      }
+
+      // Fallback to width/height attributes
+      if (!width || !height) {
+        const svgWidth = svg.getAttribute("width");
+        const svgHeight = svg.getAttribute("height");
+        if (svgWidth && svgHeight) {
+          width = parseFloat(svgWidth) || 0;
+          height = parseFloat(svgHeight) || 0;
+        }
+      }
+
+      // Final fallback: use bounding rect divided by current scale
+      if (!width || !height) {
+        const rect = svg.getBoundingClientRect();
+        const scale =
+          parseFloat(
+            diagramElement.style.getPropertyValue("--mermaid-scale"),
+          ) || 1;
+        width = rect.width / scale;
+        height = rect.height / scale;
+      }
+
+      mermaidModal.open(svg, width, height);
     }
   }
 
