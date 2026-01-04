@@ -652,15 +652,40 @@ input[name='theme-toggle'] {
   .mermaid {
     padding: 0.5rem;
     margin: 1rem 0;
-    /* Scale down all diagrams on mobile to maintain desktop proportions */
-    zoom: 0.55;
+    /* Show clipped preview on mobile */
+    max-height: 200px;
+    overflow: hidden;
+    position: relative;
   }
 
-  /* Even smaller on very small screens */
-  @media (max-width: 480px) {
-    .mermaid {
-      zoom: 0.48;
-    }
+  /* Gradient overlay to indicate there's more content */
+  .mermaid::before {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 80px;
+    background: linear-gradient(transparent, var(--background-alt));
+    pointer-events: none;
+    z-index: 1;
+  }
+
+  /* "Tap to view" indicator */
+  .mermaid::after {
+    content: '👆 Tap to view full diagram';
+    position: absolute;
+    bottom: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--primary-color);
+    color: white;
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 500;
+    z-index: 2;
+    pointer-events: none;
   }
 }
 

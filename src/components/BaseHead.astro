@@ -221,6 +221,11 @@ const socialImageURL = image
       startOnLoad: true,
       theme: "default",
       themeVariables: getMermaidThemeVariables(currentTheme),
+      flowchart: {
+        useMaxWidth: false,
+        htmlLabels: true,
+        curve: "basis",
+      },
       gantt: {
         titleTopMargin: 25,
         barHeight: 30,
@@ -231,7 +236,7 @@ const socialImageURL = image
         fontSize: 12,
         numberSectionStyles: 4,
         axisFormat: "%b '%y", // Compact format: Jan '24, Feb '24, etc.
-        useMaxWidth: true,
+        useMaxWidth: false,
       },
     });
   }
@@ -698,6 +703,11 @@ const socialImageURL = image
       startOnLoad: false,
       theme: "default",
       themeVariables: newThemeVariables,
+      flowchart: {
+        useMaxWidth: false,
+        htmlLabels: true,
+        curve: "basis",
+      },
       gantt: {
         titleTopMargin: 25,
         barHeight: 30,
@@ -708,7 +718,7 @@ const socialImageURL = image
         fontSize: 12,
         numberSectionStyles: 4,
         axisFormat: "%b '%y",
-        useMaxWidth: true,
+        useMaxWidth: false,
       },
     });
 
