@@ -549,6 +549,8 @@ input[name='theme-toggle'] {
   cursor: pointer;
   transition: box-shadow 0.2s ease, transform 0.2s ease;
   position: relative;
+  /* Optimization: isolate layout calculations */
+  contain: layout paint;
 }
 
 .mermaid::after {
@@ -582,8 +584,6 @@ input[name='theme-toggle'] {
 
 .mermaid svg {
   width: 100%;
-  min-width: 100%;
-  max-width: 100%;
   height: auto;
   display: block;
 }
@@ -653,21 +653,26 @@ input[name='theme-toggle'] {
   /* Wrapper to handle scaling - JS sets the fixed dimensions and scaling */
   .mermaid-mobile-wrapper {
     width: 100%;
+    margin: 1rem 0;
+    /* Align with desktop margin consistency */
     overflow: hidden;
     position: relative;
+    contain: layout paint;
   }
 
   .mermaid {
-    padding: 1rem;
     margin: 0;
-    box-sizing: border-box;
-    /* Width and transform-origin are set inline by JS */
+    /* Remove margin as wrapper handles it */
+    transform-origin: top left;
+    /* Default for mobile scaling */
   }
 
   .mermaid svg {
-    /* Let SVG be its natural size within the container */
+    /* Allow SVG to take defined size from JS or intrinsic size */
+    width: auto;
+    max-width: none;
+    margin: 0 auto;
     display: block;
-    max-width: none !important;
   }
 
   /* "Tap to expand" indicator at top right */

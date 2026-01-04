@@ -126,6 +126,35 @@ const socialImageURL = image
 <script type="module">
   import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs";
 
+  // ===== Configuration Constants =====
+  const MOBILE_BREAKPOINT = 768;
+  const MOBILE_DIAGRAM_WIDTH = 900;
+  const RESIZE_DEBOUNCE_MS = 150;
+
+  // Utility function for mobile detection
+  const isMobile = () => window.innerWidth <= MOBILE_BREAKPOINT;
+
+  // ===== Shared Mermaid Configuration =====
+  const mermaidDiagramConfig = {
+    flowchart: {
+      useMaxWidth: false,
+      htmlLabels: true,
+      curve: "basis",
+    },
+    gantt: {
+      titleTopMargin: 25,
+      barHeight: 30,
+      barGap: 4,
+      topPadding: 50,
+      leftPadding: 75,
+      gridLineStartPadding: 35,
+      fontSize: 12,
+      numberSectionStyles: 4,
+      axisFormat: "%b '%y",
+      useMaxWidth: false,
+    },
+  };
+
   // Function to get current theme
   function getCurrentTheme() {
     return document.documentElement.classList.contains("theme-dark")
@@ -147,35 +176,29 @@ const socialImageURL = image
         mainBkg: "#18181b",
         secondBkg: "#27272a",
         tertiaryBkg: "#3f3f46",
-        // Text colors for dark mode
         textColor: "#f4f4f5",
         nodeTextColor: "#f4f4f5",
         nodeLabelColor: "#f4f4f5",
         nodeLabelBackgroundColor: "#18181b",
         labelTextColor: "#f4f4f5",
-        // Grid and border colors
         gridColor: "#3f3f46",
         border1: "#3f3f46",
         border2: "#52525b",
-        // Section colors
         altSectionBkg: "#27272a",
         sectionBkg: "#18181b",
         sectionBkgColor: "#18181b",
         sectionBkgColor2: "#27272a",
-        // Pie chart colors
         pieTitleTextColor: "#f4f4f5",
         pieOuterStrokeColor: "#f4f4f4",
         pieSectionTextColor: "#f4f4f4",
         pieLegendTextColor: "#f4f4f5",
         pieOuterStrokeWidth: "2px",
-        // Gantt chart specific
         taskTextColor: "#f4f4f5",
         taskTextLightColor: "#f4f4f5",
         taskTextDarkColor: "#18181b",
         taskTextOutsideColor: "#f4f4f5",
         sectionTitleColor: "#f4f4f5",
         todayLineColor: "#ff6b6b",
-        // Flowchart
         edgeLabelBackground: "#27272a",
         clusterBkg: "#27272a",
         clusterBorder: "#3f3f46",
@@ -193,18 +216,14 @@ const socialImageURL = image
         mainBkg: "#ffffff",
         secondBkg: "#f9f9f9",
         tertiaryBkg: "#f0f0f0",
-        // Text colors for light mode
         textColor: "#333",
         nodeTextColor: "#333",
         nodeLabelColor: "#333",
         nodeLabelBackgroundColor: "#ffffff",
-        // Grid and border colors
         gridColor: "#cccccc",
         border1: "#cccccc",
         border2: "#999999",
-        // Section colors
         altSectionBkg: "#f9f9f9",
-        // Pie chart colors
         pieTitleTextColor: "#333",
         pieOuterStrokeColor: "#333333",
         pieSectionTextColor: "#333333",
@@ -213,40 +232,55 @@ const socialImageURL = image
     }
   }
 
+  // Build complete mermaid config with theme
+  function buildMermaidConfig(startOnLoad = true) {
+    return {
+      startOnLoad,
+      theme: "default",
+      themeVariables: getMermaidThemeVariables(getCurrentTheme()),
+      ...mermaidDiagramConfig,
+    };
+  }
+
   // Initialize Mermaid with theme detection
   function initializeMermaid() {
-    const currentTheme = getCurrentTheme();
-
-    mermaid.initialize({
-      startOnLoad: true,
-      theme: "default",
-      themeVariables: getMermaidThemeVariables(currentTheme),
-      flowchart: {
-        useMaxWidth: false,
-        htmlLabels: true,
-        curve: "basis",
-      },
-      gantt: {
-        titleTopMargin: 25,
-        barHeight: 30,
-        barGap: 4,
-        topPadding: 50,
-        leftPadding: 75,
-        gridLineStartPadding: 35,
-        fontSize: 12,
-        numberSectionStyles: 4,
-        axisFormat: "%b '%y", // Compact format: Jan '24, Feb '24, etc.
-        useMaxWidth: false,
-      },
-    });
+    mermaid.initialize(buildMermaidConfig(true));
   }
 
   // Initialize on load
   initializeMermaid();
 
+  // ===== Event Handler Management for Cleanup =====
+  let resizeHandler = null;
+  let resizeTimeout = null;
+
+  function setupResizeHandler() {
+    // Clean up any existing handler first
+    cleanupResizeHandler();
+
+    resizeHandler = () => {
+      clearTimeout(resizeTimeout);
+      resizeTimeout = setTimeout(() => {
+        scaleMermaidDiagramsForMobile();
+      }, RESIZE_DEBOUNCE_MS);
+    };
+
+    window.addEventListener("resize", resizeHandler);
+  }
+
+  function cleanupResizeHandler() {
+    if (resizeHandler) {
+      window.removeEventListener("resize", resizeHandler);
+      resizeHandler = null;
+    }
+    if (resizeTimeout) {
+      clearTimeout(resizeTimeout);
+      resizeTimeout = null;
+    }
+  }
+
   // Function to render Mermaid diagrams
   function renderMermaidDiagrams() {
-    // Try multiple selectors to catch different MDX rendering patterns
     const selectors = [
       "pre code.language-mermaid",
       "code.language-mermaid",
@@ -268,35 +302,36 @@ const socialImageURL = image
 
     // Also check for any pre elements containing Mermaid diagram keywords
     const preElements = document.querySelectorAll("pre");
+    const mermaidKeywords = [
+      "graph TB",
+      "graph TD",
+      "graph LR",
+      "graph RL",
+      "flowchart",
+      "sequenceDiagram",
+      "classDiagram",
+      "stateDiagram",
+      "erDiagram",
+      "gantt",
+      "pie title",
+      "pie ",
+      "journey",
+      "gitGraph",
+      "C4Context",
+      "mindmap",
+      "timeline",
+    ];
+
     preElements.forEach((pre) => {
       const text = pre.textContent || pre.innerText;
-      // Check for common Mermaid diagram types
-      const mermaidKeywords = [
-        "graph TB",
-        "graph TD",
-        "graph LR",
-        "graph RL",
-        "flowchart",
-        "sequenceDiagram",
-        "classDiagram",
-        "stateDiagram",
-        "erDiagram",
-        "gantt",
-        "pie title",
-        "pie ",
-        "journey",
-        "gitGraph",
-        "C4Context",
-        "mindmap",
-        "timeline",
-      ];
-
       if (mermaidKeywords.some((keyword) => text.includes(keyword))) {
         mermaidElements.push(pre);
       }
     });
 
     console.log("Found mermaid elements:", mermaidElements.length);
+
+    const mobile = isMobile();
 
     mermaidElements.forEach((element, index) => {
       // Skip if already processed
@@ -316,27 +351,21 @@ const socialImageURL = image
       mermaidDiv.className = "mermaid";
       mermaidDiv.textContent = mermaidCode.trim();
 
-      // On mobile, wrap in a fixed-width container BEFORE mermaid renders
-      const isMobile = window.innerWidth <= 768;
       const parent = element.closest("pre") || element;
 
-      if (isMobile) {
+      if (mobile) {
         // Create wrapper with fixed width so Mermaid renders at desktop size
         const wrapper = document.createElement("div");
         wrapper.className = "mermaid-mobile-wrapper";
-        wrapper.style.margin = "1rem 0";
-        wrapper.style.overflow = "hidden";
-        wrapper.style.position = "relative";
 
         // Force the mermaid container to render at a fixed large width
-        mermaidDiv.style.width = "900px";
-        mermaidDiv.style.minWidth = "900px";
+        mermaidDiv.style.width = `${MOBILE_DIAGRAM_WIDTH}px`;
+        mermaidDiv.style.minWidth = `${MOBILE_DIAGRAM_WIDTH}px`;
         mermaidDiv.style.transformOrigin = "top left";
 
         wrapper.appendChild(mermaidDiv);
         parent.parentNode.replaceChild(wrapper, parent);
       } else {
-        // Replace the code block with the mermaid div
         parent.parentNode.replaceChild(mermaidDiv, parent);
       }
 
@@ -344,434 +373,444 @@ const socialImageURL = image
       mermaidDiv.classList.add("mermaid-processed");
     });
 
-    // Re-run mermaid on the new elements and setup click handlers
+    // Re-run mermaid and setup handlers ONLY AFTER rendering is complete
     if (mermaidElements.length > 0) {
       mermaid.run().then(() => {
         setupMermaidClickHandlers();
-        scaleMermaidDiagramsForMobile();
+        // Only scale ONCE after mermaid finishes rendering
+        if (mobile) {
+          scaleMermaidDiagramsForMobile();
+        }
+        // Setup resize handler after initial render
+        setupResizeHandler();
       });
     } else {
       setupMermaidClickHandlers();
-      scaleMermaidDiagramsForMobile();
+      setupResizeHandler();
     }
   }
 
   // Function to scale Mermaid diagrams for mobile screens
+  // Optimized: Uses cached SVG dimensions to avoid forced reflows
   function scaleMermaidDiagramsForMobile() {
-    const isMobile = window.innerWidth <= 768;
-
+    const mobile = isMobile();
     const diagrams = document.querySelectorAll(".mermaid");
-    diagrams.forEach((diagram) => {
-      // Skip if already wrapped
-      const existingWrapper = diagram.parentElement;
-      const isWrapped =
-        existingWrapper &&
-        existingWrapper.classList.contains("mermaid-mobile-wrapper");
 
-      if (isMobile) {
-        // Wrap in a mobile wrapper if not already wrapped
+    diagrams.forEach((diagram) => {
+      const existingWrapper = diagram.parentElement;
+      const isWrapped = existingWrapper?.classList.contains(
+        "mermaid-mobile-wrapper",
+      );
+
+      if (mobile) {
+        // Wrap if not already wrapped (edge case: resize from desktop to mobile)
         if (!isWrapped) {
           const wrapper = document.createElement("div");
           wrapper.className = "mermaid-mobile-wrapper";
-          wrapper.style.margin = "1rem 0";
           diagram.parentNode.insertBefore(wrapper, diagram);
           wrapper.appendChild(diagram);
         }
 
         const wrapper = diagram.parentElement;
+        const containerWidth = wrapper.clientWidth || window.innerWidth - 32;
+        const scale = Math.min(1, containerWidth / MOBILE_DIAGRAM_WIDTH);
 
-        // Calculate scale factor
-        const containerWidth = wrapper.clientWidth || window.innerWidth - 32; // Account for page padding
-        const diagramWidth = 900; // Fixed width set via JS
-        const scale = Math.min(1, containerWidth / diagramWidth);
-
-        // Temporarily remove any existing transform to get accurate dimensions
-        diagram.style.transform = "none";
-
-        // Force reflow to ensure we get accurate measurements
-        diagram.offsetHeight;
-
-        // Get the actual unscaled dimensions
         const svg = diagram.querySelector("svg");
         if (svg) {
-          // Get the full diagram height including padding
-          const diagramRect = diagram.getBoundingClientRect();
-          const unscaledHeight = diagramRect.height;
+          // Use SVG's viewBox or actual dimensions - avoid forcing reflow
+          // Get height from SVG's intrinsic size or computed style
+          let unscaledHeight;
 
-          // Apply scale to the mermaid container
+          // Check if we have cached dimensions
+          if (diagram.dataset.cachedHeight) {
+            unscaledHeight = parseFloat(diagram.dataset.cachedHeight);
+          } else {
+            // First time: need to measure, but do it efficiently
+            // Use requestAnimationFrame to batch layout reads
+            const svgHeight = svg.getAttribute("height");
+            const viewBox = svg.getAttribute("viewBox");
+
+            if (svgHeight && !svgHeight.includes("%")) {
+              unscaledHeight = parseFloat(svgHeight);
+            } else if (viewBox) {
+              const parts = viewBox.split(/\s+|,/);
+              unscaledHeight = parseFloat(parts[3]) || 300;
+            } else {
+              // Fallback: read from bounding rect (single read, cached)
+              unscaledHeight = svg.getBoundingClientRect().height;
+            }
+
+            // Add padding from .mermaid container (1rem = ~16px top + bottom)
+            unscaledHeight += 32;
+
+            // Cache for future resize events
+            diagram.dataset.cachedHeight = unscaledHeight;
+          }
+
+          // Apply scale
           diagram.style.transform = `scale(${scale})`;
 
-          // Calculate wrapper height: unscaled content height * scale + buffer for breathing room
+          // Set wrapper height
           const scaledHeight = unscaledHeight * scale + 16;
-          wrapper.style.height = scaledHeight + "px";
+          wrapper.style.height = `${scaledHeight}px`;
         } else {
-          // No SVG yet, just apply transform
           diagram.style.transform = `scale(${scale})`;
         }
       } else {
-        // On desktop, remove wrapper if it exists
+        // Desktop: remove wrapper if it exists
         if (isWrapped) {
           existingWrapper.parentNode.insertBefore(diagram, existingWrapper);
           existingWrapper.remove();
         }
-        // Reset any transforms
+        // Reset transforms and cached data
         diagram.style.transform = "";
         diagram.style.minWidth = "";
         diagram.style.width = "";
+        delete diagram.dataset.cachedHeight;
       }
     });
   }
 
-  // Re-scale diagrams on window resize
-  let mermaidResizeTimeout;
-  window.addEventListener("resize", () => {
-    clearTimeout(mermaidResizeTimeout);
-    mermaidResizeTimeout = setTimeout(() => {
-      scaleMermaidDiagramsForMobile();
-    }, 100);
-  });
+  // ===== Shared Modal Logic =====
 
-  // Create and setup the mermaid modal
-  function createMermaidModal() {
-    // Check if modal already exists
-    if (document.getElementById("mermaid-modal")) {
-      return document.getElementById("mermaid-modal");
+  class ZoomPanModal {
+    constructor(config) {
+      this.config = config;
+      this.modal = null;
+      this.container = null;
+      this.zoomLevelDisplay = null;
+      this.currentZoom = 1;
+      this.isPanning = false;
+      this.startX = 0;
+      this.startY = 0;
+      this.scrollLeft = 0;
+      this.scrollTop = 0;
+      this.initialTouchDistance = 0;
+      this.lastTouchX = 0;
+      this.lastTouchY = 0;
+
+      this.createDOM();
+      this.setupEvents();
     }
 
-    // Lucide icons as SVG strings
-    const icons = {
-      zoomIn: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" x2="16.65" y1="21" y2="16.65"/><line x1="11" x2="11" y1="8" y2="14"/><line x1="8" x2="14" y1="11" y2="11"/></svg>`,
-      zoomOut: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" x2="16.65" y1="21" y2="16.65"/><line x1="8" x2="14" y1="11" y2="11"/></svg>`,
-      reset: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>`,
-      close: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>`,
-    };
+    createDOM() {
+      if (document.getElementById(this.config.modalId)) {
+        this.modal = document.getElementById(this.config.modalId);
+        this.container = this.modal.querySelector(".modal-content-container");
+        this.zoomLevelDisplay = this.modal.querySelector(".modal-zoom-level");
+        return;
+      }
 
-    const modal = document.createElement("div");
-    modal.id = "mermaid-modal";
-    modal.className = "mermaid-modal-overlay";
-    modal.innerHTML = `
-      <div class="mermaid-modal-content">
-        <div class="mermaid-modal-controls">
-          <button class="mermaid-modal-btn" id="mermaid-zoom-out" title="Zoom Out">${icons.zoomOut}</button>
-          <span class="mermaid-modal-zoom-info" id="mermaid-zoom-level">100%</span>
-          <button class="mermaid-modal-btn" id="mermaid-zoom-in" title="Zoom In">${icons.zoomIn}</button>
-          <div class="mermaid-modal-divider"></div>
-          <button class="mermaid-modal-btn" id="mermaid-zoom-reset" title="Reset">${icons.reset}</button>
-          <button class="mermaid-modal-btn" id="mermaid-close" title="Close">${icons.close}</button>
+      // Lucide icons
+      const icons = {
+        zoomIn: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" x2="16.65" y1="21" y2="16.65"/><line x1="11" x2="11" y1="8" y2="14"/><line x1="8" x2="14" y1="11" y2="11"/></svg>`,
+        zoomOut: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" x2="16.65" y1="21" y2="16.65"/><line x1="8" x2="14" y1="11" y2="11"/></svg>`,
+        reset: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>`,
+        close: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>`,
+      };
+
+      this.modal = document.createElement("div");
+      this.modal.id = this.config.modalId;
+      // Use common class plus specific one if needed
+      this.modal.className = `mermaid-modal-overlay ${this.config.overlayClass || ""}`; // Reuse existing CSS class for overlay
+
+      this.modal.innerHTML = `
+        <div class="mermaid-modal-content ${this.config.contentClass || ""}">
+          <div class="mermaid-modal-controls">
+            <button class="mermaid-modal-btn" data-action="zoom-out" title="Zoom Out">${icons.zoomOut}</button>
+            <span class="mermaid-modal-zoom-info modal-zoom-level">100%</span>
+            <button class="mermaid-modal-btn" data-action="zoom-in" title="Zoom In">${icons.zoomIn}</button>
+            <div class="mermaid-modal-divider"></div>
+            <button class="mermaid-modal-btn" data-action="reset" title="Reset">${icons.reset}</button>
+            <button class="mermaid-modal-btn" data-action="close" title="Close">${icons.close}</button>
+          </div>
+          <div class="mermaid-modal-diagram modal-content-container" style="display: flex;"></div>
+          <div class="mermaid-modal-hint">Scroll to zoom • Drag to pan</div>
         </div>
-        <div class="mermaid-modal-diagram" id="mermaid-diagram-container"></div>
-        <div class="mermaid-modal-hint">Scroll to zoom • Drag to pan</div>
-      </div>
-    `;
+      `;
 
-    document.body.appendChild(modal);
+      document.body.appendChild(this.modal);
+      this.container = this.modal.querySelector(".modal-content-container");
+      this.zoomLevelDisplay = this.modal.querySelector(".modal-zoom-level");
+    }
 
-    // Setup modal controls
-    let currentZoom = 1;
-    let isPanning = false;
-    let startX = 0,
-      startY = 0;
-    let scrollLeft = 0,
-      scrollTop = 0;
+    setupEvents() {
+      // Buttons
+      this.modal.addEventListener("click", (e) => {
+        const btn = e.target.closest("button");
+        if (btn) {
+          const action = btn.dataset.action;
+          if (action === "zoom-in") this.zoomIn();
+          if (action === "zoom-out") this.zoomOut();
+          if (action === "reset") this.resetZoom();
+          if (action === "close") this.close();
+        } else if (e.target === this.modal) {
+          this.close();
+        }
+      });
 
-    const container = modal.querySelector("#mermaid-diagram-container");
-    const zoomLevelDisplay = modal.querySelector("#mermaid-zoom-level");
+      // Keyboard
+      document.addEventListener("keydown", (e) => {
+        if (e.key === "Escape" && this.modal.classList.contains("active")) {
+          this.close();
+        }
+      });
 
-    function updateZoom(centerAfterZoom = true) {
-      const wrapper = container.querySelector(".mermaid-svg-wrapper");
-      const svg = container.querySelector("svg");
-      if (svg && wrapper) {
-        // Get original dimensions from stored data (set when modal opens)
-        const originalWidth =
-          parseFloat(container.dataset.originalWidth) ||
-          svg.getBoundingClientRect().width;
-        const originalHeight =
-          parseFloat(container.dataset.originalHeight) ||
-          svg.getBoundingClientRect().height;
+      // Wheel Zoom
+      this.container.addEventListener(
+        "wheel",
+        (e) => {
+          e.preventDefault();
+          if (e.deltaY < 0) this.zoomIn();
+          else this.zoomOut();
+        },
+        { passive: false },
+      );
 
-        // Calculate scaled dimensions
-        const scaledWidth = originalWidth * currentZoom;
-        const scaledHeight = originalHeight * currentZoom;
+      // Pan (Mouse)
+      this.container.addEventListener("mousedown", (e) => {
+        e.preventDefault();
+        this.isPanning = true;
+        this.container.style.cursor = "grabbing";
+        this.startX = e.pageX - this.container.offsetLeft;
+        this.startY = e.pageY - this.container.offsetTop;
+        this.scrollLeft = this.container.scrollLeft;
+        this.scrollTop = this.container.scrollTop;
+      });
 
-        // Apply scale transform
-        svg.style.transform = `scale(${currentZoom})`;
-        svg.style.transformOrigin = "top left";
-        zoomLevelDisplay.textContent = `${Math.round(currentZoom * 100)}%`;
+      this.container.addEventListener("mousemove", (e) => {
+        if (!this.isPanning) return;
+        e.preventDefault();
+        const x = e.pageX - this.container.offsetLeft;
+        const y = e.pageY - this.container.offsetTop;
+        const walkX = (x - this.startX) * 1.5;
+        const walkY = (y - this.startY) * 1.5;
+        this.container.scrollLeft = this.scrollLeft - walkX;
+        this.container.scrollTop = this.scrollTop - walkY;
+      });
 
-        // Get container dimensions
-        const containerWidth = container.clientWidth;
-        const containerHeight = container.clientHeight;
+      this.container.addEventListener("mouseup", () => this.stopPan());
+      this.container.addEventListener("mouseleave", () => this.stopPan());
 
-        // Calculate padding to center the content
-        // When content is smaller than container, padding centers it
-        // When content is larger, padding allows scrolling to all edges
-        const paddingX = Math.max(containerWidth / 2, scaledWidth / 2);
-        const paddingY = Math.max(containerHeight / 2, scaledHeight / 2);
+      // Pan & Zoom (Touch)
+      this.container.addEventListener(
+        "touchstart",
+        (e) => {
+          if (e.touches.length === 2) {
+            this.initialTouchDistance = Math.hypot(
+              e.touches[0].pageX - e.touches[1].pageX,
+              e.touches[0].pageY - e.touches[1].pageY,
+            );
+          } else if (e.touches.length === 1) {
+            this.isPanning = true;
+            this.lastTouchX = e.touches[0].pageX;
+            this.lastTouchY = e.touches[0].pageY;
+            this.scrollLeft = this.container.scrollLeft;
+            this.scrollTop = this.container.scrollTop;
+          }
+        },
+        { passive: false },
+      );
 
-        // Set wrapper size and padding for centering
-        wrapper.style.width = `${scaledWidth}px`;
-        wrapper.style.height = `${scaledHeight}px`;
-        wrapper.style.margin = `${paddingY}px ${paddingX}px`;
+      this.container.addEventListener(
+        "touchmove",
+        (e) => {
+          e.preventDefault();
+          if (e.touches.length === 2) {
+            const newDistance = Math.hypot(
+              e.touches[0].pageX - e.touches[1].pageX,
+              e.touches[0].pageY - e.touches[1].pageY,
+            );
+            const delta = newDistance - this.initialTouchDistance;
+            if (Math.abs(delta) > 10) {
+              if (delta > 0)
+                this.currentZoom = Math.min(this.currentZoom * 1.05, 5);
+              else this.currentZoom = Math.max(this.currentZoom * 0.95, 0.25);
+              this.updateZoom(false); // Smooth zoom
+              this.initialTouchDistance = newDistance;
+            }
+          } else if (e.touches.length === 1 && this.isPanning) {
+            const touchX = e.touches[0].pageX;
+            const touchY = e.touches[0].pageY;
+            const walkX = touchX - this.lastTouchX;
+            const walkY = touchY - this.lastTouchY;
+            this.container.scrollLeft = this.scrollLeft - walkX;
+            this.container.scrollTop = this.scrollTop - walkY;
+          }
+        },
+        { passive: false },
+      );
 
-        // Center the scroll position after zoom
-        if (centerAfterZoom) {
-          requestAnimationFrame(() => {
-            // Scroll to center the content
-            const totalWidth = scaledWidth + paddingX * 2;
-            const totalHeight = scaledHeight + paddingY * 2;
+      this.container.addEventListener("touchend", () => {
+        this.isPanning = false;
+        this.initialTouchDistance = 0;
+      });
 
-            container.scrollLeft = (totalWidth - containerWidth) / 2;
-            container.scrollTop = (totalHeight - containerHeight) / 2;
-          });
+      // Browser Back Button Support
+      window.addEventListener("popstate", () => {
+        if (
+          this.modal &&
+          this.modal.classList.contains("active") &&
+          window.location.hash !== this.config.urlHash
+        ) {
+          this.close(false);
+        }
+      });
+    }
+
+    stopPan() {
+      this.isPanning = false;
+      this.container.style.cursor = "grab";
+    }
+
+    updateZoom(centerAfterZoom = true) {
+      if (!this.container) return;
+      const content = this.container.firstElementChild; // Wrapper
+      const target = content?.firstElementChild; // SVG or IMG
+
+      if (content && target) {
+        const originalWidth = parseFloat(this.container.dataset.originalWidth);
+        const originalHeight = parseFloat(
+          this.container.dataset.originalHeight,
+        );
+
+        // Apply Scale
+        target.style.transform = `scale(${this.currentZoom})`;
+        target.style.transformOrigin = "top left";
+        this.zoomLevelDisplay.textContent = `${Math.round(this.currentZoom * 100)}%`;
+
+        // Resize Wrapper
+        const scaledWidth = originalWidth * this.currentZoom;
+        const scaledHeight = originalHeight * this.currentZoom;
+        content.style.width = `${scaledWidth}px`;
+        content.style.height = `${scaledHeight}px`;
+        content.style.margin = "auto"; // Auto margins center in flex container
+
+        if (centerAfterZoom && this.currentZoom <= 1.0) {
+          this.container.scrollLeft = 0;
+          this.container.scrollTop = 0;
         }
       }
     }
 
-    function zoomIn() {
-      currentZoom = Math.min(currentZoom * 1.25, 5);
-      updateZoom(true);
+    zoomIn() {
+      this.currentZoom = Math.min(this.currentZoom * 1.25, 5);
+      this.updateZoom(true);
     }
 
-    function zoomOut() {
-      currentZoom = Math.max(currentZoom * 0.8, 0.25);
-      updateZoom(true);
+    zoomOut() {
+      this.currentZoom = Math.max(this.currentZoom * 0.8, 0.25);
+      this.updateZoom(true);
     }
 
-    function resetZoom() {
-      currentZoom = 1;
-      const wrapper = container.querySelector(".mermaid-svg-wrapper");
-      if (wrapper) {
-        wrapper.style.width = "";
-        wrapper.style.height = "";
-        wrapper.style.margin = "";
+    resetZoom() {
+      this.currentZoom = 1;
+      this.updateZoom(true);
+    }
+
+    open(contentNode, width, height) {
+      this.container.innerHTML = "";
+
+      // Create Wrapper
+      const wrapper = document.createElement("div");
+      wrapper.className = this.config.wrapperClass;
+      // Needed for pointer events to pass through wrapper to container for panning
+      wrapper.style.pointerEvents = "none";
+
+      // Clone & Setup Content
+      const clonedContent = contentNode.cloneNode(true);
+      clonedContent.style.transform = "scale(1)";
+      clonedContent.style.transformOrigin = "top left";
+      clonedContent.removeAttribute("class");
+      if (this.config.contentAddClass)
+        clonedContent.classList.add(this.config.contentAddClass);
+
+      // Fix dimensions on clone if needed
+      if (this.config.forceDimensions) {
+        clonedContent.style.width = `${width}px`;
+        clonedContent.style.height = `${height}px`;
       }
-      updateZoom(true);
+
+      wrapper.appendChild(clonedContent);
+      this.container.appendChild(wrapper);
+
+      // Store Original Dimensions
+      this.container.dataset.originalWidth = width;
+      this.container.dataset.originalHeight = height;
+
+      // Calculate Initial Fit Zoom
+      const viewportWidth = window.innerWidth;
+      const viewportHeight = window.innerHeight;
+      const paddingX = this.config.paddingX || 40;
+      const paddingY = this.config.paddingY || 40;
+
+      const fitWidth = (viewportWidth - paddingX) / width;
+      const fitHeight = (viewportHeight - paddingY) / height;
+
+      // Initial zoom: fit to screen, max 1.0
+      this.currentZoom = Math.min(1, fitWidth, fitHeight);
+
+      this.updateZoom(true);
+
+      // Push history state
+      history.pushState(null, "", this.config.urlHash);
+
+      // Show Modal
+      this.modal.classList.add("active");
+      document.body.style.overflow = "hidden";
+
+      // Force layout update for centering
+      requestAnimationFrame(() => this.updateZoom(true));
     }
 
-    function closeModal() {
-      modal.classList.remove("active");
+    close(historyBack = true) {
+      this.modal.classList.remove("active");
       document.body.style.overflow = "";
-      currentZoom = 1;
+      this.currentZoom = 1;
 
-      // Remove hash from URL if it's #mermaid-preview
-      if (window.location.hash === "#mermaid-preview") {
+      if (historyBack && window.location.hash === this.config.urlHash) {
         history.back();
       }
     }
-
-    // Button handlers
-    modal.querySelector("#mermaid-zoom-in").addEventListener("click", zoomIn);
-    modal.querySelector("#mermaid-zoom-out").addEventListener("click", zoomOut);
-    modal
-      .querySelector("#mermaid-zoom-reset")
-      .addEventListener("click", resetZoom);
-    modal.querySelector("#mermaid-close").addEventListener("click", closeModal);
-
-    // Close on overlay click
-    modal.addEventListener("click", (e) => {
-      if (e.target === modal) {
-        closeModal();
-      }
-    });
-
-    // Close on Escape key
-    document.addEventListener("keydown", (e) => {
-      if (e.key === "Escape" && modal.classList.contains("active")) {
-        closeModal();
-      }
-    });
-
-    // Mouse wheel zoom
-    container.addEventListener(
-      "wheel",
-      (e) => {
-        e.preventDefault();
-        if (e.deltaY < 0) {
-          zoomIn();
-        } else {
-          zoomOut();
-        }
-      },
-      { passive: false },
-    );
-
-    // Pan functionality (mouse)
-    container.addEventListener("mousedown", (e) => {
-      e.preventDefault(); // Prevent default drag behavior
-      isPanning = true;
-      container.style.cursor = "grabbing";
-      startX = e.pageX - container.offsetLeft;
-      startY = e.pageY - container.offsetTop;
-      scrollLeft = container.scrollLeft;
-      scrollTop = container.scrollTop;
-    });
-
-    container.addEventListener("mousemove", (e) => {
-      if (!isPanning) return;
-      e.preventDefault();
-      const x = e.pageX - container.offsetLeft;
-      const y = e.pageY - container.offsetTop;
-      const walkX = (x - startX) * 1.5;
-      const walkY = (y - startY) * 1.5;
-      container.scrollLeft = scrollLeft - walkX;
-      container.scrollTop = scrollTop - walkY;
-    });
-
-    container.addEventListener("mouseup", () => {
-      isPanning = false;
-      container.style.cursor = "grab";
-    });
-
-    container.addEventListener("mouseleave", () => {
-      isPanning = false;
-      container.style.cursor = "grab";
-    });
-
-    // Touch support for mobile
-    let initialDistance = 0;
-    let lastTouchX = 0,
-      lastTouchY = 0;
-
-    container.addEventListener(
-      "touchstart",
-      (e) => {
-        if (e.touches.length === 2) {
-          // Pinch zoom start
-          initialDistance = Math.hypot(
-            e.touches[0].pageX - e.touches[1].pageX,
-            e.touches[0].pageY - e.touches[1].pageY,
-          );
-        } else if (e.touches.length === 1) {
-          // Pan start
-          isPanning = true;
-          lastTouchX = e.touches[0].pageX;
-          lastTouchY = e.touches[0].pageY;
-          scrollLeft = container.scrollLeft;
-          scrollTop = container.scrollTop;
-        }
-      },
-      { passive: false },
-    );
-
-    container.addEventListener(
-      "touchmove",
-      (e) => {
-        e.preventDefault();
-        if (e.touches.length === 2) {
-          // Pinch zoom
-          const newDistance = Math.hypot(
-            e.touches[0].pageX - e.touches[1].pageX,
-            e.touches[0].pageY - e.touches[1].pageY,
-          );
-          const delta = newDistance - initialDistance;
-          if (Math.abs(delta) > 10) {
-            if (delta > 0) {
-              currentZoom = Math.min(currentZoom * 1.05, 5);
-            } else {
-              currentZoom = Math.max(currentZoom * 0.95, 0.25);
-            }
-            updateZoom();
-            initialDistance = newDistance;
-          }
-        } else if (e.touches.length === 1 && isPanning) {
-          // Pan
-          const touchX = e.touches[0].pageX;
-          const touchY = e.touches[0].pageY;
-          const walkX = touchX - lastTouchX;
-          const walkY = touchY - lastTouchY;
-          container.scrollLeft = scrollLeft - walkX;
-          container.scrollTop = scrollTop - walkY;
-        }
-      },
-      { passive: false },
-    );
-
-    container.addEventListener("touchend", () => {
-      isPanning = false;
-      initialDistance = 0;
-    });
-
-    // Store functions on modal for external access
-    modal._updateZoom = updateZoom;
-    modal._setZoom = (zoom) => {
-      currentZoom = zoom;
-    };
-    modal._resetZoom = () => {
-      currentZoom = 1;
-    };
-
-    return modal;
   }
 
-  // Open a diagram in the modal
-  function openMermaidModal(diagramElement) {
-    const modal = createMermaidModal();
-    const container = modal.querySelector("#mermaid-diagram-container");
-    const svg = diagramElement.querySelector("svg");
-
-    if (svg) {
-      // Get original dimensions before cloning
-      const originalRect = svg.getBoundingClientRect();
-
-      // Clone the SVG and put it in the modal with a wrapper
-      const clonedSvg = svg.cloneNode(true);
-      clonedSvg.style.transform = "scale(1)";
-      clonedSvg.style.transformOrigin = "top left";
-
-      // Create wrapper for proper pan/zoom behavior
-      const wrapper = document.createElement("div");
-      wrapper.className = "mermaid-svg-wrapper";
-      wrapper.appendChild(clonedSvg);
-
-      container.innerHTML = "";
-      container.appendChild(wrapper);
-
-      // Store original dimensions for zoom calculations
-      container.dataset.originalWidth = originalRect.width;
-      container.dataset.originalHeight = originalRect.height;
-
-      // Calculate initial zoom to fit screen
-      const viewportWidth = window.innerWidth;
-      const viewportHeight = window.innerHeight;
-      const padding = 40; // 20px padding on each side
-
-      const fitWidth = (viewportWidth - padding) / originalRect.width;
-      const fitHeight = (viewportHeight - padding) / originalRect.height;
-
-      // Use the smaller scale factor, but don't zoom in (max 1.0)
-      const initialZoom = Math.min(1, fitWidth, fitHeight);
-
-      // Set initial zoom
-      modal._setZoom(initialZoom);
-      modal.querySelector("#mermaid-zoom-level").textContent =
-        `${Math.round(initialZoom * 100)}%`;
-
-      // Add hash to URL for browser back button support
-      history.pushState(null, "", "#mermaid-preview");
-
-      // Show modal
-      modal.classList.add("active");
-      document.body.style.overflow = "hidden";
-
-      // Center the content after modal is visible
-      requestAnimationFrame(() => {
-        modal._updateZoom(true);
-      });
-    }
-  }
-
-  // Listen for browser back button to close mermaid modal
-  window.addEventListener("popstate", () => {
-    const modal = document.getElementById("mermaid-modal");
-    if (
-      modal &&
-      modal.classList.contains("active") &&
-      window.location.hash !== "#mermaid-preview"
-    ) {
-      modal.classList.remove("active");
-      document.body.style.overflow = "";
-    }
+  // Initialize Modals
+  const mermaidModal = new ZoomPanModal({
+    modalId: "mermaid-modal",
+    urlHash: "#mermaid-preview",
+    wrapperClass: "mermaid-svg-wrapper",
+    paddingX: 40,
+    paddingY: 40,
   });
+
+  const imageModal = new ZoomPanModal({
+    modalId: "image-modal",
+    urlHash: "#image-preview",
+    wrapperClass: "image-wrapper",
+    contentAddClass: "image-modal-img", // Class for image styling
+    overlayClass: "image-modal-overlay", // For specific styling if needed
+    forceDimensions: true,
+    paddingX: 40,
+    paddingY: 90,
+  });
+
+  // Open Mermaid Diagram
+  function openMermaidModal(diagramElement) {
+    const svg = diagramElement.querySelector("svg");
+    if (svg) {
+      const rect = svg.getBoundingClientRect();
+      // For SVGs, we use getBoundingClientRect as reliable source of 'natural' size
+      mermaidModal.open(svg, rect.width, rect.height);
+    }
+  }
+
+  // Open Image
+  function openImageModal(imgElement) {
+    // Use natural width/height for images if available (better quality), fallback to rect
+    const width = imgElement.naturalWidth || imgElement.clientWidth;
+    const height = imgElement.naturalHeight || imgElement.clientHeight;
+    imageModal.open(imgElement, width, height);
+  }
 
   // Setup click handlers for all mermaid diagrams
   function setupMermaidClickHandlers() {
@@ -793,31 +832,9 @@ const socialImageURL = image
   // Function to update Mermaid theme and re-render diagrams
   function updateMermaidTheme() {
     const currentTheme = getCurrentTheme();
-    const newThemeVariables = getMermaidThemeVariables(currentTheme);
 
     // Update Mermaid configuration with new theme variables
-    mermaid.initialize({
-      startOnLoad: false,
-      theme: "default",
-      themeVariables: newThemeVariables,
-      flowchart: {
-        useMaxWidth: false,
-        htmlLabels: true,
-        curve: "basis",
-      },
-      gantt: {
-        titleTopMargin: 25,
-        barHeight: 30,
-        barGap: 4,
-        topPadding: 50,
-        leftPadding: 75,
-        gridLineStartPadding: 35,
-        fontSize: 12,
-        numberSectionStyles: 4,
-        axisFormat: "%b '%y",
-        useMaxWidth: false,
-      },
-    });
+    mermaid.initialize(buildMermaidConfig(false));
 
     // Re-render all existing Mermaid diagrams with new theme
     const existingMermaidDiagrams = document.querySelectorAll(".mermaid");
@@ -850,18 +867,6 @@ const socialImageURL = image
   themeObserver.observe(document.documentElement, {
     attributes: true,
     attributeFilter: ["class"],
-  });
-
-  // Render on initial load
-  document.addEventListener("DOMContentLoaded", () => {
-    renderMermaidDiagrams();
-    wrapWideTables();
-  });
-
-  // Render on Astro page transitions
-  document.addEventListener("astro:page-load", () => {
-    renderMermaidDiagrams();
-    wrapWideTables();
   });
 
   // Function to wrap wide tables in scrollable containers
@@ -899,359 +904,17 @@ const socialImageURL = image
   }
 
   // Re-wrap tables on window resize
-  let resizeTimeout;
-  window.addEventListener("resize", () => {
-    clearTimeout(resizeTimeout);
-    resizeTimeout = setTimeout(() => {
+  let tableResizeTimeout;
+
+  function handleTableResize() {
+    clearTimeout(tableResizeTimeout);
+    tableResizeTimeout = setTimeout(() => {
       wrapWideTables();
-    }, 250); // Debounce resize events
-  });
-
-  // ===== Image Modal Preview =====
-
-  // Create and setup the image modal
-  function createImageModal() {
-    // Check if modal already exists
-    if (document.getElementById("image-modal")) {
-      return document.getElementById("image-modal");
-    }
-
-    // Lucide icons as SVG strings
-    const icons = {
-      zoomIn: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" x2="16.65" y1="21" y2="16.65"/><line x1="11" x2="11" y1="8" y2="14"/><line x1="8" x2="14" y1="11" y2="11"/></svg>`,
-      zoomOut: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" x2="16.65" y1="21" y2="16.65"/><line x1="8" x2="14" y1="11" y2="11"/></svg>`,
-      reset: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>`,
-      close: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>`,
-    };
-
-    const modal = document.createElement("div");
-    modal.id = "image-modal";
-    modal.className = "image-modal-overlay";
-    modal.innerHTML = `
-      <div class="image-modal-content">
-        <div class="image-modal-controls">
-          <button class="image-modal-btn" id="image-zoom-out" title="Zoom Out">${icons.zoomOut}</button>
-          <span class="image-modal-zoom-info" id="image-zoom-level">100%</span>
-          <button class="image-modal-btn" id="image-zoom-in" title="Zoom In">${icons.zoomIn}</button>
-          <div class="image-modal-divider"></div>
-          <button class="image-modal-btn" id="image-zoom-reset" title="Reset">${icons.reset}</button>
-          <button class="image-modal-btn" id="image-close" title="Close">${icons.close}</button>
-        </div>
-        <div class="image-modal-container" id="image-modal-container"></div>
-        <div class="image-modal-hint">Scroll to zoom • Drag to pan</div>
-      </div>
-    `;
-
-    document.body.appendChild(modal);
-
-    // Setup modal controls
-    let currentZoom = 1;
-    let isPanning = false;
-    let startX = 0,
-      startY = 0;
-    let scrollLeft = 0,
-      scrollTop = 0;
-
-    const container = modal.querySelector("#image-modal-container");
-    const zoomLevelDisplay = modal.querySelector("#image-zoom-level");
-
-    function updateZoom(centerAfterZoom = true) {
-      const wrapper = container.querySelector(".image-wrapper");
-      const img = container.querySelector("img");
-      if (img && wrapper) {
-        // Get original dimensions from stored data (set when modal opens)
-        const originalWidth =
-          parseFloat(container.dataset.originalWidth) ||
-          img.getBoundingClientRect().width;
-        const originalHeight =
-          parseFloat(container.dataset.originalHeight) ||
-          img.getBoundingClientRect().height;
-
-        // Calculate scaled dimensions
-        const scaledWidth = originalWidth * currentZoom;
-        const scaledHeight = originalHeight * currentZoom;
-
-        // Apply scale transform
-        img.style.transform = `scale(${currentZoom})`;
-        img.style.transformOrigin = "top left";
-        zoomLevelDisplay.textContent = `${Math.round(currentZoom * 100)}%`;
-
-        // Set wrapper size to scaled dimensions
-        wrapper.style.width = `${scaledWidth}px`;
-        wrapper.style.height = `${scaledHeight}px`;
-
-        // Use margin: auto for robust centering (centers when small, top-left aligns when overflowing)
-        wrapper.style.margin = "auto";
-
-        // Ensure container handles scrolling
-        if (centerAfterZoom) {
-          // With margin: auto, we just need to ensure we don't hold onto old scroll positions unexpectedly
-          // forcing a scroll to roughly center might be needed only if we zoomed in significantly,
-          // but margin: auto handles the placement. Resetting scroll might be safer for "fit" zoom.
-          if (currentZoom <= 1.0) {
-            container.scrollLeft = 0;
-            container.scrollTop = 0;
-          }
-        }
-      }
-    }
-
-    function zoomIn() {
-      currentZoom = Math.min(currentZoom * 1.25, 5);
-      updateZoom(true);
-    }
-
-    function zoomOut() {
-      currentZoom = Math.max(currentZoom * 0.8, 0.25);
-      updateZoom(true);
-    }
-
-    function resetZoom() {
-      currentZoom = 1;
-      const wrapper = container.querySelector(".image-wrapper");
-      if (wrapper) {
-        wrapper.style.width = "";
-        wrapper.style.height = "";
-        wrapper.style.margin = "";
-      }
-      updateZoom(true);
-    }
-
-    function closeModal() {
-      modal.classList.remove("active");
-      document.body.style.overflow = "";
-      currentZoom = 1;
-
-      // Remove hash from URL if it's #image-preview
-      if (window.location.hash === "#image-preview") {
-        history.back();
-      }
-    }
-
-    // Button handlers
-    modal.querySelector("#image-zoom-in").addEventListener("click", zoomIn);
-    modal.querySelector("#image-zoom-out").addEventListener("click", zoomOut);
-    modal
-      .querySelector("#image-zoom-reset")
-      .addEventListener("click", resetZoom);
-    modal.querySelector("#image-close").addEventListener("click", closeModal);
-
-    // Close on overlay click
-    modal.addEventListener("click", (e) => {
-      if (e.target === modal) {
-        closeModal();
-      }
-    });
-
-    // Close on Escape key
-    document.addEventListener("keydown", (e) => {
-      if (e.key === "Escape" && modal.classList.contains("active")) {
-        closeModal();
-      }
-    });
-
-    // Mouse wheel zoom
-    container.addEventListener(
-      "wheel",
-      (e) => {
-        e.preventDefault();
-        if (e.deltaY < 0) {
-          zoomIn();
-        } else {
-          zoomOut();
-        }
-      },
-      { passive: false },
-    );
-
-    // Pan functionality (mouse)
-    container.addEventListener("mousedown", (e) => {
-      e.preventDefault(); // Prevent default drag behavior
-      isPanning = true;
-      container.style.cursor = "grabbing";
-      startX = e.pageX - container.offsetLeft;
-      startY = e.pageY - container.offsetTop;
-      scrollLeft = container.scrollLeft;
-      scrollTop = container.scrollTop;
-    });
-
-    container.addEventListener("mousemove", (e) => {
-      if (!isPanning) return;
-      e.preventDefault();
-      const x = e.pageX - container.offsetLeft;
-      const y = e.pageY - container.offsetTop;
-      const walkX = (x - startX) * 1.5;
-      const walkY = (y - startY) * 1.5;
-      container.scrollLeft = scrollLeft - walkX;
-      container.scrollTop = scrollTop - walkY;
-    });
-
-    container.addEventListener("mouseup", () => {
-      isPanning = false;
-      container.style.cursor = "grab";
-    });
-
-    container.addEventListener("mouseleave", () => {
-      isPanning = false;
-      container.style.cursor = "grab";
-    });
-
-    // Touch support for mobile
-    let initialDistance = 0;
-    let lastTouchX = 0,
-      lastTouchY = 0;
-
-    container.addEventListener(
-      "touchstart",
-      (e) => {
-        if (e.touches.length === 2) {
-          // Pinch zoom start
-          initialDistance = Math.hypot(
-            e.touches[0].pageX - e.touches[1].pageX,
-            e.touches[0].pageY - e.touches[1].pageY,
-          );
-        } else if (e.touches.length === 1) {
-          // Pan start
-          isPanning = true;
-          lastTouchX = e.touches[0].pageX;
-          lastTouchY = e.touches[0].pageY;
-          scrollLeft = container.scrollLeft;
-          scrollTop = container.scrollTop;
-        }
-      },
-      { passive: false },
-    );
-
-    container.addEventListener(
-      "touchmove",
-      (e) => {
-        e.preventDefault();
-        if (e.touches.length === 2) {
-          // Pinch zoom
-          const newDistance = Math.hypot(
-            e.touches[0].pageX - e.touches[1].pageX,
-            e.touches[0].pageY - e.touches[1].pageY,
-          );
-          const delta = newDistance - initialDistance;
-          if (Math.abs(delta) > 10) {
-            if (delta > 0) {
-              currentZoom = Math.min(currentZoom * 1.05, 5);
-            } else {
-              currentZoom = Math.max(currentZoom * 0.95, 0.25);
-            }
-            updateZoom();
-            initialDistance = newDistance;
-          }
-        } else if (e.touches.length === 1 && isPanning) {
-          // Pan
-          const touchX = e.touches[0].pageX;
-          const touchY = e.touches[0].pageY;
-          const walkX = touchX - lastTouchX;
-          const walkY = touchY - lastTouchY;
-          container.scrollLeft = scrollLeft - walkX;
-          container.scrollTop = scrollTop - walkY;
-        }
-      },
-      { passive: false },
-    );
-
-    container.addEventListener("touchend", () => {
-      isPanning = false;
-      initialDistance = 0;
-    });
-
-    // Store functions on modal for external access
-    modal._updateZoom = updateZoom;
-    modal._setZoom = (zoom) => {
-      currentZoom = zoom;
-    };
-    modal._resetZoom = () => {
-      currentZoom = 1;
-    };
-
-    return modal;
+    }, 250);
   }
 
-  // Open an image in the modal
-  function openImageModal(imgElement) {
-    const modal = createImageModal();
-    const container = modal.querySelector("#image-modal-container");
-
-    // Get original dimensions before cloning
-    const originalRect = imgElement.getBoundingClientRect();
-
-    // Clone the image and put it in the modal with a wrapper
-    const clonedImg = imgElement.cloneNode(true);
-    clonedImg.style.transform = "scale(1)";
-    clonedImg.style.transformOrigin = "top left";
-    clonedImg.removeAttribute("class"); // Remove any classes that might interfere
-    clonedImg.classList.add("image-modal-img");
-
-    // Create wrapper for proper pan/zoom behavior
-    const wrapper = document.createElement("div");
-    wrapper.className = "image-wrapper";
-    wrapper.appendChild(clonedImg);
-
-    container.innerHTML = "";
-    container.appendChild(wrapper);
-
-    // For images, we can use natural dimensions if available, or the client rect
-    // Ensure we use the best available dimension source
-    const contentWidth = imgElement.naturalWidth || originalRect.width;
-    const contentHeight = imgElement.naturalHeight || originalRect.height;
-
-    // Explicitly set the clone's dimensions to match what we use for calculation
-    clonedImg.style.width = `${contentWidth}px`;
-    clonedImg.style.height = `${contentHeight}px`;
-
-    // Store TRUE dimensions for zoom calculations
-    container.dataset.originalWidth = contentWidth;
-    container.dataset.originalHeight = contentHeight;
-
-    // Calculate initial zoom to fit screen
-    const viewportWidth = window.innerWidth;
-    const viewportHeight = window.innerHeight;
-
-    // Padding must match CSS: 2rem horizontal (32px), 5rem vertical (80px)
-    const paddingX = 40;
-    const paddingY = 90; // 2.5rem top + 2.5rem bottom + buffer
-
-    const fitWidth = (viewportWidth - paddingX) / contentWidth;
-    const fitHeight = (viewportHeight - paddingY) / contentHeight;
-
-    // Use the smaller scale factor, but don't zoom in (max 1.0)
-    const initialZoom = Math.min(1, fitWidth, fitHeight);
-
-    // Set initial zoom
-    modal._setZoom(initialZoom);
-    modal.querySelector("#image-zoom-level").textContent =
-      `${Math.round(initialZoom * 100)}%`;
-
-    // Add hash to URL for browser back button support
-    history.pushState(null, "", "#image-preview");
-
-    // Show modal
-    modal.classList.add("active");
-    document.body.style.overflow = "hidden";
-
-    // Center the content after modal is visible
-    requestAnimationFrame(() => {
-      modal._updateZoom(true);
-    });
-  }
-
-  // Listen for browser back button to close image modal
-  window.addEventListener("popstate", () => {
-    const modal = document.getElementById("image-modal");
-    if (
-      modal &&
-      modal.classList.contains("active") &&
-      window.location.hash !== "#image-preview"
-    ) {
-      modal.classList.remove("active");
-      document.body.style.overflow = "";
-    }
-  });
+  // Add cleanup for table resize listener
+  window.addEventListener("resize", handleTableResize);
 
   // Setup click handlers for images in content areas
   function setupImageClickHandlers() {
@@ -1277,13 +940,17 @@ const socialImageURL = image
     });
   }
 
-  // Initialize image modal handlers
+  // Render on initial load
   document.addEventListener("DOMContentLoaded", () => {
+    renderMermaidDiagrams(); // Restore mermaid rendering
+    wrapWideTables();
     setupImageClickHandlers();
   });
 
-  // Setup on Astro page transitions
+  // Render on Astro page transitions
   document.addEventListener("astro:page-load", () => {
+    renderMermaidDiagrams(); // Restore mermaid rendering
+    wrapWideTables();
     setupImageClickHandlers();
   });
 </script>
