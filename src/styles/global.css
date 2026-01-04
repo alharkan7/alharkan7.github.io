@@ -828,6 +828,55 @@ input[name='theme-toggle'] {
   }
 }
 
+/* Dark mode styles for mermaid modal SVG text */
+:root.theme-dark .mermaid-modal-diagram svg text {
+  fill: #f4f4f5 !important;
+}
+
+/* Pie chart specific text fixes for dark mode in modal */
+:root.theme-dark .mermaid-modal-diagram svg .legend text,
+:root.theme-dark .mermaid-modal-diagram svg .pieCircle+text,
+:root.theme-dark .mermaid-modal-diagram svg .slice text,
+:root.theme-dark .mermaid-modal-diagram svg text.pieTitleText {
+  fill: #f4f4f5 !important;
+}
+
+/* Gantt chart specific text fixes for dark mode in modal */
+:root.theme-dark .mermaid-modal-diagram svg .titleText,
+:root.theme-dark .mermaid-modal-diagram svg .sectionTitle,
+:root.theme-dark .mermaid-modal-diagram svg .taskText,
+:root.theme-dark .mermaid-modal-diagram svg .taskTextOutsideRight,
+:root.theme-dark .mermaid-modal-diagram svg .taskTextOutsideLeft,
+:root.theme-dark .mermaid-modal-diagram svg .sectionTitle0,
+:root.theme-dark .mermaid-modal-diagram svg .sectionTitle1,
+:root.theme-dark .mermaid-modal-diagram svg .sectionTitle2,
+:root.theme-dark .mermaid-modal-diagram svg .sectionTitle3 {
+  fill: #f4f4f5 !important;
+}
+
+/* Flowchart/graph text fixes for dark mode in modal */
+:root.theme-dark .mermaid-modal-diagram svg .nodeLabel,
+:root.theme-dark .mermaid-modal-diagram svg .edgeLabel,
+:root.theme-dark .mermaid-modal-diagram svg .label text,
+:root.theme-dark .mermaid-modal-diagram svg .cluster-label text {
+  fill: #f4f4f5 !important;
+}
+
+/* Text inside colored nodes should remain dark for visibility in modal */
+:root.theme-dark .mermaid-modal-diagram svg .node rect+.nodeLabel,
+:root.theme-dark .mermaid-modal-diagram svg .node polygon+.nodeLabel {
+  fill: #18181b !important;
+}
+
+/* Gantt chart grid and bar styling for dark mode in modal */
+:root.theme-dark .mermaid-modal-diagram svg .grid .tick line {
+  stroke: #3f3f46 !important;
+}
+
+:root.theme-dark .mermaid-modal-diagram svg .gridlines line {
+  stroke: #3f3f46 !important;
+}
+
 /* Mobile adjustments for modal */
 @media (max-width: 768px) {
   .mermaid-modal-content {

@@ -449,6 +449,11 @@ const socialImageURL = image
       modal.classList.remove("active");
       document.body.style.overflow = "";
       currentZoom = 1;
+
+      // Remove hash from URL if it's #mermaid-preview
+      if (window.location.hash === "#mermaid-preview") {
+        history.back();
+      }
     }
 
     // Button handlers
@@ -638,6 +643,9 @@ const socialImageURL = image
       modal.querySelector("#mermaid-zoom-level").textContent =
         `${Math.round(initialZoom * 100)}%`;
 
+      // Add hash to URL for browser back button support
+      history.pushState(null, "", "#mermaid-preview");
+
       // Show modal
       modal.classList.add("active");
       document.body.style.overflow = "hidden";
@@ -648,6 +656,19 @@ const socialImageURL = image
       });
     }
   }
+
+  // Listen for browser back button to close mermaid modal
+  window.addEventListener("popstate", () => {
+    const modal = document.getElementById("mermaid-modal");
+    if (
+      modal &&
+      modal.classList.contains("active") &&
+      window.location.hash !== "#mermaid-preview"
+    ) {
+      modal.classList.remove("active");
+      document.body.style.overflow = "";
+    }
+  });
 
   // Setup click handlers for all mermaid diagrams
   function setupMermaidClickHandlers() {
@@ -892,6 +913,11 @@ const socialImageURL = image
       modal.classList.remove("active");
       document.body.style.overflow = "";
       currentZoom = 1;
+
+      // Remove hash from URL if it's #image-preview
+      if (window.location.hash === "#image-preview") {
+        history.back();
+      }
     }
 
     // Button handlers
@@ -1093,6 +1119,9 @@ const socialImageURL = image
     modal.querySelector("#image-zoom-level").textContent =
       `${Math.round(initialZoom * 100)}%`;
 
+    // Add hash to URL for browser back button support
+    history.pushState(null, "", "#image-preview");
+
     // Show modal
     modal.classList.add("active");
     document.body.style.overflow = "hidden";
@@ -1102,6 +1131,19 @@ const socialImageURL = image
       modal._updateZoom(true);
     });
   }
+
+  // Listen for browser back button to close image modal
+  window.addEventListener("popstate", () => {
+    const modal = document.getElementById("image-modal");
+    if (
+      modal &&
+      modal.classList.contains("active") &&
+      window.location.hash !== "#image-preview"
+    ) {
+      modal.classList.remove("active");
+      document.body.style.overflow = "";
+    }
+  });
 
   // Setup click handlers for images in content areas
   function setupImageClickHandlers() {
