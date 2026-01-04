@@ -977,7 +977,11 @@ input[name='theme-toggle'] {
   overflow: auto;
   cursor: grab;
   touch-action: none;
-  /* Centering is handled dynamically via wrapper padding */
+  display: flex;
+  /* Use margin: auto on child for centering, safely handling overflow */
+  /* Adjust this padding to control image position */
+  /* padding: top right bottom left */
+  padding: 2.5rem 1rem 2.5rem 1rem;
   /* Prevent text selection and dragging during pan */
   user-select: none;
   -webkit-user-select: none;
@@ -988,7 +992,9 @@ input[name='theme-toggle'] {
 }
 
 .image-modal-container .image-wrapper {
-  display: inline-block;
+  display: block;
+  /* overflow: hidden ensures the large layout size of the img doesn't affect the container scrollbars */
+  overflow: hidden;
   box-sizing: border-box;
   /* Padding is set dynamically via JS to center content */
   /* Prevent selection and dragging */
@@ -1056,9 +1062,7 @@ input[name='theme-toggle'] {
     padding: 1rem;
   }
 
-  .image-modal-container img {
-    max-height: calc(100vh - 4rem);
-  }
+  /* Remove duplicate image styles in mobile query as base styles handle it */
 }
 
 /* General text wrapping for long content without spaces */
