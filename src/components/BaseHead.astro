@@ -473,6 +473,12 @@ const socialImageURL = image
 
   // ===== Shared Modal Logic =====
 
+  // Global cleanup for modal listeners to prevent accumulation across page transitions
+  if (window.modalCleanupRegistry) {
+    window.modalCleanupRegistry.forEach((cleanup) => cleanup());
+  }
+  window.modalCleanupRegistry = [];
+
   class ZoomPanModal {
     constructor(config) {
       this.config = config;
@@ -490,10 +496,13 @@ const socialImageURL = image
       this.lastTouchY = 0;
 
       this.createDOM();
-      this.setupEvents();
+      this.setupGlobalEvents();
+      this.setupElementEvents();
     }
 
     createDOM() {
+      // If modal exists in DOM, use it (unlikely with View Transitions if body swapped)
+      // If it exists but we lost reference, re-acquire it.
       if (document.getElementById(this.config.modalId)) {
         this.modal = document.getElementById(this.config.modalId);
         this.container = this.modal.querySelector(".modal-content-container");
@@ -534,7 +543,52 @@ const socialImageURL = image
       this.zoomLevelDisplay = this.modal.querySelector(".modal-zoom-level");
     }
 
-    setupEvents() {
+    setupGlobalEvents() {
+      // Keyboard (Global)
+      const keydownHandler = (e) => {
+        if (
+          e.key === "Escape" &&
+          this.modal &&
+          this.modal.classList.contains("active")
+        ) {
+          this.close();
+        }
+      };
+
+      // Remove existing listener if any (to be safe, though usage pattern implies singleton)
+      if (this.keydownHandler)
+        document.removeEventListener("keydown", this.keydownHandler);
+      this.keydownHandler = keydownHandler;
+      document.addEventListener("keydown", keydownHandler);
+
+      // Cleanup Registry for total script re-runs
+      window.modalCleanupRegistry.push(() => {
+        document.removeEventListener("keydown", keydownHandler);
+      });
+
+      // Browser Back Button Support (Global)
+      const popstateHandler = () => {
+        // Check if modal exists and is active
+        if (
+          this.modal &&
+          this.modal.classList.contains("active") &&
+          window.location.hash !== this.config.urlHash
+        ) {
+          this.close(false);
+        }
+      };
+
+      if (this.popstateHandler)
+        window.removeEventListener("popstate", this.popstateHandler);
+      this.popstateHandler = popstateHandler;
+      window.addEventListener("popstate", popstateHandler);
+
+      window.modalCleanupRegistry.push(() => {
+        window.removeEventListener("popstate", popstateHandler);
+      });
+    }
+
+    setupElementEvents() {
       // Buttons
       this.modal.addEventListener("click", (e) => {
         const btn = e.target.closest("button");
@@ -545,13 +599,6 @@ const socialImageURL = image
           if (action === "reset") this.resetZoom();
           if (action === "close") this.close();
         } else if (e.target === this.modal) {
-          this.close();
-        }
-      });
-
-      // Keyboard
-      document.addEventListener("keydown", (e) => {
-        if (e.key === "Escape" && this.modal.classList.contains("active")) {
           this.close();
         }
       });
@@ -645,17 +692,10 @@ const socialImageURL = image
         this.isPanning = false;
         this.initialTouchDistance = 0;
       });
+    }
 
-      // Browser Back Button Support
-      window.addEventListener("popstate", () => {
-        if (
-          this.modal &&
-          this.modal.classList.contains("active") &&
-          window.location.hash !== this.config.urlHash
-        ) {
-          this.close(false);
-        }
-      });
+    setupEvents() {
+      // Deprecated in favor of split setup
     }
 
     stopPan() {
@@ -709,6 +749,13 @@ const socialImageURL = image
     }
 
     open(contentNode, width, height) {
+      // REBINDING LOGIC: Check if modal is still valid in current DOM
+      if (!this.modal || !document.body.contains(this.modal)) {
+        console.log(`Recreating disconnected modal for ${this.config.modalId}`);
+        this.createDOM();
+        this.setupElementEvents();
+      }
+
       this.container.innerHTML = "";
 
       // Create Wrapper
@@ -752,8 +799,10 @@ const socialImageURL = image
 
       this.updateZoom(true);
 
-      // Push history state
-      history.pushState(null, "", this.config.urlHash);
+      // Push history state - ONLY if not already there
+      if (window.location.hash !== this.config.urlHash) {
+        history.pushState(null, "", this.config.urlHash);
+      }
 
       // Show Modal
       this.modal.classList.add("active");
@@ -942,15 +991,39 @@ const socialImageURL = image
 
   // Render on initial load
   document.addEventListener("DOMContentLoaded", () => {
-    renderMermaidDiagrams(); // Restore mermaid rendering
-    wrapWideTables();
-    setupImageClickHandlers();
+    try {
+      renderMermaidDiagrams();
+    } catch (e) {
+      console.warn("Mermaid init error:", e);
+    }
+    try {
+      wrapWideTables();
+    } catch (e) {
+      console.warn("Table wrapper error:", e);
+    }
+    try {
+      setupImageClickHandlers();
+    } catch (e) {
+      console.warn("Image handler error:", e);
+    }
   });
 
   // Render on Astro page transitions
   document.addEventListener("astro:page-load", () => {
-    renderMermaidDiagrams(); // Restore mermaid rendering
-    wrapWideTables();
-    setupImageClickHandlers();
+    try {
+      renderMermaidDiagrams();
+    } catch (e) {
+      console.warn("Mermaid page-load error:", e);
+    }
+    try {
+      wrapWideTables();
+    } catch (e) {
+      console.warn("Table wrapper error:", e);
+    }
+    try {
+      setupImageClickHandlers();
+    } catch (e) {
+      console.warn("Image handler error:", e);
+    }
   });
 </script>

@@ -1099,6 +1099,14 @@ input[name='theme-toggle'] {
   pointer-events: none;
 }
 
+.image-modal-img {
+  max-width: none !important;
+  height: auto !important;
+  display: block;
+  user-select: none;
+  -webkit-user-drag: none;
+}
+
 .image-modal-container img {
   display: block;
   max-width: none;
