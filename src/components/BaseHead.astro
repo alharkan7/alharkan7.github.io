@@ -316,9 +316,29 @@ const socialImageURL = image
       mermaidDiv.className = "mermaid";
       mermaidDiv.textContent = mermaidCode.trim();
 
-      // Replace the code block with the mermaid div
+      // On mobile, wrap in a fixed-width container BEFORE mermaid renders
+      const isMobile = window.innerWidth <= 768;
       const parent = element.closest("pre") || element;
-      parent.parentNode.replaceChild(mermaidDiv, parent);
+
+      if (isMobile) {
+        // Create wrapper with fixed width so Mermaid renders at desktop size
+        const wrapper = document.createElement("div");
+        wrapper.className = "mermaid-mobile-wrapper";
+        wrapper.style.margin = "1rem 0";
+        wrapper.style.overflow = "hidden";
+        wrapper.style.position = "relative";
+
+        // Force the mermaid container to render at a fixed large width
+        mermaidDiv.style.width = "900px";
+        mermaidDiv.style.minWidth = "900px";
+        mermaidDiv.style.transformOrigin = "top left";
+
+        wrapper.appendChild(mermaidDiv);
+        parent.parentNode.replaceChild(wrapper, parent);
+      } else {
+        // Replace the code block with the mermaid div
+        parent.parentNode.replaceChild(mermaidDiv, parent);
+      }
 
       // Mark as processed
       mermaidDiv.classList.add("mermaid-processed");
@@ -328,11 +348,88 @@ const socialImageURL = image
     if (mermaidElements.length > 0) {
       mermaid.run().then(() => {
         setupMermaidClickHandlers();
+        scaleMermaidDiagramsForMobile();
       });
     } else {
       setupMermaidClickHandlers();
+      scaleMermaidDiagramsForMobile();
     }
   }
+
+  // Function to scale Mermaid diagrams for mobile screens
+  function scaleMermaidDiagramsForMobile() {
+    const isMobile = window.innerWidth <= 768;
+
+    const diagrams = document.querySelectorAll(".mermaid");
+    diagrams.forEach((diagram) => {
+      // Skip if already wrapped
+      const existingWrapper = diagram.parentElement;
+      const isWrapped =
+        existingWrapper &&
+        existingWrapper.classList.contains("mermaid-mobile-wrapper");
+
+      if (isMobile) {
+        // Wrap in a mobile wrapper if not already wrapped
+        if (!isWrapped) {
+          const wrapper = document.createElement("div");
+          wrapper.className = "mermaid-mobile-wrapper";
+          wrapper.style.margin = "1rem 0";
+          diagram.parentNode.insertBefore(wrapper, diagram);
+          wrapper.appendChild(diagram);
+        }
+
+        const wrapper = diagram.parentElement;
+
+        // Calculate scale factor
+        const containerWidth = wrapper.clientWidth || window.innerWidth - 32; // Account for page padding
+        const diagramWidth = 900; // Fixed width set via JS
+        const scale = Math.min(1, containerWidth / diagramWidth);
+
+        // Temporarily remove any existing transform to get accurate dimensions
+        diagram.style.transform = "none";
+
+        // Force reflow to ensure we get accurate measurements
+        diagram.offsetHeight;
+
+        // Get the actual unscaled dimensions
+        const svg = diagram.querySelector("svg");
+        if (svg) {
+          // Get the full diagram height including padding
+          const diagramRect = diagram.getBoundingClientRect();
+          const unscaledHeight = diagramRect.height;
+
+          // Apply scale to the mermaid container
+          diagram.style.transform = `scale(${scale})`;
+
+          // Calculate wrapper height: unscaled content height * scale + buffer for breathing room
+          const scaledHeight = unscaledHeight * scale + 16;
+          wrapper.style.height = scaledHeight + "px";
+        } else {
+          // No SVG yet, just apply transform
+          diagram.style.transform = `scale(${scale})`;
+        }
+      } else {
+        // On desktop, remove wrapper if it exists
+        if (isWrapped) {
+          existingWrapper.parentNode.insertBefore(diagram, existingWrapper);
+          existingWrapper.remove();
+        }
+        // Reset any transforms
+        diagram.style.transform = "";
+        diagram.style.minWidth = "";
+        diagram.style.width = "";
+      }
+    });
+  }
+
+  // Re-scale diagrams on window resize
+  let mermaidResizeTimeout;
+  window.addEventListener("resize", () => {
+    clearTimeout(mermaidResizeTimeout);
+    mermaidResizeTimeout = setTimeout(() => {
+      scaleMermaidDiagramsForMobile();
+    }, 100);
+  });
 
   // Create and setup the mermaid modal
   function createMermaidModal() {

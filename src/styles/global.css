@@ -649,43 +649,53 @@ input[name='theme-toggle'] {
 
 /* Responsive adjustments for Mermaid diagrams */
 @media (max-width: 768px) {
-  .mermaid {
-    padding: 0.5rem;
-    margin: 1rem 0;
-    /* Show clipped preview on mobile */
-    max-height: 200px;
+
+  /* Wrapper to handle scaling - JS sets the fixed dimensions and scaling */
+  .mermaid-mobile-wrapper {
+    width: 100%;
     overflow: hidden;
     position: relative;
   }
 
-  /* Gradient overlay to indicate there's more content */
-  .mermaid::before {
-    content: '';
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    height: 80px;
-    background: linear-gradient(transparent, var(--background-alt));
-    pointer-events: none;
-    z-index: 1;
+  .mermaid {
+    padding: 1rem;
+    margin: 0;
+    box-sizing: border-box;
+    /* Width and transform-origin are set inline by JS */
   }
 
-  /* "Tap to view" indicator */
+  .mermaid svg {
+    /* Let SVG be its natural size within the container */
+    display: block;
+    max-width: none !important;
+  }
+
+  /* "Tap to expand" indicator at top right */
   .mermaid::after {
-    content: '👆 Tap to view full diagram';
+    content: '⤢';
     position: absolute;
-    bottom: 10px;
-    left: 50%;
-    transform: translateX(-50%);
-    background: var(--primary-color);
-    color: white;
-    padding: 8px 16px;
-    border-radius: 20px;
-    font-size: 12px;
-    font-weight: 500;
+    top: 0.5rem;
+    right: 0.5rem;
+    width: 28px;
+    height: 28px;
+    background: rgba(255, 255, 255, 0.9);
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    color: #18181b;
+    opacity: 1;
     z-index: 2;
     pointer-events: none;
+  }
+
+  /* Dark theme: dark button on dark background */
+  :root.theme-dark .mermaid::after {
+    background: rgba(0, 0, 0, 0.7);
+    border-color: rgba(255, 255, 255, 0.1);
+    color: white;
   }
 }
 
