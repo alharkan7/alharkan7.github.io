@@ -1,10 +1,6 @@
 ---
 import BaseLayout from "../layouts/BaseLayout.astro";
-// Import the data fetched by the GitHub Action
-// import starredReposData from "../../public/os-bookmarks/github_stars.json"; // Adjust path if needed
 import { createClient } from "@supabase/supabase-js";
-import fs from "fs";
-import path from "path";
 // Import Lucide icons
 import { Code, Star, GitFork, ChevronDown, ChevronUp } from "lucide-react";
 
@@ -48,9 +44,13 @@ interface SupabaseGitHubStar {
 // Initialize Supabase client
 // IMPORTANT: Replace with your actual Supabase URL and Anon Key
 const supabaseUrl = import.meta.env.SUPABASE_URL || "SUPABASE_URL";
-const supabaseAnonKey = import.meta.env.SUPABASE_ANON_KEY || "SUPABASE_ANON_KEY";
+const supabaseAnonKey =
+    import.meta.env.SUPABASE_ANON_KEY || "SUPABASE_ANON_KEY";
 
-if (supabaseUrl === "YOUR_SUPABASE_URL" || supabaseAnonKey === "YOUR_SUPABASE_ANON_KEY") {
+if (
+    supabaseUrl === "YOUR_SUPABASE_URL" ||
+    supabaseAnonKey === "YOUR_SUPABASE_ANON_KEY"
+) {
     console.warn(
         "Supabase URL or Anon Key is not set. Please update them in your environment variables or directly in the code.",
     );
@@ -66,20 +66,25 @@ async function getStarredRepos(): Promise<GitHubRepo[]> {
     let keepFetching = true;
     let totalCountFromQuery: number | null = null;
 
-    console.log("Starting to fetch starred repos from Supabase with chunking...");
+    console.log(
+        "Starting to fetch starred repos from Supabase with chunking...",
+    );
 
     while (keepFetching) {
         const { data, error, count } = await supabase
             .from("github_stars")
             .select(
                 "repo_id, full_name, html_url, description, language, stargazers_count, forks_count, pushed_at, owner_login, owner_avatar_url, starred_at",
-                { count: 'exact' } // Request exact count
+                { count: "exact" }, // Request exact count
             )
             .order("starred_at", { ascending: false })
             .range(offset, offset + CHUNK_SIZE - 1);
 
         if (error) {
-            console.error("Error fetching starred repos from Supabase (chunk):", error);
+            console.error(
+                "Error fetching starred repos from Supabase (chunk):",
+                error,
+            );
             throw error; // Propagate the error
         }
 
@@ -99,11 +104,16 @@ async function getStarredRepos(): Promise<GitHubRepo[]> {
         }
 
         // Safety break if exact count is available and we've fetched enough
-        if (totalCountFromQuery !== null && allData.length >= totalCountFromQuery) {
+        if (
+            totalCountFromQuery !== null &&
+            allData.length >= totalCountFromQuery
+        ) {
             keepFetching = false;
         }
     }
-    console.log(`Fetched a total of ${allData.length} starred repos from Supabase. Exact count from query: ${totalCountFromQuery ?? 'N/A'}`);
+    console.log(
+        `Fetched a total of ${allData.length} starred repos from Supabase. Exact count from query: ${totalCountFromQuery ?? "N/A"}`,
+    );
 
     // Transform data to match GitHubRepo interface
     return allData
@@ -124,11 +134,9 @@ async function getStarredRepos(): Promise<GitHubRepo[]> {
         : [];
 }
 
-// Cast the imported data
-// const starredRepos = starredReposData as GitHubRepo[];
 const starredRepos = await getStarredRepos();
 
-// Get the last modified date of the github_stars.json file
+// Determine the last update date from the database
 let lastUpdateDate = "Unknown";
 if (starredRepos.length > 0) {
     // Find the most recent starred_at date among all repositories
@@ -207,8 +215,12 @@ const totalStars = starredRepos.length;
                                 </span>
                             </div>
                             <div class="repo-description-container">
-                                <p class="repo-description" id={`desc-${repo.id}`}>
-                                    {repo.description || "No description provided."}
+                                <p
+                                    class="repo-description"
+                                    id={`desc-${repo.id}`}
+                                >
+                                    {repo.description ||
+                                        "No description provided."}
                                 </p>
                             </div>
                             <div class="repo-meta">
@@ -253,9 +265,7 @@ const totalStars = starredRepos.length;
                         >
                             <option value="1">1</option> {/* Placeholder */}
                         </select>
-                        <span id="page-total-span">
-                            of ?
-                        </span>
+                        <span id="page-total-span">of ?</span>
                     </div>
                     <a
                         id="next-button"
@@ -272,7 +282,13 @@ const totalStars = starredRepos.length;
         <hr class="mt-8" />
 
         <p class="footnote text-sm">
-            This list is automatically updated daily (latest star: {lastUpdateDate}) based on my GitHub <a href="https://github.com/alharkan7?tab=stars" target="_blank" rel="noopener noreferrer">stars</a>.
+            This list is automatically updated daily (latest star: {
+                lastUpdateDate
+            }) based on my GitHub <a
+                href="https://github.com/alharkan7?tab=stars"
+                target="_blank"
+                rel="noopener noreferrer">stars</a
+            >.
         </p>
     </div>
 </BaseLayout>
@@ -465,7 +481,9 @@ const totalStars = starredRepos.length;
     .page-select {
         padding: 0.25rem; /* Adjusted padding */
         font-size: 0.9em;
-        background-color: var(--background-body); /* Use body background for theme compatibility */
+        background-color: var(
+            --background-body
+        ); /* Use body background for theme compatibility */
         color: var(--text-main);
         border: none; /* Remove border */
         outline: none; /* Remove outline */
@@ -488,31 +506,31 @@ const totalStars = starredRepos.length;
 <style is:global>
     /* Thin scrollbar for #page-select in Webkit browsers */
     #page-select::-webkit-scrollbar {
-      width: 5px;
+        width: 5px;
     }
 
     #page-select::-webkit-scrollbar-track {
-      background: transparent;
+        background: transparent;
     }
 
     #page-select::-webkit-scrollbar-thumb {
-      background-color: var(--text-secondary);
-      border-radius: 10px;
-      border: none;
+        background-color: var(--text-secondary);
+        border-radius: 10px;
+        border: none;
     }
 
     /* Thin scrollbar for #page-select in Firefox */
     #page-select {
-      scrollbar-width: thin;
-      scrollbar-color: var(--text-secondary) transparent;
+        scrollbar-width: thin;
+        scrollbar-color: var(--text-secondary) transparent;
     }
 </style>
 
 <script>
     // Declare custom window property type needed for the popstate guard
     declare global {
-        interface Window { 
-            _popstateHandledStars?: boolean; 
+        interface Window {
+            _popstateHandledStars?: boolean;
         }
     }
 
@@ -521,84 +539,117 @@ const totalStars = starredRepos.length;
 
         // Query DOM elements
         const repoGrid = document.querySelector(".repo-grid");
-        const prevButton = document.getElementById("prev-button") as HTMLAnchorElement;
-        const nextButton = document.getElementById("next-button") as HTMLAnchorElement;
-        const pageSelect = document.getElementById("page-select") as HTMLSelectElement;
+        const prevButton = document.getElementById(
+            "prev-button",
+        ) as HTMLAnchorElement;
+        const nextButton = document.getElementById(
+            "next-button",
+        ) as HTMLAnchorElement;
+        const pageSelect = document.getElementById(
+            "page-select",
+        ) as HTMLSelectElement;
         const pageTotalSpan = document.getElementById("page-total-span");
-        const paginationControls = document.querySelector(".pagination-controls") as HTMLElement | null;
+        const paginationControls = document.querySelector(
+            ".pagination-controls",
+        ) as HTMLElement | null;
 
         // Check if elements exist
-        if (!repoGrid || !prevButton || !nextButton || !pageSelect || !pageTotalSpan || !paginationControls) {
-            console.error("Pagination elements missing. Aborting initialization.");
+        if (
+            !repoGrid ||
+            !prevButton ||
+            !nextButton ||
+            !pageSelect ||
+            !pageTotalSpan ||
+            !paginationControls
+        ) {
+            console.error(
+                "Pagination elements missing. Aborting initialization.",
+            );
             // Hide controls if they partially exist but others are missing
-            if(paginationControls) paginationControls.style.display = 'none';
+            if (paginationControls) paginationControls.style.display = "none";
             return;
         }
 
         // --- State Calculation ---
         const itemsPerPage = 30;
         // Get all repo cards directly from the grid container
-        const allRepos = Array.from(repoGrid.children).filter(el => el.classList.contains('repo-card'));
+        const allRepos = Array.from(repoGrid.children).filter((el) =>
+            el.classList.contains("repo-card"),
+        );
         const totalItems = allRepos.length;
         const totalPages = Math.ceil(totalItems / itemsPerPage) || 1; // Ensure at least 1 page
 
-        // --- Read Current Page from URL --- 
+        // --- Read Current Page from URL ---
         const urlParams = new URLSearchParams(window.location.search);
         let currentPage = parseInt(urlParams.get("page") || "1", 10);
         // Clamp page number to valid range
-        currentPage = Math.max(1, Math.min(currentPage, totalPages)); 
+        currentPage = Math.max(1, Math.min(currentPage, totalPages));
 
-        console.log(`Stars State: currentPage=${currentPage}, totalPages=${totalPages}, totalItems=${totalItems}`);
+        console.log(
+            `Stars State: currentPage=${currentPage}, totalPages=${totalPages}, totalItems=${totalItems}`,
+        );
 
-        // --- Update Display Function --- 
+        // --- Update Display Function ---
         function updatePageDisplay() {
             // Re-check core elements in case something went wrong
-            if (!paginationControls || !pageSelect || !pageTotalSpan) return; 
+            if (!paginationControls || !pageSelect || !pageTotalSpan) return;
 
             if (totalItems === 0) {
                 console.log("No repo items found, hiding pagination.");
-                paginationControls.style.display = 'none';
+                paginationControls.style.display = "none";
                 return;
             }
-            paginationControls.style.display = 'flex'; // Ensure controls are visible
+            paginationControls.style.display = "flex"; // Ensure controls are visible
 
             const startIndex = (currentPage - 1) * itemsPerPage;
             const endIndex = startIndex + itemsPerPage;
 
             // Hide all repo cards initially
-            allRepos.forEach(repo => (repo as HTMLElement).style.display = 'none');
-            
+            allRepos.forEach(
+                (repo) => ((repo as HTMLElement).style.display = "none"),
+            );
+
             // Show only the cards for the current page
             const reposToShow = allRepos.slice(startIndex, endIndex);
-            reposToShow.forEach(repo => (repo as HTMLElement).style.display = 'flex'); // Use flex based on .repo-card style
+            reposToShow.forEach(
+                (repo) => ((repo as HTMLElement).style.display = "flex"),
+            ); // Use flex based on .repo-card style
 
-            console.log(`Displaying repos ${startIndex + 1} to ${Math.min(endIndex, totalItems)}`);
+            console.log(
+                `Displaying repos ${startIndex + 1} to ${Math.min(endIndex, totalItems)}`,
+            );
 
-            // --- Update Controls State --- 
-            prevButton.setAttribute('aria-disabled', String(currentPage === 1));
-            prevButton.classList.toggle('disabled', currentPage === 1);
-            nextButton.setAttribute('aria-disabled', String(currentPage === totalPages));
-            nextButton.classList.toggle('disabled', currentPage === totalPages);
+            // --- Update Controls State ---
+            prevButton.setAttribute("aria-disabled", String(currentPage === 1));
+            prevButton.classList.toggle("disabled", currentPage === 1);
+            nextButton.setAttribute(
+                "aria-disabled",
+                String(currentPage === totalPages),
+            );
+            nextButton.classList.toggle("disabled", currentPage === totalPages);
 
             // Update page select dropdown
             // Check if update is needed (different total pages or selected value)
-            if (pageSelect.options.length !== totalPages || parseInt(pageSelect.value, 10) !== currentPage) {
-                 console.log("Rebuilding page select dropdown");
-                 pageSelect.innerHTML = ''; // Clear existing options
-                 for (let i = 1; i <= totalPages; i++) {
-                     const option = document.createElement('option');
-                     option.value = String(i);
-                     option.textContent = String(i);
-                     if (i === currentPage) {
-                         option.selected = true;
-                     }
-                     pageSelect.appendChild(option);
-                 }
-             } else {
-                 // Ensure the value is correct even if options weren't rebuilt
-                 pageSelect.value = String(currentPage);
-             }
-             pageSelect.disabled = totalPages <= 1;
+            if (
+                pageSelect.options.length !== totalPages ||
+                parseInt(pageSelect.value, 10) !== currentPage
+            ) {
+                console.log("Rebuilding page select dropdown");
+                pageSelect.innerHTML = ""; // Clear existing options
+                for (let i = 1; i <= totalPages; i++) {
+                    const option = document.createElement("option");
+                    option.value = String(i);
+                    option.textContent = String(i);
+                    if (i === currentPage) {
+                        option.selected = true;
+                    }
+                    pageSelect.appendChild(option);
+                }
+            } else {
+                // Ensure the value is correct even if options weren't rebuilt
+                pageSelect.value = String(currentPage);
+            }
+            pageSelect.disabled = totalPages <= 1;
 
             // Update "of X" text
             pageTotalSpan.innerHTML = `of&nbsp;&nbsp;&nbsp;${totalPages}`;
@@ -610,17 +661,17 @@ const totalStars = starredRepos.length;
             url.searchParams.set("page", currentPage.toString());
             // Only push state if the URL actually changes
             if (url.toString() !== window.location.href) {
-                history.pushState({ page: currentPage }, "", url.toString()); 
+                history.pushState({ page: currentPage }, "", url.toString());
                 console.log(`Pushed history state: ${url.toString()}`);
             }
         }
 
-        // --- Event Handlers --- 
+        // --- Event Handlers ---
         function handlePrevClick(event: MouseEvent) {
             event.preventDefault();
             if (currentPage > 1) {
                 currentPage--;
-                updateUrl(); 
+                updateUrl();
                 updatePageDisplay();
             }
         }
@@ -645,30 +696,44 @@ const totalStars = starredRepos.length;
             }
         }
 
-        // --- Attach Event Listeners --- 
+        // --- Attach Event Listeners ---
         // Remove potentially existing listeners first to be safe, although reload makes it less critical
-        prevButton.removeEventListener("click", handlePrevClick as EventListener);
+        prevButton.removeEventListener(
+            "click",
+            handlePrevClick as EventListener,
+        );
         prevButton.addEventListener("click", handlePrevClick as EventListener);
 
-        nextButton.removeEventListener("click", handleNextClick as EventListener);
+        nextButton.removeEventListener(
+            "click",
+            handleNextClick as EventListener,
+        );
         nextButton.addEventListener("click", handleNextClick as EventListener);
 
         pageSelect.removeEventListener("change", handlePageSelectChange);
         pageSelect.addEventListener("change", handlePageSelectChange);
 
-        // --- Initial Setup --- 
+        // --- Initial Setup ---
         updatePageDisplay(); // Render the correct page view first
-        
+
         // Set initial URL using replaceState to match the potentially clamped currentPage
         const initialUrl = new URL(window.location.href);
         initialUrl.searchParams.set("page", currentPage.toString());
-        if (initialUrl.toString() !== window.location.href) { // Only replace if the URL needs adjustment
-             history.replaceState({ page: currentPage }, "", initialUrl.toString());
-             console.log(`Initial URL set (replaceState): ${initialUrl.toString()}`);
+        if (initialUrl.toString() !== window.location.href) {
+            // Only replace if the URL needs adjustment
+            history.replaceState(
+                { page: currentPage },
+                "",
+                initialUrl.toString(),
+            );
+            console.log(
+                `Initial URL set (replaceState): ${initialUrl.toString()}`,
+            );
         } else {
-            console.log(`Initial URL (${initialUrl.toString()}) already correct.`);
+            console.log(
+                `Initial URL (${initialUrl.toString()}) already correct.`,
+            );
         }
-
     } // End initializePagination
 
     // --- Description Toggle Functionality ---
@@ -680,54 +745,73 @@ const totalStars = starredRepos.length;
         const chevronUpIcon = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chevron-up"><path d="m18 15-6-6-6 6"/></svg>`;
 
         // Find all repo cards to iterate through descriptions and metas together
-        const repoCards = document.querySelectorAll('.repo-card');
+        const repoCards = document.querySelectorAll(".repo-card");
 
-        repoCards.forEach(card => {
-            const descriptionElement = card.querySelector('.repo-description') as HTMLElement | null;
-            const metaElement = card.querySelector('.repo-meta') as HTMLElement | null;
-            const descriptionContainer = card.querySelector('.repo-description-container') as HTMLElement | null;
+        repoCards.forEach((card) => {
+            const descriptionElement = card.querySelector(
+                ".repo-description",
+            ) as HTMLElement | null;
+            const metaElement = card.querySelector(
+                ".repo-meta",
+            ) as HTMLElement | null;
+            const descriptionContainer = card.querySelector(
+                ".repo-description-container",
+            ) as HTMLElement | null;
 
             if (!descriptionElement || !metaElement || !descriptionContainer) {
-                console.warn("Missing elements in a repo card, skipping toggle setup.", card);
+                console.warn(
+                    "Missing elements in a repo card, skipping toggle setup.",
+                    card,
+                );
                 return;
             }
 
             // Check if the content is overflowing the clamped height
-            const isOverflowing = descriptionElement.scrollHeight > descriptionElement.clientHeight;
+            const isOverflowing =
+                descriptionElement.scrollHeight >
+                descriptionElement.clientHeight;
 
             // Clean up any existing button from the meta element first
-            const existingButton = metaElement.querySelector('.show-more-button');
+            const existingButton =
+                metaElement.querySelector(".show-more-button");
             if (existingButton) {
                 existingButton.remove();
             }
             // Reset potential padding added previously
-            metaElement.style.paddingTop = '';
+            metaElement.style.paddingTop = "";
 
             if (isOverflowing) {
-                 // Add padding to meta only if overflowing
-                 metaElement.style.paddingTop = '0.5rem';
+                // Add padding to meta only if overflowing
+                metaElement.style.paddingTop = "0.5rem";
 
                 // Create the button
-                const button = document.createElement('button');
-                button.type = 'button'; // Good practice for buttons not submitting forms
-                button.classList.add('show-more-button');
-                button.setAttribute('aria-expanded', 'false');
-                button.setAttribute('aria-controls', descriptionElement.id);
-                button.setAttribute('aria-label', 'Show full description'); // Accessibility
+                const button = document.createElement("button");
+                button.type = "button"; // Good practice for buttons not submitting forms
+                button.classList.add("show-more-button");
+                button.setAttribute("aria-expanded", "false");
+                button.setAttribute("aria-controls", descriptionElement.id);
+                button.setAttribute("aria-label", "Show full description"); // Accessibility
                 button.innerHTML = chevronDownIcon; // Initial state: chevron down
 
                 // Add event listener to toggle expansion
-                button.addEventListener('click', (event) => {
+                button.addEventListener("click", (event) => {
                     event.preventDefault();
                     event.stopPropagation();
-                    const isExpanded = descriptionElement.classList.toggle('expanded');
-                    button.setAttribute('aria-expanded', String(isExpanded));
+                    const isExpanded =
+                        descriptionElement.classList.toggle("expanded");
+                    button.setAttribute("aria-expanded", String(isExpanded));
                     if (isExpanded) {
                         button.innerHTML = chevronUpIcon; // Expanded state: chevron up
-                        button.setAttribute('aria-label', 'Show less description');
+                        button.setAttribute(
+                            "aria-label",
+                            "Show less description",
+                        );
                     } else {
                         button.innerHTML = chevronDownIcon; // Collapsed state: chevron down
-                        button.setAttribute('aria-label', 'Show full description');
+                        button.setAttribute(
+                            "aria-label",
+                            "Show full description",
+                        );
                     }
                 });
 
@@ -738,13 +822,18 @@ const totalStars = starredRepos.length;
         console.log("Description toggles initialized.");
     }
 
-    // --- Global Listeners --- 
+    // --- Global Listeners ---
 
     // Run initialization after Astro navigates to the page or on initial load
     document.addEventListener("astro:page-load", () => {
         // Ensure we are on the stars page before initializing
-        if (window.location.pathname === '/stars' || window.location.pathname === '/stars/') {
-            console.log("Astro:page-load event fired on /stars, initializing...");
+        if (
+            window.location.pathname === "/stars" ||
+            window.location.pathname === "/stars/"
+        ) {
+            console.log(
+                "Astro:page-load event fired on /stars, initializing...",
+            );
             initializePagination();
             initializeDescriptionToggles(); // <-- Call the new function here
         } else {
@@ -753,17 +842,20 @@ const totalStars = starredRepos.length;
     });
 
     // Handle back/forward navigation using popstate -> RELOAD strategy
-    if (!window._popstateHandledStars) { // Guard to add listener only once
+    if (!window._popstateHandledStars) {
+        // Guard to add listener only once
         window.addEventListener("popstate", (event: PopStateEvent) => {
             // Check if we are definitely on the stars page before reloading
-            if (window.location.pathname === '/stars' || window.location.pathname === '/stars/') {
+            if (
+                window.location.pathname === "/stars" ||
+                window.location.pathname === "/stars/"
+            ) {
                 console.log("Reloading /stars page due to popstate event.");
-                window.location.reload(); 
+                window.location.reload();
             } else {
                 console.log("Popstate event ignored (not on /stars page).");
             }
         });
         window._popstateHandledStars = true;
     }
-
 </script>

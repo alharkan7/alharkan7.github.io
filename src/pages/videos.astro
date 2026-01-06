@@ -1,7 +1,5 @@
 ---
 import BaseLayout from "../layouts/BaseLayout.astro";
-// import { readFile } from 'node:fs/promises'; // Remove Node.js fs
-// import path from 'node:path'; // Remove Node.js path
 import { createClient } from "@supabase/supabase-js";
 import fs from "fs";
 import path from "path";
@@ -210,7 +208,7 @@ if (supabase) {
     errorMessage = "Supabase client could not be initialized. Videos cannot be loaded.";
 }
 
-// Get the last modified date of the liked_videos.json file
+// Determine the last update date from the database
 
 
 // --- Initial State from URL (Client will refine) ---
@@ -380,7 +378,7 @@ if (!validLimits.includes(initialLimit)) {
         initialUniqueYears: uniqueYears, // Still useful for initial filter population
         initialUniqueChannels: uniqueChannels, // Still useful for initial filter population
         validLimits,
-        // jsonUrl: '/os-bookmarks/liked_videos.json' // Remove jsonUrl
+
         fetchErrorMessage: errorMessage // Pass any fetch error to the client
     }}
 >
