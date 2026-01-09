@@ -1,0 +1,951 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jakarta Job Market Analysis 2026</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            --bg: #fafafa;
+            --card: #ffffff;
+            --text: #1a1a1a;
+            --text-muted: #666666;
+            --border: #e5e5e5;
+            --accent: #4a6cf7;
+            --accent-light: #f0f4ff;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+            background-image: radial-gradient(circle, #e0e0e0 1px, transparent 1px);
+            background-size: 24px 24px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 40px 24px;
+        }
+
+        header {
+            text-align: center;
+            padding: 60px 0 40px;
+            border-bottom: 1px solid var(--border);
+            margin-bottom: 48px;
+        }
+
+        header h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+            margin-bottom: 8px;
+            color: #1a1a1a;
+        }
+
+        header p {
+            color: var(--text-muted);
+            font-size: 1.1rem;
+        }
+
+        .stats-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 16px;
+            margin-bottom: 48px;
+        }
+
+        .stat-card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            padding: 24px;
+            text-align: center;
+            transition: all 0.2s ease;
+        }
+
+        .stat-card:hover {
+            border-color: var(--accent);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(74, 108, 247, 0.1);
+        }
+
+        .stat-card .value {
+            font-size: 2rem;
+            font-weight: 700;
+            display: block;
+            margin-bottom: 4px;
+            color: #1a1a1a;
+        }
+
+        .stat-card .label {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: var(--text-muted);
+        }
+
+        section {
+            background: var(--card);
+            border: 1px solid var(--border);
+            padding: 32px;
+            margin-bottom: 24px;
+        }
+
+        section h2 {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 24px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid var(--border);
+            color: #1a1a1a;
+        }
+
+        .grid-2 {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 24px;
+        }
+
+        .grid-3 {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 24px;
+        }
+
+        @media (max-width: 768px) {
+
+            .grid-2,
+            .grid-3 {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .chart-container {
+            position: relative;
+            height: 300px;
+            width: 100%;
+        }
+
+        .chart-container.tall {
+            height: 400px;
+        }
+
+        .viz-image {
+            width: 100%;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+        }
+
+        .viz-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 24px;
+        }
+
+        .viz-card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            padding: 16px;
+            text-align: center;
+        }
+
+        .viz-card h4 {
+            margin-bottom: 12px;
+            color: #333333;
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+
+        .viz-image {
+            cursor: pointer;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .viz-image:hover {
+            transform: scale(1.02);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        /* Image Preview Modal */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.85);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .modal-overlay.active {
+            display: flex;
+        }
+
+        .modal-content {
+            position: relative;
+            max-width: 90vw;
+            max-height: 90vh;
+        }
+
+        .modal-content img {
+            max-width: 100%;
+            max-height: 85vh;
+            border-radius: 8px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+
+        .modal-title {
+            color: white;
+            text-align: center;
+            margin-top: 16px;
+            font-size: 1.1rem;
+            font-weight: 500;
+        }
+
+        .modal-close {
+            position: absolute;
+            top: -40px;
+            right: 0;
+            background: none;
+            border: none;
+            color: white;
+            font-size: 2rem;
+            cursor: pointer;
+            padding: 8px;
+            line-height: 1;
+        }
+
+        .modal-close:hover {
+            color: #f43f5e;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.9rem;
+        }
+
+        th,
+        td {
+            padding: 12px 16px;
+            text-align: left;
+            border-bottom: 1px solid var(--border);
+        }
+
+        th {
+            font-weight: 600;
+            background: var(--accent-light);
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--accent);
+        }
+
+        tr:hover {
+            background: var(--accent-light);
+        }
+
+        .tag {
+            display: inline-block;
+            padding: 6px 12px;
+            background: var(--accent-light);
+            border: 1px solid #d0d9ff;
+            font-size: 0.8rem;
+            margin: 4px;
+            border-radius: 4px;
+            color: #4a6cf7;
+        }
+
+        .tag.primary {
+            background: linear-gradient(135deg, #4a6cf7 0%, #6b5ce7 100%);
+            color: white;
+            border-color: transparent;
+        }
+
+        .tag.teal {
+            background: #e0f7f6;
+            color: #0d9488;
+            border-color: #99f0e8;
+        }
+
+        .tag.lavender {
+            background: #f3e8ff;
+            color: #7c3aed;
+            border-color: #ddd6fe;
+        }
+
+        .insight-list {
+            list-style: none;
+        }
+
+        .insight-list li {
+            padding: 12px 0;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+        }
+
+        .insight-list li:last-child {
+            border-bottom: none;
+        }
+
+        .insight-list .icon {
+            width: 28px;
+            height: 28px;
+            background: linear-gradient(135deg, #4a6cf7 0%, #6b5ce7 100%);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75rem;
+            font-weight: 600;
+            flex-shrink: 0;
+            border-radius: 50%;
+        }
+
+        footer {
+            text-align: center;
+            padding: 40px 0;
+            border-top: 1px solid var(--border);
+            margin-top: 48px;
+            color: var(--text-muted);
+            font-size: 0.85rem;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 0;
+            border-bottom: 1px solid var(--border);
+            margin-bottom: 24px;
+        }
+
+        .tab {
+            padding: 12px 24px;
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+            font-weight: 500;
+            transition: all 0.2s;
+            color: var(--text-muted);
+        }
+
+        .tab:hover {
+            background: var(--accent-light);
+            color: var(--accent);
+        }
+
+        .tab.active {
+            border-bottom-color: var(--accent);
+            color: var(--accent);
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <header>
+            <h1>Jakarta Job Market Analysis</h1>
+            <p>Analysis of 3,204 job postings from JobStreet Indonesia • January 2026</p>
+        </header>
+
+        <div class="stats-row">
+            <div class="stat-card">
+                <span class="value">3,204</span>
+                <span class="label">Total Jobs</span>
+            </div>
+            <div class="stat-card">
+                <span class="value">7.25M</span>
+                <span class="label">Median Salary (IDR)</span>
+            </div>
+            <div class="stat-card">
+                <span class="value">38%</span>
+                <span class="label">Salary Disclosed</span>
+            </div>
+            <div class="stat-card">
+                <span class="value">53</span>
+                <span class="label">Skills Identified</span>
+            </div>
+            <div class="stat-card">
+                <span class="value">5.6%</span>
+                <span class="label">Fresh Grad Friendly</span>
+            </div>
+        </div>
+
+        <!-- Interactive Charts -->
+        <div class="grid-2">
+            <section>
+                <h2>Top Job Categories</h2>
+                <div class="chart-container tall">
+                    <canvas id="categoriesChart"></canvas>
+                </div>
+            </section>
+
+            <section>
+                <h2>Skills Demand</h2>
+                <div class="chart-container tall">
+                    <canvas id="skillsChart"></canvas>
+                </div>
+            </section>
+        </div>
+
+        <div class="grid-2">
+            <section>
+                <h2>Salary Distribution</h2>
+                <div class="chart-container">
+                    <canvas id="salaryChart"></canvas>
+                </div>
+            </section>
+
+            <section>
+                <h2>Work Arrangement</h2>
+                <div class="chart-container">
+                    <canvas id="workTypeChart"></canvas>
+                </div>
+            </section>
+        </div>
+
+        <div class="grid-2">
+            <section>
+                <h2>Geographic Distribution</h2>
+                <div class="chart-container">
+                    <canvas id="regionChart"></canvas>
+                </div>
+            </section>
+
+            <section>
+                <h2>Experience Requirements</h2>
+                <div class="chart-container">
+                    <canvas id="experienceChart"></canvas>
+                </div>
+            </section>
+        </div>
+
+        <!-- Word Clouds -->
+        <section>
+            <h2>Word Clouds - Text Analysis</h2>
+            <div class="grid-3">
+                <div class="viz-card">
+                    <h4>Job Descriptions</h4>
+                    <img src="output/visualizations/15_wordcloud_descriptions.png" class="viz-image"
+                        alt="Job Descriptions Word Cloud">
+                </div>
+                <div class="viz-card">
+                    <h4>Qualifications</h4>
+                    <img src="output/visualizations/16_wordcloud_qualifications.png" class="viz-image"
+                        alt="Qualifications Word Cloud">
+                </div>
+                <div class="viz-card">
+                    <h4>Responsibilities</h4>
+                    <img src="output/visualizations/17_wordcloud_responsibilities.png" class="viz-image"
+                        alt="Responsibilities Word Cloud">
+                </div>
+            </div>
+        </section>
+
+        <!-- All Generated Visualizations -->
+        <section>
+            <h2>All Visualizations</h2>
+            <div class="tabs" id="viz-tabs">
+                <div class="tab active" onclick="showVizTab('overview-viz')">Overview</div>
+                <div class="tab" onclick="showVizTab('salary-viz')">Salary</div>
+                <div class="tab" onclick="showVizTab('skills-viz')">Skills & Requirements</div>
+            </div>
+
+            <div id="overview-viz" class="tab-content active">
+                <div class="viz-grid">
+                    <div class="viz-card">
+                        <h4>Top Job Categories</h4>
+                        <img src="output/visualizations/01_top_job_categories.png" class="viz-image"
+                            alt="Top Job Categories">
+                    </div>
+                    <div class="viz-card">
+                        <h4>Work Type Distribution</h4>
+                        <img src="output/visualizations/02_work_type_distribution.png" class="viz-image"
+                            alt="Work Type">
+                    </div>
+                    <div class="viz-card">
+                        <h4>Work Arrangement</h4>
+                        <img src="output/visualizations/03_work_arrangement.png" class="viz-image"
+                            alt="Work Arrangement">
+                    </div>
+                    <div class="viz-card">
+                        <h4>Jakarta Regions</h4>
+                        <img src="output/visualizations/04_jakarta_regions.png" class="viz-image" alt="Jakarta Regions">
+                    </div>
+                    <div class="viz-card">
+                        <h4>Top Employers</h4>
+                        <img src="output/visualizations/05_top_employers.png" class="viz-image" alt="Top Employers">
+                    </div>
+                    <div class="viz-card">
+                        <h4>Field Completeness</h4>
+                        <img src="output/visualizations/06_field_completeness.png" class="viz-image"
+                            alt="Field Completeness">
+                    </div>
+                </div>
+            </div>
+
+            <div id="salary-viz" class="tab-content">
+                <div class="viz-grid">
+                    <div class="viz-card">
+                        <h4>Salary Distribution</h4>
+                        <img src="output/visualizations/07_salary_distribution.png" class="viz-image"
+                            alt="Salary Distribution">
+                    </div>
+                    <div class="viz-card">
+                        <h4>Salary by Category</h4>
+                        <img src="output/visualizations/08_salary_by_category.png" class="viz-image"
+                            alt="Salary by Category">
+                    </div>
+                    <div class="viz-card">
+                        <h4>Salary by Work Type</h4>
+                        <img src="output/visualizations/09_salary_by_work_type.png" class="viz-image"
+                            alt="Salary by Work Type">
+                    </div>
+                    <div class="viz-card">
+                        <h4>Salary by Region</h4>
+                        <img src="output/visualizations/10_salary_by_region.png" class="viz-image"
+                            alt="Salary by Region">
+                    </div>
+                    <div class="viz-card">
+                        <h4>Salary Bands</h4>
+                        <img src="output/visualizations/11_salary_bands.png" class="viz-image" alt="Salary Bands">
+                    </div>
+                </div>
+            </div>
+
+            <div id="skills-viz" class="tab-content">
+                <div class="viz-grid">
+                    <div class="viz-card">
+                        <h4>Top Skills</h4>
+                        <img src="output/visualizations/12_top_skills.png" class="viz-image" alt="Top Skills">
+                    </div>
+                    <div class="viz-card">
+                        <h4>Education Requirements</h4>
+                        <img src="output/visualizations/13_education_requirements.png" class="viz-image"
+                            alt="Education Requirements">
+                    </div>
+                    <div class="viz-card">
+                        <h4>Experience Requirements</h4>
+                        <img src="output/visualizations/14_experience_requirements.png" class="viz-image"
+                            alt="Experience Requirements">
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Key Insights -->
+        <section>
+            <h2>Key Insights</h2>
+            <div class="grid-2">
+                <div>
+                    <ul class="insight-list">
+                        <li>
+                            <span class="icon">1</span>
+                            <div><strong>Experience Paradox:</strong> 32.5% of jobs require 1-3 years experience, but
+                                only 5.6% accept fresh graduates</div>
+                        </li>
+                        <li>
+                            <span class="icon">2</span>
+                            <div><strong>Technical Skills:</strong> Excel (38%) and ERP systems (42%) are non-negotiable
+                                requirements</div>
+                        </li>
+                        <li>
+                            <span class="icon">3</span>
+                            <div><strong>Remote Work:</strong> Only 1% offer fully remote positions; 95.6% require
+                                on-site presence</div>
+                        </li>
+                    </ul>
+                </div>
+                <div>
+                    <ul class="insight-list">
+                        <li>
+                            <span class="icon">4</span>
+                            <div><strong>Salary Gap:</strong> Management roles earn 70%+ premium over entry-level (IDR
+                                12.5M vs 7.25M median)</div>
+                        </li>
+                        <li>
+                            <span class="icon">5</span>
+                            <div><strong>Transparency:</strong> 62% of employers don't disclose salary information in
+                                job postings</div>
+                        </li>
+                        <li>
+                            <span class="icon">6</span>
+                            <div><strong>Education:</strong> 53% require Bachelor's degree (S1), only 6.6% accept high
+                                school graduates</div>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- Recommendations -->
+        <section>
+            <h2>Recommendations</h2>
+            <div class="grid-2">
+                <div>
+                    <h3 style="margin-bottom: 16px; font-weight: 600; color: #4a6cf7;">For Job Seekers</h3>
+                    <div class="tag primary">Master Excel</div>
+                    <div class="tag primary">Learn ERP Systems</div>
+                    <div class="tag primary">Build Communication Skills</div>
+                    <div class="tag primary">Get Internship Experience</div>
+                    <div class="tag teal">Target Sales/Finance Roles</div>
+                    <div class="tag teal">Consider South Jakarta</div>
+                </div>
+                <div>
+                    <h3 style="margin-bottom: 16px; font-weight: 600; color: #7c3aed;">For Employers</h3>
+                    <div class="tag lavender">Disclose Salary Ranges</div>
+                    <div class="tag lavender">Offer Remote Options</div>
+                    <div class="tag lavender">Create Graduate Programs</div>
+                    <div class="tag">Clarify Experience Needs</div>
+                    <div class="tag">Highlight Career Growth</div>
+                    <div class="tag">Invest in Training</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Data Tables -->
+        <section>
+            <h2>Data Tables</h2>
+            <div class="tabs">
+                <div class="tab active" onclick="showTab('skills-table')">Top Skills</div>
+                <div class="tab" onclick="showTab('categories-table')">Job Categories</div>
+                <div class="tab" onclick="showTab('salary-table')">Salary Data</div>
+            </div>
+
+            <div id="skills-table" class="tab-content active">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Skill</th>
+                            <th>Count</th>
+                            <th>Percentage</th>
+                        </tr>
+                    </thead>
+                    <tbody id="skillsTableBody"></tbody>
+                </table>
+            </div>
+
+            <div id="categories-table" class="tab-content">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Category</th>
+                            <th>Jobs</th>
+                            <th>Share</th>
+                        </tr>
+                    </thead>
+                    <tbody id="categoriesTableBody"></tbody>
+                </table>
+            </div>
+
+            <div id="salary-table" class="tab-content">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Category</th>
+                            <th>Median (IDR)</th>
+                            <th>Mean (IDR)</th>
+                        </tr>
+                    </thead>
+                    <tbody id="salaryTableBody"></tbody>
+                </table>
+            </div>
+        </section>
+
+        <footer>
+            <p><strong>Jakarta Job Market Analysis</strong></p>
+            <p>Data: JobStreet Indonesia • Analysis: January 2026 • Python + pandas + scikit-learn</p>
+        </footer>
+    </div>
+
+    <!-- Image Preview Modal -->
+    <div class="modal-overlay" id="imageModal" onclick="closeModal(event)">
+        <div class="modal-content">
+            <button class="modal-close" onclick="closeModal(event)">&times;</button>
+            <img id="modalImage" src="" alt="">
+            <p class="modal-title" id="modalTitle"></p>
+        </div>
+    </div>
+
+    <script>
+        Chart.defaults.font.family = "'Inter', sans-serif";
+        Chart.defaults.color = '#666';
+
+        // Soft, harmonious color palette
+        const softColors = {
+            blue: '#6366f1',
+            indigo: '#8b5cf6',
+            purple: '#a855f7',
+            teal: '#14b8a6',
+            cyan: '#06b6d4',
+            sky: '#0ea5e9',
+            emerald: '#10b981',
+            green: '#22c55e',
+            amber: '#f59e0b',
+            rose: '#f43f5e',
+            pink: '#ec4899',
+            slate: '#64748b'
+        };
+
+        const barGradient = ['#6366f1', '#8b5cf6', '#a855f7', '#d946ef', '#ec4899', '#f43f5e', '#f97316', '#eab308', '#22c55e', '#14b8a6'];
+        const pieColors = ['#6366f1', '#8b5cf6', '#14b8a6', '#06b6d4', '#f59e0b', '#f43f5e'];
+
+        // Categories Chart
+        new Chart(document.getElementById('categoriesChart'), {
+            type: 'bar',
+            data: {
+                labels: ['Sales', 'Finance', 'Account Mgmt', 'Admin', 'Marketing', 'HR', 'IT', 'Logistics', 'Customer Svc', 'Engineering'],
+                datasets: [{
+                    data: [205, 190, 133, 113, 110, 95, 87, 76, 71, 65],
+                    backgroundColor: barGradient,
+                    borderWidth: 0,
+                    borderRadius: 4
+                }]
+            },
+            options: {
+                indexAxis: 'y',
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { display: false } },
+                scales: {
+                    x: { grid: { color: '#f0f0f0' }, border: { display: false } },
+                    y: { grid: { display: false }, border: { display: false } }
+                }
+            }
+        });
+
+        // Skills Chart
+        new Chart(document.getElementById('skillsChart'), {
+            type: 'bar',
+            data: {
+                labels: ['ERP', 'Excel', 'Communication', 'Sales', 'Data', 'English', 'Marketing', 'Analytical', 'Design', 'Leadership'],
+                datasets: [{
+                    data: [42.1, 38.2, 37.7, 31.2, 25.7, 25.3, 23.0, 13.5, 13.3, 12.0],
+                    backgroundColor: barGradient,
+                    borderWidth: 0,
+                    borderRadius: 4
+                }]
+            },
+            options: {
+                indexAxis: 'y',
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { display: false } },
+                scales: {
+                    x: { grid: { color: '#f0f0f0' }, border: { display: false }, ticks: { callback: v => v + '%' } },
+                    y: { grid: { display: false }, border: { display: false } }
+                }
+            }
+        });
+
+        // Salary Chart
+        new Chart(document.getElementById('salaryChart'), {
+            type: 'doughnut',
+            data: {
+                labels: ['< 4M', '4-6M', '6-8M', '8-10M', '10-15M', '> 15M'],
+                datasets: [{
+                    data: [43, 327, 341, 200, 172, 133],
+                    backgroundColor: pieColors,
+                    borderWidth: 3,
+                    borderColor: '#fff'
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { position: 'right' } }
+            }
+        });
+
+        // Work Type Chart
+        new Chart(document.getElementById('workTypeChart'), {
+            type: 'doughnut',
+            data: {
+                labels: ['On-site', 'Hybrid', 'Remote'],
+                datasets: [{
+                    data: [95.6, 3.4, 1.0],
+                    backgroundColor: ['#6366f1', '#14b8a6', '#f59e0b'],
+                    borderWidth: 3,
+                    borderColor: '#fff'
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { position: 'right' } }
+            }
+        });
+
+        // Region Chart
+        new Chart(document.getElementById('regionChart'), {
+            type: 'bar',
+            data: {
+                labels: ['General', 'South', 'North', 'West', 'Central', 'East'],
+                datasets: [{
+                    data: [33.3, 21.2, 15.6, 14.4, 11.8, 3.7],
+                    backgroundColor: ['#6366f1', '#8b5cf6', '#a855f7', '#14b8a6', '#06b6d4', '#f59e0b'],
+                    borderWidth: 0,
+                    borderRadius: 4
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { display: false } },
+                scales: {
+                    y: { grid: { color: '#f0f0f0' }, border: { display: false }, ticks: { callback: v => v + '%' } },
+                    x: { grid: { display: false }, border: { display: false } }
+                }
+            }
+        });
+
+        // Experience Chart
+        new Chart(document.getElementById('experienceChart'), {
+            type: 'bar',
+            data: {
+                labels: ['1-3 Years', '3-5 Years', '0-1 Years', '5+ Years', 'Fresh Grad'],
+                datasets: [{
+                    data: [32.5, 15.3, 9.1, 7.1, 5.6],
+                    backgroundColor: ['#6366f1', '#8b5cf6', '#14b8a6', '#06b6d4', '#f59e0b'],
+                    borderWidth: 0,
+                    borderRadius: 4
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { display: false } },
+                scales: {
+                    y: { grid: { color: '#f0f0f0' }, border: { display: false }, ticks: { callback: v => v + '%' } },
+                    x: { grid: { display: false }, border: { display: false } }
+                }
+            }
+        });
+
+        // Tab functions
+        function showTab(tabId) {
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            document.getElementById(tabId).classList.add('active');
+            event.target.classList.add('active');
+        }
+
+        function showVizTab(tabId) {
+            ['overview-viz', 'salary-viz', 'skills-viz'].forEach(id => {
+                document.getElementById(id).classList.remove('active');
+            });
+            // Only target tabs within the viz-tabs container
+            document.querySelectorAll('#viz-tabs .tab').forEach(t => t.classList.remove('active'));
+            document.getElementById(tabId).classList.add('active');
+            event.target.classList.add('active');
+        }
+
+        // Table data
+        const skillsData = [
+            { skill: 'ERP Systems', count: 1348, pct: '42.1%' },
+            { skill: 'Excel', count: 1223, pct: '38.2%' },
+            { skill: 'Communication', count: 1207, pct: '37.7%' },
+            { skill: 'Sales', count: 1000, pct: '31.2%' },
+            { skill: 'Data Analysis', count: 824, pct: '25.7%' },
+            { skill: 'English', count: 811, pct: '25.3%' },
+            { skill: 'Marketing', count: 736, pct: '23.0%' },
+            { skill: 'Analytical', count: 431, pct: '13.5%' },
+            { skill: 'Design', count: 427, pct: '13.3%' },
+            { skill: 'Leadership', count: 384, pct: '12.0%' }
+        ];
+
+        const categoriesData = [
+            { cat: 'Sales Representatives', jobs: 205, pct: '6.4%' },
+            { cat: 'Financial Accounting', jobs: 190, pct: '5.9%' },
+            { cat: 'Account Management', jobs: 133, pct: '4.2%' },
+            { cat: 'Administrative Assistants', jobs: 113, pct: '3.5%' },
+            { cat: 'Marketing Communications', jobs: 110, pct: '3.4%' },
+            { cat: 'HR Operations', jobs: 95, pct: '3.0%' },
+            { cat: 'IT Support', jobs: 87, pct: '2.7%' },
+            { cat: 'Logistics', jobs: 76, pct: '2.4%' },
+            { cat: 'Customer Service', jobs: 71, pct: '2.2%' },
+            { cat: 'Engineering', jobs: 65, pct: '2.0%' }
+        ];
+
+        const salaryData = [
+            { cat: 'Management', median: '12,500,000', mean: '14,200,000' },
+            { cat: 'PA/Secretarial', median: '9,750,000', mean: '10,100,000' },
+            { cat: 'Business Dev', median: '9,500,000', mean: '11,300,000' },
+            { cat: 'Brand Management', median: '9,250,000', mean: '10,800,000' },
+            { cat: 'Admin Assistants', median: '8,500,000', mean: '9,100,000' },
+            { cat: 'Financial Accounting', median: '7,500,000', mean: '8,900,000' },
+            { cat: 'Sales', median: '7,000,000', mean: '8,200,000' },
+            { cat: 'Marketing', median: '6,750,000', mean: '7,800,000' },
+            { cat: 'Customer Service', median: '5,500,000', mean: '6,100,000' },
+            { cat: 'Admin General', median: '5,000,000', mean: '5,600,000' }
+        ];
+
+        document.getElementById('skillsTableBody').innerHTML = skillsData.map(s =>
+            `<tr><td>${s.skill}</td><td>${s.count}</td><td>${s.pct}</td></tr>`).join('');
+        document.getElementById('categoriesTableBody').innerHTML = categoriesData.map(c =>
+            `<tr><td>${c.cat}</td><td>${c.jobs}</td><td>${c.pct}</td></tr>`).join('');
+        document.getElementById('salaryTableBody').innerHTML = salaryData.map(s =>
+            `<tr><td>${s.cat}</td><td>${s.median}</td><td>${s.mean}</td></tr>`).join('');
+
+        // Image Modal Functions
+        function openModal(imgSrc, imgTitle) {
+            const modal = document.getElementById('imageModal');
+            const modalImg = document.getElementById('modalImage');
+            const modalTitle = document.getElementById('modalTitle');
+
+            modalImg.src = imgSrc;
+            modalTitle.textContent = imgTitle;
+            modal.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeModal(event) {
+            if (event.target === document.getElementById('imageModal') ||
+                event.target.classList.contains('modal-close')) {
+                document.getElementById('imageModal').classList.remove('active');
+                document.body.style.overflow = 'auto';
+            }
+        }
+
+        // Add click handlers to all visualization images
+        document.querySelectorAll('.viz-image').forEach(img => {
+            img.addEventListener('click', function () {
+                const title = this.alt || this.closest('.viz-card')?.querySelector('h4')?.textContent || 'Visualization';
+                openModal(this.src, title);
+            });
+        });
+
+        // Close modal on Escape key
+        document.addEventListener('keydown', function (e) {
+            if (e.key === 'Escape') {
+                document.getElementById('imageModal').classList.remove('active');
+                document.body.style.overflow = 'auto';
+            }
+        });
+    </script>
+</body>
+
+</html>
