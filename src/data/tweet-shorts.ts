@@ -2,6 +2,8 @@ type TweetEmbed = string;
 
 export const tweetEmbeds: TweetEmbed[] = [
 
+    `<blockquote class="twitter-tweet"><p lang="en" dir="ltr">Ever-growing threads on notable AI developments for research, education, and software engineering —fields that I&#39;ve been paying close attention to in the past 5 years:</p>&mdash; Al Harkan (@alhrkn) <a href="https://twitter.com/alhrkn/status/1908342469529604533?ref_src=twsrc%5Etfw">April 5, 2025</a></blockquote>`
+,
     `<blockquote class="twitter-tweet"><p lang="en" dir="ltr">&quot;Everything will break.<br><br>Entropy, the steady decline into disorder, that&#39;s a fundamental part of the universe.<br><br>Entropy will get us all in the end.<br><br>But that doesn&#39;t mean you shouldn&#39;t build things anyway.&quot;</p>&mdash; Al (@alhrkn) <a href="https://twitter.com/alhrkn/status/1584363585605496832?ref_src=twsrc%5Etfw">October 24, 2022</a></blockquote>`
 ,
     `<blockquote class="twitter-tweet"><p lang="en" dir="ltr">The dominant form of internet content is shifting: from picture and text, to video —enabled by the proliferation of high-speed internet.<br><br>Some might worry that it would make the future generations become less interested in reading, given how easy it is to just listen &amp; watch.</p>&mdash; Al (@alhrkn) <a href="https://twitter.com/alhrkn/status/1438888187036794881?ref_src=twsrc%5Etfw">September 17, 2021</a></blockquote>`
