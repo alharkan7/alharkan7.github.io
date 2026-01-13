@@ -12,10 +12,20 @@ const allPostsGlob = import.meta.glob(
   "../../data/blog-posts/uncategorized/*.{md,mdx}",
   { eager: true },
 );
-const allPosts = Object.values(allPostsGlob) as any;
+
+interface Post {
+  frontmatter: {
+    title: string;
+    description: string;
+    publishDate: string;
+  };
+  file: string;
+}
+
+const allPosts = Object.values(allPostsGlob) as Post[];
 
 const sortedPosts = allPosts.sort(
-  (a, b) =>
+  (a: Post, b: Post) =>
     new Date(b.frontmatter.publishDate).valueOf() -
     new Date(a.frontmatter.publishDate).valueOf(),
 );
@@ -36,8 +46,8 @@ const paginatedPosts = sortedPosts.slice(0, postsPerPage);
     <h1>Uncategorized</h1>
     <hr />
     {
-      paginatedPosts.map((post, index) => {
-        const href = `/${post.file.split("/uncategorized/").pop().split(".").shift()}`;
+      paginatedPosts.map((post: Post, index: number) => {
+        const href = `/${post.file.split("/uncategorized/").pop()?.split(".").shift() ?? ''}`;
         return (
           <div>
             {index !== 0 && <hr />}
@@ -106,7 +116,7 @@ const paginatedPosts = sortedPosts.slice(0, postsPerPage);
       color: var(--text-secondary);
       transition: all 0.2s ease;
       font-family: var(--font-family-sans);
-      font-size: 1.8em;
+      font-size: 1.2em;
       font-weight: 700;
       text-decoration: none;
       box-shadow: inset 0 -0.12em 0 var(--primary-color);
