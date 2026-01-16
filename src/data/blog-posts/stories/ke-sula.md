@@ -14,11 +14,11 @@ Awal Oktober lalu saya mendapat kesempatan langka untuk mengunjungi kabupaten Ke
 
 Saya berangkat dari Jakarta bersama kak Ayu Apriyanti, Manajer Divisi PM & Talent IM, menggunakan pesawat pukul 1.10 dari bandara Soetta. Karena _shuttle bus_ yang akan saya tumpangi dari Blok M tidak beroperasi sampai tengah malam, saya menumpang bus sekitar jam 7 malam, dan tiba di terminal 3 terlalu cepat. _Literally_ 4 jam terlalu cepat, saya menghabiskan waktu menulis satu [_review_ ini](/origin/) (maaf, _hehe_). Sampai sekitar jam 12 kak Ayap tiba, kami _check-in_ dan menuju _gate_ 22 yang malangnya berada di ujung jauh terminal, 30 menit berjalan. \*_Tapi karena kali terakhir saya terbang dari terminal 3 adalah tahun lalu sebelum pembangunan besar-besaran selesai, saya jadi bisa menikmati megahnya terminal baru, lengang di tengah malam._
 
-[![](/assets/blog/Foto-1.jpg)](/assets/blog/Foto-1.jpg)
+[![](https://ik.imagekit.io/raihankalla/assets/blog/Foto-1.jpg)](https://ik.imagekit.io/raihankalla/assets/blog/Foto-1.jpg)
 
 Mengenai lokasi Kepulauan Sula, apabila kita menyapu pandang peta Indonesia dari ujung ke ujung, pulau ini mungkin mudah terlewatkan. Mungil jika dibandingkan Sulawesi dan Maluku di sisi barat dan timur lautnya, Kepulauan Sula terdiri dari dua pulau utama yang menyerupai pistol menghadap ke kiri. Melakukan _zooming in_ (atau _magnifying_) ke kepulauan mungil tersebut dan berada langsung di sana, seperti menelisik sebuah cawan petri berisi sampel biologi melalui mikroskop lalu mengecilkan diri hingga bisa hadir di tengah-tengah jaringan selnya (bahasa Inggris: _culture_), dan berada di Sula adalah hadir mengamati budayanya (_pun intended_).
 
-[![](/assets/blog/Foto-2.jpg)](/assets/blog/Foto-2.jpg)
+[![](https://ik.imagekit.io/raihankalla/assets/blog/Foto-2.jpg)](https://ik.imagekit.io/raihankalla/assets/blog/Foto-2.jpg)
 
 Kepulauan Sula terdiri dari dua pulau utama: pulau Sulabesi yang melintang dan pulau Mangoli yang membujur, dengan ibukota Sanana terletak di pulau Sulabesi. Dari total 6 hari berada di sana, kami menghabiskan 3 hari berkeliling Sulabesi dengan mobil dan motor, dan 3 hari 2 malam lainnya berkeliling Mangoli menggunakan _speed boat_.
 
@@ -33,7 +33,7 @@ Hari 0 – Mendarat di Negeri para Raja
 
 Setelah lebih kurang 3 jam perjalanan, ini adalah pemandangan pertama yang menyambut kami, beberapa menit sebelum mendarat.
 
-[![](/assets/blog/Foto-7.jpg)](/assets/blog/Foto-7.jpg)
+[![](https://ik.imagekit.io/raihankalla/assets/blog/Foto-7.jpg)](https://ik.imagekit.io/raihankalla/assets/blog/Foto-7.jpg)
 
 **Ternate**. Kata Kak Ida ([@nursidayaru](/ke-sula/instagram.com/nursidayaru)) yang asli Ternate, kota ini punya julukan Negeri para Raja. Sementara kata seorang _blogger_ lain, Ternate dari atas seperti bisul-bisul indah di kulit bumi. _Well,_ karena bisulnya memang seindah dan sekaya ini, saya sama sekali tak keberatan ia dijuluki Negeri para Raja. \*Pelajari Kesultanan [Ternate](/ke-sula/id.wikipedia.org/wiki/Kesultanan_Ternate) dan [Tidore](/ke-sula/id.wikipedia.org/wiki/Kesultanan_Tidore).
 
@@ -49,21 +49,21 @@ Setelah bertemu Bupati, kami kembali ke rumah kak Eka untuk bersiap-siap. Ia dan
 
 \*
 
-[![](/assets/blog/Foto-6.jpg)](/assets/blog/Foto-6.jpg)
+[![](https://ik.imagekit.io/raihankalla/assets/blog/Foto-6.jpg)](https://ik.imagekit.io/raihankalla/assets/blog/Foto-6.jpg)
 
 Sebenarnya ada 2 alternatif untuk menuju Sula dari Ternate. Menggunakan kapal yang lama perjalanannya 14 jam ini, atau menggunakan pesawat Susi Air yang bisa tiba dalam 2 jam, dan lebih murah. Menggunakan kapal, per penumpang dikenakan biaya sebesar 300.000 rupiah, menerima satu porsi makan dan sehelai kasur. Sedangkan untuk yang ingin menyewa kamar, dikenai biaya 600.000 rupiah untuk kamar dengan dua kasur bertingkat. Tapi kapal berangkat 2 – 3 kali per minggu, sedangkan pesawat harus _booking_ dua minggu sebelumnya, itu jika beruntung. Maka pada pukul 5 WIT kapal kami pun bertolak ke Sula.
 
-[![](/assets/blog/Foto-5.jpg)](/assets/blog/Foto-5.jpg)
+[![](https://ik.imagekit.io/raihankalla/assets/blog/Foto-5.jpg)](https://ik.imagekit.io/raihankalla/assets/blog/Foto-5.jpg)
 
 Berbeda dengan di Jawa, menjelang pukul 6 WIT di Ternate ternyata relatif masih terang. Jadi saya sempat menangkap beberapa pemandangan bagus dan saya abadikan di kamera ponsel saya. Termasuk panorama ikonik di muka belakang lembar seribu rupiah berikut:
 
-[![](/assets/blog/Foto-8.jpg)](/assets/blog/Foto-8.jpg)
+[![](https://ik.imagekit.io/raihankalla/assets/blog/Foto-8.jpg)](https://ik.imagekit.io/raihankalla/assets/blog/Foto-8.jpg)
 
 Agaknya tak berlebihan (buat saya) jika saya bilang saya tak bisa berkata-kata melihat indahnya perairan Ternate. Dalam satu _frame:_ gunung, laut, langit, pantai, awan, perahu, ditambah pelangi. Bahkan saya tak bohong seharusnya di _frame_ ini juga ada pasangan lumba-lumba berlompatan, hanya saja kamera dan tangan saya tak cukup cepat menangkap. \*Sedih.
 
 **_Please_ salahkan saya jika saya gagal menceritakan betapa menariknya tempat ini. Jika saya gagal, itu hanya karena saya yang kurang pandai berkisah, pun mungkin kurang pandai mengambil gambar dengan kamera ponsel yang  “wah”.**
 
-[![](/assets/blog/Foto-9.jpg)](/assets/blog/Foto-9.jpg)
+[![](https://ik.imagekit.io/raihankalla/assets/blog/Foto-9.jpg)](https://ik.imagekit.io/raihankalla/assets/blog/Foto-9.jpg)
 
 > _Gambar di atas adalah foto terakhir yang saya ambil dari Ternate di hari pertama sebelum langit jadi gelap._
 > 
@@ -81,6 +81,6 @@ Agaknya tak berlebihan (buat saya) jika saya bilang saya tak bisa berkata-kata m
 > 
 > _Esok paginya saya bangun terkesiap, menyadari perjalanan berangkat kami sudah lengkap. Kami tiba di Kepulauan Sula dengan siap._
 
-[![](/assets/blog/Foto.jpg)](/assets/blog/Foto.jpg)
+[![](https://ik.imagekit.io/raihankalla/assets/blog/Foto.jpg)](https://ik.imagekit.io/raihankalla/assets/blog/Foto.jpg)
 
 \[Bersambung ke Bagian 2\]

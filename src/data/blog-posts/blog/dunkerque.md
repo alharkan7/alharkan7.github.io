@@ -19,7 +19,7 @@ Then I came to watch the movie. And this is more of my experience than a review.
 
 \*
 
-![Source: Dunkirk (2017)](/assets/blog/dunkerque-pict-1.webp)
+![Source: Dunkirk (2017)](https://ik.imagekit.io/raihankalla/assets/blog/dunkerque-pict-1.webp)
 
 Throughout its 106 minutes length, these are basically my stage of feelings when I watched the movie.
 
@@ -40,7 +40,7 @@ I’ve been collecting all of Christopher Nolan’s movie scripts, all 10 of his
 
 There’s an unwritten law in script writing technique stating that one page of the script equals to one minute of the film. Yes, it doesn’t apply to every case, but that basic rule makes movie scenes detailed enough to follow and enjoy, not too long to make us bored, nor too short to make audience confused. \*_You can learn more about this_ [_here_](https://johnaugust.com/2006/how-accurate-is-the-page-per-minute-rule). So, in Dunkirk’s case it makes me questioned that 82 pages script turned into 106 minutes film, there must be a catch.
 
-![](/assets/blog/dunkerque-pict-2.webp)
+![](https://ik.imagekit.io/raihankalla/assets/blog/dunkerque-pict-2.webp)
 
 And the answer was the director’s choice to make that movie lesser in dialogues, indeed. He chose to create a film to have little dialogues, and instead of trying to engage audience with spoken narratives, it tried to engage audiences with visual spectacles. That, is what made some audience confused throughout the movie. They used to look at screen and follow the actors talk, telling what they came from, how did they end up there, how’s their family, etc. But in Dunkirk, we were brought the actions seconds after the movie started, and that’s relatively what happened until the movie ended. We weren’t given a chance to learn the characters’ family and their motives, and how they ended up in situations like that. All we watched in Dunkirk was what happened in the history of Evacuation of Dunkirk.
 
@@ -66,7 +66,7 @@ I’m not going to be an all-knowing explainer here, but this specific narrative
 
 They who patiently watched the movie to the end would understand that the story was a block set of inter-related narratives. It can be seen as a whole, one unit of an artistic movie, or as three separated arts:
 
-![Source: dunkirkmovie.com](/assets/blog/dunkerque-pict-3.webp)
+![Source: dunkirkmovie.com](https://ik.imagekit.io/raihankalla/assets/blog/dunkerque-pict-3.webp)
 
 The History: “We Shall Never Surrender”
 ---------------------------------------

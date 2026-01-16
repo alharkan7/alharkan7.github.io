@@ -41,7 +41,9 @@
   "devDependencies": {
     "@astrojs/ts-plugin": "^1.10.6",
     "@types/node": "^25.0.3",
+    "dotenv": "^17.2.3",
     "glob": "^10.3.10",
+    "imagekit": "^6.0.0",
     "typescript": "^5.9.3"
   },
   "pnpm": {

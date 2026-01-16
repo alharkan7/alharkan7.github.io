@@ -32,7 +32,7 @@ Saya pikir, sangat disayangkan bahwa momen seperti itu di publik tak banyak menj
 
 > Jika pengorbanan mereka yang seperti itu tak mampu menggerakkan hati seseorang untuk ikut ambil bagian, sekecil apapun dengan sama baiknya niatan, saya tak tahu lagi apa yang sanggup membangkitkan.
 
-[![](/assets/blog/DSC_0042.jpg)](/assets/blog/DSC_0042.jpg)
+[![](https://ik.imagekit.io/raihankalla/assets/blog/DSC_0042.jpg)](https://ik.imagekit.io/raihankalla/assets/blog/DSC_0042.jpg)
 
 Mereka alasan saya membuat satu lagi janji, bahwa saya akan mengabadikan momen itu. Agar cerita mereka dapat diteruskan dan disimak orang lain. Maka untuk kalian yang membaca sampai ke baris ini, terima kasih telah membantu saya melunasi janji.
 

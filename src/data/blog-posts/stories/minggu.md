@@ -10,7 +10,7 @@ Minggu pagi-pagi (27/08) saya sudah berangkat menuju Bogor sambil menenteng _lon
 
 Hari sebelumnya, saya datang ke wisuda senior saya dari FEB UI. Acara berlalu seperti biasanya kita merayakan wisuda teman baik: menunggu wisudawan keluar, berdesak-desakan mencari satu sama lain, seserahan buket bunga atau kado, foto-foto di sudut ikonik kampus, lalu ditutup dengan makan bareng kemudian pulang.
 
-[![](/assets/blog/IMG-20170825-WA0036.jpg)](/assets/blog/IMG-20170825-WA0036.jpg)
+[![](https://ik.imagekit.io/raihankalla/assets/blog/IMG-20170825-WA0036.jpg)](https://ik.imagekit.io/raihankalla/assets/blog/IMG-20170825-WA0036.jpg)
 
 Yang saya tidak tahu adalah, ternyata di wisuda yang sama hadir teman saya sewaktu masih di Malang. Sama sekali tak pernah dekat, bahkan selama 4 tahun terakhir tak sekalipun berkabar, tapi sempat tergabung di satu forum diskusi yang sama. Agak kaget waktu malam harinya saya lihat di WhatsApp Story, kami sama-sama mengunggah foto dengan lokasi yang sama di lapangan Rotunda dengan latar belakang rektorat UI.  Ternyata dia datang untuk wisuda temannya yang juga dari FEB UI, tapi berbeda jurusan.
 
@@ -64,7 +64,7 @@ Tapi sekali lagi, saya pikir hal semacam itu sama sekali bukan keberuntungan. Se
 
 Minggu pagi itu kami menghabiskan waktu hampir 4 jam mengobrol sambil berkeliling Kebun Raya. Meng-_update_ kabar-kabar yang terlewat selama bertahun-tahun, kabar teman-teman kami yang lain, yang sedang di UGM, yang sedang di UB, dan yang juga sedang di Jakarta. Tapi yang juga menarik menurut saya adalah ‘curhatan’ tentang suka-dukanya bekerja di Kemendes. Yang membuat saya tahu bagaimana dinamika di satu sudut institusi pemerintahan pusat, cerita dari tangan orang pertama.
 
-[![](/assets/blog/DSC_0146.jpg)](/assets/blog/DSC_0146.jpg)
+[![](https://ik.imagekit.io/raihankalla/assets/blog/DSC_0146.jpg)](https://ik.imagekit.io/raihankalla/assets/blog/DSC_0146.jpg)
 
 Saya tak akan bercerita mendetail, tapi secara umum pekerjaannya sebagai Staf Ahli melibatkan proses penyusunan dan implementasi program-program di Kementerian, spesifik di Dikjen di mana dia tergabung. Hal ini termasuk bagaimana, dari ceritanya, timnya mengadopsi konsep-konsep pembangunan dari luar negeri, dari banyak karya-karya penelitian, untuk dirancang dan diterapkan di Indonesia; bagaimana menyusun dan merumuskan anggaran-anggaran program tersebut untuk diajukan ke pejabat terkait; bagaimana berkoordinasi dengan kementerian dan institusi pemerintahan lain dalam proses perumusan dan pengelolaan program; bagaimana proses lelang pengadaan dan pelaksanaan program jika sedang tidak dikelola dari internal sendiri; juga bagaimana dia banyak ditugaskan untuk melakukan perjalanan dinas ke banyak desa indah (?) di Indonesia untuk mengumpulkan data atau laporan terkait program yang sedang dikelola.
 

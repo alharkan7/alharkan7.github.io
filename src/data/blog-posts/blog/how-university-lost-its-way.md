@@ -29,7 +29,7 @@ The roots of higher education are intertwined with the very dawn of human civili
 In ancient Mesopotamia, the development of the complex cuneiform writing system necessitated formal training. Only a select few were chosen to become scribes, typically the sons of royalty and professionals like physicians and temple administrators.<sup>[2]</sup> These scribal schools, known as ***edubas***, were centers where literacy was disseminated among the elite from as early as 2000 BCE.<sup>[2]</sup> The curriculum was rigorous, involving the mastery of vocabularies, grammars, and the extinct Sumerian language. 
 
 <figure>
-  <img src="/assets/how-university-lost-its-way/image-copy-0.png" alt="Assyrian scribes" />
+  <img src="https://ik.imagekit.io/raihankalla/assets/how-university-lost-its-way/image-copy-0.png" alt="Assyrian scribes" />
   <figcaption>Assyrian scribes (source: <a href="https://en.wikipedia.org/wiki/Eduba">Wikipedia</a>)</figcaption>
 </figure>
 
@@ -42,21 +42,21 @@ Long before the first European universities took shape, vibrant centers of highe
 In Asia, the Indian subcontinent was home to great Buddhist monastic universities, or ***mahaviharas***. Among the most famous were Nalanda and Taxila. Nalanda, a renowned center for Buddhist scholarship, attracted thousands of students and scholars from across Asia, including China, Persia, and the Middle East.<sup>[3]</sup> Taxila, which may date back to the 6th century BCE, offered a remarkably diverse curriculum. Students entering at age sixteen could study the sacred Vedas alongside the "Eighteen Arts," which included practical skills like archery, hunting, medicine, and military science.<sup>[3]</sup> This early blend of religious, liberal, and vocational training shows that the debate over the purpose of education is ancient indeed.
 
 <figure>
-  <img src="/assets/how-university-lost-its-way/image-copy-1.png" alt="The ruins of Nalanda Mahavihara" />
+  <img src="https://ik.imagekit.io/raihankalla/assets/how-university-lost-its-way/image-copy-1.webp" alt="The ruins of Nalanda Mahavihara" />
   <figcaption>The ruins of Nalanda Mahavihara (source: <a href="https://en.wikipedia.org/wiki/Mahavihara">Wikipedia</a>)</figcaption>
 </figure>
 
 In the Middle East, Al-Azhar was established in Cairo in 970 CE by the Fatimid Caliphate.<sup>[5]</sup> Initially a *madrasa*, or Islamic school, it taught the Qur'an, Islamic law, theology, Arabic grammar, and logic.<sup>[5]</sup> For much of its early history, its structure was informal, with no entrance requirements, formal curriculum, or degrees, emphasizing a model of scholarly mentorship over credentialing.<sup>[5]</sup>
 
 <figure>
-  <img src="/assets/how-university-lost-its-way/image-copy-2.png" alt="al-Azhar University circa 1250" />
+  <img src="https://ik.imagekit.io/raihankalla/assets/how-university-lost-its-way/image-copy-2.png" alt="al-Azhar University circa 1250" />
   <figcaption>al-Azhar University circa 1250 (source: <a href="https://madainproject.com/al_azhar">Madain Project</a>)</figcaption>
 </figure>
 
 In classical Europe, Plato's Academy, founded in Athens around 387 BCE, served as a center for the study of philosophy and mathematics.<sup>[3]</sup> In Ptolemaic Egypt, the great Museum and Library of Alexandria functioned as premier organizations of higher learning, drawing scholars from across the Hellenistic world.<sup>[3]</sup>
 
 <figure>
-  <img src="/assets/how-university-lost-its-way/image-copy-3.png" alt="Platonic Academy, mosaic from Pompeii" />
+  <img src="https://ik.imagekit.io/raihankalla/assets/how-university-lost-its-way/image-copy-3.webp" alt="Platonic Academy, mosaic from Pompeii" />
   <figcaption>Platonic Academy, mosaic from Pompeii (source: <a href="https://en.wikipedia.org/wiki/Platonic_Academy">Wikipedia</a>)</figcaption>
 </figure>
 
@@ -69,7 +69,7 @@ A pivotal development in this evolution was the rise of academic guilds. As the 
 The University of Oxford provides a clear case study of this new model's development and funding. Its growth accelerated dramatically after 1167, when King Henry II, in a political dispute with the Archbishop of Canterbury, banned English students from attending the University of Paris.<sup>[9]</sup> Many of these returning scholars and students settled in Oxford. Initially, the university was simply a collection of masters and students who lodged with the townspeople. This arrangement led to frequent and often violent clashes between "town and gown".<sup>[9]</sup> These riots hastened the establishment of endowed halls of residence, which evolved into the first colleges. University, Balliol, and Merton Colleges, established between 1249 and 1264, were founded not by the state, but by wealthy patrons and churchmen like William of Durham.<sup>[9]</sup> These colleges were self-governing entities with their own buildings and, crucially, their own endowments, primarily in the form of land and later, investments.<sup>[10]</sup> This established a funding model based on private wealth and patronage, one that allowed institutions like Oxford and Cambridge to operate for centuries without needing state aid or relying on mass tuition fees.<sup>[12]</sup>
 
 <figure>
-  <img src="/assets/how-university-lost-its-way/image-copy-4.png" alt="Representation of a university class, 1350s" />
+  <img src="https://ik.imagekit.io/raihankalla/assets/how-university-lost-its-way/image-copy-4.webp" alt="Representation of a university class, 1350s" />
   <figcaption>Representation of a university class, 1350s (source: <a href="https://en.wikipedia.org/wiki/History_of_European_universities">Wikipedia</a>)</figcaption>
 </figure>
 
@@ -88,14 +88,14 @@ The 18th-century intellectual movement known as the Enlightenment, or the Age of
 This intellectual shift had profound structural consequences. As national legal systems emerged and replaced feudal laws, the governance of universities began to move from the authority of the Church to the control of the state.<sup>[13]</sup> National ministries of education were formed to oversee university policies, creating a more centralized and secular system. The curriculum was modernized to reflect the new emphasis on empirical knowledge and critical inquiry. Subjects like mathematics, natural sciences, and modern philosophy gained prominence, pushing aside the singular focus on theology.<sup>[13]</sup>
 
 <figure>
-  <img src="/assets/how-university-lost-its-way/image-copy-5.png" alt="Académie des sciences in 1671" />
+  <img src="https://ik.imagekit.io/raihankalla/assets/how-university-lost-its-way/image-copy-5.webp" alt="Académie des sciences in 1671" />
   <figcaption>Académie des sciences in 1671 (source: <a href="https://en.wikipedia.org/wiki/Age_of_Enlightenment">Wikipedia</a>)</figcaption>
 </figure>
 
 The most influential expression of this new ideal was the Humboldtian model of higher education, which emerged in Germany in the early 19th century.<sup>[14]</sup> Spearheaded by the philosopher and statesman Wilhelm von Humboldt, this model was revolutionary. Its core principle was the unity of research and teaching **(*Einheit von Forschung und Lehre*)**, arguing that students learn best when they are engaged with the process of discovery alongside their professors.<sup>[14]</sup> The Humboldtian ideal championed unconditional academic freedom, insisting that universities must be independent from the ideological, economic, and political influence of the state.<sup>[14]</sup> To ensure this independence, Humboldt even proposed that universities should possess their own assets and goods to finance themselves.<sup>[14]</sup> The ultimate goal was not merely to train students for a profession, but to cultivate them through a broad, humanistic education (***Bildung***) into autonomous individuals and critical-thinking "world citizens".<sup>[14]</sup> This powerful vision of the research-based, academically free university became the blueprint for modern higher education institutions across Europe and, eventually, the world.
 
 <figure>
-  <img src="/assets/how-university-lost-its-way/image-copy-6.png" alt="Humboldt University of Berlin, c. 1850" />
+  <img src="https://ik.imagekit.io/raihankalla/assets/how-university-lost-its-way/image-copy-6.webp" alt="Humboldt University of Berlin, c. 1850" />
   <figcaption>Humboldt University of Berlin, c. 1850 (source: <a href="https://en.wikipedia.org/wiki/Humboldtian_model_of_higher_education">Wikipedia</a>)</figcaption>
 </figure>
 
@@ -108,7 +108,7 @@ A pivotal moment in this process was the passage of the **Morrill Land-Grant Act
 However, the single most transformative event in the history of American higher education was the Servicemen's Readjustment Act of 1944, universally known as the **G.I. Bill**. The Second World War had financially devastated many smaller private colleges, which saw their male student bodies vanish into the armed forces.<sup>[17]</sup> The G.I. Bill reversed this trend in a spectacular fashion. It provided federal funding to cover tuition and living expenses for over 2.2 million returning veterans to attend college.<sup>[18]</sup> The impact was immediate and staggering. Total college enrollment in the U.S. jumped by more than 50%, from 1.3 million in 1939 to over 2 million in 1946\.<sup>[18]</sup> An institution that had once been the exclusive domain of the wealthy elite was suddenly flooded with students from every social and economic background. The G.I. Bill single-handedly created the American middle class of the mid-20th century and firmly established the principle that the federal government had a vital role to play in ensuring access to higher education.
 
 <figure>
-  <img src="/assets/how-university-lost-its-way/image-copy-7.png" alt="A government poster informing soldiers about the G.I. Bill" />
+  <img src="https://ik.imagekit.io/raihankalla/assets/how-university-lost-its-way/image-copy-7.webp" alt="A government poster informing soldiers about the G.I. Bill" />
   <figcaption>A government poster informing soldiers about the G.I. Bill (source: <a href="https://en.wikipedia.org/wiki/G.I._Bill">Wikipedia</a>)</figcaption>
 </figure>
 
@@ -145,7 +145,7 @@ While the exact mechanics are debated, research confirms the core of this dynami
 With declining state support and a new, seemingly endless revenue stream from federally backed student loans, universities began to compete for students not just as scholars, but as customers. This ignited what has been termed the "amenities arms race".<sup>[23]</sup> To attract the tuition dollars of 18-year-olds (and their parents), institutions began pouring money into lavish, non-academic facilities.
 
 <figure>
-  <img src="/assets/how-university-lost-its-way/image-copy-8.png" alt="Lazy river at a dorm at the University of North Florida" />
+  <img src="https://ik.imagekit.io/raihankalla/assets/how-university-lost-its-way/image-copy-8.webp" alt="Lazy river at a dorm at the University of North Florida" />
   <figcaption>Lazy river at a dorm at the University of North Florida (source: <a href="https://en.wikipedia.org/wiki/Higher_education_financing_issues_in_the_United_States">Wikipedia</a>)</figcaption>
 </figure>
 
@@ -156,7 +156,7 @@ Campuses were transformed with resort-style dormitories, massive recreation cent
 As universities began to operate more like businesses competing in a marketplace, their internal structures changed accordingly. The most dramatic shift was the explosion in the number of non-teaching administrative staff.<sup>[19]</sup> The ranks of fundraisers, marketers, admissions officers, alumni relations staff, wellness counselors, and diversity, equity, and inclusion (DEI) officers swelled, growing at a rate that far outpaced the growth of full-time faculty.<sup>[20]</sup>
 
 <figure>
-  <img src="/assets/how-university-lost-its-way/image-copy-9.png" alt="Comic illustration of an administrative bloat in a university" />
+  <img src="https://ik.imagekit.io/raihankalla/assets/how-university-lost-its-way/image-copy-9.png" alt="Comic illustration of an administrative bloat in a university" />
   <figcaption>Comic illustration of an administrative bloat in a university (source: <a href="https://www.collegecost.org/">College Planners of America</a>)</figcaption>
 </figure>
 
@@ -170,7 +170,7 @@ It is crucial to recognize that the high-tuition, high-debt model that defines A
 * **France:** The French state is the primary funder of higher education, heavily subsidizing its public universities.<sup>[28]</sup> The true cost of educating a student is estimated to be around €10,000 per year, but the government assumes the vast majority of this cost. This allows public universities to charge exceptionally low tuition fees, for example, around €175 per year for a bachelor's degree for EU students.<sup>[29]</sup>  
 * **Scandinavia:** The Nordic model is built on social democratic principles, viewing higher education as a pillar of the welfare state and a right for all citizens.<sup>[31]</sup> These systems are characterized by high levels of public funding and, consequently, no or very low tuition fees.<sup>[31]</sup> In countries like Norway and Sweden, higher education is tuition-free for students from within the EU/EEA.<sup>[33]</sup>
 
-![](/assets/how-university-lost-its-way/mermaid-1.png)
+![](https://ik.imagekit.io/raihankalla/assets/how-university-lost-its-way/mermaid-1.png)
 
 These examples demonstrate that maintaining an accessible, affordable, and high-quality system of higher education is a matter of political will and societal priority. The American system's trajectory was not preordained. It was the outcome of a fundamental philosophical shift in which the financial risk of higher education was deliberately transferred from the collective, the state, to the individual student. The student loan system was not merely a financial tool; it was the primary instrument for executing this transfer. This act had profound consequences, transforming students into debt-fueled consumers and universities into service providers competing for market share. The university was no longer just a public institution accountable to the state for the public good; it had become a privatized service accountable to the market for its bottom line.
 
@@ -182,7 +182,7 @@ The commercialization of the university has created a deeply paradoxical situati
 
 As a bachelor's degree shifted from an elite distinction to a mainstream expectation, its signaling power in the labor market diminished. In response, employers began requiring a four-year degree for jobs that had never needed one before, a phenomenon known as "degree inflation".<sup>[36]</sup> This practice is often less about a genuine increase in the skills required for a position and more about using the degree as a convenient screening tool to filter a vast pool of applicants.<sup>[37]</sup>
 
-![](/assets/how-university-lost-its-way/mermaid-2.png)
+![](https://ik.imagekit.io/raihankalla/assets/how-university-lost-its-way/mermaid-2.png)
 
 This has created a significant "degree gap" in the workforce. A 2015 analysis found that while 67% of job postings for production supervisors required a bachelor's degree, only 16% of the people actually employed in that role held one.<sup>[38]</sup> This trend has corrosive effects. It locks millions of experienced and qualified workers without degrees out of opportunities for advancement and forces countless others into a costly and time-consuming educational path simply to be considered for jobs they are already capable of performing.<sup>[38]</sup> The degree becomes less a marker of acquired skill and more a minimum ticket to ride.<sup>[37]</sup>
 
@@ -192,7 +192,7 @@ The most direct and damaging evidence of the degree's diminishing value is the s
 
 This has devastating financial consequences. The much-touted "college wage premium" largely evaporates for the underemployed. A recent graduate working in a college-level job earns, on average, 88% more than a high school graduate. By contrast, an underemployed recent graduate earns only 25% more, roughly the same as someone who attended college but dropped out.<sup>[39]</sup> They have incurred the full cost and debt of a degree but are reaping little of its promised economic reward.
 
-![](/assets/how-university-lost-its-way/mermaid-3.png)
+![](https://ik.imagekit.io/raihankalla/assets/how-university-lost-its-way/mermaid-3.png)
 
 Crucially, the value of a degree is no longer monolithic; it has fractured, with outcomes now varying dramatically by field of study. A degree in a high-demand, specialized field like nursing or engineering provides a much more direct and secure path to a well-paying job than a degree in a more general or less market-aligned field.
 
@@ -200,7 +200,7 @@ Crucially, the value of a degree is no longer monolithic; it has fractured, with
 
 Compounding the problem of underemployment is a persistent complaint from the business community: that college graduates, despite their expensive credentials, are often unprepared for the realities of the modern workplace. A significant gap exists between the skills employers seek and the qualifications of recent graduates.<sup>[45]</sup>
 
-![](/assets/how-university-lost-its-way/mermaid-4.png)
+![](https://ik.imagekit.io/raihankalla/assets/how-university-lost-its-way/mermaid-4.png)
 
 The most cited deficiencies are not in technical, job-specific skills, but in what are often called "durable" or "soft" skills. A 2025 report based on insights from early-career employees found a pressing need for stronger preparation in areas such as navigating ambiguity, problem-solving under pressure, adaptability, critical thinking, and the ability to give and receive constructive feedback.<sup>[45]</sup> This suggests that while universities are effective at issuing credentials, they are struggling to cultivate the practical and cognitive flexibility required in a rapidly changing economy.
 
@@ -213,7 +213,7 @@ In March 2025, the unemployment rate for college graduates aged 22-27 hit 5.8%, 
 This complex reality reveals that the "value of a college degree" has fractured into distinct components. There is the **Economic Value**, which provides a direct and high return on investment, but as the data shows, is now largely confined to specific, high-demand majors. There is the **Credential Value**, which serves as the necessary "ticket to ride" but does not guarantee a good job or a commensurate salary. And there is the **Intrinsic Value**, the personal growth, critical thinking, and intellectual expansion that has always been a part of the university's promise.<sup>[51]</sup>
 
 <figure>
-  <img src="/assets/how-university-lost-its-way/Venn-1.png" alt="The fractured value of a college degree" />
+  <img src="https://ik.imagekit.io/raihankalla/assets/how-university-lost-its-way/Venn-1.png" alt="The fractured value of a college degree" />
   <figcaption>The current college degree crisis stems from a profound misalignment of these values.</figcaption>
 </figure>
 

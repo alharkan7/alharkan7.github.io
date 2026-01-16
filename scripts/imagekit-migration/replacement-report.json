@@ -1,0 +1,568 @@
+{
+  "processedAt": "2026-01-16T12:31:05.051Z",
+  "isDryRun": false,
+  "files": [
+    {
+      "path": "src/data/blog-posts/stories/pengajarmuda.md",
+      "replacements": [
+        {
+          "from": "/assets/blog/DSC_0042.jpg",
+          "to": "https://ik.imagekit.io/raihankalla/assets/blog/DSC_0042.jpg"
+        },
+        {
+          "from": "/assets/blog/DSC_0042.jpg",
+          "to": "https://ik.imagekit.io/raihankalla/assets/blog/DSC_0042.jpg"
+        }
+      ]
+    },
+    {
+      "path": "src/data/blog-posts/stories/minggu.md",
+      "replacements": [
+        {
+          "from": "/assets/blog/IMG-20170825-WA0036.jpg",
+          "to": "https://ik.imagekit.io/raihankalla/assets/blog/IMG-20170825-WA0036.jpg"
+        },
+        {
+          "from": "/assets/blog/IMG-20170825-WA0036.jpg",
+          "to": "https://ik.imagekit.io/raihankalla/assets/blog/IMG-20170825-WA0036.jpg"
+        },
+        {
+          "from": "/assets/blog/DSC_0146.jpg",
+          "to": "https://ik.imagekit.io/raihankalla/assets/blog/DSC_0146.jpg"
+        },
+        {
+          "from": "/assets/blog/DSC_0146.jpg",
+          "to": "https://ik.imagekit.io/raihankalla/assets/blog/DSC_0146.jpg"
+        }
+      ]
+    },
+    {
+      "path": "src/data/blog-posts/stories/ke-sula.md",
+      "replacements": [
+        {
+          "from": "/assets/blog/Foto-1.jpg",
+          "to": "https://ik.imagekit.io/raihankalla/assets/blog/Foto-1.jpg"
+        },
+        {
+          "from": "/assets/blog/Foto-1.jpg",
+          "to": "https://ik.imagekit.io/raihankalla/assets/blog/Foto-1.jpg"
+        },
+        {
+          "from": "/assets/blog/Foto-2.jpg",
+          "to": "https://ik.imagekit.io/raihankalla/assets/blog/Foto-2.jpg"
+        },
+        {
+          "from": "/assets/blog/Foto-2.jpg",
+          "to": "https://ik.imagekit.io/raihankalla/assets/blog/Foto-2.jpg"
+        },
+        {
+          "from": "/assets/blog/Foto-5.jpg",
+          "to": "https://ik.imagekit.io/raihankalla/assets/blog/Foto-5.jpg"
+        },
+        {
+          "from": "/assets/blog/Foto-5.jpg",
+          "to": "https://ik.imagekit.io/raihankalla/assets/blog/Foto-5.jpg"
+        },
+        {
+          "from": "/assets/blog/Foto-6.jpg",
+          "to": "https://ik.imagekit.io/raihankalla/assets/blog/Foto-6.jpg"
+        },
+        {
+          "from": "/assets/blog/Foto-6.jpg",
+          "to": "https://ik.imagekit.io/raihankalla/assets/blog/Foto-6.jpg"
+        },
+        {
+          "from": "/assets/blog/Foto-7.jpg",
+          "to": "https://ik.imagekit.io/raihankalla/assets/blog/Foto-7.jpg"
+        },
+        {
+          "from": "/assets/blog/Foto-7.jpg",
+          "to": "https://ik.imagekit.io/raihankalla/assets/blog/Foto-7.jpg"
+        },
+        {
+          "from": "/assets/blog/Foto-8.jpg",
+          "to": "https://ik.imagekit.io/raihankalla/assets/blog/Foto-8.jpg"
+        },
+        {
+          "from": "/assets/blog/Foto-8.jpg",
+          "to": "https://ik.imagekit.io/raihankalla/assets/blog/Foto-8.jpg"
+        },
+        {
+          "from": "/assets/blog/Foto-9.jpg",
+          "to": "https://ik.imagekit.io/raihankalla/assets/blog/Foto-9.jpg"
+        },
+        {
+          "from": "/assets/blog/Foto-9.jpg",
+          "to": "https://ik.imagekit.io/raihankalla/assets/blog/Foto-9.jpg"
+        },
+        {
+          "from": "/assets/blog/Foto.jpg",
+          "to": "https://ik.imagekit.io/raihankalla/assets/blog/Foto.jpg"
+        },
+        {
+          "from": "/assets/blog/Foto.jpg",
+          "to": "https://ik.imagekit.io/raihankalla/assets/blog/Foto.jpg"
+        }
+      ]
+    },
+    {
+      "path": "src/data/blog-posts/stories/gim.md",
+      "replacements": [
+        {
+          "from": "/assets/blog/DSC_0056.jpg",
+          "to": "https://ik.imagekit.io/raihankalla/assets/blog/DSC_0056.jpg"
+        },
+        {
+          "from": "/assets/blog/DSC_0056.jpg",
+          "to": "https://ik.imagekit.io/raihankalla/assets/blog/DSC_0056.jpg"
+        },
+        {
+          "from": "/assets/blog/2.jpg",
+          "to": "https://ik.imagekit.io/raihankalla/assets/blog/2.jpg"
+        },
+        {
+          "from": "/assets/blog/2.jpg",
+          "to": "https://ik.imagekit.io/raihankalla/assets/blog/2.jpg"
+        },
+        {
+          "from": "/assets/blog/3.png",
+          "to": "https://ik.imagekit.io/raihankalla/assets/blog/3.png"
+        },
+        {
+          "from": "/assets/blog/3.png",
+          "to": "https://ik.imagekit.io/raihankalla/assets/blog/3.png"
+        },
+        {
+          "from": "/assets/blog/5.png",
+          "to": "https://ik.imagekit.io/raihankalla/assets/blog/5.png"
+        },
+        {
+          "from": "/assets/blog/5.png",
+          "to": "https://ik.imagekit.io/raihankalla/assets/blog/5.png"
+        },
+        {
+          "from": "/assets/blog/6.jpg",
+          "to": "https://ik.imagekit.io/raihankalla/assets/blog/6.jpg"
+        },
+        {
+          "from": "/assets/blog/6.jpg",
+          "to": "https://ik.imagekit.io/raihankalla/assets/blog/6.jpg"
+        },
+        {
+          "from": "/assets/blog/6.jpg",
+          "to": "https://ik.imagekit.io/raihankalla/assets/blog/6.jpg"
+        },
+        {
+          "from": "/assets/blog/6.jpg",
+          "to": "https://ik.imagekit.io/raihankalla/assets/blog/6.jpg"
+        }
+      ]
+    },
+    {
+      "path": "src/data/blog-posts/stories/100haribersama.md",
+      "replacements": [
+        {
+          "from": "/assets/blog/Picture1.jpg",
+          "to": "https://ik.imagekit.io/raihankalla/assets/blog/Picture1.jpg"
+        },
+        {
+          "from": "/assets/blog/Picture1.jpg",
+          "to": "https://ik.imagekit.io/raihankalla/assets/blog/Picture1.jpg"
+        },
+        {
+          "from": "/assets/blog/1.jpg",
+          "to": "https://ik.imagekit.io/raihankalla/assets/blog/1.jpg"
+        },
+        {
+          "from": "/assets/blog/1.jpg",
+          "to": "https://ik.imagekit.io/raihankalla/assets/blog/1.jpg"
+        }
+      ]
+    },
+    {
+      "path": "src/data/blog-posts/misc/indoneswag.md",
+      "replacements": [
+        {
+          "from": "/assets/blog/Tabel-0.jpg",
+          "to": "https://ik.imagekit.io/raihankalla/assets/blog/Tabel-0.jpg"
+        },
+        {
+          "from": "/assets/blog/Tabel-0.jpg",
+          "to": "https://ik.imagekit.io/raihankalla/assets/blog/Tabel-0.jpg"
+        },
+        {
+          "from": "/assets/blog/Tabel-1.jpg",
+          "to": "https://ik.imagekit.io/raihankalla/assets/blog/Tabel-1.jpg"
+        },
+        {
+          "from": "/assets/blog/Tabel-1.jpg",
+          "to": "https://ik.imagekit.io/raihankalla/assets/blog/Tabel-1.jpg"
+        },
+        {
+          "from": "/assets/blog/Tabel-2.jpg",
+          "to": "https://ik.imagekit.io/raihankalla/assets/blog/Tabel-2.jpg"
+        },
+        {
+          "from": "/assets/blog/Tabel-2.jpg",
+          "to": "https://ik.imagekit.io/raihankalla/assets/blog/Tabel-2.jpg"
+        },
+        {
+          "from": "/assets/blog/Swag-1.png",
+          "to": "https://ik.imagekit.io/raihankalla/assets/blog/Swag-1.png"
+        },
+        {
+          "from": "/assets/blog/Swag-1.png",
+          "to": "https://ik.imagekit.io/raihankalla/assets/blog/Swag-1.png"
+        },
+        {
+          "from": "/assets/blog/1.png",
+          "to": "https://ik.imagekit.io/raihankalla/assets/blog/1.png"
+        },
+        {
+          "from": "/assets/blog/1.png",
+          "to": "https://ik.imagekit.io/raihankalla/assets/blog/1.png"
+        }
+      ]
+    },
+    {
+      "path": "src/data/blog-posts/blog/stoics.md",
+      "replacements": [
+        {
+          "from": "/assets/blog/stoic-virtues.webp",
+          "to": "https://ik.imagekit.io/raihankalla/assets/blog/stoic-virtues.webp"
+        },
+        {
+          "from": "/assets/blog/stoic-virtues.webp",
+          "to": "https://ik.imagekit.io/raihankalla/assets/blog/stoic-virtues.webp"
+        },
+        {
+          "from": "/assets/blog/stoic-logos.webp",
+          "to": "https://ik.imagekit.io/raihankalla/assets/blog/stoic-logos.webp"
+        },
+        {
+          "from": "/assets/blog/stoic-logos.webp",
+          "to": "https://ik.imagekit.io/raihankalla/assets/blog/stoic-logos.webp"
+        }
+      ]
+    },
+    {
+      "path": "src/data/blog-posts/blog/learning-paradox.md",
+      "replacements": [
+        {
+          "from": "/assets/blog/learning-exponential-growth.webp",
+          "to": "https://ik.imagekit.io/raihankalla/assets/blog/learning-exponential-growth.webp"
+        },
+        {
+          "from": "/assets/blog/learning-meme.webp",
+          "to": "https://ik.imagekit.io/raihankalla/assets/blog/learning-meme.webp"
+        }
+      ]
+    },
+    {
+      "path": "src/data/blog-posts/blog/how-university-lost-its-way.md",
+      "replacements": [
+        {
+          "from": "/assets/how-university-lost-its-way/image-copy-0.png",
+          "to": "https://ik.imagekit.io/raihankalla/assets/how-university-lost-its-way/image-copy-0.png"
+        },
+        {
+          "from": "/assets/how-university-lost-its-way/image-copy-1.png",
+          "to": "https://ik.imagekit.io/raihankalla/assets/how-university-lost-its-way/image-copy-1.png"
+        },
+        {
+          "from": "/assets/how-university-lost-its-way/image-copy-2.png",
+          "to": "https://ik.imagekit.io/raihankalla/assets/how-university-lost-its-way/image-copy-2.png"
+        },
+        {
+          "from": "/assets/how-university-lost-its-way/image-copy-3.png",
+          "to": "https://ik.imagekit.io/raihankalla/assets/how-university-lost-its-way/image-copy-3.png"
+        },
+        {
+          "from": "/assets/how-university-lost-its-way/image-copy-4.png",
+          "to": "https://ik.imagekit.io/raihankalla/assets/how-university-lost-its-way/image-copy-4.png"
+        },
+        {
+          "from": "/assets/how-university-lost-its-way/image-copy-5.png",
+          "to": "https://ik.imagekit.io/raihankalla/assets/how-university-lost-its-way/image-copy-5.png"
+        },
+        {
+          "from": "/assets/how-university-lost-its-way/image-copy-6.png",
+          "to": "https://ik.imagekit.io/raihankalla/assets/how-university-lost-its-way/image-copy-6.png"
+        },
+        {
+          "from": "/assets/how-university-lost-its-way/image-copy-7.png",
+          "to": "https://ik.imagekit.io/raihankalla/assets/how-university-lost-its-way/image-copy-7.png"
+        },
+        {
+          "from": "/assets/how-university-lost-its-way/image-copy-8.png",
+          "to": "https://ik.imagekit.io/raihankalla/assets/how-university-lost-its-way/image-copy-8.png"
+        },
+        {
+          "from": "/assets/how-university-lost-its-way/image-copy-9.png",
+          "to": "https://ik.imagekit.io/raihankalla/assets/how-university-lost-its-way/image-copy-9.png"
+        },
+        {
+          "from": "/assets/how-university-lost-its-way/mermaid-1.png",
+          "to": "https://ik.imagekit.io/raihankalla/assets/how-university-lost-its-way/mermaid-1.png"
+        },
+        {
+          "from": "/assets/how-university-lost-its-way/mermaid-2.png",
+          "to": "https://ik.imagekit.io/raihankalla/assets/how-university-lost-its-way/mermaid-2.png"
+        },
+        {
+          "from": "/assets/how-university-lost-its-way/mermaid-3.png",
+          "to": "https://ik.imagekit.io/raihankalla/assets/how-university-lost-its-way/mermaid-3.png"
+        },
+        {
+          "from": "/assets/how-university-lost-its-way/mermaid-4.png",
+          "to": "https://ik.imagekit.io/raihankalla/assets/how-university-lost-its-way/mermaid-4.png"
+        },
+        {
+          "from": "/assets/how-university-lost-its-way/Venn-1.png",
+          "to": "https://ik.imagekit.io/raihankalla/assets/how-university-lost-its-way/Venn-1.png"
+        }
+      ]
+    },
+    {
+      "path": "src/data/blog-posts/blog/dunkerque.md",
+      "replacements": [
+        {
+          "from": "/assets/blog/dunkerque-pict-1.webp",
+          "to": "https://ik.imagekit.io/raihankalla/assets/blog/dunkerque-pict-1.webp"
+        },
+        {
+          "from": "/assets/blog/dunkerque-pict-2.webp",
+          "to": "https://ik.imagekit.io/raihankalla/assets/blog/dunkerque-pict-2.webp"
+        },
+        {
+          "from": "/assets/blog/dunkerque-pict-3.webp",
+          "to": "https://ik.imagekit.io/raihankalla/assets/blog/dunkerque-pict-3.webp"
+        }
+      ]
+    },
+    {
+      "path": "src/pages/page/turnbackhoax-analysis.html",
+      "replacements": [
+        {
+          "from": "/turnbackhoax/politics/coherence-comparison.png",
+          "to": "https://ik.imagekit.io/raihankalla/turnbackhoax/politics/coherence-comparison.png"
+        },
+        {
+          "from": "/turnbackhoax/politics/top-terms-per-topic.png",
+          "to": "https://ik.imagekit.io/raihankalla/turnbackhoax/politics/top-terms-per-topic.png"
+        },
+        {
+          "from": "/turnbackhoax/others/coherence-comparison.png",
+          "to": "https://ik.imagekit.io/raihankalla/turnbackhoax/others/coherence-comparison.png"
+        },
+        {
+          "from": "/turnbackhoax/politics/topic-distribution.png",
+          "to": "https://ik.imagekit.io/raihankalla/turnbackhoax/politics/topic-distribution.png"
+        },
+        {
+          "from": "/turnbackhoax/others/top-terms-per-topic.png",
+          "to": "https://ik.imagekit.io/raihankalla/turnbackhoax/others/top-terms-per-topic.png"
+        },
+        {
+          "from": "/turnbackhoax/others/topic-distribution.png",
+          "to": "https://ik.imagekit.io/raihankalla/turnbackhoax/others/topic-distribution.png"
+        },
+        {
+          "from": "/turnbackhoax/scam/coherence-comparison.png",
+          "to": "https://ik.imagekit.io/raihankalla/turnbackhoax/scam/coherence-comparison.png"
+        },
+        {
+          "from": "/turnbackhoax/scam/top-terms-per-topic.png",
+          "to": "https://ik.imagekit.io/raihankalla/turnbackhoax/scam/top-terms-per-topic.png"
+        },
+        {
+          "from": "/turnbackhoax/scam/topic-distribution.png",
+          "to": "https://ik.imagekit.io/raihankalla/turnbackhoax/scam/topic-distribution.png"
+        },
+        {
+          "from": "/turnbackhoax/politics/wordclouds.png",
+          "to": "https://ik.imagekit.io/raihankalla/turnbackhoax/politics/wordclouds.png"
+        },
+        {
+          "from": "/turnbackhoax/others/wordclouds.png",
+          "to": "https://ik.imagekit.io/raihankalla/turnbackhoax/others/wordclouds.png"
+        },
+        {
+          "from": "/turnbackhoax/scam/wordclouds.png",
+          "to": "https://ik.imagekit.io/raihankalla/turnbackhoax/scam/wordclouds.png"
+        }
+      ]
+    },
+    {
+      "path": "src/pages/page/job-stats.html",
+      "replacements": [
+        {
+          "from": "/job-stats/17_wordcloud_responsibilities.png",
+          "to": "https://ik.imagekit.io/raihankalla/job-stats/17_wordcloud_responsibilities.png"
+        },
+        {
+          "from": "/job-stats/16_wordcloud_qualifications.png",
+          "to": "https://ik.imagekit.io/raihankalla/job-stats/16_wordcloud_qualifications.png"
+        },
+        {
+          "from": "/job-stats/14_experience_requirements.png",
+          "to": "https://ik.imagekit.io/raihankalla/job-stats/14_experience_requirements.png"
+        },
+        {
+          "from": "/job-stats/02_work_type_distribution.png",
+          "to": "https://ik.imagekit.io/raihankalla/job-stats/02_work_type_distribution.png"
+        },
+        {
+          "from": "/job-stats/13_education_requirements.png",
+          "to": "https://ik.imagekit.io/raihankalla/job-stats/13_education_requirements.png"
+        },
+        {
+          "from": "/job-stats/15_wordcloud_descriptions.png",
+          "to": "https://ik.imagekit.io/raihankalla/job-stats/15_wordcloud_descriptions.png"
+        },
+        {
+          "from": "/job-stats/07_salary_distribution.png",
+          "to": "https://ik.imagekit.io/raihankalla/job-stats/07_salary_distribution.png"
+        },
+        {
+          "from": "/job-stats/09_salary_by_work_type.png",
+          "to": "https://ik.imagekit.io/raihankalla/job-stats/09_salary_by_work_type.png"
+        },
+        {
+          "from": "/job-stats/01_top_job_categories.png",
+          "to": "https://ik.imagekit.io/raihankalla/job-stats/01_top_job_categories.png"
+        },
+        {
+          "from": "/job-stats/06_field_completeness.png",
+          "to": "https://ik.imagekit.io/raihankalla/job-stats/06_field_completeness.png"
+        },
+        {
+          "from": "/job-stats/08_salary_by_category.png",
+          "to": "https://ik.imagekit.io/raihankalla/job-stats/08_salary_by_category.png"
+        },
+        {
+          "from": "/job-stats/03_work_arrangement.png",
+          "to": "https://ik.imagekit.io/raihankalla/job-stats/03_work_arrangement.png"
+        },
+        {
+          "from": "/job-stats/10_salary_by_region.png",
+          "to": "https://ik.imagekit.io/raihankalla/job-stats/10_salary_by_region.png"
+        },
+        {
+          "from": "/job-stats/04_jakarta_regions.png",
+          "to": "https://ik.imagekit.io/raihankalla/job-stats/04_jakarta_regions.png"
+        },
+        {
+          "from": "/job-stats/05_top_employers.png",
+          "to": "https://ik.imagekit.io/raihankalla/job-stats/05_top_employers.png"
+        },
+        {
+          "from": "/job-stats/11_salary_bands.png",
+          "to": "https://ik.imagekit.io/raihankalla/job-stats/11_salary_bands.png"
+        },
+        {
+          "from": "/job-stats/12_top_skills.png",
+          "to": "https://ik.imagekit.io/raihankalla/job-stats/12_top_skills.png"
+        }
+      ]
+    },
+    {
+      "path": "src/pages/page/BRIN_Survey_Report.html",
+      "replacements": [
+        {
+          "from": "/brin/eda/education_distribution.png",
+          "to": "https://ik.imagekit.io/raihankalla/brin/eda/education_distribution.png"
+        },
+        {
+          "from": "/brin/eda/training_participation.png",
+          "to": "https://ik.imagekit.io/raihankalla/brin/eda/training_participation.png"
+        },
+        {
+          "from": "/brin/eda/green_credit_interest.png",
+          "to": "https://ik.imagekit.io/raihankalla/brin/eda/green_credit_interest.png"
+        },
+        {
+          "from": "/brin/eda/location_distribution.png",
+          "to": "https://ik.imagekit.io/raihankalla/brin/eda/location_distribution.png"
+        },
+        {
+          "from": "/brin/eda/missing_data_analysis.png",
+          "to": "https://ik.imagekit.io/raihankalla/brin/eda/missing_data_analysis.png"
+        },
+        {
+          "from": "/brin/eda/gender_distribution.png",
+          "to": "https://ik.imagekit.io/raihankalla/brin/eda/gender_distribution.png"
+        },
+        {
+          "from": "/brin/eda/business_category.png",
+          "to": "https://ik.imagekit.io/raihankalla/brin/eda/business_category.png"
+        },
+        {
+          "from": "/brin/eda/business_sector.png",
+          "to": "https://ik.imagekit.io/raihankalla/brin/eda/business_sector.png"
+        },
+        {
+          "from": "/brin/eda/green_business.png",
+          "to": "https://ik.imagekit.io/raihankalla/brin/eda/green_business.png"
+        },
+        {
+          "from": "/brin/eda/energy_usage.png",
+          "to": "https://ik.imagekit.io/raihankalla/brin/eda/energy_usage.png"
+        },
+        {
+          "from": "/brin/eda/legal_entity.png",
+          "to": "https://ik.imagekit.io/raihankalla/brin/eda/legal_entity.png"
+        }
+      ]
+    },
+    {
+      "path": "src/pages/page/BRIN_Quantitative_Analysis.html",
+      "replacements": [
+        {
+          "from": "/brin/analysis/bankability_by_gender.png",
+          "to": "https://ik.imagekit.io/raihankalla/brin/analysis/bankability_by_gender.png"
+        },
+        {
+          "from": "/brin/analysis/green_maturity_dist.png",
+          "to": "https://ik.imagekit.io/raihankalla/brin/analysis/green_maturity_dist.png"
+        },
+        {
+          "from": "/brin/analysis/green_gap_region.png",
+          "to": "https://ik.imagekit.io/raihankalla/brin/analysis/green_gap_region.png"
+        }
+      ]
+    },
+    {
+      "path": "src/pages/bio.astro",
+      "replacements": [
+        {
+          "from": "/assets/profile-pic.webp",
+          "to": "https://ik.imagekit.io/raihankalla/assets/profile-pic.webp"
+        }
+      ]
+    },
+    {
+      "path": "src/components/Logo.astro",
+      "replacements": [
+        {
+          "from": "/assets/logo.webp",
+          "to": "https://ik.imagekit.io/raihankalla/assets/logo.webp"
+        }
+      ]
+    },
+    {
+      "path": "src/components/Bio.astro",
+      "replacements": [
+        {
+          "from": "/assets/profile-pic.webp",
+          "to": "https://ik.imagekit.io/raihankalla/assets/profile-pic.webp"
+        }
+      ]
+    }
+  ],
+  "summary": {
+    "totalFiles": 95,
+    "modifiedFiles": 17,
+    "totalReplacements": 118
+  }
+}

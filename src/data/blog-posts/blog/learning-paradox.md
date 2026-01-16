@@ -8,7 +8,7 @@ The whole point of this writing is to talk about my experience when I was learni
 
 The story began when I had a quite long holiday (months) in 2016, and there was a checklist that I hadn’t crossed for a long time, which was to learn code. Computer code. I always knew that I had special interest with that thing, but never paid much attention to that, busying myself with my major in school and organization activities. Until finally I had time to reflect on what I hadn’t done but still eager me to dive in, I decided to kickstart it by myself. The journey wasn’t all easy: I was stressfully stuck on understanding a single line of code many times, repeating a-minute-long video course for like endlessly because I never came to grasp the concept, or once giving up for weeks because my codes didn’t work. **Just like the first time we learned to ride a bicycle or driving, or starting to learn a new language, it was hard. And most of the time, it was very hard.**
 
-![](/assets/blog/learning-meme.webp)
+![](https://ik.imagekit.io/raihankalla/assets/blog/learning-meme.webp)
 
 Jumping to 6 months later, I was still no expert in coding. _Haha_, no kidding. But at least now I can build my own simple Android apps, personal website, tweak backend settings manually by altering its codes and databases, read some popular programming languages like Java, Python, and sets of typical web development syntax like HTML, CSS, JavaScript, and a bit more. In my leveled-up efforts, I joined Google Developer Group to engage with programming community and enrolled in Indonesia Android Kejar, which later gave me an opportunity to attend the Awarding Night as a speaker to share my experience of learning coding from zero. There are more impressive people out there who’s succeeded in learning programming or even ethical hacking by themselves, which I think are super cool. But I think I know enough to realize how much I don’t know, which makes me understand how long I need to learn more.
 
@@ -25,7 +25,7 @@ The Paradox
 
 If my progress of self-taught process was drawn as a graph, it would be something like an exponential graph. The explanation was simple: I spent my first half or more than 6-months period by learning about everything I didn’t know.  Like literally tried to understand everything because I didn’t know where my position was, how far I knew and how far I needed to know. It’s like when you’re a plain alien that came to earth and tried to learn about football: because of you knew nothing about it, you didn’t start to learn structurally from basic rules to basic tricks and finally to perfecting the moves. Instead, you started to learn randomly from ‘kicking’ with hands, shooting from outside the lines, or even scoring to your own goal. It was that chaotic.
 
-![](/assets/blog/learning-exponential-growth.webp)
+![](https://ik.imagekit.io/raihankalla/assets/blog/learning-exponential-growth.webp)
 
 But the moment I grasped the concept map of everything about the subject, it was structured organically like tree branches, and suddenly I could decide which branches I needed to follow and which ones I didn’t need to. By then, the progress was accelerated, like almost exponentially. Because suddenly I didn’t need to learn about how to be goalkeeper deeply if I was about to focus on becoming a striker, nor learning about how to be a defender, winger, or else. I could focus on the bigger picture, the rules, what role I want to take in the game and what lessons I need to learn. The rest is about practicing with cases for improvement.
 

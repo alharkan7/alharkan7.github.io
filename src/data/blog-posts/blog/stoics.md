@@ -75,7 +75,7 @@ As an institution, school of Stoics had faded away, but its influences remain un
 2.    Concept: Worldview & The Virtues
 --------------------------------------
 
-[![](/assets/blog/stoic-logos.webp)](/assets/blog/stoic-logos.webp)
+[![](https://ik.imagekit.io/raihankalla/assets/blog/stoic-logos.webp)](https://ik.imagekit.io/raihankalla/assets/blog/stoic-logos.webp)
 
 _According to Stoics, the universe is material and reasoning substance, known as Nature, which is divided into two classes, the active and the passive. The passive substances are matter, and the active substances is Logos (Universal Reason), Human, an intelligent aether which acts on the passive matter._
 
@@ -88,7 +88,7 @@ Cardinal Virtues
 
 **Rather than focusing on imagining an ideal society, the Stoics try to deal with the world as it is**, while pursuing **self improvements**. To guide towards that goal, the Stoics have four Cardinal Virtues:
 
-[![](/assets/blog/stoic-virtues.webp)](/assets/blog/stoic-virtues.webp)
+[![](https://ik.imagekit.io/raihankalla/assets/blog/stoic-virtues.webp)](https://ik.imagekit.io/raihankalla/assets/blog/stoic-virtues.webp)
 
 *   Sophia (**Wisdom**), the ability to navigate through complex situations in a logical, informed, and calm manner.
 *   Andreia (**Courage**), facing daily challenges with clarity and integrity, not just in extraordinary circumstances.

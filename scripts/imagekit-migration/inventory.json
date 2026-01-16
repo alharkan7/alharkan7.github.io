@@ -1,0 +1,844 @@
+{
+  "generatedAt": "2026-01-16T12:26:56.821Z",
+  "summary": {
+    "totalImages": 102,
+    "totalSizeMB": "49.91",
+    "extensions": [
+      ".webp",
+      ".jpg",
+      ".png",
+      ".svg"
+    ],
+    "folders": [
+      "assets",
+      "assets/blog",
+      "assets/how-university-lost-its-way",
+      "brin/analysis",
+      "brin/eda",
+      "(root)",
+      "job-stats",
+      "turnbackhoax/others",
+      "turnbackhoax/politics",
+      "turnbackhoax/scam",
+      "turnbackhoax/sentiment"
+    ]
+  },
+  "images": [
+    {
+      "localPath": "/Users/alharkan/Documents/Repositories/alharkan7.github.io/public/assets/about-illustration.webp",
+      "publicPath": "/assets/about-illustration.webp",
+      "imagekitPath": "assets/about-illustration.webp",
+      "filename": "about-illustration.webp",
+      "sizeBytes": 24456,
+      "sizeKB": "23.88"
+    },
+    {
+      "localPath": "/Users/alharkan/Documents/Repositories/alharkan7.github.io/public/assets/blog/1.jpg",
+      "publicPath": "/assets/blog/1.jpg",
+      "imagekitPath": "assets/blog/1.jpg",
+      "filename": "1.jpg",
+      "sizeBytes": 28017,
+      "sizeKB": "27.36"
+    },
+    {
+      "localPath": "/Users/alharkan/Documents/Repositories/alharkan7.github.io/public/assets/blog/1.png",
+      "publicPath": "/assets/blog/1.png",
+      "imagekitPath": "assets/blog/1.png",
+      "filename": "1.png",
+      "sizeBytes": 53740,
+      "sizeKB": "52.48"
+    },
+    {
+      "localPath": "/Users/alharkan/Documents/Repositories/alharkan7.github.io/public/assets/blog/2.jpg",
+      "publicPath": "/assets/blog/2.jpg",
+      "imagekitPath": "assets/blog/2.jpg",
+      "filename": "2.jpg",
+      "sizeBytes": 55556,
+      "sizeKB": "54.25"
+    },
+    {
+      "localPath": "/Users/alharkan/Documents/Repositories/alharkan7.github.io/public/assets/blog/3.png",
+      "publicPath": "/assets/blog/3.png",
+      "imagekitPath": "assets/blog/3.png",
+      "filename": "3.png",
+      "sizeBytes": 61002,
+      "sizeKB": "59.57"
+    },
+    {
+      "localPath": "/Users/alharkan/Documents/Repositories/alharkan7.github.io/public/assets/blog/5.png",
+      "publicPath": "/assets/blog/5.png",
+      "imagekitPath": "assets/blog/5.png",
+      "filename": "5.png",
+      "sizeBytes": 23123,
+      "sizeKB": "22.58"
+    },
+    {
+      "localPath": "/Users/alharkan/Documents/Repositories/alharkan7.github.io/public/assets/blog/6.jpg",
+      "publicPath": "/assets/blog/6.jpg",
+      "imagekitPath": "assets/blog/6.jpg",
+      "filename": "6.jpg",
+      "sizeBytes": 10467,
+      "sizeKB": "10.22"
+    },
+    {
+      "localPath": "/Users/alharkan/Documents/Repositories/alharkan7.github.io/public/assets/blog/casual-life-3d-girl-boy-poses.webp",
+      "publicPath": "/assets/blog/casual-life-3d-girl-boy-poses.webp",
+      "imagekitPath": "assets/blog/casual-life-3d-girl-boy-poses.webp",
+      "filename": "casual-life-3d-girl-boy-poses.webp",
+      "sizeBytes": 19138,
+      "sizeKB": "18.69"
+    },
+    {
+      "localPath": "/Users/alharkan/Documents/Repositories/alharkan7.github.io/public/assets/blog/casual-life-3d-likes.webp",
+      "publicPath": "/assets/blog/casual-life-3d-likes.webp",
+      "imagekitPath": "assets/blog/casual-life-3d-likes.webp",
+      "filename": "casual-life-3d-likes.webp",
+      "sizeBytes": 96608,
+      "sizeKB": "94.34"
+    },
+    {
+      "localPath": "/Users/alharkan/Documents/Repositories/alharkan7.github.io/public/assets/blog/casual-life-3d-meditation-crystal.webp",
+      "publicPath": "/assets/blog/casual-life-3d-meditation-crystal.webp",
+      "imagekitPath": "assets/blog/casual-life-3d-meditation-crystal.webp",
+      "filename": "casual-life-3d-meditation-crystal.webp",
+      "sizeBytes": 138486,
+      "sizeKB": "135.24"
+    },
+    {
+      "localPath": "/Users/alharkan/Documents/Repositories/alharkan7.github.io/public/assets/blog/casual-life-3d-workspace.webp",
+      "publicPath": "/assets/blog/casual-life-3d-workspace.webp",
+      "imagekitPath": "assets/blog/casual-life-3d-workspace.webp",
+      "filename": "casual-life-3d-workspace.webp",
+      "sizeBytes": 56598,
+      "sizeKB": "55.27"
+    },
+    {
+      "localPath": "/Users/alharkan/Documents/Repositories/alharkan7.github.io/public/assets/blog/DSC_0042.jpg",
+      "publicPath": "/assets/blog/DSC_0042.jpg",
+      "imagekitPath": "assets/blog/DSC_0042.jpg",
+      "filename": "DSC_0042.jpg",
+      "sizeBytes": 464352,
+      "sizeKB": "453.47"
+    },
+    {
+      "localPath": "/Users/alharkan/Documents/Repositories/alharkan7.github.io/public/assets/blog/DSC_0056.jpg",
+      "publicPath": "/assets/blog/DSC_0056.jpg",
+      "imagekitPath": "assets/blog/DSC_0056.jpg",
+      "filename": "DSC_0056.jpg",
+      "sizeBytes": 9345,
+      "sizeKB": "9.13"
+    },
+    {
+      "localPath": "/Users/alharkan/Documents/Repositories/alharkan7.github.io/public/assets/blog/DSC_0146.jpg",
+      "publicPath": "/assets/blog/DSC_0146.jpg",
+      "imagekitPath": "assets/blog/DSC_0146.jpg",
+      "filename": "DSC_0146.jpg",
+      "sizeBytes": 121008,
+      "sizeKB": "118.17"
+    },
+    {
+      "localPath": "/Users/alharkan/Documents/Repositories/alharkan7.github.io/public/assets/blog/dunkerque-pict-1.webp",
+      "publicPath": "/assets/blog/dunkerque-pict-1.webp",
+      "imagekitPath": "assets/blog/dunkerque-pict-1.webp",
+      "filename": "dunkerque-pict-1.webp",
+      "sizeBytes": 92514,
+      "sizeKB": "90.35"
+    },
+    {
+      "localPath": "/Users/alharkan/Documents/Repositories/alharkan7.github.io/public/assets/blog/dunkerque-pict-2.webp",
+      "publicPath": "/assets/blog/dunkerque-pict-2.webp",
+      "imagekitPath": "assets/blog/dunkerque-pict-2.webp",
+      "filename": "dunkerque-pict-2.webp",
+      "sizeBytes": 29362,
+      "sizeKB": "28.67"
+    },
+    {
+      "localPath": "/Users/alharkan/Documents/Repositories/alharkan7.github.io/public/assets/blog/dunkerque-pict-3.webp",
+      "publicPath": "/assets/blog/dunkerque-pict-3.webp",
+      "imagekitPath": "assets/blog/dunkerque-pict-3.webp",
+      "filename": "dunkerque-pict-3.webp",
+      "sizeBytes": 35580,
+      "sizeKB": "34.75"
+    },
+    {
+      "localPath": "/Users/alharkan/Documents/Repositories/alharkan7.github.io/public/assets/blog/Foto-1.jpg",
+      "publicPath": "/assets/blog/Foto-1.jpg",
+      "imagekitPath": "assets/blog/Foto-1.jpg",
+      "filename": "Foto-1.jpg",
+      "sizeBytes": 87079,
+      "sizeKB": "85.04"
+    },
+    {
+      "localPath": "/Users/alharkan/Documents/Repositories/alharkan7.github.io/public/assets/blog/Foto-2.jpg",
+      "publicPath": "/assets/blog/Foto-2.jpg",
+      "imagekitPath": "assets/blog/Foto-2.jpg",
+      "filename": "Foto-2.jpg",
+      "sizeBytes": 65013,
+      "sizeKB": "63.49"
+    },
+    {
+      "localPath": "/Users/alharkan/Documents/Repositories/alharkan7.github.io/public/assets/blog/Foto-5.jpg",
+      "publicPath": "/assets/blog/Foto-5.jpg",
+      "imagekitPath": "assets/blog/Foto-5.jpg",
+      "filename": "Foto-5.jpg",
+      "sizeBytes": 120067,
+      "sizeKB": "117.25"
+    },
+    {
+      "localPath": "/Users/alharkan/Documents/Repositories/alharkan7.github.io/public/assets/blog/Foto-6.jpg",
+      "publicPath": "/assets/blog/Foto-6.jpg",
+      "imagekitPath": "assets/blog/Foto-6.jpg",
+      "filename": "Foto-6.jpg",
+      "sizeBytes": 85624,
+      "sizeKB": "83.62"
+    },
+    {
+      "localPath": "/Users/alharkan/Documents/Repositories/alharkan7.github.io/public/assets/blog/Foto-7.jpg",
+      "publicPath": "/assets/blog/Foto-7.jpg",
+      "imagekitPath": "assets/blog/Foto-7.jpg",
+      "filename": "Foto-7.jpg",
+      "sizeBytes": 87814,
+      "sizeKB": "85.76"
+    },
+    {
+      "localPath": "/Users/alharkan/Documents/Repositories/alharkan7.github.io/public/assets/blog/Foto-8.jpg",
+      "publicPath": "/assets/blog/Foto-8.jpg",
+      "imagekitPath": "assets/blog/Foto-8.jpg",
+      "filename": "Foto-8.jpg",
+      "sizeBytes": 98328,
+      "sizeKB": "96.02"
+    },
+    {
+      "localPath": "/Users/alharkan/Documents/Repositories/alharkan7.github.io/public/assets/blog/Foto-9.jpg",
+      "publicPath": "/assets/blog/Foto-9.jpg",
+      "imagekitPath": "assets/blog/Foto-9.jpg",
+      "filename": "Foto-9.jpg",
+      "sizeBytes": 106447,
+      "sizeKB": "103.95"
+    },
+    {
+      "localPath": "/Users/alharkan/Documents/Repositories/alharkan7.github.io/public/assets/blog/Foto.jpg",
+      "publicPath": "/assets/blog/Foto.jpg",
+      "imagekitPath": "assets/blog/Foto.jpg",
+      "filename": "Foto.jpg",
+      "sizeBytes": 76582,
+      "sizeKB": "74.79"
+    },
+    {
+      "localPath": "/Users/alharkan/Documents/Repositories/alharkan7.github.io/public/assets/blog/IMG-20170825-WA0036.jpg",
+      "publicPath": "/assets/blog/IMG-20170825-WA0036.jpg",
+      "imagekitPath": "assets/blog/IMG-20170825-WA0036.jpg",
+      "filename": "IMG-20170825-WA0036.jpg",
+      "sizeBytes": 218874,
+      "sizeKB": "213.74"
+    },
+    {
+      "localPath": "/Users/alharkan/Documents/Repositories/alharkan7.github.io/public/assets/blog/learning-exponential-growth.webp",
+      "publicPath": "/assets/blog/learning-exponential-growth.webp",
+      "imagekitPath": "assets/blog/learning-exponential-growth.webp",
+      "filename": "learning-exponential-growth.webp",
+      "sizeBytes": 7836,
+      "sizeKB": "7.65"
+    },
+    {
+      "localPath": "/Users/alharkan/Documents/Repositories/alharkan7.github.io/public/assets/blog/learning-meme.webp",
+      "publicPath": "/assets/blog/learning-meme.webp",
+      "imagekitPath": "assets/blog/learning-meme.webp",
+      "filename": "learning-meme.webp",
+      "sizeBytes": 62164,
+      "sizeKB": "60.71"
+    },
+    {
+      "localPath": "/Users/alharkan/Documents/Repositories/alharkan7.github.io/public/assets/blog/Picture1.jpg",
+      "publicPath": "/assets/blog/Picture1.jpg",
+      "imagekitPath": "assets/blog/Picture1.jpg",
+      "filename": "Picture1.jpg",
+      "sizeBytes": 104597,
+      "sizeKB": "102.15"
+    },
+    {
+      "localPath": "/Users/alharkan/Documents/Repositories/alharkan7.github.io/public/assets/blog/stoic-logos.webp",
+      "publicPath": "/assets/blog/stoic-logos.webp",
+      "imagekitPath": "assets/blog/stoic-logos.webp",
+      "filename": "stoic-logos.webp",
+      "sizeBytes": 31752,
+      "sizeKB": "31.01"
+    },
+    {
+      "localPath": "/Users/alharkan/Documents/Repositories/alharkan7.github.io/public/assets/blog/stoic-virtues.webp",
+      "publicPath": "/assets/blog/stoic-virtues.webp",
+      "imagekitPath": "assets/blog/stoic-virtues.webp",
+      "filename": "stoic-virtues.webp",
+      "sizeBytes": 22244,
+      "sizeKB": "21.72"
+    },
+    {
+      "localPath": "/Users/alharkan/Documents/Repositories/alharkan7.github.io/public/assets/blog/Swag-1.png",
+      "publicPath": "/assets/blog/Swag-1.png",
+      "imagekitPath": "assets/blog/Swag-1.png",
+      "filename": "Swag-1.png",
+      "sizeBytes": 43461,
+      "sizeKB": "42.44"
+    },
+    {
+      "localPath": "/Users/alharkan/Documents/Repositories/alharkan7.github.io/public/assets/blog/Tabel-0.jpg",
+      "publicPath": "/assets/blog/Tabel-0.jpg",
+      "imagekitPath": "assets/blog/Tabel-0.jpg",
+      "filename": "Tabel-0.jpg",
+      "sizeBytes": 30353,
+      "sizeKB": "29.64"
+    },
+    {
+      "localPath": "/Users/alharkan/Documents/Repositories/alharkan7.github.io/public/assets/blog/Tabel-1.jpg",
+      "publicPath": "/assets/blog/Tabel-1.jpg",
+      "imagekitPath": "assets/blog/Tabel-1.jpg",
+      "filename": "Tabel-1.jpg",
+      "sizeBytes": 151518,
+      "sizeKB": "147.97"
+    },
+    {
+      "localPath": "/Users/alharkan/Documents/Repositories/alharkan7.github.io/public/assets/blog/Tabel-2.jpg",
+      "publicPath": "/assets/blog/Tabel-2.jpg",
+      "imagekitPath": "assets/blog/Tabel-2.jpg",
+      "filename": "Tabel-2.jpg",
+      "sizeBytes": 204709,
+      "sizeKB": "199.91"
+    },
+    {
+      "localPath": "/Users/alharkan/Documents/Repositories/alharkan7.github.io/public/assets/home-illustration-small.webp",
+      "publicPath": "/assets/home-illustration-small.webp",
+      "imagekitPath": "assets/home-illustration-small.webp",
+      "filename": "home-illustration-small.webp",
+      "sizeBytes": 28944,
+      "sizeKB": "28.27"
+    },
+    {
+      "localPath": "/Users/alharkan/Documents/Repositories/alharkan7.github.io/public/assets/home-illustration.webp",
+      "publicPath": "/assets/home-illustration.webp",
+      "imagekitPath": "assets/home-illustration.webp",
+      "filename": "home-illustration.webp",
+      "sizeBytes": 74564,
+      "sizeKB": "72.82"
+    },
+    {
+      "localPath": "/Users/alharkan/Documents/Repositories/alharkan7.github.io/public/assets/how-university-lost-its-way/image-copy-0.png",
+      "publicPath": "/assets/how-university-lost-its-way/image-copy-0.png",
+      "imagekitPath": "assets/how-university-lost-its-way/image-copy-0.png",
+      "filename": "image-copy-0.png",
+      "sizeBytes": 384142,
+      "sizeKB": "375.14"
+    },
+    {
+      "localPath": "/Users/alharkan/Documents/Repositories/alharkan7.github.io/public/assets/how-university-lost-its-way/image-copy-1.png",
+      "publicPath": "/assets/how-university-lost-its-way/image-copy-1.png",
+      "imagekitPath": "assets/how-university-lost-its-way/image-copy-1.png",
+      "filename": "image-copy-1.png",
+      "sizeBytes": 4379412,
+      "sizeKB": "4276.77"
+    },
+    {
+      "localPath": "/Users/alharkan/Documents/Repositories/alharkan7.github.io/public/assets/how-university-lost-its-way/image-copy-2.png",
+      "publicPath": "/assets/how-university-lost-its-way/image-copy-2.png",
+      "imagekitPath": "assets/how-university-lost-its-way/image-copy-2.png",
+      "filename": "image-copy-2.png",
+      "sizeBytes": 545662,
+      "sizeKB": "532.87"
+    },
+    {
+      "localPath": "/Users/alharkan/Documents/Repositories/alharkan7.github.io/public/assets/how-university-lost-its-way/image-copy-3.png",
+      "publicPath": "/assets/how-university-lost-its-way/image-copy-3.png",
+      "imagekitPath": "assets/how-university-lost-its-way/image-copy-3.png",
+      "filename": "image-copy-3.png",
+      "sizeBytes": 5364070,
+      "sizeKB": "5238.35"
+    },
+    {
+      "localPath": "/Users/alharkan/Documents/Repositories/alharkan7.github.io/public/assets/how-university-lost-its-way/image-copy-4.png",
+      "publicPath": "/assets/how-university-lost-its-way/image-copy-4.png",
+      "imagekitPath": "assets/how-university-lost-its-way/image-copy-4.png",
+      "filename": "image-copy-4.png",
+      "sizeBytes": 4357584,
+      "sizeKB": "4255.45"
+    },
+    {
+      "localPath": "/Users/alharkan/Documents/Repositories/alharkan7.github.io/public/assets/how-university-lost-its-way/image-copy-5.png",
+      "publicPath": "/assets/how-university-lost-its-way/image-copy-5.png",
+      "imagekitPath": "assets/how-university-lost-its-way/image-copy-5.png",
+      "filename": "image-copy-5.png",
+      "sizeBytes": 2377982,
+      "sizeKB": "2322.25"
+    },
+    {
+      "localPath": "/Users/alharkan/Documents/Repositories/alharkan7.github.io/public/assets/how-university-lost-its-way/image-copy-6.png",
+      "publicPath": "/assets/how-university-lost-its-way/image-copy-6.png",
+      "imagekitPath": "assets/how-university-lost-its-way/image-copy-6.png",
+      "filename": "image-copy-6.png",
+      "sizeBytes": 4373083,
+      "sizeKB": "4270.59"
+    },
+    {
+      "localPath": "/Users/alharkan/Documents/Repositories/alharkan7.github.io/public/assets/how-university-lost-its-way/image-copy-7.png",
+      "publicPath": "/assets/how-university-lost-its-way/image-copy-7.png",
+      "imagekitPath": "assets/how-university-lost-its-way/image-copy-7.png",
+      "filename": "image-copy-7.png",
+      "sizeBytes": 471926,
+      "sizeKB": "460.87"
+    },
+    {
+      "localPath": "/Users/alharkan/Documents/Repositories/alharkan7.github.io/public/assets/how-university-lost-its-way/image-copy-8.png",
+      "publicPath": "/assets/how-university-lost-its-way/image-copy-8.png",
+      "imagekitPath": "assets/how-university-lost-its-way/image-copy-8.png",
+      "filename": "image-copy-8.png",
+      "sizeBytes": 4207516,
+      "sizeKB": "4108.90"
+    },
+    {
+      "localPath": "/Users/alharkan/Documents/Repositories/alharkan7.github.io/public/assets/how-university-lost-its-way/image-copy-9.png",
+      "publicPath": "/assets/how-university-lost-its-way/image-copy-9.png",
+      "imagekitPath": "assets/how-university-lost-its-way/image-copy-9.png",
+      "filename": "image-copy-9.png",
+      "sizeBytes": 134193,
+      "sizeKB": "131.05"
+    },
+    {
+      "localPath": "/Users/alharkan/Documents/Repositories/alharkan7.github.io/public/assets/how-university-lost-its-way/mermaid-1.png",
+      "publicPath": "/assets/how-university-lost-its-way/mermaid-1.png",
+      "imagekitPath": "assets/how-university-lost-its-way/mermaid-1.png",
+      "filename": "mermaid-1.png",
+      "sizeBytes": 261994,
+      "sizeKB": "255.85"
+    },
+    {
+      "localPath": "/Users/alharkan/Documents/Repositories/alharkan7.github.io/public/assets/how-university-lost-its-way/mermaid-2.png",
+      "publicPath": "/assets/how-university-lost-its-way/mermaid-2.png",
+      "imagekitPath": "assets/how-university-lost-its-way/mermaid-2.png",
+      "filename": "mermaid-2.png",
+      "sizeBytes": 314846,
+      "sizeKB": "307.47"
+    },
+    {
+      "localPath": "/Users/alharkan/Documents/Repositories/alharkan7.github.io/public/assets/how-university-lost-its-way/mermaid-3.png",
+      "publicPath": "/assets/how-university-lost-its-way/mermaid-3.png",
+      "imagekitPath": "assets/how-university-lost-its-way/mermaid-3.png",
+      "filename": "mermaid-3.png",
+      "sizeBytes": 200961,
+      "sizeKB": "196.25"
+    },
+    {
+      "localPath": "/Users/alharkan/Documents/Repositories/alharkan7.github.io/public/assets/how-university-lost-its-way/mermaid-4.png",
+      "publicPath": "/assets/how-university-lost-its-way/mermaid-4.png",
+      "imagekitPath": "assets/how-university-lost-its-way/mermaid-4.png",
+      "filename": "mermaid-4.png",
+      "sizeBytes": 397872,
+      "sizeKB": "388.55"
+    },
+    {
+      "localPath": "/Users/alharkan/Documents/Repositories/alharkan7.github.io/public/assets/how-university-lost-its-way/Venn-1.png",
+      "publicPath": "/assets/how-university-lost-its-way/Venn-1.png",
+      "imagekitPath": "assets/how-university-lost-its-way/Venn-1.png",
+      "filename": "Venn-1.png",
+      "sizeBytes": 183285,
+      "sizeKB": "178.99"
+    },
+    {
+      "localPath": "/Users/alharkan/Documents/Repositories/alharkan7.github.io/public/assets/logo.webp",
+      "publicPath": "/assets/logo.webp",
+      "imagekitPath": "assets/logo.webp",
+      "filename": "logo.webp",
+      "sizeBytes": 32604,
+      "sizeKB": "31.84"
+    },
+    {
+      "localPath": "/Users/alharkan/Documents/Repositories/alharkan7.github.io/public/assets/profile-pic.webp",
+      "publicPath": "/assets/profile-pic.webp",
+      "imagekitPath": "assets/profile-pic.webp",
+      "filename": "profile-pic.webp",
+      "sizeBytes": 29308,
+      "sizeKB": "28.62"
+    },
+    {
+      "localPath": "/Users/alharkan/Documents/Repositories/alharkan7.github.io/public/assets/social.png",
+      "publicPath": "/assets/social.png",
+      "imagekitPath": "assets/social.png",
+      "filename": "social.png",
+      "sizeBytes": 552392,
+      "sizeKB": "539.45"
+    },
+    {
+      "localPath": "/Users/alharkan/Documents/Repositories/alharkan7.github.io/public/brin/analysis/bankability_by_gender.png",
+      "publicPath": "/brin/analysis/bankability_by_gender.png",
+      "imagekitPath": "brin/analysis/bankability_by_gender.png",
+      "filename": "bankability_by_gender.png",
+      "sizeBytes": 81463,
+      "sizeKB": "79.55"
+    },
+    {
+      "localPath": "/Users/alharkan/Documents/Repositories/alharkan7.github.io/public/brin/analysis/green_gap_region.png",
+      "publicPath": "/brin/analysis/green_gap_region.png",
+      "imagekitPath": "brin/analysis/green_gap_region.png",
+      "filename": "green_gap_region.png",
+      "sizeBytes": 75172,
+      "sizeKB": "73.41"
+    },
+    {
+      "localPath": "/Users/alharkan/Documents/Repositories/alharkan7.github.io/public/brin/analysis/green_maturity_dist.png",
+      "publicPath": "/brin/analysis/green_maturity_dist.png",
+      "imagekitPath": "brin/analysis/green_maturity_dist.png",
+      "filename": "green_maturity_dist.png",
+      "sizeBytes": 114724,
+      "sizeKB": "112.04"
+    },
+    {
+      "localPath": "/Users/alharkan/Documents/Repositories/alharkan7.github.io/public/brin/eda/business_category.png",
+      "publicPath": "/brin/eda/business_category.png",
+      "imagekitPath": "brin/eda/business_category.png",
+      "filename": "business_category.png",
+      "sizeBytes": 136386,
+      "sizeKB": "133.19"
+    },
+    {
+      "localPath": "/Users/alharkan/Documents/Repositories/alharkan7.github.io/public/brin/eda/business_sector.png",
+      "publicPath": "/brin/eda/business_sector.png",
+      "imagekitPath": "brin/eda/business_sector.png",
+      "filename": "business_sector.png",
+      "sizeBytes": 172291,
+      "sizeKB": "168.25"
+    },
+    {
+      "localPath": "/Users/alharkan/Documents/Repositories/alharkan7.github.io/public/brin/eda/education_distribution.png",
+      "publicPath": "/brin/eda/education_distribution.png",
+      "imagekitPath": "brin/eda/education_distribution.png",
+      "filename": "education_distribution.png",
+      "sizeBytes": 134445,
+      "sizeKB": "131.29"
+    },
+    {
+      "localPath": "/Users/alharkan/Documents/Repositories/alharkan7.github.io/public/brin/eda/energy_usage.png",
+      "publicPath": "/brin/eda/energy_usage.png",
+      "imagekitPath": "brin/eda/energy_usage.png",
+      "filename": "energy_usage.png",
+      "sizeBytes": 154882,
+      "sizeKB": "151.25"
+    },
+    {
+      "localPath": "/Users/alharkan/Documents/Repositories/alharkan7.github.io/public/brin/eda/gender_distribution.png",
+      "publicPath": "/brin/eda/gender_distribution.png",
+      "imagekitPath": "brin/eda/gender_distribution.png",
+      "filename": "gender_distribution.png",
+      "sizeBytes": 97407,
+      "sizeKB": "95.12"
+    },
+    {
+      "localPath": "/Users/alharkan/Documents/Repositories/alharkan7.github.io/public/brin/eda/green_business.png",
+      "publicPath": "/brin/eda/green_business.png",
+      "imagekitPath": "brin/eda/green_business.png",
+      "filename": "green_business.png",
+      "sizeBytes": 74493,
+      "sizeKB": "72.75"
+    },
+    {
+      "localPath": "/Users/alharkan/Documents/Repositories/alharkan7.github.io/public/brin/eda/green_credit_interest.png",
+      "publicPath": "/brin/eda/green_credit_interest.png",
+      "imagekitPath": "brin/eda/green_credit_interest.png",
+      "filename": "green_credit_interest.png",
+      "sizeBytes": 241271,
+      "sizeKB": "235.62"
+    },
+    {
+      "localPath": "/Users/alharkan/Documents/Repositories/alharkan7.github.io/public/brin/eda/legal_entity.png",
+      "publicPath": "/brin/eda/legal_entity.png",
+      "imagekitPath": "brin/eda/legal_entity.png",
+      "filename": "legal_entity.png",
+      "sizeBytes": 330981,
+      "sizeKB": "323.22"
+    },
+    {
+      "localPath": "/Users/alharkan/Documents/Repositories/alharkan7.github.io/public/brin/eda/location_distribution.png",
+      "publicPath": "/brin/eda/location_distribution.png",
+      "imagekitPath": "brin/eda/location_distribution.png",
+      "filename": "location_distribution.png",
+      "sizeBytes": 114480,
+      "sizeKB": "111.80"
+    },
+    {
+      "localPath": "/Users/alharkan/Documents/Repositories/alharkan7.github.io/public/brin/eda/missing_data_analysis.png",
+      "publicPath": "/brin/eda/missing_data_analysis.png",
+      "imagekitPath": "brin/eda/missing_data_analysis.png",
+      "filename": "missing_data_analysis.png",
+      "sizeBytes": 251901,
+      "sizeKB": "246.00"
+    },
+    {
+      "localPath": "/Users/alharkan/Documents/Repositories/alharkan7.github.io/public/brin/eda/training_participation.png",
+      "publicPath": "/brin/eda/training_participation.png",
+      "imagekitPath": "brin/eda/training_participation.png",
+      "filename": "training_participation.png",
+      "sizeBytes": 70891,
+      "sizeKB": "69.23"
+    },
+    {
+      "localPath": "/Users/alharkan/Documents/Repositories/alharkan7.github.io/public/google-icon.svg",
+      "publicPath": "/google-icon.svg",
+      "imagekitPath": "google-icon.svg",
+      "filename": "google-icon.svg",
+      "sizeBytes": 768,
+      "sizeKB": "0.75"
+    },
+    {
+      "localPath": "/Users/alharkan/Documents/Repositories/alharkan7.github.io/public/job-stats/01_top_job_categories.png",
+      "publicPath": "/job-stats/01_top_job_categories.png",
+      "imagekitPath": "job-stats/01_top_job_categories.png",
+      "filename": "01_top_job_categories.png",
+      "sizeBytes": 277897,
+      "sizeKB": "271.38"
+    },
+    {
+      "localPath": "/Users/alharkan/Documents/Repositories/alharkan7.github.io/public/job-stats/02_work_type_distribution.png",
+      "publicPath": "/job-stats/02_work_type_distribution.png",
+      "imagekitPath": "job-stats/02_work_type_distribution.png",
+      "filename": "02_work_type_distribution.png",
+      "sizeBytes": 101052,
+      "sizeKB": "98.68"
+    },
+    {
+      "localPath": "/Users/alharkan/Documents/Repositories/alharkan7.github.io/public/job-stats/03_work_arrangement.png",
+      "publicPath": "/job-stats/03_work_arrangement.png",
+      "imagekitPath": "job-stats/03_work_arrangement.png",
+      "filename": "03_work_arrangement.png",
+      "sizeBytes": 90473,
+      "sizeKB": "88.35"
+    },
+    {
+      "localPath": "/Users/alharkan/Documents/Repositories/alharkan7.github.io/public/job-stats/04_jakarta_regions.png",
+      "publicPath": "/job-stats/04_jakarta_regions.png",
+      "imagekitPath": "job-stats/04_jakarta_regions.png",
+      "filename": "04_jakarta_regions.png",
+      "sizeBytes": 146478,
+      "sizeKB": "143.04"
+    },
+    {
+      "localPath": "/Users/alharkan/Documents/Repositories/alharkan7.github.io/public/job-stats/05_top_employers.png",
+      "publicPath": "/job-stats/05_top_employers.png",
+      "imagekitPath": "job-stats/05_top_employers.png",
+      "filename": "05_top_employers.png",
+      "sizeBytes": 283493,
+      "sizeKB": "276.85"
+    },
+    {
+      "localPath": "/Users/alharkan/Documents/Repositories/alharkan7.github.io/public/job-stats/06_field_completeness.png",
+      "publicPath": "/job-stats/06_field_completeness.png",
+      "imagekitPath": "job-stats/06_field_completeness.png",
+      "filename": "06_field_completeness.png",
+      "sizeBytes": 110127,
+      "sizeKB": "107.55"
+    },
+    {
+      "localPath": "/Users/alharkan/Documents/Repositories/alharkan7.github.io/public/job-stats/07_salary_distribution.png",
+      "publicPath": "/job-stats/07_salary_distribution.png",
+      "imagekitPath": "job-stats/07_salary_distribution.png",
+      "filename": "07_salary_distribution.png",
+      "sizeBytes": 144902,
+      "sizeKB": "141.51"
+    },
+    {
+      "localPath": "/Users/alharkan/Documents/Repositories/alharkan7.github.io/public/job-stats/08_salary_by_category.png",
+      "publicPath": "/job-stats/08_salary_by_category.png",
+      "imagekitPath": "job-stats/08_salary_by_category.png",
+      "filename": "08_salary_by_category.png",
+      "sizeBytes": 251262,
+      "sizeKB": "245.37"
+    },
+    {
+      "localPath": "/Users/alharkan/Documents/Repositories/alharkan7.github.io/public/job-stats/09_salary_by_work_type.png",
+      "publicPath": "/job-stats/09_salary_by_work_type.png",
+      "imagekitPath": "job-stats/09_salary_by_work_type.png",
+      "filename": "09_salary_by_work_type.png",
+      "sizeBytes": 112702,
+      "sizeKB": "110.06"
+    },
+    {
+      "localPath": "/Users/alharkan/Documents/Repositories/alharkan7.github.io/public/job-stats/10_salary_by_region.png",
+      "publicPath": "/job-stats/10_salary_by_region.png",
+      "imagekitPath": "job-stats/10_salary_by_region.png",
+      "filename": "10_salary_by_region.png",
+      "sizeBytes": 162392,
+      "sizeKB": "158.59"
+    },
+    {
+      "localPath": "/Users/alharkan/Documents/Repositories/alharkan7.github.io/public/job-stats/11_salary_bands.png",
+      "publicPath": "/job-stats/11_salary_bands.png",
+      "imagekitPath": "job-stats/11_salary_bands.png",
+      "filename": "11_salary_bands.png",
+      "sizeBytes": 87265,
+      "sizeKB": "85.22"
+    },
+    {
+      "localPath": "/Users/alharkan/Documents/Repositories/alharkan7.github.io/public/job-stats/12_top_skills.png",
+      "publicPath": "/job-stats/12_top_skills.png",
+      "imagekitPath": "job-stats/12_top_skills.png",
+      "filename": "12_top_skills.png",
+      "sizeBytes": 202372,
+      "sizeKB": "197.63"
+    },
+    {
+      "localPath": "/Users/alharkan/Documents/Repositories/alharkan7.github.io/public/job-stats/13_education_requirements.png",
+      "publicPath": "/job-stats/13_education_requirements.png",
+      "imagekitPath": "job-stats/13_education_requirements.png",
+      "filename": "13_education_requirements.png",
+      "sizeBytes": 118777,
+      "sizeKB": "115.99"
+    },
+    {
+      "localPath": "/Users/alharkan/Documents/Repositories/alharkan7.github.io/public/job-stats/14_experience_requirements.png",
+      "publicPath": "/job-stats/14_experience_requirements.png",
+      "imagekitPath": "job-stats/14_experience_requirements.png",
+      "filename": "14_experience_requirements.png",
+      "sizeBytes": 100006,
+      "sizeKB": "97.66"
+    },
+    {
+      "localPath": "/Users/alharkan/Documents/Repositories/alharkan7.github.io/public/job-stats/15_wordcloud_descriptions.png",
+      "publicPath": "/job-stats/15_wordcloud_descriptions.png",
+      "imagekitPath": "job-stats/15_wordcloud_descriptions.png",
+      "filename": "15_wordcloud_descriptions.png",
+      "sizeBytes": 2480844,
+      "sizeKB": "2422.70"
+    },
+    {
+      "localPath": "/Users/alharkan/Documents/Repositories/alharkan7.github.io/public/job-stats/16_wordcloud_qualifications.png",
+      "publicPath": "/job-stats/16_wordcloud_qualifications.png",
+      "imagekitPath": "job-stats/16_wordcloud_qualifications.png",
+      "filename": "16_wordcloud_qualifications.png",
+      "sizeBytes": 2360163,
+      "sizeKB": "2304.85"
+    },
+    {
+      "localPath": "/Users/alharkan/Documents/Repositories/alharkan7.github.io/public/job-stats/17_wordcloud_responsibilities.png",
+      "publicPath": "/job-stats/17_wordcloud_responsibilities.png",
+      "imagekitPath": "job-stats/17_wordcloud_responsibilities.png",
+      "filename": "17_wordcloud_responsibilities.png",
+      "sizeBytes": 2529102,
+      "sizeKB": "2469.83"
+    },
+    {
+      "localPath": "/Users/alharkan/Documents/Repositories/alharkan7.github.io/public/turnbackhoax/others/coherence-comparison.png",
+      "publicPath": "/turnbackhoax/others/coherence-comparison.png",
+      "imagekitPath": "turnbackhoax/others/coherence-comparison.png",
+      "filename": "coherence-comparison.png",
+      "sizeBytes": 169584,
+      "sizeKB": "165.61"
+    },
+    {
+      "localPath": "/Users/alharkan/Documents/Repositories/alharkan7.github.io/public/turnbackhoax/others/top-terms-per-topic.png",
+      "publicPath": "/turnbackhoax/others/top-terms-per-topic.png",
+      "imagekitPath": "turnbackhoax/others/top-terms-per-topic.png",
+      "filename": "top-terms-per-topic.png",
+      "sizeBytes": 503643,
+      "sizeKB": "491.84"
+    },
+    {
+      "localPath": "/Users/alharkan/Documents/Repositories/alharkan7.github.io/public/turnbackhoax/others/topic-distribution.png",
+      "publicPath": "/turnbackhoax/others/topic-distribution.png",
+      "imagekitPath": "turnbackhoax/others/topic-distribution.png",
+      "filename": "topic-distribution.png",
+      "sizeBytes": 108840,
+      "sizeKB": "106.29"
+    },
+    {
+      "localPath": "/Users/alharkan/Documents/Repositories/alharkan7.github.io/public/turnbackhoax/others/wordclouds.png",
+      "publicPath": "/turnbackhoax/others/wordclouds.png",
+      "imagekitPath": "turnbackhoax/others/wordclouds.png",
+      "filename": "wordclouds.png",
+      "sizeBytes": 1883357,
+      "sizeKB": "1839.22"
+    },
+    {
+      "localPath": "/Users/alharkan/Documents/Repositories/alharkan7.github.io/public/turnbackhoax/politics/coherence-comparison.png",
+      "publicPath": "/turnbackhoax/politics/coherence-comparison.png",
+      "imagekitPath": "turnbackhoax/politics/coherence-comparison.png",
+      "filename": "coherence-comparison.png",
+      "sizeBytes": 153779,
+      "sizeKB": "150.17"
+    },
+    {
+      "localPath": "/Users/alharkan/Documents/Repositories/alharkan7.github.io/public/turnbackhoax/politics/top-terms-per-topic.png",
+      "publicPath": "/turnbackhoax/politics/top-terms-per-topic.png",
+      "imagekitPath": "turnbackhoax/politics/top-terms-per-topic.png",
+      "filename": "top-terms-per-topic.png",
+      "sizeBytes": 692922,
+      "sizeKB": "676.68"
+    },
+    {
+      "localPath": "/Users/alharkan/Documents/Repositories/alharkan7.github.io/public/turnbackhoax/politics/topic-distribution.png",
+      "publicPath": "/turnbackhoax/politics/topic-distribution.png",
+      "imagekitPath": "turnbackhoax/politics/topic-distribution.png",
+      "filename": "topic-distribution.png",
+      "sizeBytes": 114887,
+      "sizeKB": "112.19"
+    },
+    {
+      "localPath": "/Users/alharkan/Documents/Repositories/alharkan7.github.io/public/turnbackhoax/politics/wordclouds.png",
+      "publicPath": "/turnbackhoax/politics/wordclouds.png",
+      "imagekitPath": "turnbackhoax/politics/wordclouds.png",
+      "filename": "wordclouds.png",
+      "sizeBytes": 2828473,
+      "sizeKB": "2762.18"
+    },
+    {
+      "localPath": "/Users/alharkan/Documents/Repositories/alharkan7.github.io/public/turnbackhoax/scam/coherence-comparison.png",
+      "publicPath": "/turnbackhoax/scam/coherence-comparison.png",
+      "imagekitPath": "turnbackhoax/scam/coherence-comparison.png",
+      "filename": "coherence-comparison.png",
+      "sizeBytes": 150292,
+      "sizeKB": "146.77"
+    },
+    {
+      "localPath": "/Users/alharkan/Documents/Repositories/alharkan7.github.io/public/turnbackhoax/scam/top-terms-per-topic.png",
+      "publicPath": "/turnbackhoax/scam/top-terms-per-topic.png",
+      "imagekitPath": "turnbackhoax/scam/top-terms-per-topic.png",
+      "filename": "top-terms-per-topic.png",
+      "sizeBytes": 372481,
+      "sizeKB": "363.75"
+    },
+    {
+      "localPath": "/Users/alharkan/Documents/Repositories/alharkan7.github.io/public/turnbackhoax/scam/topic-distribution.png",
+      "publicPath": "/turnbackhoax/scam/topic-distribution.png",
+      "imagekitPath": "turnbackhoax/scam/topic-distribution.png",
+      "filename": "topic-distribution.png",
+      "sizeBytes": 103367,
+      "sizeKB": "100.94"
+    },
+    {
+      "localPath": "/Users/alharkan/Documents/Repositories/alharkan7.github.io/public/turnbackhoax/scam/wordclouds.png",
+      "publicPath": "/turnbackhoax/scam/wordclouds.png",
+      "imagekitPath": "turnbackhoax/scam/wordclouds.png",
+      "filename": "wordclouds.png",
+      "sizeBytes": 1328298,
+      "sizeKB": "1297.17"
+    },
+    {
+      "localPath": "/Users/alharkan/Documents/Repositories/alharkan7.github.io/public/turnbackhoax/sentiment/candidate_sentiment_distribution.png",
+      "publicPath": "/turnbackhoax/sentiment/candidate_sentiment_distribution.png",
+      "imagekitPath": "turnbackhoax/sentiment/candidate_sentiment_distribution.png",
+      "filename": "candidate_sentiment_distribution.png",
+      "sizeBytes": 205306,
+      "sizeKB": "200.49"
+    },
+    {
+      "localPath": "/Users/alharkan/Documents/Repositories/alharkan7.github.io/public/turnbackhoax/sentiment/others_sentiment_distribution.png",
+      "publicPath": "/turnbackhoax/sentiment/others_sentiment_distribution.png",
+      "imagekitPath": "turnbackhoax/sentiment/others_sentiment_distribution.png",
+      "filename": "others_sentiment_distribution.png",
+      "sizeBytes": 212930,
+      "sizeKB": "207.94"
+    },
+    {
+      "localPath": "/Users/alharkan/Documents/Repositories/alharkan7.github.io/public/turnbackhoax/sentiment/scam_sentiment_distribution.png",
+      "publicPath": "/turnbackhoax/sentiment/scam_sentiment_distribution.png",
+      "imagekitPath": "turnbackhoax/sentiment/scam_sentiment_distribution.png",
+      "filename": "scam_sentiment_distribution.png",
+      "sizeBytes": 295604,
+      "sizeKB": "288.68"
+    }
+  ]
+}
