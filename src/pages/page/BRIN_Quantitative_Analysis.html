@@ -425,6 +425,182 @@
 </head>
 
 <body>
+    <!-- Password Protection Overlay -->
+    <div id="password-overlay" class="password-overlay">
+        <div class="password-modal">
+            <div class="password-icon">🔒</div>
+            <h2>Protected Content</h2>
+            <p>This page is password protected. Please enter the password to continue.</p>
+            <form id="password-form" onsubmit="checkPassword(event)">
+                <input type="password" id="password-input" placeholder="Enter password" autocomplete="off" autofocus>
+                <button type="submit">Unlock</button>
+            </form>
+            <p id="password-error" class="password-error"></p>
+        </div>
+    </div>
+
+    <style>
+        .password-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: #f8f9fa;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 10000;
+        }
+
+        .password-overlay.hidden {
+            display: none;
+        }
+
+        .password-modal {
+            background: white;
+            padding: 50px 40px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.07);
+            border: 1px solid #e9ecef;
+            text-align: center;
+            max-width: 400px;
+            width: 90%;
+            animation: modalSlideIn 0.3s ease;
+        }
+
+        @keyframes modalSlideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .password-icon {
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+        }
+
+        .password-modal h2 {
+            font-size: 1.4rem;
+            color: #2c3e50;
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+
+        .password-modal p {
+            color: #6c757d;
+            font-size: 0.9rem;
+            margin-bottom: 25px;
+        }
+
+        .password-modal form {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .password-modal input {
+            padding: 12px 16px;
+            border: 1px solid #e9ecef;
+            border-radius: 6px;
+            font-size: 1rem;
+            font-family: inherit;
+            transition: border-color 0.2s, box-shadow 0.2s;
+            outline: none;
+        }
+
+        .password-modal input:focus {
+            border-color: #0056b3;
+            box-shadow: 0 0 0 3px rgba(0, 86, 179, 0.1);
+        }
+
+        .password-modal button {
+            padding: 12px 20px;
+            background-color: #0056b3;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 0.95rem;
+            font-weight: 500;
+            font-family: inherit;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        .password-modal button:hover {
+            background-color: #004494;
+        }
+
+        .password-modal button:active {
+            background-color: #003670;
+        }
+
+        .password-error {
+            color: #c0392b !important;
+            font-weight: 500;
+            font-size: 0.85rem;
+            margin-bottom: 0 !important;
+            min-height: 20px;
+        }
+
+        .content-hidden {
+            display: none !important;
+        }
+    </style>
+
+    <script>
+        // ===== CHANGE THIS PASSWORD =====
+        const PROTECTED_PASSWORD = 'brin2026';
+        // ================================
+
+        function checkPassword(e) {
+            e.preventDefault();
+            const input = document.getElementById('password-input');
+            const error = document.getElementById('password-error');
+
+            if (input.value === PROTECTED_PASSWORD) {
+                unlockPage();
+            } else {
+                error.textContent = 'Incorrect password. Please try again.';
+                input.value = '';
+                input.focus();
+                // Shake animation
+                const modal = document.querySelector('.password-modal');
+                modal.style.animation = 'none';
+                modal.offsetHeight; // Trigger reflow
+                modal.style.animation = 'shake 0.4s ease';
+            }
+        }
+
+        function unlockPage() {
+            const overlay = document.getElementById('password-overlay');
+            overlay.classList.add('hidden');
+            document.querySelector('.container').classList.remove('content-hidden');
+        }
+
+        // Hide content on page load
+        document.addEventListener('DOMContentLoaded', function () {
+            document.querySelector('.container').classList.add('content-hidden');
+        });
+
+        // Add shake animation
+        const shakeStyle = document.createElement('style');
+        shakeStyle.textContent = `
+            @keyframes shake {
+                0%, 100% { transform: translateX(0); }
+                20%, 60% { transform: translateX(-5px); }
+                40%, 80% { transform: translateX(5px); }
+            }
+        `;
+        document.head.appendChild(shakeStyle);
+    </script>
+
     <div class="container">
         <!-- Header -->
         <header class="header">
