@@ -1,0 +1,923 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BRIN UMKM Survey Analysis - Comprehensive Report</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #0056b3;
+            --secondary-color: #2c3e50;
+            --accent-color: #e31c23;
+            /* BRIN red nuance for accent */
+            --bg-color: #f8f9fa;
+            --card-bg: #ffffff;
+            --text-color: #333333;
+            --text-muted: #6c757d;
+            --border-color: #e9ecef;
+            --success-color: #198754;
+            --border-radius: 8px;
+            --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.07);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            overflow-y: scroll;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            line-height: 1.6;
+            color: var(--text-color);
+            background-color: var(--bg-color);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .container {
+            max-width: 1200px;
+            width: 100%;
+            margin: 40px auto;
+            background: var(--card-bg);
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow-md);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            min-height: 80vh;
+        }
+
+        /* Header */
+        .header {
+            background-color: white;
+            padding: 40px 50px;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+        }
+
+        .header-content h1 {
+            font-size: 2.2rem;
+            font-weight: 700;
+            color: var(--secondary-color);
+            letter-spacing: -0.02em;
+            margin-bottom: 8px;
+        }
+
+        .header-content h2 {
+            font-size: 1.1rem;
+            font-weight: 400;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .meta-info {
+            text-align: right;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 6px 12px;
+            background-color: #e8f5e9;
+            color: #1b5e20;
+            font-size: 0.85rem;
+            font-weight: 600;
+            border-radius: 4px;
+            border: 1px solid #c8e6c9;
+        }
+
+        .date-badge {
+            display: block;
+            margin-top: 8px;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+        }
+
+        /* Navigation */
+        .nav-tabs {
+            background: white;
+            border-bottom: 1px solid var(--border-color);
+            padding: 0 50px;
+            display: flex;
+            gap: 30px;
+        }
+
+        .nav-tab {
+            background: none;
+            border: none;
+            padding: 20px 0;
+            font-family: inherit;
+            font-size: 0.95rem;
+            font-weight: 500;
+            color: var(--text-muted);
+            cursor: pointer;
+            position: relative;
+            transition: color 0.2s ease;
+            outline: none;
+            /* Remove focus outline */
+        }
+
+        .nav-tab:focus {
+            outline: none;
+        }
+
+        .nav-tab:hover {
+            color: var(--primary-color);
+        }
+
+        .nav-tab.active {
+            color: var(--primary-color);
+            font-weight: 500;
+            /* Keep weight constant to prevent width shift */
+        }
+
+        .nav-tab.active::after {
+            content: '';
+            position: absolute;
+            bottom: -1px;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background-color: var(--primary-color);
+        }
+
+        /* Content */
+        .content {
+            padding: 50px;
+            background-color: white;
+            flex: 1;
+        }
+
+        .tab-content {
+            display: none;
+            animation: fadeIn 0.4s ease;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(5px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Typography & Components in Content */
+        h2.section-title {
+            font-size: 1.5rem;
+            color: var(--secondary-color);
+            margin-bottom: 30px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        h3 {
+            font-size: 1.2rem;
+            color: var(--secondary-color);
+            margin: 35px 0 15px;
+            font-weight: 600;
+        }
+
+        h4 {
+            font-size: 1rem;
+            color: var(--text-color);
+            margin: 20px 0 10px;
+            font-weight: 600;
+        }
+
+        p {
+            margin-bottom: 1rem;
+            color: #4a5568;
+        }
+
+        /* Stats Grid */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 25px;
+            margin-bottom: 40px;
+        }
+
+        .stat-card {
+            background: white;
+            border: 1px solid var(--border-color);
+            padding: 25px;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow-sm);
+            transition: box-shadow 0.2s;
+        }
+
+        .stat-card:hover {
+            border-color: #cbd5e1;
+            box-shadow: var(--shadow-md);
+        }
+
+        .stat-number {
+            font-size: 2.2rem;
+            font-weight: 700;
+            color: var(--primary-color);
+            line-height: 1.2;
+            margin-bottom: 5px;
+        }
+
+        .stat-label {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            font-weight: 500;
+        }
+
+        /* Lists */
+        ul {
+            list-style-position: inside;
+            margin-left: 10px;
+            color: #4a5568;
+        }
+
+        li {
+            margin-bottom: 8px;
+        }
+
+        .findings-list {
+            background-color: #f8fafc;
+            border-left: 4px solid var(--primary-color);
+            padding: 20px;
+            border-radius: 0 4px 4px 0;
+            margin: 20px 0;
+        }
+
+        .findings-list ul {
+            list-style: none;
+            margin: 0;
+        }
+
+        .findings-list li {
+            position: relative;
+            padding-left: 20px;
+            margin-bottom: 12px;
+        }
+
+        .findings-list li:before {
+            content: "•";
+            color: var(--primary-color);
+            font-weight: bold;
+            position: absolute;
+            left: 0;
+        }
+
+        strong {
+            color: var(--secondary-color);
+            font-weight: 600;
+        }
+
+        .highlight {
+            color: var(--primary-color);
+            font-weight: 600;
+        }
+
+        /* Tables */
+        .table-container {
+            overflow-x: auto;
+            border: 1px solid var(--border-color);
+            border-radius: var(--border-radius);
+            margin: 20px 0;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.95rem;
+        }
+
+        th {
+            background-color: #f1f5f9;
+            color: var(--secondary-color);
+            font-weight: 600;
+            text-align: left;
+            padding: 12px 20px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        td {
+            padding: 12px 20px;
+            border-bottom: 1px solid var(--border-color);
+            color: #4a5568;
+        }
+
+        tr:last-child td {
+            border-bottom: none;
+        }
+
+        /* Visualizations */
+        .visualization-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(450px, 1fr));
+            gap: 40px;
+            margin-top: 30px;
+        }
+
+        .visualization {
+            background: white;
+            padding: 20px;
+            border: 1px solid var(--border-color);
+            border-radius: var(--border-radius);
+        }
+
+        .visualization img {
+            width: 100%;
+            height: auto;
+            border-radius: 4px;
+        }
+
+        .visualization-caption {
+            margin-top: 15px;
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            text-align: center;
+            border-top: 1px solid #f1f1f1;
+            padding-top: 10px;
+        }
+
+        /* Recommendations */
+        .recommendation-card {
+            border: 1px solid var(--border-color);
+            border-radius: var(--border-radius);
+            padding: 25px;
+            margin-bottom: 20px;
+            background: white;
+            border-left: 4px solid var(--secondary-color);
+            transition: transform 0.2s;
+        }
+
+        .recommendation-card:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .recommendation-card h4 {
+            color: var(--secondary-color);
+            margin-top: 0;
+            font-size: 1.1rem;
+        }
+
+        /* Code Block */
+        .code-block {
+            background-color: #1e293b;
+            color: #e2e8f0;
+            padding: 20px;
+            border-radius: 6px;
+            font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
+            font-size: 0.9rem;
+            line-height: 1.5;
+            overflow-x: auto;
+            margin: 20px 0;
+        }
+
+        /* Checklist */
+        .checklist {
+            display: grid;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .checklist-item {
+            display: flex;
+            align-items: center;
+            padding: 10px;
+            background: #f8fafc;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            color: var(--secondary-color);
+        }
+
+        .checklist-icon {
+            margin-right: 12px;
+            color: var(--success-color);
+        }
+
+        /* Footer */
+        .footer {
+            background-color: white;
+            border-top: 1px solid var(--border-color);
+            padding: 30px 50px;
+            text-align: center;
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            margin-top: auto;
+        }
+
+        .footer strong {
+            display: block;
+            color: var(--secondary-color);
+            margin-bottom: 5px;
+        }
+
+        /* Mobile */
+        @media (max-width: 768px) {
+            .header {
+                flex-direction: column;
+                padding: 30px 20px;
+                text-align: left;
+            }
+
+            .meta-info {
+                text-align: left;
+                margin-top: 15px;
+            }
+
+            .nav-tabs {
+                padding: 0 20px;
+                overflow-x: auto;
+                gap: 20px;
+            }
+
+            .nav-tab {
+                white-space: nowrap;
+            }
+
+            .content {
+                padding: 30px 20px;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .visualization-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header class="header">
+            <div class="header-content">
+                <h1>BRIN UMKM Survey Analysis</h1>
+                <h2>Exploratory Data Analysis Report</h2>
+            </div>
+            <div class="meta-info">
+                <div class="status-badge">Complete</div>
+                <div class="date-badge">January 16, 2026</div>
+            </div>
+        </header>
+
+        <!-- Navigation Tabs -->
+        <nav class="nav-tabs">
+            <button class="nav-tab active" onclick="showTab('overview')">Overview</button>
+            <button class="nav-tab" onclick="showTab('findings')">Key Findings</button>
+            <button class="nav-tab" onclick="showTab('visualizations')">Visualizations</button>
+            <button class="nav-tab" onclick="showTab('recommendations')">Recommendations</button>
+            <button class="nav-tab" onclick="showTab('methodology')">Methodology</button>
+        </nav>
+
+        <!-- Content Sections -->
+        <div class="content">
+            <!-- Overview Tab -->
+            <div id="overview" class="tab-content active">
+                <h2 class="section-title">Project Overview</h2>
+
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-number">161</div>
+                        <div class="stat-label">Respondents</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number">73</div>
+                        <div class="stat-label">Variables</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number">69.6%</div>
+                        <div class="stat-label">Green Businesses</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number">70.2%</div>
+                        <div class="stat-label">Trained</div>
+                    </div>
+                </div>
+
+                <h3>Research Focus</h3>
+                <p>This comprehensive analysis examines UMKM (Micro, Small, and Medium Enterprises) across Indonesia,
+                    focusing on sustainability practices, financing needs, and business development challenges.</p>
+
+                <div class="findings-list">
+                    <h4>Core Research Areas</h4>
+                    <ul>
+                        <li><strong>Business Characteristics:</strong> Types, sectors, legal status, and employee
+                            distribution</li>
+                        <li><strong>Sustainability Practices:</strong> Green business identification, energy usage,
+                            waste management</li>
+                        <li><strong>Financing & Credit:</strong> Credit history, green financing interest, barriers</li>
+                        <li><strong>Training & Development:</strong> Participation rates, preferred formats, needs</li>
+                        <li><strong>Inclusion & Accessibility:</strong> Disability considerations, gender barriers</li>
+                    </ul>
+                </div>
+
+                <h3>Data Overview</h3>
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Metric</th>
+                                <th>Value</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Sample Size</td>
+                                <td>161 respondents</td>
+                            </tr>
+                            <tr>
+                                <td>Variables</td>
+                                <td>73 survey questions</td>
+                            </tr>
+                            <tr>
+                                <td>Missing Data</td>
+                                <td>9.43% overall</td>
+                            </tr>
+                            <tr>
+                                <td>Geographic Focus</td>
+                                <td>Primarily Java region</td>
+                            </tr>
+                            <tr>
+                                <td>Study Period</td>
+                                <td>2025 survey collection</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Key Findings Tab -->
+            <div id="findings" class="tab-content">
+                <h2 class="section-title">Key Findings</h2>
+
+                <h3>Demographics</h3>
+                <div class="findings-list">
+                    <ul>
+                        <li><strong>Gender:</strong> <span class="highlight">69.6%</span> of respondents are female
+                            entrepreneurs.</li>
+                        <li><strong>Primary Location:</strong> Concentrated in Java (DKI Jakarta, Banten, Jawa Barat,
+                            Jawa Tengah, DIY, Jawa Timur).</li>
+                        <li><strong>Education:</strong> Diverse educational background ranging from high school to
+                            postgraduate levels.</li>
+                    </ul>
+                </div>
+
+                <h3>Business Characteristics</h3>
+                <div class="findings-list">
+                    <ul>
+                        <li><strong>Dominant Scale:</strong> Micro enterprises (Usaha Mikro) form the majority.</li>
+                        <li><strong>Top Sector:</strong> Food & Beverage leads with <span class="highlight">44
+                                businesses (27.3%)</span>.</li>
+                        <li><strong>Green Identity:</strong> <span class="highlight">69.6%</span> identify as green
+                            businesses.</li>
+                        <li><strong>Legality:</strong> A significant portion operates without formal legal entity
+                            registration.</li>
+                    </ul>
+                </div>
+
+                <h3>Sustainability Practices</h3>
+                <div class="findings-list">
+                    <ul>
+                        <li><strong>Energy Source:</strong> 75.8% rely solely on conventional electricity (PLN).</li>
+                        <li><strong>Renewables:</strong> Limited adoption, with only <span
+                                class="highlight">11.8%</span> using mixed or renewable sources.</li>
+                        <li><strong>Waste Management:</strong> 30.4% report no active waste management practices.</li>
+                        <li><strong>Packaging:</strong> 33.5% do not use eco-friendly packaging solutions.</li>
+                    </ul>
+                </div>
+
+                <h3>Financing Insights</h3>
+                <div class="findings-list">
+                    <ul>
+                        <li><strong>Credit Access:</strong> <span class="highlight">59.0%</span> have never accessed
+                            business loans.</li>
+                        <li><strong>Syariah Preference:</strong> 26.1% express interest specifically in syariah-based
+                            (interest-free) plans.</li>
+                        <li><strong>Collateral Issues:</strong> 20.5% are interested only if collateral requirements are
+                            waived.</li>
+                        <li><strong>Disinterest:</strong> 19.3% show no interest in green credit options.</li>
+                    </ul>
+                </div>
+
+                <h3>Training & Development</h3>
+                <div class="findings-list">
+                    <ul>
+                        <li><strong>Engagement:</strong> <span class="highlight">70.2%</span> have participated in
+                            training programs.</li>
+                        <li><strong>Format Preference:</strong> Strong preference for hands-on, practical learning.</li>
+                        <li><strong>Barriers:</strong> Location distance, time constraints, and technology access are
+                            key hurdles.</li>
+                    </ul>
+                </div>
+
+                <h3>Inclusion Challenges</h3>
+                <div class="findings-list">
+                    <ul>
+                        <li><strong>Gender Barriers:</strong> 30.4% report gender-related challenges in business.</li>
+                        <li><strong>Disabilities:</strong> <span class="highlight">16.1%</span> of entrepreneurs have
+                            physical limitations.</li>
+                        <li><strong>Detailed Needs:</strong> Issues with mobility (26), emotional/mental health (6),
+                            vision (6), and cognitive (3) cited.</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Visualizations Tab -->
+            <div id="visualizations" class="tab-content">
+                <h2 class="section-title">Data Visualizations</h2>
+                <p>The following visualizations illustrate distributions and patterns identified during the analysis.
+                </p>
+
+                <div class="visualization-grid">
+                    <div class="visualization">
+                        <img src="/brin/eda/gender_distribution.png" alt="Gender Distribution">
+                        <p class="visualization-caption">Figure 1: Gender Distribution of Respondents</p>
+                    </div>
+
+                    <div class="visualization">
+                        <img src="/brin/eda/business_category.png" alt="Business Category">
+                        <p class="visualization-caption">Figure 2: Business Category Distribution</p>
+                    </div>
+
+                    <div class="visualization">
+                        <img src="/brin/eda/business_sector.png" alt="Business Sector">
+                        <p class="visualization-caption">Figure 3: Top 15 Business Sectors</p>
+                    </div>
+
+                    <div class="visualization">
+                        <img src="/brin/eda/education_distribution.png" alt="Education Distribution">
+                        <p class="visualization-caption">Figure 4: Education Level Distribution</p>
+                    </div>
+
+                    <div class="visualization">
+                        <img src="/brin/eda/location_distribution.png" alt="Location Distribution">
+                        <p class="visualization-caption">Figure 5: Top 10 Business Locations</p>
+                    </div>
+
+                    <div class="visualization">
+                        <img src="/brin/eda/green_business.png" alt="Green Business">
+                        <p class="visualization-caption">Figure 6: Green vs Conventional Business</p>
+                    </div>
+
+                    <div class="visualization">
+                        <img src="/brin/eda/legal_entity.png" alt="Legal Entity">
+                        <p class="visualization-caption">Figure 7: Legal Entity Types</p>
+                    </div>
+
+                    <div class="visualization">
+                        <img src="/brin/eda/energy_usage.png" alt="Energy Usage">
+                        <p class="visualization-caption">Figure 8: Energy Usage Patterns</p>
+                    </div>
+
+                    <div class="visualization">
+                        <img src="/brin/eda/green_credit_interest.png" alt="Green Credit Interest">
+                        <p class="visualization-caption">Figure 9: Interest in Green Credit Financing</p>
+                    </div>
+
+                    <div class="visualization">
+                        <img src="/brin/eda/training_participation.png" alt="Training Participation">
+                        <p class="visualization-caption">Figure 10: Training Participation Rates</p>
+                    </div>
+
+                    <div class="visualization">
+                        <img src="/brin/eda/missing_data_analysis.png" alt="Missing Data">
+                        <p class="visualization-caption">Figure 11: Missing Data Analysis</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Recommendations Tab -->
+            <div id="recommendations" class="tab-content">
+                <h2 class="section-title">Policy Recommendations</h2>
+
+                <div class="recommendation-card">
+                    <h4>1. Green Transition Support</h4>
+                    <ul>
+                        <li>Provide targeted subsidies for renewable energy adoption.</li>
+                        <li>Offer specialized training on sustainable business practices.</li>
+                        <li>Establish green certification programs for credibility.</li>
+                        <li>Develop sector-specific sustainability guidelines.</li>
+                    </ul>
+                </div>
+
+                <div class="recommendation-card">
+                    <h4>2. Accessible Financing</h4>
+                    <ul>
+                        <li>Develop syariah-compliant green credit products.</li>
+                        <li>Reduce or eliminate collateral requirements for micro-enterprises.</li>
+                        <li>Simplify loan application processes.</li>
+                        <li>Provide financial literacy training alongside credit products.</li>
+                        <li>Create alternative credit scoring mechanisms based on business activity.</li>
+                    </ul>
+                </div>
+
+                <div class="recommendation-card">
+                    <h4>3. Capacity Building</h4>
+                    <ul>
+                        <li>Increase availability of hands-on practical training programs.</li>
+                        <li>Decentralize training to bring it closer to communities.</li>
+                        <li>Improve digital literacy initiatives for modern business tools.</li>
+                        <li>Develop sector-specific training curricula.</li>
+                        <li>Provide follow-up mentorship programs to ensure application of learning.</li>
+                    </ul>
+                </div>
+
+                <div class="recommendation-card">
+                    <h4>4. Inclusion Enhancement</h4>
+                    <ul>
+                        <li>Address gender-based barriers through targeted support programs.</li>
+                        <li>Ensure business support services are disability-accessible.</li>
+                        <li>Provide assistive technologies and necessary accommodations.</li>
+                        <li>Create inclusive mentorship networks.</li>
+                        <li>Develop awareness campaigns on inclusive business practices.</li>
+                    </ul>
+                </div>
+
+                <div class="recommendation-card">
+                    <h4>5. Business Formalization Support</h4>
+                    <ul>
+                        <li>Assist with legal entity registration procedures.</li>
+                        <li>Simplify bureaucratic processes for small businesses.</li>
+                        <li>Provide one-on-one business licensing support.</li>
+                        <li>Offer tax compliance guidance and incentives.</li>
+                        <li>Establish one-stop service centers for administrative needs.</li>
+                    </ul>
+                </div>
+
+                <h3>Next Steps for Implementation</h3>
+                <div class="checklist">
+                    <div class="checklist-item">
+                        <span class="checklist-icon">✔</span> Conduct stakeholder consultations
+                    </div>
+                    <div class="checklist-item">
+                        <span class="checklist-icon">✔</span> Develop pilot programs for green transition
+                    </div>
+                    <div class="checklist-item">
+                        <span class="checklist-icon">✔</span> Partner with financial institutions for syariah products
+                    </div>
+                    <div class="checklist-item">
+                        <span class="checklist-icon">✔</span> Create training modules and materials
+                    </div>
+                    <div class="checklist-item">
+                        <span class="checklist-icon">✔</span> Establish monitoring and evaluation framework
+                    </div>
+                    <div class="checklist-item">
+                        <span class="checklist-icon">✔</span> Design accessibility standards for programs
+                    </div>
+                </div>
+            </div>
+
+            <!-- Methodology Tab -->
+            <div id="methodology" class="tab-content">
+                <h2 class="section-title">Research Methodology</h2>
+
+                <h3>Data Collection</h3>
+                <p>Survey data was collected from <strong>161 UMKM businesses</strong> across Indonesia during 2025. The
+                    survey instrument comprised 73 comprehensive questions covering business operations, sustainability
+                    practices, financing needs, and demographic information.</p>
+
+                <h3>Analysis Approach</h3>
+                <p>The exploratory data analysis was conducted using Python, utilizing the standard data science stack:
+                </p>
+
+                <div class="code-block">
+                    #!/usr/bin/env python3
+                    import pandas as pd
+                    import numpy as np
+                    import matplotlib.pyplot as plt
+                    import seaborn as sns
+                </div>
+
+                <h3>Analysis Modules</h3>
+                <div class="findings-list">
+                    <ul>
+                        <li><strong>Data Quality Assessment:</strong> Missing data analysis and completeness metrics.
+                        </li>
+                        <li><strong>Descriptive Statistics:</strong> Frequencies, distributions, and central tendencies.
+                        </li>
+                        <li><strong>Demographic Analysis:</strong> Gender, age, location, and education patterns.</li>
+                        <li><strong>Business Profiling:</strong> Sectors, categories, legal status, and size metrics.
+                        </li>
+                        <li><strong>Sustainability Assessment:</strong> Energy, waste, packaging, and green practices.
+                        </li>
+                        <li><strong>Financing Analysis:</strong> Credit access, barriers, and preferences.</li>
+                        <li><strong>Training Evaluation:</strong> Participation, formats, and effectiveness.</li>
+                        <li><strong>Inclusion Analysis:</strong> Disability, gender, and accessibility barriers.</li>
+                    </ul>
+                </div>
+
+                <h3>Visualization Standards</h3>
+                <p>All visualizations adhere to publication-ready standards:</p>
+                <ul>
+                    <li>300 DPI resolution for print quality.</li>
+                    <li>Consistent color palette using seaborn "husl".</li>
+                    <li>Clear labels, legends, and titles.</li>
+                    <li>Accessible color schemes for readability.</li>
+                </ul>
+
+                <h3>Project Structure</h3>
+                <div class="code-block">
+                    riset-brin/
+                    ├── data/ # Survey data
+                    ├── scripts/ # Python analysis scripts
+                    ├── output/ # Statistical summaries
+                    ├── figures/ # Visualizations (11 PNG)
+                    ├── reports/ # Analysis reports
+                    └── documentation # Project docs
+                </div>
+
+                <h3>Data Quality Metrics</h3>
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Quality Metric</th>
+                                <th>Result</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Overall Missing Data</td>
+                                <td>9.43%</td>
+                            </tr>
+                            <tr>
+                                <td>Complete Records</td>
+                                <td>161 respondents</td>
+                            </tr>
+                            <tr>
+                                <td>Valid Response Rate</td>
+                                <td>90.57%</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <h3>Reproducibility</h3>
+                <p>The analysis is fully reproducible. To regenerate all outputs, execute the following:</p>
+
+                <div class="code-block">
+                    cd /path/to/riset-brin
+                    python3 scripts/exploratory_data_analysis.py
+                </div>
+
+                <p style="margin-top: 10px; font-size: 0.9em; color: var(--text-muted);">
+                    All scripts, data, and documentation are version-controlled and available in the project repository.
+                </p>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <strong>BRIN UMKM Survey Analysis Project</strong>
+            <p>Exploratory Data Analysis | January 2026</p>
+            <p>Research Team - BRIN (Badan Riset dan Inovasi Nasional)</p>
+        </footer>
+    </div>
+
+    <script>
+        function showTab(tabName) {
+            // Hide all tabs
+            const tabs = document.querySelectorAll('.tab-content');
+            tabs.forEach(tab => tab.classList.remove('active'));
+
+            // Remove active class from all nav tabs
+            const navTabs = document.querySelectorAll('.nav-tab');
+            navTabs.forEach(navTab => navTab.classList.remove('active'));
+
+            // Show selected tab
+            document.getElementById(tabName).classList.add('active');
+
+            // Add active class to clicked nav tab
+            event.target.classList.add('active');
+
+            // Scroll to top of content, not page
+            const container = document.querySelector('.container');
+            container.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+    </script>
+</body>
+
+</html>

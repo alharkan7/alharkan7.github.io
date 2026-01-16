@@ -1,0 +1,639 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BRIN Quantitative Analysis - Deep Dive Findings</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #0056b3;
+            --secondary-color: #2c3e50;
+            --accent-color: #c0392b;
+            --bg-color: #f8f9fa;
+            --card-bg: #ffffff;
+            --text-color: #333333;
+            --text-muted: #6c757d;
+            --border-color: #e9ecef;
+            --success-color: #198754;
+            --alert-color: #c0392b;
+            --border-radius: 8px;
+            --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.07);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            overflow-y: scroll;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            line-height: 1.6;
+            color: var(--text-color);
+            background-color: var(--bg-color);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .container {
+            max-width: 1200px;
+            width: 100%;
+            margin: 40px auto;
+            background: var(--card-bg);
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow-md);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            min-height: 80vh;
+        }
+
+        /* Header */
+        .header {
+            background-color: white;
+            padding: 40px 50px;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+        }
+
+        .header-content h1 {
+            font-size: 2.2rem;
+            font-weight: 700;
+            color: var(--secondary-color);
+            letter-spacing: -0.02em;
+            margin-bottom: 8px;
+        }
+
+        .header-content h2 {
+            font-size: 1.1rem;
+            font-weight: 400;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .meta-info {
+            text-align: right;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 6px 12px;
+            background-color: #fff3e0;
+            color: #e65100;
+            font-size: 0.85rem;
+            font-weight: 600;
+            border-radius: 4px;
+            border: 1px solid #ffe0b2;
+        }
+
+        .date-badge {
+            display: block;
+            margin-top: 8px;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+        }
+
+        /* Navigation */
+        .nav-tabs {
+            background: white;
+            border-bottom: 1px solid var(--border-color);
+            padding: 0 50px;
+            display: flex;
+            gap: 30px;
+        }
+
+        .nav-tab {
+            background: none;
+            border: none;
+            padding: 20px 0;
+            font-family: inherit;
+            font-size: 0.95rem;
+            font-weight: 500;
+            color: var(--text-muted);
+            cursor: pointer;
+            position: relative;
+            transition: color 0.2s ease;
+            outline: none;
+        }
+
+        .nav-tab:focus {
+            outline: none;
+        }
+
+        .nav-tab:hover {
+            color: var(--primary-color);
+        }
+
+        .nav-tab.active {
+            color: var(--primary-color);
+            font-weight: 500;
+        }
+
+        .nav-tab.active::after {
+            content: '';
+            position: absolute;
+            bottom: -1px;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background-color: var(--primary-color);
+        }
+
+        /* Content */
+        .content {
+            padding: 50px;
+            background-color: white;
+            flex: 1;
+        }
+
+        .tab-content {
+            display: none;
+            animation: fadeIn 0.4s ease;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(5px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Section */
+        .section {
+            margin-bottom: 40px;
+        }
+
+        h2.section-title {
+            font-size: 1.5rem;
+            color: var(--secondary-color);
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        h3 {
+            font-size: 1.2rem;
+            color: var(--secondary-color);
+            margin: 30px 0 15px;
+            font-weight: 600;
+        }
+
+        p {
+            margin-bottom: 1rem;
+            color: #4a5568;
+        }
+
+        ul {
+            list-style-position: inside;
+            margin-left: 10px;
+            color: #4a5568;
+            margin-bottom: 1rem;
+        }
+
+        li {
+            margin-bottom: 8px;
+        }
+
+        strong {
+            color: var(--secondary-color);
+            font-weight: 600;
+        }
+
+        /* Stats Grid */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: white;
+            border: 1px solid var(--border-color);
+            padding: 25px;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow-sm);
+            transition: box-shadow 0.2s;
+        }
+
+        .stat-card:hover {
+            border-color: #cbd5e1;
+            box-shadow: var(--shadow-md);
+        }
+
+        .stat-card.alert {
+            border-left: 4px solid var(--alert-color);
+        }
+
+        .stat-number {
+            font-size: 2.2rem;
+            font-weight: 700;
+            color: var(--primary-color);
+            line-height: 1.2;
+            margin-bottom: 5px;
+        }
+
+        .stat-card.alert .stat-number {
+            color: var(--alert-color);
+        }
+
+        .stat-label {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            font-weight: 500;
+        }
+
+        /* Findings Box */
+        .findings-box {
+            background-color: #f8fafc;
+            border-left: 4px solid var(--primary-color);
+            padding: 20px;
+            border-radius: 0 4px 4px 0;
+            margin: 20px 0;
+        }
+
+        .key-finding {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--secondary-color);
+            margin-bottom: 10px;
+        }
+
+        .findings-box p {
+            margin-bottom: 0;
+        }
+
+        /* Visualizations */
+        .visualization-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(450px, 1fr));
+            gap: 30px;
+            margin: 30px 0;
+        }
+
+        .visualization {
+            background: white;
+            padding: 20px;
+            border: 1px solid var(--border-color);
+            border-radius: var(--border-radius);
+        }
+
+        .visualization img {
+            width: 100%;
+            height: auto;
+            border-radius: 4px;
+        }
+
+        .visualization-caption {
+            margin-top: 15px;
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            text-align: center;
+            border-top: 1px solid #f1f1f1;
+            padding-top: 10px;
+        }
+
+        /* Tables */
+        .table-container {
+            overflow-x: auto;
+            border: 1px solid var(--border-color);
+            border-radius: var(--border-radius);
+            margin: 20px 0;
+        }
+
+        .stat-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.95rem;
+        }
+
+        .stat-table th {
+            background-color: #f1f5f9;
+            color: var(--secondary-color);
+            font-weight: 600;
+            text-align: left;
+            padding: 12px 20px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .stat-table td {
+            padding: 12px 20px;
+            border-bottom: 1px solid var(--border-color);
+            color: #4a5568;
+        }
+
+        .stat-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .badge-fail {
+            display: inline-block;
+            background: #ffebee;
+            color: #c62828;
+            padding: 4px 10px;
+            border-radius: 4px;
+            font-weight: 600;
+            font-size: 0.85em;
+        }
+
+        /* Code Block */
+        .code-block {
+            background-color: #1e293b;
+            color: #e2e8f0;
+            padding: 20px;
+            border-radius: 6px;
+            font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
+            font-size: 0.9rem;
+            line-height: 1.5;
+            overflow-x: auto;
+            margin: 20px 0;
+        }
+
+        /* Footer */
+        .footer {
+            background-color: white;
+            border-top: 1px solid var(--border-color);
+            padding: 30px 50px;
+            text-align: center;
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            margin-top: auto;
+        }
+
+        .footer strong {
+            display: block;
+            color: var(--secondary-color);
+            margin-bottom: 5px;
+        }
+
+        /* Mobile */
+        @media (max-width: 768px) {
+            .header {
+                flex-direction: column;
+                padding: 30px 20px;
+                text-align: left;
+            }
+
+            .meta-info {
+                text-align: left;
+                margin-top: 15px;
+            }
+
+            .nav-tabs {
+                padding: 0 20px;
+                overflow-x: auto;
+                gap: 20px;
+            }
+
+            .nav-tab {
+                white-space: nowrap;
+            }
+
+            .content {
+                padding: 30px 20px;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .visualization-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header class="header">
+            <div class="header-content">
+                <h1>Deep Dive Analysis</h1>
+                <h2>Quantitative Findings: BAB 3 Inputs</h2>
+            </div>
+            <div class="meta-info">
+                <div class="status-badge">Phase 2: Statistical Validation</div>
+                <div class="date-badge">January 2026</div>
+            </div>
+        </header>
+
+        <!-- Navigation -->
+        <nav class="nav-tabs">
+            <button class="nav-tab active" onclick="showTab('summary')">Key Summary</button>
+            <button class="nav-tab" onclick="showTab('segmentation')">Segmentation</button>
+            <button class="nav-tab" onclick="showTab('stats')">Statistical Tests</button>
+            <button class="nav-tab" onclick="showTab('recos')">Recommendations</button>
+        </nav>
+
+        <!-- Content -->
+        <div class="content">
+
+            <!-- Summary Tab -->
+            <div id="summary" class="tab-content active">
+                <h2 class="section-title">Executive Summary</h2>
+                <p>This phase applied rigorous scoring models to move beyond self-reported data. The results reveal
+                    a significant gap between "Green Intent" and "Operational Readiness".</p>
+
+                <div class="stats-grid">
+                    <div class="stat-card alert">
+                        <div class="stat-number">92%</div>
+                        <div class="stat-label">Are "Incubation Targets" (Not Credit Ready)</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number">20/100</div>
+                        <div class="stat-label">Average Green Maturity Score</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number">0%</div>
+                        <div class="stat-label">Investment Ready (Formal + Green)</div>
+                    </div>
+                </div>
+
+                <div class="findings-box">
+                    <div class="key-finding">Core Insight 1: Systemic Barriers</div>
+                    <p>We found <strong>NO STATISTICAL DIFFERENCE</strong> in performance between women, remote (3T)
+                        regions, or disability groups. The barriers are structural to the sector, not specific to
+                        demographics. The entire ecosystem is early-stage.</p>
+                </div>
+
+                <div class="findings-box">
+                    <div class="key-finding">Core Insight 2: The "Missing Middle"</div>
+                    <p>While 70% identify as "Green Businesses", only ~10% have the basic operational maturity
+                        (SOPs, Records, Legal) to handle commercial finance. There is a "Missing Middle" of
+                        readiness.</p>
+                </div>
+            </div>
+
+            <!-- Segmentation Tab -->
+            <div id="segmentation" class="tab-content">
+                <h2 class="section-title">Bankability Segmentation Model</h2>
+                <p>We segmented respondents into three tiers based on Legal Status, Financial Records, and Green
+                    Score.</p>
+
+                <div class="visualization-grid">
+                    <div class="visualization">
+                        <img src="/brin/analysis/bankability_by_gender.png" alt="Bankability by Gender">
+                        <p class="visualization-caption">Figure 1: Bankability Tiers by Gender (Stacked)</p>
+                    </div>
+                    <div class="visualization">
+                        <img src="/brin/analysis/green_maturity_dist.png" alt="Green Maturity Distribution">
+                        <p class="visualization-caption">Figure 2: Distribution of Green Maturity Scores (0-100)</p>
+                    </div>
+                </div>
+
+                <h3>Tier Definitions</h3>
+                <div class="table-container">
+                    <table class="stat-table">
+                        <thead>
+                            <tr>
+                                <th>Tier Name</th>
+                                <th>Definitions</th>
+                                <th>Share of Pop.</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>Tier 1: Investment Ready</strong></td>
+                                <td>Formal Entity + Audited/App Records + Green Score > 60</td>
+                                <td><span class="badge-fail">0.0%</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Tier 2: Credit Ready</strong></td>
+                                <td>Some Legality + Records + Green Score > 40</td>
+                                <td>8.1%</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Tier 3: Incubation Target</strong></td>
+                                <td>Informal, No SOPs, Low Records</td>
+                                <td><strong>91.9%</strong></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Stats Tab -->
+            <div id="stats" class="tab-content">
+                <h2 class="section-title">Statistical Hypothesis Testing</h2>
+                <p>We ran rigorous tests to see if observed differences were real or due to chance.</p>
+
+                <div class="visualization-grid">
+                    <div class="visualization">
+                        <img src="/brin/analysis/green_gap_region.png" alt="Green Gap Region">
+                        <p class="visualization-caption">Figure 3: Green Maturity Gap (Java vs 3T)</p>
+                    </div>
+                </div>
+
+                <div class="table-container">
+                    <table class="stat-table">
+                        <thead>
+                            <tr>
+                                <th>Hypothesis Test</th>
+                                <th>Groups Compared</th>
+                                <th>P-Value</th>
+                                <th>Conclusion</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>Gender Gap</strong> (T-Test)</td>
+                                <td>Male vs Female Green Scores</td>
+                                <td>0.61</td>
+                                <td><strong>No Difference</strong> (Equal Performance)</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Regional Gap</strong> (T-Test)</td>
+                                <td>Java/Bali vs 3T Regions</td>
+                                <td>0.41</td>
+                                <td><strong>No Difference</strong> (Equal Performance)</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Inclusion Gap</strong> (Chi-Square)</td>
+                                <td>Disability vs Bankability Tier</td>
+                                <td>0.42</td>
+                                <td><strong>No Difference</strong> (Equal Access)</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="findings-box">
+                    <p><strong>Interpretation:</strong> The "P-Values" are all > 0.05, meaning we cannot claim any
+                        group is "worse" than another. This suggests that <strong>interventions should be
+                            universal</strong> rather than segmented by ability/gender, though delivery methods must
+                        remain accessible.</p>
+                </div>
+            </div>
+
+            <!-- Recommendations Tab -->
+            <div id="recos" class="tab-content">
+                <h2 class="section-title">Recommendations for Main Report (BAB 6)</h2>
+
+                <h3>1. Program Design: "Green Fundamentals"</h3>
+                <p>Since Green Maturity scores are low (~20/100), the incubation curriculum must start with basics,
+                    not advanced tech.</p>
+                <ul>
+                    <li><strong>Module 1:</strong> "Simple Green SOPs" (How to write them)</li>
+                    <li><strong>Module 2:</strong> "From Cash to Accrual" (Bookkeeping Apps)</li>
+                    <li><strong>Module 3:</strong> "Legal Literacy" (Getting an NIB)</li>
+                </ul>
+
+                <h3>2. Financial Product: "The Bridge Grant"</h3>
+                <p>Commercial loans (Tier 1/2) won't work for 92% of the market (Tier 3). We need a "Bridge Grant"
+                    product.</p>
+                <ul>
+                    <li><strong>Value:</strong> Small amounts (e.g., Rp 5jt - 10jt)</li>
+                    <li><strong>Usage:</strong> Strictly for Legal Registration costs or Buying Basic Green Tools
+                        (Composters).</li>
+                    <li><strong>Goal:</strong> Move them from Tier 3 -> Tier 2.</li>
+                </ul>
+
+                <h3>3. Policy: "Step-Ladder Certification"</h3>
+                <p>Existing certifications are too hard. Create a "Bronze/Silver/Gold" ladder so early-stage UMKM
+                    can get recognized for small steps (like sorting waste).</p>
+            </div>
+
+        </div>
+
+        <footer class="footer">
+            <strong>BRIN Research Team</strong>
+            <p>Quantitative Deep Dive | January 2026</p>
+        </footer>
+    </div>
+
+    <script>
+        function showTab(tabName) {
+            document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+            document.getElementById(tabName).classList.add('active');
+            event.target.classList.add('active');
+
+            // Scroll to top of content
+            const container = document.querySelector('.container');
+            container.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+    </script>
+</body>
+
+</html>
