@@ -532,6 +532,23 @@
             <div class="stat"><span class="value">1.6%</span><span class="label">Remote Jobs</span></div>
         </div>
 
+        <section id="methodology">
+            <h2>Methodology</h2>
+            <div class="insight" style="border-left-color: var(--text-tertiary);">
+                <ul style="margin-top: 8px; margin-left: 20px;">
+                    <li><strong>Data Scraping:</strong> Data was collected using a custom <strong>Playwright-based
+                            scraper</strong> to navigate dynamic content on JobStreet Indonesia. The system automated
+                        pagination and detailed extraction to capture 19,686 unique job postings across Jakarta,
+                        ensuring high fidelity by handling lazy loading and anti-bot measures.</li>
+                    <li style="margin-top: 6px;"><strong>Analysis Pipeline:</strong> The raw data underwent a rigorous
+                        cleaning process using <strong>Python (Pandas)</strong> to remove 322 duplicates and standardize
+                        inconsistent fields. Advanced analysis included <strong>NLP-based text mining</strong> for skill
+                        extraction and custom scoring algorithms to evaluate 'Accessibility' (entry barriers) and
+                        'Transparency' (salary disclosure rates).</li>
+                </ul>
+            </div>
+        </section>
+
         <section id="overview">
             <h2>Dataset Overview</h2>
             <div class="two-col">
