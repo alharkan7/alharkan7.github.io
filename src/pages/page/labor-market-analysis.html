@@ -1,0 +1,1481 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jakarta Job Market Analysis 2026</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #f8fafc;
+            --card: #ffffff;
+            --text-primary: #0f172a;
+            --text-secondary: #475569;
+            --text-tertiary: #94a3b8;
+            --border: #e2e8f0;
+            --primary: #0f172a;
+            /* Slate 900 */
+            --accent: #2563eb;
+            /* Blue 600 */
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --surface-hover: #f1f5f9;
+            --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+            --shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            background-color: var(--bg);
+            /* Dot pattern background */
+            background-image: radial-gradient(#bfdbfe 1px, transparent 1px);
+            background-size: 24px 24px;
+            color: var(--text-primary);
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        .container {
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 40px 24px;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 64px;
+            position: relative;
+        }
+
+        header h1 {
+            font-size: 3rem;
+            font-weight: 800;
+            color: var(--text-primary);
+            letter-spacing: -0.025em;
+            margin-bottom: 16px;
+            line-height: 1.2;
+        }
+
+        header p {
+            font-size: 1.125rem;
+            color: var(--text-secondary);
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        .nav {
+            position: sticky;
+            top: 24px;
+            z-index: 1000;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 4px;
+            justify-content: center;
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            padding: 6px;
+            border-radius: 9999px;
+            border: 1px solid var(--border);
+            box-shadow: var(--shadow-lg);
+            width: fit-content;
+            max-width: 90vw;
+            margin: 0 auto 48px;
+        }
+
+        .nav a {
+            color: var(--text-secondary);
+            padding: 8px 20px;
+            border-radius: 9999px;
+            text-decoration: none;
+            font-size: 0.875rem;
+            font-weight: 500;
+            transition: all 0.2s ease;
+        }
+
+        .nav a:hover {
+            background: var(--surface-hover);
+            color: var(--primary);
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 24px;
+            margin-bottom: 48px;
+        }
+
+        .stat {
+            background: var(--card);
+            border: 1px solid var(--border);
+            padding: 24px;
+            border-radius: 16px;
+            text-align: center;
+            transition: transform 0.2s, box-shadow 0.2s;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .stat:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow);
+            border-color: var(--accent);
+        }
+
+        .stat .value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--primary);
+            display: block;
+            margin-bottom: 4px;
+            letter-spacing: -0.025em;
+        }
+
+        .stat .label {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--text-secondary);
+            font-weight: 600;
+        }
+
+        section {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 32px;
+            margin-bottom: 32px;
+            box-shadow: var(--shadow-sm);
+        }
+
+        section h2 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 24px;
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            letter-spacing: -0.025em;
+        }
+
+        h3 {
+            font-size: 1.125rem;
+            font-weight: 600;
+            margin: 24px 0 16px;
+            color: var(--text-primary);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+            font-size: 0.9375rem;
+            margin: 16px 0;
+        }
+
+        th,
+        td {
+            padding: 12px 16px;
+            text-align: left;
+            border-bottom: 1px solid var(--border);
+        }
+
+        th {
+            background: var(--bg);
+            font-weight: 600;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--text-secondary);
+        }
+
+        th:first-child {
+            border-top-left-radius: 8px;
+        }
+
+        th:last-child {
+            border-top-right-radius: 8px;
+        }
+
+        tr:last-child td {
+            border-bottom: none;
+        }
+
+        tr:hover td {
+            background: var(--surface-hover);
+        }
+
+        .highlight {
+            color: var(--accent);
+            font-weight: 600;
+        }
+
+        .grid-2 {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(450px, 1fr));
+            gap: 32px;
+        }
+
+        .insight {
+            background: var(--bg);
+            border-left: 4px solid var(--accent);
+            padding: 16px 20px;
+            border-radius: 4px 8px 8px 4px;
+            margin: 20px 0;
+            font-size: 0.9375rem;
+            color: var(--text-secondary);
+        }
+
+        .insight strong {
+            color: var(--primary);
+            font-weight: 600;
+        }
+
+        .insight.warning {
+            background: #fffbeb;
+            border-color: var(--warning);
+            color: #92400e;
+        }
+
+        .insight.warning strong {
+            color: #92400e;
+        }
+
+        .insight.danger {
+            background: #fef2f2;
+            border-color: var(--danger);
+            color: #991b1b;
+        }
+
+        .insight.danger strong {
+            color: #991b1b;
+        }
+
+        .table-wrapper {
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+            width: 100%;
+            margin-bottom: 24px;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+        }
+
+        .table-wrapper table {
+            margin: 0;
+            border: none;
+        }
+
+        .table-wrapper td,
+        .table-wrapper th {
+            white-space: nowrap;
+        }
+
+        .viz-card {
+            background: var(--card);
+            border-radius: 12px;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .viz-card .caption {
+            font-size: 0.75rem;
+            color: var(--text-tertiary);
+            padding: 0 16px 16px;
+            line-height: 1.4;
+            margin-top: 12px;
+        }
+
+        .viz-card h4 {
+            font-size: 0.875rem;
+            font-weight: 600;
+            margin-bottom: 12px;
+            color: var(--text-secondary);
+            text-align: center;
+        }
+
+        .viz-card img {
+            width: 100%;
+            height: auto;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            cursor: zoom-in;
+            transition: transform 0.2s, box-shadow 0.2s;
+            display: block;
+        }
+
+        .viz-card img:hover {
+            box-shadow: var(--shadow-lg);
+            border-color: var(--accent);
+        }
+
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 2px 10px;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .badge.blue {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+
+        .badge.green {
+            background: #dcfce7;
+            color: #166534;
+        }
+
+        .badge.yellow {
+            background: #fef9c3;
+            color: #854d0e;
+        }
+
+        .badge.red {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .progress-bar {
+            height: 6px;
+            background: var(--border);
+            border-radius: 3px;
+            overflow: hidden;
+            margin-top: 6px;
+        }
+
+        .progress-bar .fill {
+            height: 100%;
+            background: var(--accent);
+            border-radius: 3px;
+        }
+
+        .two-col {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 40px;
+        }
+
+        footer {
+            text-align: center;
+            padding: 48px 24px;
+            color: var(--text-tertiary);
+            font-size: 0.875rem;
+            border-top: 1px solid var(--border);
+            margin-top: 64px;
+        }
+
+        footer a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.2s;
+        }
+
+        footer a:hover {
+            color: var(--primary);
+            text-decoration: underline;
+        }
+
+        /* Modal Styles */
+        .modal-backdrop {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(15, 23, 42, 0.9);
+            backdrop-filter: blur(8px);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+            padding: 24px;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .modal-backdrop.active {
+            opacity: 1;
+        }
+
+        .modal-content {
+            position: relative;
+            max-width: 95vw;
+            max-height: 95vh;
+            overflow: auto;
+            border-radius: 8px;
+            box-shadow: var(--shadow-lg);
+        }
+
+        .modal-content img {
+            display: block;
+            max-width: 100%;
+            max-height: 90vh;
+            /* Leave room */
+            object-fit: contain;
+            cursor: zoom-out;
+            /* Since it starts as "preview", clicking again might close or zoom */
+        }
+
+        .modal-controls {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            z-index: 1010;
+        }
+
+        .close-btn {
+            background: rgba(255, 255, 255, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 9999px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: background 0.2s;
+        }
+
+        .close-btn:hover {
+            background: rgba(255, 255, 255, 0.4);
+        }
+
+        @media (max-width: 768px) {
+
+            .two-col,
+            .grid-2 {
+                grid-template-columns: 1fr;
+            }
+
+            header h1 {
+                font-size: 2rem;
+            }
+
+            .container {
+                padding: 24px 16px;
+            }
+
+            .nav {
+                justify-content: flex-start;
+                flex-wrap: nowrap;
+                overflow-x: auto;
+                width: calc(100% + 32px);
+                max-width: calc(100% + 32px);
+                margin-left: -16px;
+                /* Offset the container padding */
+                margin-right: -16px;
+                padding: 12px 16px;
+                background: rgba(255, 255, 255, 0.95);
+                border-radius: 0;
+                border: none;
+                border-bottom: 1px solid var(--border);
+                top: 0;
+                -ms-overflow-style: none;
+                scrollbar-width: none;
+            }
+
+            .nav::-webkit-scrollbar {
+                display: none;
+            }
+
+            .nav a {
+                white-space: nowrap;
+                flex-shrink: 0;
+                padding: 6px 16px;
+                font-size: 0.8125rem;
+                background: var(--surface-hover);
+            }
+
+            footer p {
+                padding: 0 16px;
+                word-wrap: break-word;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <header>
+            <h1>Jakarta Job Market Analysis</h1>
+            <p>Comprehensive Analysis of 19,686 Job Postings on JobStreet Indonesia</p>
+        </header>
+        <div class="nav">
+            <a href="#overview">Overview</a>
+            <a href="#salary">Salary</a>
+            <a href="#skills">Skills</a>
+            <a href="#accessibility">Accessibility</a>
+            <a href="#freshgrad">Fresh Grads</a>
+            <a href="#transparency">Transparency</a>
+            <a href="#insights">Insights</a>
+        </div>
+
+        <div class="stats-grid">
+            <div class="stat"><span class="value">19,686</span><span class="label">Total Jobs</span></div>
+            <div class="stat"><span class="value">8,153</span><span class="label">Companies</span></div>
+            <div class="stat"><span class="value">6.25M</span><span class="label">Median Salary</span></div>
+            <div class="stat"><span class="value">33.1%</span><span class="label">Salary Disclosed</span></div>
+            <div class="stat"><span class="value">8.9%</span><span class="label">Fresh Grad Friendly</span></div>
+            <div class="stat"><span class="value">1.6%</span><span class="label">Remote Jobs</span></div>
+        </div>
+
+        <section id="overview">
+            <h2>Dataset Overview</h2>
+            <div class="two-col">
+                <div>
+                    <h3>Work Type Distribution</h3>
+                    <div class="table-wrapper">
+                        <table>
+                            <tr>
+                                <th>Type</th>
+                                <th>Count</th>
+                                <th>%</th>
+                            </tr>
+                            <tr>
+                                <td>Full-time</td>
+                                <td class="highlight">16,117</td>
+                                <td>81.9%</td>
+                            </tr>
+                            <tr>
+                                <td>Contract/Temp</td>
+                                <td>3,081</td>
+                                <td>15.6%</td>
+                            </tr>
+                            <tr>
+                                <td>Part-time</td>
+                                <td>350</td>
+                                <td>1.8%</td>
+                            </tr>
+                            <tr>
+                                <td>Casual</td>
+                                <td>113</td>
+                                <td>0.6%</td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+                <div>
+                    <h3>Work Arrangement</h3>
+                    <div class="table-wrapper">
+                        <table>
+                            <tr>
+                                <th>Arrangement</th>
+                                <th>Count</th>
+                                <th>%</th>
+                            </tr>
+                            <tr>
+                                <td>On-site</td>
+                                <td class="highlight">18,711</td>
+                                <td>95.1%</td>
+                            </tr>
+                            <tr>
+                                <td>Hybrid</td>
+                                <td>659</td>
+                                <td>3.4%</td>
+                            </tr>
+                            <tr>
+                                <td>Remote</td>
+                                <td>316</td>
+                                <td>1.6%</td>
+                            </tr>
+                        </table>
+                    </div>
+                    <div class="insight warning"><strong>Limited Remote Options</strong>Only 1.6% of jobs offer remote
+                        work, indicating traditional work culture dominance.</div>
+                </div>
+            </div>
+            <h3>Top 10 Job Categories</h3>
+            <div class="table-wrapper">
+                <table>
+                    <tr>
+                        <th>#</th>
+                        <th>Category</th>
+                        <th>Jobs</th>
+                        <th>% Share</th>
+                        <th>Distribution</th>
+                    </tr>
+                    <tr>
+                        <td>1</td>
+                        <td>Financial Accounting & Reporting</td>
+                        <td class="highlight">1,320</td>
+                        <td>6.7%</td>
+                        <td>
+                            <div class="progress-bar">
+                                <div class="fill" style="width:100%"></div>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>2</td>
+                        <td>Sales Representatives/Consultants</td>
+                        <td>1,017</td>
+                        <td>5.2%</td>
+                        <td>
+                            <div class="progress-bar">
+                                <div class="fill" style="width:77%"></div>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>3</td>
+                        <td>Administrative Assistants</td>
+                        <td>811</td>
+                        <td>4.1%</td>
+                        <td>
+                            <div class="progress-bar">
+                                <div class="fill" style="width:61%"></div>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>4</td>
+                        <td>Management</td>
+                        <td>663</td>
+                        <td>3.4%</td>
+                        <td>
+                            <div class="progress-bar">
+                                <div class="fill" style="width:50%"></div>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>5</td>
+                        <td>Retail Assistants</td>
+                        <td>660</td>
+                        <td>3.4%</td>
+                        <td>
+                            <div class="progress-bar">
+                                <div class="fill" style="width:50%"></div>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>6</td>
+                        <td>Marketing Communications</td>
+                        <td>636</td>
+                        <td>3.2%</td>
+                        <td>
+                            <div class="progress-bar">
+                                <div class="fill" style="width:48%"></div>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>7</td>
+                        <td>Account & Relationship Mgmt</td>
+                        <td>603</td>
+                        <td>3.1%</td>
+                        <td>
+                            <div class="progress-bar">
+                                <div class="fill" style="width:46%"></div>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>8</td>
+                        <td>Developers/Programmers</td>
+                        <td>577</td>
+                        <td>2.9%</td>
+                        <td>
+                            <div class="progress-bar">
+                                <div class="fill" style="width:44%"></div>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>9</td>
+                        <td>Consulting & Generalist HR</td>
+                        <td>557</td>
+                        <td>2.8%</td>
+                        <td>
+                            <div class="progress-bar">
+                                <div class="fill" style="width:42%"></div>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>10</td>
+                        <td>New Business Development</td>
+                        <td>527</td>
+                        <td>2.7%</td>
+                        <td>
+                            <div class="progress-bar">
+                                <div class="fill" style="width:40%"></div>
+                            </div>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+            <h3>Geographic Distribution</h3>
+            <div class="table-wrapper">
+                <table>
+                    <tr>
+                        <th>Region</th>
+                        <th>Jobs</th>
+                        <th>%</th>
+                        <th>Median Salary</th>
+                    </tr>
+                    <tr>
+                        <td>Jakarta (General)</td>
+                        <td>6,119</td>
+                        <td>31.1%</td>
+                        <td>IDR 7,250,000</td>
+                    </tr>
+                    <tr>
+                        <td>Other Areas</td>
+                        <td>5,869</td>
+                        <td>29.8%</td>
+                        <td>IDR 4,750,000</td>
+                    </tr>
+                    <tr>
+                        <td>South Jakarta</td>
+                        <td>2,509</td>
+                        <td>12.8%</td>
+                        <td class="highlight">IDR 7,500,000</td>
+                    </tr>
+                    <tr>
+                        <td>North Jakarta</td>
+                        <td>1,767</td>
+                        <td>9.0%</td>
+                        <td>IDR 6,750,000</td>
+                    </tr>
+                    <tr>
+                        <td>West Jakarta</td>
+                        <td>1,652</td>
+                        <td>8.4%</td>
+                        <td>IDR 6,250,000</td>
+                    </tr>
+                    <tr>
+                        <td>Central Jakarta</td>
+                        <td>1,352</td>
+                        <td>6.9%</td>
+                        <td>IDR 6,600,000</td>
+                    </tr>
+                    <tr>
+                        <td>East Jakarta</td>
+                        <td>418</td>
+                        <td>2.1%</td>
+                        <td>IDR 6,188,000</td>
+                    </tr>
+                </table>
+            </div>
+        </section>
+
+        <section id="salary">
+            <h2>Salary Analysis</h2>
+            <div class="insight"><strong>Key Salary Statistics</strong> Median: <strong>IDR 6,250,000</strong> | Mean:
+                <strong>IDR 8,326,169</strong> | Only 33.1% of jobs disclose salary (6,514 jobs)
+            </div>
+            <div class="two-col">
+                <div>
+                    <h3>Salary Distribution</h3>
+                    <div class="table-wrapper">
+                        <table>
+                            <tr>
+                                <th>Band</th>
+                                <th>Jobs</th>
+                                <th>%</th>
+                            </tr>
+                            <tr>
+                                <td>
+                                    < 4M IDR</td>
+                                <td>901</td>
+                                <td>13.8%</td>
+                            </tr>
+                            <tr>
+                                <td>4M - 6M IDR</td>
+                                <td class="highlight">2,193</td>
+                                <td>33.7%</td>
+                            </tr>
+                            <tr>
+                                <td>6M - 8M IDR</td>
+                                <td>1,505</td>
+                                <td>23.1%</td>
+                            </tr>
+                            <tr>
+                                <td>8M - 10M IDR</td>
+                                <td>681</td>
+                                <td>10.5%</td>
+                            </tr>
+                            <tr>
+                                <td>10M - 15M IDR</td>
+                                <td>696</td>
+                                <td>10.7%</td>
+                            </tr>
+                            <tr>
+                                <td>> 15M IDR</td>
+                                <td>538</td>
+                                <td>8.3%</td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+                <div>
+                    <h3>Top Paying Categories</h3>
+                    <div class="table-wrapper">
+                        <table>
+                            <tr>
+                                <th>Category</th>
+                                <th>Median</th>
+                            </tr>
+                            <tr>
+                                <td>Management</td>
+                                <td class="highlight">11.5M</td>
+                            </tr>
+                            <tr>
+                                <td>Developers/Programmers</td>
+                                <td>8.9M</td>
+                            </tr>
+                            <tr>
+                                <td>New Business Dev</td>
+                                <td>7.5M</td>
+                            </tr>
+                            <tr>
+                                <td>Account & Relationship</td>
+                                <td>7.5M</td>
+                            </tr>
+                            <tr>
+                                <td>HR Consulting</td>
+                                <td>7.0M</td>
+                            </tr>
+                            <tr>
+                                <td>Financial Accounting</td>
+                                <td>6.5M</td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <div class="grid-2" style="margin-top:24px">
+                <div class="viz-card">
+                    <h4>Salary Distribution</h4><img src="https://ik.imagekit.io/raihankalla/labor_market/07_salary_distribution.png"
+                        alt="Salary Distribution">
+                    <p class="caption">The 4M-6M IDR range dominates the market (33.7% of offers), while high-income
+                        roles (>15M) remain scarce at just 8.3%.</p>
+                </div>
+                <div class="viz-card">
+                    <h4>Salary by Category</h4><img src="https://ik.imagekit.io/raihankalla/labor_market/08_salary_by_category.png"
+                        alt="Salary by Category">
+                    <p class="caption">Management roles command the highest median pay (11.5M IDR), significantly
+                        outpacing administrative and operational functions.</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="skills">
+            <h2>Skills & Requirements</h2>
+            <div class="two-col">
+                <div>
+                    <h3>Top 15 Most Demanded Skills</h3>
+                    <div class="table-wrapper">
+                        <table>
+                            <tr>
+                                <th>#</th>
+                                <th>Skill</th>
+                                <th>Jobs</th>
+                                <th>%</th>
+                            </tr>
+                            <tr>
+                                <td>1</td>
+                                <td>ERP Systems</td>
+                                <td>7,683</td>
+                                <td>39.0%</td>
+                            </tr>
+                            <tr>
+                                <td>2</td>
+                                <td>Excel</td>
+                                <td>6,568</td>
+                                <td>33.4%</td>
+                            </tr>
+                            <tr>
+                                <td>3</td>
+                                <td>Communication</td>
+                                <td>5,832</td>
+                                <td>29.6%</td>
+                            </tr>
+                            <tr>
+                                <td>4</td>
+                                <td>Data Analysis</td>
+                                <td>5,397</td>
+                                <td>27.4%</td>
+                            </tr>
+                            <tr>
+                                <td>5</td>
+                                <td>Sales</td>
+                                <td>4,871</td>
+                                <td>24.7%</td>
+                            </tr>
+                            <tr>
+                                <td>6</td>
+                                <td>Marketing</td>
+                                <td>3,567</td>
+                                <td>18.1%</td>
+                            </tr>
+                            <tr>
+                                <td>7</td>
+                                <td>English</td>
+                                <td>3,509</td>
+                                <td>17.8%</td>
+                            </tr>
+                            <tr>
+                                <td>8</td>
+                                <td>Design</td>
+                                <td>2,374</td>
+                                <td>12.1%</td>
+                            </tr>
+                            <tr>
+                                <td>9</td>
+                                <td>Finance</td>
+                                <td>2,329</td>
+                                <td>11.8%</td>
+                            </tr>
+                            <tr>
+                                <td>10</td>
+                                <td>Analytical</td>
+                                <td>2,250</td>
+                                <td>11.4%</td>
+                            </tr>
+                            <tr>
+                                <td>11</td>
+                                <td>MS Office</td>
+                                <td>2,044</td>
+                                <td>10.4%</td>
+                            </tr>
+                            <tr>
+                                <td>12</td>
+                                <td>Accounting</td>
+                                <td>2,012</td>
+                                <td>10.2%</td>
+                            </tr>
+                            <tr>
+                                <td>13</td>
+                                <td>Interpersonal</td>
+                                <td>1,875</td>
+                                <td>9.5%</td>
+                            </tr>
+                            <tr>
+                                <td>14</td>
+                                <td>Leadership</td>
+                                <td>1,865</td>
+                                <td>9.5%</td>
+                            </tr>
+                            <tr>
+                                <td>15</td>
+                                <td>SAP</td>
+                                <td>1,008</td>
+                                <td>5.1%</td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+                <div>
+                    <h3>Education Requirements</h3>
+                    <div class="table-wrapper">
+                        <table>
+                            <tr>
+                                <th>Level</th>
+                                <th>Jobs</th>
+                                <th>%</th>
+                            </tr>
+                            <tr>
+                                <td>S1/Bachelor</td>
+                                <td class="highlight">9,641</td>
+                                <td>49.0%</td>
+                            </tr>
+                            <tr>
+                                <td>D3/Diploma</td>
+                                <td>3,244</td>
+                                <td>16.5%</td>
+                            </tr>
+                            <tr>
+                                <td>SMA/SMK</td>
+                                <td>1,674</td>
+                                <td>8.5%</td>
+                            </tr>
+                            <tr>
+                                <td>S2/Master</td>
+                                <td>500</td>
+                                <td>2.5%</td>
+                            </tr>
+                            <tr>
+                                <td>S3/PhD</td>
+                                <td>93</td>
+                                <td>0.5%</td>
+                            </tr>
+                        </table>
+                    </div>
+                    <h3>Experience Requirements</h3>
+                    <div class="table-wrapper">
+                        <table>
+                            <tr>
+                                <th>Level</th>
+                                <th>Jobs</th>
+                                <th>%</th>
+                            </tr>
+                            <tr>
+                                <td>Fresh Graduate</td>
+                                <td>1,671</td>
+                                <td>8.5%</td>
+                            </tr>
+                            <tr>
+                                <td>0-1 years</td>
+                                <td>2,416</td>
+                                <td>12.3%</td>
+                            </tr>
+                            <tr>
+                                <td>1-3 years</td>
+                                <td class="highlight">5,385</td>
+                                <td>27.4%</td>
+                            </tr>
+                            <tr>
+                                <td>3-5 years</td>
+                                <td>2,194</td>
+                                <td>11.1%</td>
+                            </tr>
+                            <tr>
+                                <td>5+ years</td>
+                                <td>1,448</td>
+                                <td>7.4%</td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <div class="grid-2" style="margin-top:24px">
+                <div class="viz-card">
+                    <h4>Top Skills</h4><img src="https://ik.imagekit.io/raihankalla/labor_market/12_top_skills.png" alt="Top Skills">
+                    <p class="caption">Technical proficiency in ERP Systems (39%) and Excel (33%) outranks soft skills,
+                        indicating a strong focus on operational readiness.</p>
+                </div>
+                <div class="viz-card">
+                    <h4>Education Requirements</h4><img src="https://ik.imagekit.io/raihankalla/labor_market/13_education_requirements.png"
+                        alt="Education">
+                    <p class="caption">A Bachelor's degree (S1) is the new standard, required for 49% of listings,
+                        creating a high barrier for SMA/SMK graduates (8.5%).</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="accessibility">
+            <h2>Job Accessibility Analysis</h2>
+            <div class="insight"><strong>Overall Accessibility Score: 64.6/100</strong> </br> Measures how easy it is
+                for candidates to qualify based on experience, education, skills, and flexibility requirements.</div>
+            <div class="two-col">
+                <div>
+                    <h3>Accessibility Distribution</h3>
+                    <div class="table-wrapper">
+                        <table>
+                            <tr>
+                                <th>Level</th>
+                                <th>Jobs</th>
+                                <th>%</th>
+                            </tr>
+                            <tr>
+                                <td><span class="badge green">Easy (80+)</span></td>
+                                <td>719</td>
+                                <td>3.7%</td>
+                            </tr>
+                            <tr>
+                                <td><span class="badge blue">Accessible (60-80)</span></td>
+                                <td class="highlight">14,389</td>
+                                <td>73.1%</td>
+                            </tr>
+                            <tr>
+                                <td><span class="badge yellow">Moderate (40-60)</span></td>
+                                <td>4,578</td>
+                                <td>23.3%</td>
+                            </tr>
+                            <tr>
+                                <td><span class="badge red">Hard (<40)< /span>
+                                </td>
+                                <td>0</td>
+                                <td>0.0%</td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+                <div>
+                    <h3>Skill Overload Analysis</h3>
+                    <table>
+                        <tr>
+                            <th>Level</th>
+                            <th>Jobs</th>
+                            <th>%</th>
+                        </tr>
+                        <tr>
+                            <td>Low (1-2 skills)</td>
+                            <td>5,153</td>
+                            <td>26.2%</td>
+                        </tr>
+                        <tr>
+                            <td>Moderate (3-4)</td>
+                            <td class="highlight">7,570</td>
+                            <td>38.5%</td>
+                        </tr>
+                        <tr>
+                            <td>High (5-6)</td>
+                            <td>4,575</td>
+                            <td>23.2%</td>
+                        </tr>
+                        <tr>
+                            <td>Very High (7-9)</td>
+                            <td>2,106</td>
+                            <td>10.7%</td>
+                        </tr>
+                        <tr>
+                            <td>Extreme (10+)</td>
+                            <td>282</td>
+                            <td>1.4%</td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+            <div class="insight warning"><strong>Skills-Salary Correlation: 0.127 (Weak)</strong> </br> This weak
+                correlation suggests employers are <strong>over-specifying requirements</strong> - asking for more
+                skills than they're willing to pay for. Mean skills per job: 4.79</div>
+            <div class="grid-2" style="margin-top:24px">
+                <div class="viz-card">
+                    <h4>Accessibility Distribution</h4><img src="https://ik.imagekit.io/raihankalla/labor_market/18_accessibility_distribution.png"
+                        alt="Accessibility">
+                    <p class="caption">73% of jobs fall in the 'Accessible' range (60-80 score), suggesting moderate
+                        entry barriers, though 'Easy' entry roles are rare (3.7%).</p>
+                </div>
+                <div class="viz-card">
+                    <h4>Skills vs Salary</h4><img src="https://ik.imagekit.io/raihankalla/labor_market/24_skills_vs_salary_correlation.png"
+                        alt="Skills vs Salary">
+                    <p class="caption">A weak correlation (0.13) confirms that demanding a higher volume of skills does
+                        not significantly translate to higher pay offers.</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="freshgrad">
+            <h2>Fresh Graduate & Entry-Level Analysis</h2>
+            <div class="two-col">
+                <div>
+                    <h3>Entry-Level Summary</h3>
+                    <table>
+                        <tr>
+                            <th>Metric</th>
+                            <th>Value</th>
+                        </tr>
+                        <tr>
+                            <td>Total Entry-Level Jobs</td>
+                            <td>3,714 (18.9%)</td>
+                        </tr>
+                        <tr>
+                            <td>Fresh Grad Friendly</td>
+                            <td class="highlight">1,759 (8.9%)</td>
+                        </tr>
+                        <tr>
+                            <td>Experience Paradox Cases</td>
+                            <td>453 (12.2%)</td>
+                        </tr>
+                        <tr>
+                            <td>Mean Experience Required</td>
+                            <td>4.73 years</td>
+                        </tr>
+                    </table>
+                    <div class="insight danger"><strong>Experience Paradox</strong> 12.2% of "entry-level" positions
+                        still require prior experience, creating barriers for true beginners.</div>
+                </div>
+                <div>
+                    <h3>Best Categories for Fresh Grads</h3>
+                    <div class="table-wrapper">
+                        <table>
+                            <tr>
+                                <th>Category</th>
+                                <th>Jobs</th>
+                                <th>%</th>
+                            </tr>
+                            <tr>
+                                <td>Financial Accounting</td>
+                                <td class="highlight">134</td>
+                                <td>7.6%</td>
+                            </tr>
+                            <tr>
+                                <td>Administrative Assistants</td>
+                                <td>119</td>
+                                <td>6.8%</td>
+                            </tr>
+                            <tr>
+                                <td>Sales Representatives</td>
+                                <td>87</td>
+                                <td>4.9%</td>
+                            </tr>
+                            <tr>
+                                <td>Marketing Communications</td>
+                                <td>67</td>
+                                <td>3.8%</td>
+                            </tr>
+                            <tr>
+                                <td>Account & Relationship Mgmt</td>
+                                <td>48</td>
+                                <td>2.7%</td>
+                            </tr>
+                            <tr>
+                                <td>Developers/Programmers</td>
+                                <td>45</td>
+                                <td>2.6%</td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <div class="grid-2" style="margin-top:24px">
+                <div class="viz-card">
+                    <h4>Experience Distribution</h4><img src="https://ik.imagekit.io/raihankalla/labor_market/26_experience_distribution.png"
+                        alt="Experience">
+                    <p class="caption">The '1-3 years' experience bracket accounts for 27% of demand, creating a
+                        bottleneck for true fresh graduates (only 8.5%).</p>
+                </div>
+                <div class="viz-card">
+                    <h4>Experience by Category</h4><img src="https://ik.imagekit.io/raihankalla/labor_market/27_experience_by_category.png"
+                        alt="Experience by Category">
+                    <p class="caption">Technical roles (Devs/Engineering) demand higher baseline experience compared to
+                        Sales and Admin support roles.</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="transparency">
+            <h2>Transparency Analysis</h2>
+            <div class="insight danger"><strong>Transparency Score: 51.9/100</strong> </br> Only <strong>33.1%</strong>
+                of jobs disclose salary. 66.9% keep compensation hidden from candidates.</div>
+            <div class="two-col">
+                <div>
+                    <h3>Transparency Metrics</h3>
+                    <div class="table-wrapper">
+                        <table>
+                            <tr>
+                                <th>Metric</th>
+                                <th>Value</th>
+                            </tr>
+                            <tr>
+                                <td>Salary Disclosed</td>
+                                <td>6,514 (33.1%)</td>
+                            </tr>
+                            <tr>
+                                <td>Salary Hidden</td>
+                                <td class="highlight">13,172 (66.9%)</td>
+                            </tr>
+                            <tr>
+                                <td>Benefits Listed</td>
+                                <td>2,185 (11.1%)</td>
+                            </tr>
+                            <tr>
+                                <td>Very Transparent Jobs</td>
+                                <td>5,472 (27.8%)</td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+                <div>
+                    <h3>Transparency by Work Type</h3>
+                    <div class="table-wrapper">
+                        <table>
+                            <tr>
+                                <th>Arrangement</th>
+                                <th>Disclosure Rate</th>
+                            </tr>
+                            <tr>
+                                <td>Remote</td>
+                                <td class="highlight">50%</td>
+                            </tr>
+                            <tr>
+                                <td>Hybrid</td>
+                                <td>40%</td>
+                            </tr>
+                            <tr>
+                                <td>On-site</td>
+                                <td>30%</td>
+                            </tr>
+                        </table>
+                    </div>
+                    <div class="insight"><strong>Insight</strong> Remote jobs are 67% more likely to disclose salary
+                        compared to on-site positions.</div>
+                </div>
+            </div>
+            <div class="grid-2" style="margin-top:24px">
+                <div class="viz-card">
+                    <h4>Transparency Analysis</h4><img src="https://ik.imagekit.io/raihankalla/labor_market/29_transparency_analysis.png"
+                        alt="Transparency">
+                    <p class="caption">Salary transparency remains vertically low at 33.1%, forcing the majority of
+                        candidates (66.9%) to negotiate blindly.</p>
+                </div>
+                <div class="viz-card">
+                    <h4>Salary Disclosure Patterns</h4><img src="https://ik.imagekit.io/raihankalla/labor_market/33_salary_disclosure_patterns.png"
+                        alt="Disclosure Patterns">
+                    <p class="caption">Remote positions are significantly more transparent (50% disclosure) than
+                        traditional on-site roles (30%).</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="insights">
+            <h2>Key Insights & Recommendations</h2>
+            <h3>For Job Seekers</h3>
+            <div class="insight"><strong>Must-Have Skills</strong> Excel (33%), Communication (30%), ERP Systems (39%),
+                English (18%)</div>
+            <div class="insight"><strong>Target Locations</strong> South Jakarta offers highest median salary (IDR
+                7.5M). Avoid non-Jakarta areas for 30%+ salary premium.</div>
+            <div class="insight"><strong>Education Matters</strong> Bachelor's degree opens 49% of the market.
+                Consider D3 for quick entry (16.5% of jobs).</div>
+
+            <h3>For Employers</h3>
+            <div class="insight warning"><strong>Transparency Gap</strong> Only 33.1% disclose salary. Publishing
+                ranges can improve application quality and reduce time-to-hire.</div>
+            <div class="insight warning"><strong>Over-specification Risk</strong> Weak skills-salary correlation
+                (0.127) suggests job requirements may be inflated. Focus on essential skills.</div>
+
+            <h3>For Policy Makers</h3>
+            <div class="insight danger"><strong>Remote Work Gap</strong> Only 1.6% remote positions limits geographic
+                inclusion. Consider incentives for flexible work.</div>
+            <div class="insight danger"><strong>Fresh Grad Barriers</strong> Only 8.9% of jobs explicitly welcome
+                fresh graduates. Youth employment programs needed.</div>
+        </section>
+
+        <section>
+            <h2>All Visualizations</h2>
+            <div class="grid-2">
+                <div class="viz-card">
+                    <h4>Top Job Categories</h4><img src="https://ik.imagekit.io/raihankalla/labor_market/01_top_job_categories.png" alt="Categories">
+                    <p class="caption">Finance and Sales dominate the market, collectively accounting for nearly 12% of
+                        all available positions.</p>
+                </div>
+                <div class="viz-card">
+                    <h4>Work Type</h4><img src="https://ik.imagekit.io/raihankalla/labor_market/02_work_type_distribution.png" alt="Work Type">
+                    <p class="caption">The market is rigid, with Full-time contracts (82%) vastly outnumbering freelance
+                        or part-time flexibility.</p>
+                </div>
+                <div class="viz-card">
+                    <h4>Work Arrangement</h4><img src="https://ik.imagekit.io/raihankalla/labor_market/03_work_arrangement.png" alt="Arrangement">
+                    <p class="caption">Remote work has stagnated at 1.6%, showing a strong return-to-office mandate (95%
+                        On-site).</p>
+                </div>
+                <div class="viz-card">
+                    <h4>Jakarta Regions</h4><img src="https://ik.imagekit.io/raihankalla/labor_market/04_jakarta_regions.png" alt="Regions">
+                    <p class="caption">South Jakarta remains the primary business hub (12.8%), while huge portions of
+                        listings are generic 'Jakarta'.</p>
+                </div>
+                <div class="viz-card">
+                    <h4>Top Employers</h4><img src="https://ik.imagekit.io/raihankalla/labor_market/05_top_employers.png" alt="Employers">
+                    <p class="caption">Major hiring activity is consolidated among a few key players in banking, tech,
+                        and retail sectors.</p>
+                </div>
+                <div class="viz-card">
+                    <h4>Salary by Region</h4><img src="https://ik.imagekit.io/raihankalla/labor_market/10_salary_by_region.png" alt="Salary Region">
+                    <p class="caption">South Jakarta commands a premium (7.5M Median), roughly 20% higher than West or
+                        East Jakarta salaries.</p>
+                </div>
+                <div class="viz-card">
+                    <h4>Accessibility vs Salary</h4><img src="https://ik.imagekit.io/raihankalla/labor_market/20_accessibility_vs_salary.png"
+                        alt="Access vs Salary">
+                    <p class="caption">Higher paying roles correlate with lower accessibility scores, reflecting
+                        stricter experience and skill requirements.</p>
+                </div>
+                <div class="viz-card">
+                    <h4>Transparency vs Accessibility</h4><img
+                        src="https://ik.imagekit.io/raihankalla/labor_market/32_transparency_vs_accessibility.png" alt="Trans vs Access">
+                    <p class="caption">Jobs that disclose salaries tend to have clearer requirements, resulting in
+                        slightly higher accessibility scores.</p>
+                </div>
+            </div>
+        </section>
+
+        <footer>
+            <p><strong>Jakarta Job Market Analysis Report</strong></p>
+            <p><a href="https://drive.google.com/file/d/1pOEGEKrfajnVZVGZPjOv8Y202TjonhLT/view?usp=drive_link"
+                    target="_blank">Datasets</a> scraped, prepped & analyzed by <a href="https://x.com/alhrkn"
+                    target="_blank">@alhrkn</a> | <a href="https://raihankalla.id" target="_blank">raihankalla.id</a>
+            </p>
+            <p style="font-size: 0.75rem; margin-top: 5px; opacity: 0.8;">© 2026. Do not copy or redistribute without
+                permission.</p>
+        </footer>
+    </div>
+    <div id="imageModal" class="modal-backdrop">
+        <div class="modal-controls">
+            <button class="close-btn" onclick="closeModal()">Close &times;</button>
+        </div>
+        <div class="modal-content">
+            <img id="modalImg" src="" alt="Full Screen Preview" onclick="toggleZoom(this)">
+        </div>
+    </div>
+
+    <script>
+        const modal = document.getElementById('imageModal');
+        const modalImg = document.getElementById('modalImg');
+        const body = document.body;
+        let isZoomed = false;
+
+        function openModal(src) {
+            modal.style.display = 'flex';
+            // Force reflow
+            void modal.offsetWidth;
+            modal.classList.add('active');
+            modalImg.src = src;
+            body.style.overflow = 'hidden';
+            isZoomed = false;
+            modalImg.style.transform = 'scale(1)';
+            modalImg.style.cursor = 'zoom-in';
+        }
+
+        function closeModal() {
+            modal.classList.remove('active');
+            setTimeout(() => {
+                modal.style.display = 'none';
+                modalImg.src = '';
+            }, 300);
+            body.style.overflow = '';
+        }
+
+        function toggleZoom(img) {
+            if (isZoomed) {
+                img.style.transform = 'scale(1)';
+                img.style.cursor = 'zoom-in';
+                isZoomed = false;
+            } else {
+                img.style.transform = 'scale(1.5)';
+                img.style.cursor = 'zoom-out';
+                isZoomed = true;
+            }
+        }
+
+        // Initialize all images
+        document.addEventListener('DOMContentLoaded', () => {
+            const images = document.querySelectorAll('.viz-card img');
+            images.forEach(img => {
+                img.onclick = () => openModal(img.src);
+            });
+
+            // Close on background click
+            modal.addEventListener('click', (e) => {
+                if (e.target === modal) {
+                    closeModal();
+                }
+            });
+
+            // Escape key
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape' && modal.style.display === 'flex') {
+                    closeModal();
+                }
+            });
+        });
+    </script>
+</body>
+
+</html>
