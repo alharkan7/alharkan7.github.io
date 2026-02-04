@@ -33,6 +33,8 @@
             box-sizing: border-box;
         }
 
+
+
         body {
             font-family: 'Inter', system-ui, -apple-system, sans-serif;
             background-color: var(--bg);
@@ -77,6 +79,7 @@
         }
 
         .nav {
+            position: -webkit-sticky;
             position: sticky;
             top: 24px;
             z-index: 1000;
@@ -457,7 +460,7 @@
 
             .two-col,
             .grid-2 {
-                grid-template-columns: 1fr;
+                grid-template-columns: minmax(0, 1fr);
             }
 
             header h1 {
@@ -466,23 +469,43 @@
 
             .container {
                 padding: 24px 16px;
+                /* Ensure container doesn't clip sticky nav */
+                overflow-x: clip;
+                overflow-y: visible;
+            }
+
+            section {
+                padding: 24px 16px;
+                /* Reduce padding on mobile */
             }
 
             .nav {
                 justify-content: flex-start;
                 flex-wrap: nowrap;
                 overflow-x: auto;
+                /* Use calc to expand full width beyond container padding */
                 width: calc(100% + 32px);
-                max-width: calc(100% + 32px);
+                max-width: none;
                 margin-left: -16px;
-                /* Offset the container padding */
                 margin-right: -16px;
+
                 padding: 12px 16px;
-                background: rgba(255, 255, 255, 0.95);
+                background: rgba(255, 255, 255, 0.98);
                 border-radius: 0;
                 border: none;
                 border-bottom: 1px solid var(--border);
+                /* Fix sticky positioning on mobile */
+                position: -webkit-sticky;
+                position: sticky;
                 top: 0;
+                left: 0;
+                right: 0;
+                /* Ensure proper stacking and rendering */
+                z-index: 1000;
+                transform: translateZ(0);
+                -webkit-transform: translateZ(0);
+                /* Prevent scroll-up clipping issues */
+                will-change: transform;
                 -ms-overflow-style: none;
                 scrollbar-width: none;
             }
@@ -1130,38 +1153,40 @@
                 </div>
                 <div>
                     <h3>Skill Overload Analysis</h3>
-                    <table>
-                        <tr>
-                            <th>Level</th>
-                            <th>Jobs</th>
-                            <th>%</th>
-                        </tr>
-                        <tr>
-                            <td>Low (1-2 skills)</td>
-                            <td>5,153</td>
-                            <td>26.2%</td>
-                        </tr>
-                        <tr>
-                            <td>Moderate (3-4)</td>
-                            <td class="highlight">7,570</td>
-                            <td>38.5%</td>
-                        </tr>
-                        <tr>
-                            <td>High (5-6)</td>
-                            <td>4,575</td>
-                            <td>23.2%</td>
-                        </tr>
-                        <tr>
-                            <td>Very High (7-9)</td>
-                            <td>2,106</td>
-                            <td>10.7%</td>
-                        </tr>
-                        <tr>
-                            <td>Extreme (10+)</td>
-                            <td>282</td>
-                            <td>1.4%</td>
-                        </tr>
-                    </table>
+                    <div class="table-wrapper">
+                        <table>
+                            <tr>
+                                <th>Level</th>
+                                <th>Jobs</th>
+                                <th>%</th>
+                            </tr>
+                            <tr>
+                                <td>Low (1-2 skills)</td>
+                                <td>5,153</td>
+                                <td>26.2%</td>
+                            </tr>
+                            <tr>
+                                <td>Moderate (3-4)</td>
+                                <td class="highlight">7,570</td>
+                                <td>38.5%</td>
+                            </tr>
+                            <tr>
+                                <td>High (5-6)</td>
+                                <td>4,575</td>
+                                <td>23.2%</td>
+                            </tr>
+                            <tr>
+                                <td>Very High (7-9)</td>
+                                <td>2,106</td>
+                                <td>10.7%</td>
+                            </tr>
+                            <tr>
+                                <td>Extreme (10+)</td>
+                                <td>282</td>
+                                <td>1.4%</td>
+                            </tr>
+                        </table>
+                    </div>
                 </div>
             </div>
             <div class="insight warning"><strong>Skills-Salary Correlation: 0.127 (Weak)</strong> </br> This weak
@@ -1188,28 +1213,30 @@
             <div class="two-col">
                 <div>
                     <h3>Entry-Level Summary</h3>
-                    <table>
-                        <tr>
-                            <th>Metric</th>
-                            <th>Value</th>
-                        </tr>
-                        <tr>
-                            <td>Total Entry-Level Jobs</td>
-                            <td>3,714 (18.9%)</td>
-                        </tr>
-                        <tr>
-                            <td>Fresh Grad Friendly</td>
-                            <td class="highlight">1,759 (8.9%)</td>
-                        </tr>
-                        <tr>
-                            <td>Experience Paradox Cases</td>
-                            <td>453 (12.2%)</td>
-                        </tr>
-                        <tr>
-                            <td>Mean Experience Required</td>
-                            <td>4.73 years</td>
-                        </tr>
-                    </table>
+                    <div class="table-wrapper">
+                        <table>
+                            <tr>
+                                <th>Metric</th>
+                                <th>Value</th>
+                            </tr>
+                            <tr>
+                                <td>Total Entry-Level Jobs</td>
+                                <td>3,714 (18.9%)</td>
+                            </tr>
+                            <tr>
+                                <td>Fresh Grad Friendly</td>
+                                <td class="highlight">1,759 (8.9%)</td>
+                            </tr>
+                            <tr>
+                                <td>Experience Paradox Cases</td>
+                                <td>453 (12.2%)</td>
+                            </tr>
+                            <tr>
+                                <td>Mean Experience Required</td>
+                                <td>4.73 years</td>
+                            </tr>
+                        </table>
+                    </div>
                     <div class="insight danger"><strong>Experience Paradox</strong> 12.2% of "entry-level" positions
                         still require prior experience, creating barriers for true beginners.</div>
                 </div>
@@ -1349,24 +1376,36 @@
         <section id="insights">
             <h2>Key Insights & Recommendations</h2>
             <h3>For Job Seekers</h3>
-            <div class="insight"><strong>Must-Have Skills</strong> Excel (33%), Communication (30%), ERP Systems (39%),
-                English (18%)</div>
-            <div class="insight"><strong>Target Locations</strong> South Jakarta offers highest median salary (IDR
-                7.5M). Avoid non-Jakarta areas for 30%+ salary premium.</div>
-            <div class="insight"><strong>Education Matters</strong> Bachelor's degree opens 49% of the market.
-                Consider D3 for quick entry (16.5% of jobs).</div>
+            <div class="insight">
+                <ul>
+                    <li><strong>Must-Have Skills:</strong> Excel (33%), Communication (30%), ERP Systems (39%),
+                        English (18%)</li>
+                    <li><strong>Target Locations:</strong> South Jakarta offers highest median salary (IDR
+                        7.5M). Avoid non-Jakarta areas for 30%+ salary premium.</li>
+                    <li><strong>Education Matters:</strong> Bachelor's degree opens 49% of the market.
+                        Consider D3 for quick entry (16.5% of jobs).</li>
+                </ul>
+            </div>
 
             <h3>For Employers</h3>
-            <div class="insight warning"><strong>Transparency Gap</strong> Only 33.1% disclose salary. Publishing
-                ranges can improve application quality and reduce time-to-hire.</div>
-            <div class="insight warning"><strong>Over-specification Risk</strong> Weak skills-salary correlation
-                (0.127) suggests job requirements may be inflated. Focus on essential skills.</div>
+            <div class="insight warning">
+                <ul>
+                    <li><strong>Transparency Gap:</strong> Only 33.1% disclose salary. Publishing
+                        ranges can improve application quality and reduce time-to-hire.</li>
+                    <li><strong>Over-specification Risk:</strong> Weak skills-salary correlation
+                        (0.127) suggests job requirements may be inflated. Focus on essential skills.</li>
+                </ul>
+            </div>
 
             <h3>For Policy Makers</h3>
-            <div class="insight danger"><strong>Remote Work Gap</strong> Only 1.6% remote positions limits geographic
-                inclusion. Consider incentives for flexible work.</div>
-            <div class="insight danger"><strong>Fresh Grad Barriers</strong> Only 8.9% of jobs explicitly welcome
-                fresh graduates. Youth employment programs needed.</div>
+            <div class="insight danger">
+                <ul>
+                    <li><strong>Remote Work Gap:</strong> Only 1.6% remote positions limits geographic
+                        inclusion. Consider incentives for flexible work.</li>
+                    <li><strong>Fresh Grad Barriers:</strong> Only 8.9% of jobs explicitly welcome
+                        fresh graduates. Youth employment programs needed.</li>
+                </ul>
+            </div>
         </section>
 
         <section>
