@@ -1,0 +1,163 @@
+---
+export interface FeaturedItem {
+  title: string;
+  subtitle: string;
+  url: string;
+  coverImage: string;
+}
+
+interface Props {
+  sectionTitle: string;
+  sectionSubtitle?: string;
+  items: FeaturedItem[];
+}
+
+const { sectionTitle, sectionSubtitle, items } = Astro.props;
+---
+
+<style>
+  .featured-section {
+    margin: 3rem 0;
+  }
+
+  .featured-header {
+    margin-bottom: 2rem;
+  }
+
+  .featured-title {
+    font-family: var(--font-family-serif);
+    font-weight: 600;
+    font-size: 1.8rem;
+    margin-bottom: 0.5rem;
+    color: var(--text-primary);
+  }
+
+  .featured-subtitle {
+    font-family: var(--font-family-sans);
+    font-weight: 400;
+    color: var(--text-secondary);
+    font-size: 1rem;
+  }
+
+  .featured-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 1.5rem;
+  }
+
+  .featured-item {
+    display: flex;
+    flex-direction: column;
+    text-decoration: none;
+    color: inherit;
+    transition: all 0.2s ease;
+    border-radius: 8px;
+    overflow: hidden;
+  }
+
+  .featured-item:hover {
+    transform: translateY(-4px);
+  }
+
+  .featured-item:hover .featured-item-title {
+    color: var(--primary-color);
+  }
+
+  .featured-image-wrapper {
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    background-color: var(--background-elevated, rgba(0, 0, 0, 0.05));
+    border-radius: 8px;
+    overflow: hidden;
+    margin-bottom: 0.5rem;
+  }
+
+  .featured-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+  }
+
+  .featured-item:hover .featured-image {
+    transform: scale(1.05);
+  }
+
+  .featured-content {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .featured-item-title {
+    font-family: var(--font-family-serif);
+    font-weight: 600;
+    font-size: 1.1rem;
+    color: var(--text-primary);
+    transition: color 0.2s ease;
+    margin-top: 0.5rem;
+    margin-bottom: 1rem;
+    line-height: 1.5;
+  }
+
+  .featured-item-subtitle {
+    font-family: var(--font-family-sans);
+    font-weight: 400;
+    color: var(--text-secondary);
+    font-size: 0.95rem;
+    line-height: 1.5;
+    margin: 0;
+  }
+
+  @media screen and (max-width: 520px) {
+    .featured-section {
+      margin: 2rem 0;
+    }
+
+    .featured-title {
+      font-size: 1.5rem;
+    }
+
+    .featured-subtitle {
+      font-size: 0.9rem;
+    }
+
+    .featured-grid {
+      grid-template-columns: 1fr;
+      gap: 1rem;
+    }
+  }
+</style>
+
+<section class="featured-section">
+  <div class="featured-header">
+    <h2 class="featured-title">{sectionTitle}</h2>
+    {sectionSubtitle && <p class="featured-subtitle">{sectionSubtitle}</p>}
+  </div>
+
+  <div class="featured-grid">
+    {
+      items.map((item) => (
+        <a
+          href={item.url}
+          class="featured-item"
+          target={item.url.startsWith("http") ? "_blank" : "_self"}
+          rel={item.url.startsWith("http") ? "noopener noreferrer" : ""}
+        >
+          <div class="featured-image-wrapper">
+            <img
+              src={item.coverImage}
+              alt={item.title}
+              class="featured-image"
+              loading="lazy"
+            />
+          </div>
+          <div class="featured-content">
+            <h3 class="featured-item-title">{item.title}</h3>
+            {item.subtitle && <p class="featured-item-subtitle">{item.subtitle}</p>}
+          </div>
+        </a>
+      ))
+    }
+  </div>
+</section>

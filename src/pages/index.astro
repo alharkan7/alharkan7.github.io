@@ -1,6 +1,7 @@
 ---
 import BaseLayout from "../layouts/BaseLayout.astro";
 import QuickLinks from "../components/QuickLinks.astro";
+import FeaturedSection from "../components/FeaturedSection.astro";
 
 const title = "Al Harkan's Blog";
 const description = "On Media, Technology, and Everything in Between";
@@ -32,6 +33,46 @@ const sortedPosts = allPosts.sort(
 const totalPosts = sortedPosts.length;
 const totalPages = Math.ceil(totalPosts / postsPerPage);
 const paginatedPosts = sortedPosts.slice(0, postsPerPage);
+
+// Featured projects data
+const featuredProjects = [
+  {
+    title: "Jakarta Labor Market Analysis (19K+ Job Postings)",
+    subtitle: "",
+    url: "/page/labor-market-analysis",
+    coverImage: "https://ik.imagekit.io/raihankalla/research_section_cover/job-market-analysis.png",
+  },
+  {
+    title: "Econometric Growth vs Envinromental Impact",
+    subtitle: "",
+    url: "/page/pdrb-iklh",
+    coverImage: "https://ik.imagekit.io/raihankalla/research_section_cover/pdrb-iklh.png",
+  },
+  {
+    title: "TurnBackHoax Analysis of 2025: Narrative 3D Network",
+    subtitle: "",
+    url: "https://alhrkn.vercel.app/hoax-network",
+    coverImage: "https://ik.imagekit.io/raihankalla/research_section_cover/hoax-2025-network.png",
+  },
+  {
+    title: "TurnBackHoax Analysis of2024 (Topic Modeling)",
+    subtitle: "",
+    url: "/page/turnbackhoax-analysis",
+    coverImage: "https://ik.imagekit.io/raihankalla/research_section_cover/hoax-2024-topic-modeling.png",
+  },
+  {
+    title: "TurnBackHoax Analysis of 2024: Text Network",
+    subtitle: "",
+    url: "/page/turnbackhoax-text-network",
+    coverImage: "https://ik.imagekit.io/raihankalla/research_section_cover/hoax-2024-network.png",
+  },
+  {
+    title: "TurnBackHoax Analysis of 2024: Sentiment Analysis",
+    subtitle: "",
+    url: "/page/turnbackhoax-sentiment-analysis",
+    coverImage: "https://ik.imagekit.io/raihankalla/research_section_cover/hoax-2024-sentiment.png",
+  },
+];
 ---
 
 <BaseLayout
@@ -44,6 +85,13 @@ const paginatedPosts = sortedPosts.slice(0, postsPerPage);
     <h1>{title}</h1>
     <p><b>{description}</b></p>
     <QuickLinks />
+    <hr />
+    <FeaturedSection
+      sectionTitle="I Do Research for Fun"
+      sectionSubtitle="I like to scrape, analyze or visualize data in my spare time. Here's the list of special pages showcasing the results that don't fit the blog formatting."
+      items={featuredProjects}
+    />
+    <h1>Featured Posts</h1>
     <hr />
     {
       paginatedPosts.map((post: Post, index: number) => {
