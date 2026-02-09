@@ -1,0 +1,893 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bibliometric Analysis - Good News from Indonesia</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #2563eb;
+            --primary-dark: #1e40af;
+            --secondary: #475569;
+            --accent: #059669;
+            --bg-body: #f8f9fa;
+            --bg-card: #ffffff;
+            --bg-card-hover: #f1f5f9;
+            --text-primary: #0f172a;
+            --text-secondary: #64748b;
+            --border: #e2e8f0;
+            --success: #10b981;
+            --warning: #f59e0b;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            background-color: var(--bg-body);
+            background-image: radial-gradient(#cbd5e1 1px, transparent 1px);
+            background-size: 24px 24px;
+            color: var(--text-primary);
+            min-height: 100vh;
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        header {
+            background: var(--bg-card);
+            padding: 2.5rem 2rem;
+            text-align: center;
+            margin-bottom: 2rem;
+            border-radius: 0.5rem;
+            border: 1px solid var(--border);
+            box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1);
+        }
+
+        header h1 {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            color: var(--text-primary);
+            letter-spacing: -0.025em;
+        }
+
+        header p {
+            font-size: 1rem;
+            color: var(--text-secondary);
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: var(--bg-card);
+            border-radius: 0.5rem;
+            padding: 1.5rem;
+            text-align: center;
+            border: 1px solid var(--border);
+            box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+            transition: all 0.2s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+            border-color: var(--primary);
+        }
+
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 0.25rem;
+        }
+
+        .stat-label {
+            color: var(--text-secondary);
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .tabs {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0;
+            margin-bottom: 2rem;
+            background: var(--bg-card);
+            padding: 0.25rem;
+            border-radius: 0.5rem;
+            border: 1px solid var(--border);
+            box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+        }
+
+        .tab {
+            padding: 0.75rem 1.5rem;
+            background: transparent;
+            border: none;
+            color: var(--text-secondary);
+            cursor: pointer;
+            border-radius: 0.375rem;
+            font-size: 0.9rem;
+            font-weight: 500;
+            transition: all 0.2s;
+            flex: 1;
+            text-align: center;
+        }
+
+        .tab:hover {
+            color: var(--primary);
+            background: var(--bg-card-hover);
+        }
+
+        .tab.active {
+            background: var(--primary);
+            color: white;
+            box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1);
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(5px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .chart-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .chart-card {
+            background: var(--bg-card);
+            border-radius: 0.5rem;
+            padding: 1.5rem;
+            border: 1px solid var(--border);
+            box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1);
+        }
+
+        .chart-card h3 {
+            font-size: 1rem;
+            margin-bottom: 1.5rem;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-weight: 600;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 0.75rem;
+        }
+
+        .chart-card h3::before {
+            content: '';
+            width: 4px;
+            height: 16px;
+            background: var(--primary);
+            border-radius: 2px;
+        }
+
+        .chart-container {
+            position: relative;
+            height: 350px;
+        }
+
+        .chart-container.tall {
+            height: 500px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.875rem;
+        }
+
+        th,
+        td {
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 1px solid var(--border);
+        }
+
+        th {
+            color: var(--text-secondary);
+            font-weight: 600;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            background: var(--bg-card-hover);
+        }
+
+        tr:last-child td {
+            border-bottom: none;
+        }
+
+        tr:hover {
+            background: var(--bg-card-hover);
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 0.25rem 0.625rem;
+            border-radius: 999px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            border: 1px solid transparent;
+        }
+
+        .badge-primary {
+            background: #eff6ff;
+            color: var(--primary);
+            border-color: #dbeafe;
+        }
+
+        .badge-secondary {
+            background: #f1f5f9;
+            color: var(--text-secondary);
+            border-color: var(--border);
+        }
+
+        .badge-accent {
+            background: #ecfdf5;
+            color: var(--accent);
+            border-color: #d1fae5;
+        }
+
+        .tag-cloud {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+
+        .tag {
+            padding: 0.375rem 0.875rem;
+            background: white;
+            border-radius: 999px;
+            font-size: 0.85rem;
+            border: 1px solid var(--border);
+            transition: all 0.2s;
+            color: var(--text-secondary);
+        }
+
+        .tag:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+            background: #eff6ff;
+        }
+
+        .topic-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .topic-item {
+            flex: 1;
+            min-width: 220px;
+            background: white;
+            padding: 1.25rem;
+            border-radius: 0.5rem;
+            text-align: left;
+            border: 1px solid var(--border);
+            box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+        }
+
+        .topic-name {
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+            color: var(--text-primary);
+        }
+
+        .topic-count {
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+        }
+
+        .word-cloud-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            justify-content: center;
+            padding: 1rem;
+        }
+
+        .word-item {
+            padding: 0.25rem 0.75rem;
+            border-radius: 0.25rem;
+            background: var(--bg-card-hover);
+            border: 1px solid var(--border);
+            color: var(--text-secondary);
+        }
+
+        .loading {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 4rem;
+            color: var(--text-secondary);
+            font-style: italic;
+        }
+
+        @media (max-width: 768px) {
+            .chart-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            header h1 {
+                font-size: 1.5rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <header>
+            <h1>Bibliometric Analysis</h1>
+            <p><a href="https://goodnews.id" target="_blank" style="color: var(--primary); text-decoration: none;">Good
+                    News From Indonesia</a> - <a
+                    href="https://docs.google.com/spreadsheets/d/1wu5t9hlUzE6_NLVNCCN0TFzqQ5M871iqKxv8m9jcLyc/"
+                    target="_blank" style="color: var(--primary); text-decoration: none;">2025 Dataset</a></p>
+        </header>
+
+        <div class="stats-grid" id="statsGrid">
+            <div class="loading">Loading statistics...</div>
+        </div>
+
+        <div class="tabs">
+            <button class="tab active" data-tab="trends">Publication Trends</button>
+            <button class="tab" data-tab="authors">Authors</button>
+            <button class="tab" data-tab="topics">Topics</button>
+            <button class="tab" data-tab="tags">Tags</button>
+            <button class="tab" data-tab="content">Content</button>
+            <button class="tab" data-tab="nlp">NLP Analysis</button>
+            <button class="tab" data-tab="temporal">Temporal</button>
+        </div>
+
+        <div id="tabContents"></div>
+    </div>
+
+    <script>
+        let data = null;
+        const colors = {
+            primary: '#2563eb', // Blue 600
+            secondary: '#64748b', // Slate 500
+            accent: '#0ea5e9', // Sky 500
+            success: '#10b981', // Emerald 500 (kept for status)
+            warning: '#f59e0b', // Amber 500 (kept for status)
+            // Monochromatic Blue Gradient
+            gradient: [
+                '#1e3a8a', // Blue 900
+                '#1e40af', // Blue 800
+                '#1d4ed8', // Blue 700
+                '#2563eb', // Blue 600
+                '#3b82f6', // Blue 500
+                '#60a5fa', // Blue 400
+                '#0284c7', // Sky 600
+                '#0ea5e9', // Sky 500
+                '#38bdf8', // Sky 400
+                '#94a3b8'  // Slate 400
+            ],
+            // Distinct palette for multi-line charts (high contrast)
+            distinct: [
+                '#2563eb', // Blue
+                '#dc2626', // Red
+                '#059669', // Emerald
+                '#d97706', // Amber
+                '#7c3aed', // Violet
+                '#db2777', // Pink
+                '#0891b2'  // Cyan
+            ]
+        };
+
+        async function loadData() {
+            try {
+                const response = await fetch('/bibliometric_analysis_results.json');
+                data = await response.json();
+                renderDashboard();
+            } catch (error) {
+                console.error('Error loading data:', error);
+                document.getElementById('statsGrid').innerHTML = '<div class="loading" style="color: #f43f5e;">Error loading data. Make sure bibliometric_analysis_results.json is in the same directory.</div>';
+            }
+        }
+
+        function renderDashboard() {
+            renderStats();
+            renderTabs();
+            setupTabNavigation();
+        }
+
+        function renderStats() {
+            const stats = [
+                { value: data.metadata.total_articles.toLocaleString(), label: 'Total Articles' },
+                { value: data.author_analysis.stats.total_authors.toLocaleString(), label: 'Unique Authors' },
+                { value: data.topic_analysis.stats.total_topics, label: 'Topics' },
+                { value: data.tag_analysis.stats.total_unique_tags.toLocaleString(), label: 'Unique Tags' },
+                { value: `${data.content_analysis.stats.avg_reading_time} min`, label: 'Avg Reading Time' },
+                { value: data.content_analysis.stats.avg_word_count.toLocaleString(), label: 'Avg Word Count' }
+            ];
+
+            document.getElementById('statsGrid').innerHTML = stats.map(s => `
+                <div class="stat-card">
+                    <div class="stat-value">${s.value}</div>
+                    <div class="stat-label">${s.label}</div>
+                </div>
+            `).join('');
+        }
+
+        function renderTabs() {
+            const tabContents = document.getElementById('tabContents');
+            tabContents.innerHTML = `
+                <div id="trends" class="tab-content active">${renderTrendsTab()}</div>
+                <div id="authors" class="tab-content">${renderAuthorsTab()}</div>
+                <div id="topics" class="tab-content">${renderTopicsTab()}</div>
+                <div id="tags" class="tab-content">${renderTagsTab()}</div>
+                <div id="content" class="tab-content">${renderContentTab()}</div>
+                <div id="nlp" class="tab-content">${renderNLPTab()}</div>
+                <div id="temporal" class="tab-content">${renderTemporalTab()}</div>
+            `;
+
+            setTimeout(() => {
+                renderAllCharts();
+            }, 100);
+        }
+
+        function renderTrendsTab() {
+            return `
+                <div class="chart-grid">
+                    <div class="chart-card">
+                        <h3>Monthly Publication Trend</h3>
+                        <div class="chart-container"><canvas id="monthlyChart"></canvas></div>
+                    </div>
+                    <div class="chart-card">
+                        <h3>Publication by Weekday</h3>
+                        <div class="chart-container"><canvas id="weekdayChart"></canvas></div>
+                    </div>
+                    <div class="chart-card">
+                        <h3>Publication by Hour</h3>
+                        <div class="chart-container"><canvas id="hourlyChart"></canvas></div>
+                    </div>
+                    <div class="chart-card">
+                        <h3>Year-Month Time Series</h3>
+                        <div class="chart-container"><canvas id="timeSeriesChart"></canvas></div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderAuthorsTab() {
+            const topAuthors = data.author_analysis.author_counts.slice(0, 20);
+            return `
+                <div class="chart-grid">
+                    <div class="chart-card">
+                        <h3>Top 20 Most Prolific Authors</h3>
+                        <div class="chart-container tall"><canvas id="authorsChart"></canvas></div>
+                    </div>
+                    <div class="chart-card">
+                        <h3>Author Statistics</h3>
+                        <table>
+                            <thead><tr><th>Rank</th><th>Author</th><th>Articles</th></tr></thead>
+                            <tbody>
+                                ${topAuthors.map((a, i) => `<tr><td>${i + 1}</td><td>${a.author}</td><td><span class="badge badge-primary">${a.count}</span></td></tr>`).join('')}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderTopicsTab() {
+            return `
+                <div class="chart-grid">
+                    <div class="chart-card">
+                        <h3>Article Distribution by Topic</h3>
+                        <div class="chart-container"><canvas id="topicPieChart"></canvas></div>
+                    </div>
+                    <div class="chart-card">
+                        <h3>Topic Comparison</h3>
+                        <div class="chart-container"><canvas id="topicBarChart"></canvas></div>
+                    </div>
+                </div>
+                <div class="chart-card" style="margin-top: 1.5rem;">
+                    <h3>All Topics Overview</h3>
+                    <div class="topic-list">
+                        ${data.topic_analysis.topic_distribution.map(t => `
+                            <div class="topic-item">
+                                <div class="topic-name">${t.topic}</div>
+                                <div class="topic-count">${t.count.toLocaleString()} articles (${t.percentage}%)</div>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderTagsTab() {
+            const topTags = data.tag_analysis.tag_frequency.slice(0, 50);
+            return `
+                <div class="chart-grid">
+                    <div class="chart-card">
+                        <h3>Top 20 Tags</h3>
+                        <div class="chart-container tall"><canvas id="tagsChart"></canvas></div>
+                    </div>
+                    <div class="chart-card">
+                        <h3>Tag Cloud (Top 50)</h3>
+                        <div class="tag-cloud">
+                            ${topTags.map((t, i) => {
+                const size = Math.max(0.7, 1.5 - (i * 0.02));
+                return `<span class="tag" style="font-size: ${size}rem">${t.tag} <small>(${t.count})</small></span>`;
+            }).join('')}
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderContentTab() {
+            return `
+                <div class="chart-grid">
+                    <div class="chart-card">
+                        <h3>Reading Time Distribution</h3>
+                        <div class="chart-container"><canvas id="readingTimeChart"></canvas></div>
+                    </div>
+                    <div class="chart-card">
+                        <h3>Word Count Distribution</h3>
+                        <div class="chart-container"><canvas id="wordCountChart"></canvas></div>
+                    </div>
+                    <div class="chart-card">
+                        <h3>Top 30 Most Frequent Words</h3>
+                        <div class="word-cloud-container">
+                            ${data.content_analysis.word_frequency.slice(0, 30).map((w, i) => {
+                const size = Math.max(0.8, 1.4 - (i * 0.02));
+                return `<span class="word-item" style="font-size: ${size}rem">${w.word}</span>`;
+            }).join('')}
+                        </div>
+                    </div>
+                    <div class="chart-card">
+                        <h3>Content Stats by Topic</h3>
+                        <table>
+                            <thead><tr><th>Topic</th><th>Avg Words</th><th>Median</th><th>Max</th></tr></thead>
+                            <tbody>
+                                ${Object.entries(data.content_analysis.content_by_topic).map(([topic, stats]) => `
+                                    <tr><td>${topic}</td><td>${stats.avg_words}</td><td>${stats.median_words}</td><td>${stats.max_words}</td></tr>
+                                `).join('')}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Helper function to interpret LDA topics based on keywords
+        function generateTopicInterpretation(words) {
+            const wordSet = new Set(words.map(w => w.toLowerCase()));
+
+            // Pattern matching for common theme interpretations
+            if (wordSet.has('wisata') || wordSet.has('pantai') || wordSet.has('pulau') || wordSet.has('museum')) {
+                return 'Tourism, travel destinations, and local attractions';
+            }
+            if (wordSet.has('pendidikan') || wordSet.has('sekolah') || wordSet.has('mahasiswa') || wordSet.has('belajar')) {
+                return 'Education, schools, and academic initiatives';
+            }
+            if (wordSet.has('ekonomi') || wordSet.has('industri') || wordSet.has('produk') || wordSet.has('pasar')) {
+                return 'Economy, business, and market developments';
+            }
+            if (wordSet.has('budaya') || wordSet.has('tradisi') || wordSet.has('seni') || wordSet.has('adat')) {
+                return 'Culture, traditions, and arts heritage';
+            }
+            if (wordSet.has('sejarah') || wordSet.has('belanda') || wordSet.has('presiden') || wordSet.has('nasional')) {
+                return 'History, national events, and heritage';
+            }
+            if (wordSet.has('anak') && (wordSet.has('keluarga') || wordSet.has('orang tua'))) {
+                return 'Family and children-related topics';
+            }
+            if (wordSet.has('teknologi') || wordSet.has('digital') || wordSet.has('energi') || wordSet.has('inovasi')) {
+                return 'Technology, innovation, and digital transformation';
+            }
+            if (wordSet.has('desa') || wordSet.has('masyarakat') || wordSet.has('warga')) {
+                return 'Community development and rural society';
+            }
+            if (wordSet.has('pemerintah') || wordSet.has('kebijakan') || wordSet.has('negara')) {
+                return 'Government policies and national affairs';
+            }
+            if (wordSet.has('makanan') || wordSet.has('kuliner') || wordSet.has('rasa')) {
+                return 'Food, culinary, and local cuisine';
+            }
+            if (wordSet.has('kota') || wordSet.has('jalan') || wordSet.has('area') || wordSet.has('tempat')) {
+                return 'Urban development and local places';
+            }
+            if (wordSet.has('orang') || wordSet.has('saya') || wordSet.has('cerita')) {
+                return 'Personal stories and human interest';
+            }
+
+            // Default interpretation based on first few keywords
+            return `Topics related to: ${words.slice(0, 3).join(', ')}`;
+        }
+
+        function renderNLPTab() {
+            const topics = data.nlp_analysis.topic_modeling?.topics || {};
+            const clusters = data.nlp_analysis.article_clusters || [];
+            const keywords = data.nlp_analysis.keyword_extraction || [];
+
+            return `
+                <div class="chart-grid">
+                    <div class="chart-card">
+                        <h3>Article Clusters</h3>
+                        <div style="display: flex; gap: 1rem; flex-wrap: wrap; align-items: start;">
+                            <div class="chart-container" style="flex: 1; min-width: 250px;"><canvas id="clustersChart"></canvas></div>
+                            <div style="flex: 1; min-width: 200px; max-height: 350px; overflow-y: auto;">
+                                <table style="font-size: 0.8rem;">
+                                    <thead><tr><th>Cluster</th><th>Keywords</th></tr></thead>
+                                    <tbody>
+                                        ${clusters.map(c => `
+                                            <tr>
+                                                <td style="white-space: nowrap;"><span class="badge" style="background:${colors.gradient[c.cluster % colors.gradient.length]}; color:white; white-space: nowrap;">Cluster ${c.cluster + 1}</span></td>
+                                                <td>${c.label || 'N/A'}</td>
+                                            </tr>
+                                        `).join('')}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="chart-card">
+                        <h3>
+                            <div>
+                                Top TF-IDF Keywords
+                                <div style="font-size: 0.75rem; font-weight: normal; color: var(--text-secondary); margin-top: 0.25rem;">(Term Frequency-Inverse Document Frequency)</div>
+                            </div>
+                        </h3>
+                        <div class="word-cloud-container">
+                            ${keywords.slice(0, 30).map((k, i) => {
+                const size = Math.max(0.8, 1.3 - (i * 0.015));
+                return `<span class="word-item" style="font-size: ${size}rem">${k.keyword}</span>`;
+            }).join('')}
+                        </div>
+                    </div>
+                </div>
+                <div class="chart-card" style="margin-top: 1.5rem;">
+                    <h3>LDA Topic Modeling Results</h3>
+                    <div class="topic-list">
+                        ${Object.entries(topics).map(([name, topic]) => {
+                // Format Topic Name: "Topic_1" -> "Topic 1"
+                const formattedName = name.replace('_', ' ');
+                // Generate interpretation based on keywords
+                const interpretation = generateTopicInterpretation(topic.words);
+                return `
+                                <div class="topic-item" style="text-align: left;">
+                                    <div class="topic-name">${formattedName}</div>
+                                    <div class="topic-count" style="font-size: 0.8rem; line-height: 1.4;">${topic.words.slice(0, 8).join(', ')}</div>
+                                    <div style="font-size: 0.75rem; color: var(--text-secondary); margin-top: 0.5rem; font-style: italic;">${interpretation}</div>
+                                </div>
+                            `;
+            }).join('')}
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderTemporalTab() {
+            const spikes = data.temporal_patterns.publication_spikes || [];
+            return `
+                <div class="chart-grid">
+                    <div class="chart-card">
+                        <h3>Seasonal Patterns (Monthly)</h3>
+                        <div class="chart-container"><canvas id="seasonalChart"></canvas></div>
+                    </div>
+                    <div class="chart-card">
+                        <h3>Publication Spikes Detected</h3>
+                        <table>
+                            <thead><tr><th>Date</th><th>Articles</th><th>Z-Score</th></tr></thead>
+                            <tbody>
+                                ${spikes.slice(0, 10).map(s => `
+                                    <tr><td>${s.date}</td><td><span class="badge badge-accent">${s.count}</span></td><td>${s.z_score}</td></tr>
+                                `).join('')}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderAllCharts() {
+            // Monthly Chart
+            const monthlyData = data.publication_trends.monthly;
+            const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+            new Chart(document.getElementById('monthlyChart'), {
+                type: 'bar',
+                data: {
+                    labels: months,
+                    datasets: [{ label: 'Articles', data: Object.values(monthlyData), backgroundColor: colors.gradient, borderRadius: 8 }]
+                },
+                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
+            });
+
+            // Weekday Chart
+            new Chart(document.getElementById('weekdayChart'), {
+                type: 'bar',
+                data: {
+                    labels: Object.keys(data.publication_trends.weekday),
+                    datasets: [{ label: 'Articles', data: Object.values(data.publication_trends.weekday), backgroundColor: colors.primary, borderRadius: 8 }]
+                },
+                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
+            });
+
+            // Hourly Chart
+            new Chart(document.getElementById('hourlyChart'), {
+                type: 'line',
+                data: {
+                    labels: Object.keys(data.publication_trends.hourly),
+                    datasets: [{ label: 'Articles', data: Object.values(data.publication_trends.hourly), borderColor: colors.secondary, backgroundColor: 'rgba(71, 85, 105, 0.1)', fill: true, tension: 0.3 }]
+                },
+                options: { responsive: true, maintainAspectRatio: false }
+            });
+
+            // Time Series
+            const timeSeries = data.publication_trends.year_month_series;
+            new Chart(document.getElementById('timeSeriesChart'), {
+                type: 'line',
+                data: {
+                    labels: timeSeries.map(t => t.period),
+                    datasets: [{ label: 'Articles', data: timeSeries.map(t => t.count), borderColor: colors.accent, backgroundColor: 'rgba(5, 150, 105, 0.1)', fill: true, tension: 0.3 }]
+                },
+                options: { responsive: true, maintainAspectRatio: false }
+            });
+
+            // Authors Chart
+            const topAuthors = data.author_analysis.author_counts.slice(0, 20);
+            new Chart(document.getElementById('authorsChart'), {
+                type: 'bar',
+                data: {
+                    labels: topAuthors.map(a => a.author),
+                    datasets: [{ label: 'Articles', data: topAuthors.map(a => a.count), backgroundColor: colors.gradient, borderRadius: 6 }]
+                },
+                options: { responsive: true, maintainAspectRatio: false, indexAxis: 'y', plugins: { legend: { display: false } } }
+            });
+
+            // Topic Charts
+            const topicData = data.topic_analysis.topic_distribution;
+            new Chart(document.getElementById('topicPieChart'), {
+                type: 'doughnut',
+                data: {
+                    labels: topicData.map(t => t.topic),
+                    datasets: [{ data: topicData.map(t => t.count), backgroundColor: colors.gradient }]
+                },
+                options: { responsive: true, maintainAspectRatio: false }
+            });
+
+            new Chart(document.getElementById('topicBarChart'), {
+                type: 'bar',
+                data: {
+                    labels: topicData.map(t => t.topic),
+                    datasets: [{ label: 'Articles', data: topicData.map(t => t.count), backgroundColor: colors.gradient, borderRadius: 8 }]
+                },
+                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
+            });
+
+            // Tags Chart
+            const topTags = data.tag_analysis.tag_frequency.slice(0, 20);
+            new Chart(document.getElementById('tagsChart'), {
+                type: 'bar',
+                data: {
+                    labels: topTags.map(t => t.tag.length > 25 ? t.tag.substring(0, 25) + '...' : t.tag),
+                    datasets: [{ label: 'Count', data: topTags.map(t => t.count), backgroundColor: colors.gradient, borderRadius: 6 }]
+                },
+                options: { responsive: true, maintainAspectRatio: false, indexAxis: 'y', plugins: { legend: { display: false } } }
+            });
+
+            // Reading Time Chart
+            const readingTime = data.content_analysis.reading_time_distribution;
+            new Chart(document.getElementById('readingTimeChart'), {
+                type: 'bar',
+                data: {
+                    labels: Object.keys(readingTime).map(k => k + ' min'),
+                    datasets: [{ label: 'Articles', data: Object.values(readingTime), backgroundColor: colors.primary, borderRadius: 8 }]
+                },
+                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
+            });
+
+            // Word Count Chart
+            const wordCount = data.content_analysis.word_count_distribution;
+            new Chart(document.getElementById('wordCountChart'), {
+                type: 'bar',
+                data: {
+                    labels: Object.keys(wordCount),
+                    datasets: [{ label: 'Articles', data: Object.values(wordCount), backgroundColor: colors.secondary, borderRadius: 8 }]
+                },
+                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
+            });
+
+            // Clusters Chart
+            const clusters = data.nlp_analysis.article_clusters || [];
+            if (clusters.length > 0) {
+                new Chart(document.getElementById('clustersChart'), {
+                    type: 'pie',
+                    data: {
+                        labels: clusters.map(c => 'Cluster ' + (c.cluster + 1)),
+                        datasets: [{ data: clusters.map(c => c.count), backgroundColor: colors.gradient }]
+                    },
+                    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
+                });
+            }
+
+            // Seasonal Chart
+            const seasonal = data.temporal_patterns.seasonal_patterns;
+            const seasonalDatasets = Object.entries(seasonal).slice(0, 5).map(([topic, monthly], i) => ({
+                label: topic,
+                data: Object.values(monthly),
+                borderColor: colors.distinct[i % colors.distinct.length],
+                backgroundColor: 'transparent',
+                tension: 0.4
+            }));
+
+            new Chart(document.getElementById('seasonalChart'), {
+                type: 'line',
+                data: { labels: months, datasets: seasonalDatasets },
+                options: { responsive: true, maintainAspectRatio: false }
+            });
+        }
+
+        function setupTabNavigation() {
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.addEventListener('click', () => {
+                    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                    document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+                    tab.classList.add('active');
+                    document.getElementById(tab.dataset.tab).classList.add('active');
+                });
+            });
+        }
+
+        loadData();
+    </script>
+
+    <footer
+        style="text-align: center; padding: 2rem; margin-top: 2rem; border-top: 1px solid var(--border); color: var(--text-secondary); font-size: 0.875rem;">
+        <p><strong style="color: var(--text-primary);">Bibliometric Analysis - Good News From Indonesia</strong></p>
+        <p style="margin-top: 0.5rem;"><a
+                href="https://docs.google.com/spreadsheets/d/1wu5t9hlUzE6_NLVNCCN0TFzqQ5M871iqKxv8m9jcLyc/"
+                target="_blank" style="color: var(--primary);">Dataset</a> Scraped, Prepped & Analyzed by <a
+                href="https://x.com/alhrkn" target="_blank" style="color: var(--primary);">@alhrkn</a> | <a
+                href="https://raihankalla.id" target="_blank" style="color: var(--primary);">raihankalla.id</a></p>
+        <p style="font-size: 0.75rem; margin-top: 0.5rem; opacity: 0.8;">© 2026. Do Not Copy Without Permission.</p>
+    </footer>
+</body>
+
+</html>
