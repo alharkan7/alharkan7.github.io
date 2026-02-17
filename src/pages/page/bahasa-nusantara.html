@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
+  <link rel="icon" type="image/svg+xml" href="/vite.svg" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -11,7 +12,7 @@
     body {
       margin: 0;
       overflow: hidden;
-      background: #0f172a;
+      background: #f8fafc;
       font-family: 'Outfit', sans-serif;
     }
     canvas {
@@ -20,13 +21,13 @@
     }
     .tooltip {
       position: absolute;
-      background: rgba(255, 255, 255, 0.94);
-      color: rgba(15, 23, 42, 0.92);
+      background: rgba(255, 255, 255, 0.96);
+      color: #0f172a;
       padding: 8px 10px;
       padding: 8px 10px;
       border-radius: 10px;
-      border: 1px solid rgba(15, 23, 42, 0.10);
-      box-shadow: 0 18px 48px rgba(15, 23, 42, 0.16);
+      border: 1px solid rgba(15, 23, 42, 0.08);
+      box-shadow: 0 18px 48px rgba(15, 23, 42, 0.12);
       pointer-events: none;
       display: none;
       font-size: 14px;
@@ -39,10 +40,10 @@
       width: 44px;
       height: 44px;
       border-radius: 50%;
-      background: rgba(15, 23, 42, 0.6);
+      background: rgba(255, 255, 255, 0.8);
       backdrop-filter: blur(8px);
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      color: #e2e8f0;
+      border: 1px solid rgba(15, 23, 42, 0.08);
+      color: #334155;
       cursor: pointer;
       display: flex;
       align-items: center;
@@ -60,10 +61,10 @@
       transform: scale(1);
     }
     #reset-btn:hover {
-      background: rgba(30, 41, 59, 0.8);
-      color: #fff;
+      background: rgba(255, 255, 255, 1);
+      color: #0f172a;
       transform: scale(1.05);
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
     }
     #reset-btn svg {
       width: 20px;
@@ -76,10 +77,10 @@
       width: 44px;
       height: 44px;
       border-radius: 50%;
-      background: rgba(15, 23, 42, 0.6);
+      background: rgba(255, 255, 255, 0.8);
       backdrop-filter: blur(8px);
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      color: #e2e8f0;
+      border: 1px solid rgba(15, 23, 42, 0.08);
+      color: #334155;
       cursor: pointer;
       display: flex;
       align-items: center;
@@ -89,10 +90,10 @@
       padding: 0;
     }
     #info-btn:hover {
-      background: rgba(30, 41, 59, 0.8);
-      color: #fff;
+      background: rgba(255, 255, 255, 1);
+      color: #0f172a;
       transform: scale(1.05);
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
     }
     #info-btn svg {
       width: 20px;
@@ -104,8 +105,8 @@
       left: 0;
       width: 100%;
       height: 100%;
-      background: rgba(15, 23, 42, 0.8);
-      backdrop-filter: blur(4px);
+      background: rgba(241, 245, 249, 0.6);
+      backdrop-filter: blur(6px);
       display: flex;
       align-items: center;
       justify-content: center;
@@ -119,15 +120,15 @@
       pointer-events: auto;
     }
     .modal-content {
-      background: #1e293b;
-      border: 1px solid rgba(255, 255, 255, 0.1);
+      background: #ffffff;
+      border: 1px solid rgba(15, 23, 42, 0.08);
       border-radius: 16px;
       padding: 24px;
       width: calc(100% - 48px);
       max-width: 400px;
       box-sizing: border-box;
-      color: #f1f5f9;
-      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+      color: #0f172a;
+      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.05), 0 10px 10px -5px rgba(0, 0, 0, 0.02);
       transform: translateY(20px);
       transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     }
@@ -144,7 +145,7 @@
     .modal-body {
       font-size: 14px;
       line-height: 1.6;
-      color: #cbd5e1;
+      color: #334155;
       font-family: 'Outfit', sans-serif;
     }
     .modal-body ul {
@@ -158,7 +159,7 @@
       margin-bottom: 0;
     }
     .modal-body a {
-      color: #38bdf8;
+      color: #0ea5e9;
       text-decoration: none;
     }
     .modal-body a:hover {
@@ -170,12 +171,12 @@
       right: 16px;
       background: transparent;
       border: none;
-      color: #94a3b8;
+      color: #64748b;
       cursor: pointer;
       padding: 4px;
     }
     .modal-close:hover {
-      color: #f1f5f9;
+      color: #0f172a;
     }
 
   </style>
@@ -4541,12 +4542,12 @@ let provinceLangMap = new Map();
 let islandData = [];
 let provinceData = [];
 
-// Colors - Dark Theme Data Art
-const COLOR_MAIN_1 = '#38bdf8'; // Sky 400
-const COLOR_MAIN_2 = '#818cf8'; // Indigo 400
-const COLOR_ACCENT = '#f472b6'; // Pink 400
-const COLOR_BG = '#0f172a'; // Slate 900
-const COLOR_TEXT = '#f1f5f9'; // Slate 100
+// Colors - Light Theme Data Art
+const COLOR_MAIN_1 = '#0ea5e9'; // Sky 500
+const COLOR_MAIN_2 = '#6366f1'; // Indigo 500
+const COLOR_ACCENT = '#ec4899'; // Pink 500
+const COLOR_BG = '#f8fafc'; // Slate 50
+const COLOR_TEXT = '#1e293b'; // Slate 800
 
 const tooltip = document.getElementById('tooltip');
 const resetBtn = document.getElementById('reset-btn');
@@ -4717,7 +4718,7 @@ class Node {
     this.label = label;
     this.tooltipText = tooltipText ?? label;
     this.hue = hue;
-    this.color = hsla(this.hue, 85, 65, 1);
+    this.color = hsla(this.hue, 80, 50, 1);
 
     this.x = width / 2;
     this.y = height / 2;
@@ -4768,7 +4769,7 @@ class Node {
     const pad = Math.max(6, this.r + 3);
 
     ctx.globalAlpha = labelAlpha;
-    ctx.fillStyle = 'rgba(241, 245, 249, 0.9)';
+    ctx.fillStyle = 'rgba(15, 23, 42, 0.9)';
     const s = uiScale();
     const rootPx = Math.round(16 * s);
     const islandPx = Math.round(10 * s);
@@ -4871,8 +4872,8 @@ function drawTreeLanguageLabelsScreenSpace() {
   let count = 0;
   ctx.font = `${Math.round(7 * uiScale())}px Outfit`;
   ctx.textBaseline = 'middle';
-  ctx.fillStyle = 'rgba(226, 232, 240, 0.7)';
-  ctx.shadowColor = 'rgba(0, 0, 0, 0.5)';
+  ctx.fillStyle = 'rgba(51, 65, 85, 0.7)';
+  ctx.shadowColor = 'rgba(255, 255, 255, 0.5)';
   ctx.shadowBlur = 6;
 
   for (const n of items) {
@@ -4959,10 +4960,10 @@ function drawTreeHoverChipScreenSpace() {
   const y1 = textY - h / 2 - padY;
   const y2 = y1 + h + padY * 2;
 
-  ctx.fillStyle = 'rgba(255, 255, 255, 0.94)';
+  ctx.fillStyle = 'rgba(255, 255, 255, 0.96)';
   roundRect(ctx, x1, y1, x2 - x1, y2 - y1, 7);
   ctx.fill();
-  ctx.strokeStyle = hsla(n.hue, 96, 46, 0.55);
+  ctx.strokeStyle = hsla(n.hue, 80, 50, 0.55);
   ctx.lineWidth = 1;
   ctx.stroke();
 
@@ -5183,9 +5184,9 @@ function drawSceneText(scene, opacity, yOffset) {
   // Let's move gradient with text.
   
   const grad = ctx.createLinearGradient(0, yOffset, 0, fadeH + yOffset);
-  grad.addColorStop(0, `rgba(15, 23, 42, ${0.98 * opacity})`);
-  grad.addColorStop(0.7, `rgba(15, 23, 42, ${0.9 * opacity})`);
-  grad.addColorStop(1, `rgba(15, 23, 42, 0)`);
+  grad.addColorStop(0, `rgba(248, 250, 252, ${0.98 * opacity})`);
+  grad.addColorStop(0.7, `rgba(248, 250, 252, ${0.9 * opacity})`);
+  grad.addColorStop(1, `rgba(248, 250, 252, 0)`);
   ctx.fillStyle = grad;
   ctx.fillRect(0, 0, width, fadeH + Math.abs(yOffset) + 100); // Fill large enough area
 
@@ -5194,16 +5195,16 @@ function drawSceneText(scene, opacity, yOffset) {
   ctx.textAlign = alignRight ? 'right' : 'center';
   
   // Title
-  ctx.shadowColor = `rgba(0, 0, 0, ${0.8 * opacity})`;
+  ctx.shadowColor = `rgba(255, 255, 255, ${0.8 * opacity})`;
   ctx.shadowBlur = 12;
-  ctx.fillStyle = `rgba(248, 250, 252, ${opacity})`; // Light text
+  ctx.fillStyle = `rgba(15, 23, 42, ${opacity})`; // Dark text
   ctx.font = titleFont;
   ctx.fillText(scene.title, textX, titleY);
   
   // Caption
   ctx.shadowBlur = 4;
   ctx.font = bodyFont;
-  ctx.fillStyle = `rgba(203, 213, 225, ${opacity})`; // Slate 300
+  ctx.fillStyle = `rgba(51, 65, 85, ${opacity})`; // Slate 700
   let y = captionY;
   for (let i = 0; i < lines.length; i++) {
     ctx.fillText(lines[i], textX, y);
@@ -5220,26 +5221,38 @@ function drawSceneText(scene, opacity, yOffset) {
      };
   }
   
-  // Next Button
+  // Next Button (Text Link)
+  ctx.font = `500 ${bodySize}px Outfit, sans-serif`;
   const nextW = ctx.measureText(nextText).width;
   const nextY = y + gap;
-  let nextX = alignRight ? (textX) : (textX); 
   
   // Next button hitbox - Only update for the ACTIVE scene
   if (scene === scenes[sceneIndex] && opacity > 0.8) {
-    const nh = lineH;
+    let hx1, hx2;
+    // Align relative to textX based on alignment
+    if (alignRight) {
+       hx1 = canvasRect.left + (textX - nextW - 10);
+       hx2 = canvasRect.left + (textX + 10);
+    } else {
+       hx1 = canvasRect.left + (textX - nextW/2 - 10);
+       hx2 = canvasRect.left + (textX + nextW/2 + 10);
+    }
+
     nextHitBox = {
-      x1: canvasRect.left + (nextX - nextW/2 - 20),
+      x1: hx1,
       y1: canvasRect.top + (nextY - 10),
-      x2: canvasRect.left + (nextX + nextW/2 + 20),
-      y2: canvasRect.top + (nextY + nh + 10)
+      x2: hx2,
+      y2: canvasRect.top + (nextY + lineH + 10)
     };
   }
   
-  ctx.fillStyle = COLOR_MAIN_1; // We can fade this too if we want, but it uses globalAlpha
-  ctx.shadowBlur = 8;
-  ctx.shadowColor = COLOR_MAIN_1;
-  ctx.fillText(nextText, nextX, nextY);
+  // Draw Text
+  ctx.shadowColor = 'transparent';
+  ctx.shadowBlur = 0;
+  ctx.shadowOffsetY = 0;
+  ctx.fillStyle = COLOR_MAIN_1;
+  // Reuse existing textAlign/textBaseline from earlier
+  ctx.fillText(nextText, textX, nextY);
   
   ctx.restore();
 }
@@ -5272,7 +5285,7 @@ function layoutGrid() {
   labels = [];
   targetZoom = 1.0;
   defaultZoom = 1.0;
-  globalZoom = width < 520 ? 1.6 : 1.2; 
+  globalZoom = width < 520 ? 0.9 : 0.8; 
   panX = 0;
   panY = 0;
   targetPanX = 0;
@@ -5296,7 +5309,7 @@ function layoutGrid() {
     
     // Colorful spiral gradient
     const hue = (200 + i * 0.5) % 360;
-    c.color = hsla(hue, 85, 65, 1);
+    c.color = hsla(hue, 80, 50, 1);
     
     c.group = (langList[i]?.bahasa?.toString?.() ?? `Language ${i + 1}`);
     c.alpha = 0;
@@ -5372,7 +5385,7 @@ function layoutBarChart(data, labelKey) {
       text: `${totalCount}`,
       rotation: 0,
       font: labelFont,
-      fillStyle: 'rgba(203, 213, 225, 0.8)'
+      fillStyle: 'rgba(100, 116, 139, 0.8)'
     });
 
     // Add label
@@ -5382,7 +5395,7 @@ function layoutBarChart(data, labelKey) {
       text: item[labelKey],
       rotation: labelRotation, // Rotate labels if many
       font: labelFont,
-      fillStyle: 'rgba(241, 245, 249, 0.9)'
+      fillStyle: 'rgba(15, 23, 42, 0.9)'
     });
 
     // Assign circles
@@ -5453,10 +5466,10 @@ function drawCircleHoverChipScreenSpace() {
   const y1 = textY - h / 2 - padY;
   const y2 = y1 + h + padY * 2;
 
-  ctx.fillStyle = 'rgba(255, 255, 255, 0.94)';
+  ctx.fillStyle = 'rgba(255, 255, 255, 0.96)';
   roundRect(ctx, x1, y1, x2 - x1, y2 - y1, 7);
   ctx.fill();
-  ctx.strokeStyle = 'rgba(148, 163, 184, 0.75)';
+  ctx.strokeStyle = 'rgba(148, 163, 184, 0.5)';
   ctx.lineWidth = 1;
   ctx.stroke();
 
@@ -5473,7 +5486,7 @@ function layoutTree() {
   targetPanY = 0;
   focusNode = null;
   targetZoom = 1.0;
-  globalZoom = width < 520 ? 1.35 : 1.7;
+  globalZoom = width < 520 ? 0.9 : 1.0;
   targetZoom = globalZoom;
   defaultZoom = globalZoom;
   tooltip.style.display = 'none';
@@ -5682,7 +5695,7 @@ function makeEdge(a, b, cx, cy) {
     b,
     cpx: mx + nx * bend + (cx - mx) * pullToCenter,
     cpy: my + ny * bend + (cy - my) * pullToCenter,
-    stroke: hsla((a.hue + b.hue) / 2, 75, 55, 1)
+    stroke: hsla((a.hue + b.hue) / 2, 70, 45, 1)
   };
 }
 
