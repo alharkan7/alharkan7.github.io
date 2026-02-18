@@ -49,18 +49,47 @@
             background-color: var(--card-bg);
             padding: 24px;
             border-bottom: 1px solid var(--border-color);
+            display: flex;
+            align-items: flex-start;
+            gap: 20px;
+        }
+
+        .header-content {
+            flex: 1;
         }
 
         h1 {
             font-size: 1.875rem;
             font-weight: 700;
             color: var(--text-color);
-            margin-bottom: 0.5rem;
+            margin-bottom: 0.25rem;
         }
 
         .subtitle {
             color: var(--secondary-color);
             font-size: 1rem;
+        }
+
+        .home-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 44px;
+            height: 44px;
+            background-color: var(--bg-color);
+            border-radius: 50%;
+            color: var(--text-color);
+            text-decoration: none;
+            transition: all 0.2s;
+            border: 1px solid var(--border-color);
+            flex-shrink: 0;
+            margin-top: 4px;
+        }
+
+        .home-btn:hover {
+            background-color: var(--hover-color);
+            color: var(--primary-color);
+            transform: scale(1.05);
         }
 
         /* Tabs */
@@ -278,8 +307,16 @@
 
     <div class="container">
         <header>
-            <h1>Sentiment Analysis Report</h1>
-            <div class="subtitle">Indonesian Hoaxes Trends of 2024 - TurnBackHoax.id Data</div>
+            <a href="/" class="home-btn" aria-label="Home">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                    <polyline points="9 22 9 12 15 12 15 22"></polyline>
+                </svg>
+            </a>
+            <div class="header-content">
+                <h1>Sentiment Analysis Report</h1>
+                <div class="subtitle">Indonesian Hoaxes Trends of 2024 - TurnBackHoax.id Data</div>
+            </div>
         </header>
 
         <div class="tabs">

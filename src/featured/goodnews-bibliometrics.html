@@ -110,14 +110,21 @@
 
         .tabs {
             display: flex;
-            flex-wrap: wrap;
-            gap: 0;
+            flex-wrap: nowrap;
+            overflow-x: auto;
+            gap: 0.25rem;
             margin-bottom: 2rem;
-            background: var(--bg-card);
-            padding: 0.25rem;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(8px);
+            padding: 0.5rem;
             border-radius: 0.5rem;
             border: 1px solid var(--border);
-            box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+            position: sticky;
+            top: 10px;
+            z-index: 50;
+            -webkit-overflow-scrolling: touch;
+            justify-content: center;
         }
 
         .tab {
@@ -130,8 +137,12 @@
             font-size: 0.9rem;
             font-weight: 500;
             transition: all 0.2s;
-            flex: 1;
-            text-align: center;
+            white-space: nowrap;
+            flex-shrink: 0;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
         }
 
         .tab:hover {
@@ -353,6 +364,10 @@
             header h1 {
                 font-size: 1.5rem;
             }
+
+            .tabs {
+                justify-content: flex-start;
+            }
         }
     </style>
 </head>
@@ -372,6 +387,12 @@
         </div>
 
         <div class="tabs">
+            <a href="/" class="tab" aria-label="Home" style="padding: 0.75rem 1rem;">
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                    <polyline points="9 22 9 12 15 12 15 22"></polyline>
+                </svg>
+            </a>
             <button class="tab active" data-tab="trends">Publication Trends</button>
             <button class="tab" data-tab="authors">Authors</button>
             <button class="tab" data-tab="topics">Topics</button>

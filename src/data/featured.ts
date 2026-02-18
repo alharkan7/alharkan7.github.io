@@ -53,4 +53,22 @@ export const featuredProjects = [
     url: "/turnbackhoax-sentiment-analysis",
     coverImage: "https://ik.imagekit.io/raihankalla/research_section_cover/hoax-2024-sentiment-chart.png",
   },
+  {
+    title: "Green Financing for SMEs - Survey Report",
+    subtitle: "",
+    url: "/BRIN-Survey-Report",
+    coverImage: "https://ik.imagekit.io/raihankalla/research_section_cover/green-finance-2.png",
+  },
+  {
+    title: "Green Financing for SMEs - Quantitative Analysis",
+    subtitle: "",
+    url: "/BRIN-Quantitative-Analysis",
+    coverImage: "https://ik.imagekit.io/raihankalla/research_section_cover/green-finance-1.png",
+  },
+  {
+    title: "Green Financing for SMEs - CrossTab Analysis",
+    subtitle: "",
+    url: "/BRIN-CrossTab-Analysis",
+    coverImage: "https://ik.imagekit.io/raihankalla/research_section_cover/green-finance-3.png",
+  },
 ];

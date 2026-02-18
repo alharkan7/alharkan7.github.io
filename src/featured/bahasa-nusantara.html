@@ -32,10 +32,40 @@
       font-size: 14px;
       max-width: min(360px, calc(100vw - 24px));
     }
-    #reset-btn {
+    #home-btn {
       position: absolute;
       top: 24px;
       left: 24px;
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.8);
+      backdrop-filter: blur(8px);
+      border: 1px solid rgba(15, 23, 42, 0.08);
+      color: #334155;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      z-index: 100;
+      padding: 0;
+      text-decoration: none;
+    }
+    #home-btn:hover {
+      background: rgba(255, 255, 255, 1);
+      color: #0f172a;
+      transform: scale(1.05);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    }
+    #home-btn svg {
+      width: 20px;
+      height: 20px;
+    }
+    #reset-btn {
+      position: absolute;
+      top: 24px;
+      left: 80px;
       width: 44px;
       height: 44px;
       border-radius: 50%;
@@ -182,6 +212,12 @@
 </head>
 <body>
   <div id="tooltip" class="tooltip"></div>
+  <a id="home-btn" href="/" aria-label="Home">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+      <polyline points="9 22 9 12 15 12 15 22"></polyline>
+    </svg>
+  </a>
   <button id="reset-btn" aria-label="Reset View">
     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
       <path d="M8 3v3a2 2 0 0 1-2 2H3m18 0h-3a2 2 0 0 1-2-2V3m0 18v-3a2 2 0 0 1 2-2h3M3 16h3a2 2 0 0 1 2 2v3"/>
