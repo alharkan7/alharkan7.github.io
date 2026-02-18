@@ -1,5 +1,4 @@
 import redirectData from '../../vercel.json';
-import { defineConfig } from 'astro/config';
 import astroConfig from '../../astro.config.mjs';
 
 interface Redirect {

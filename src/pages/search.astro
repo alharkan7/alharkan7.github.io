@@ -11,13 +11,13 @@ const allPostsGlob = import.meta.glob("../posts/*/*.{md,mdx}", {
 const allPosts = Object.values(allPostsGlob) as any;
 
 const sortedPosts = allPosts.sort(
-  (a, b) =>
+  (a:any, b:any) =>
     new Date(b.frontmatter.publishDate).valueOf() -
     new Date(a.frontmatter.publishDate).valueOf(),
 );
 
 // Prepare posts data for client-side use
-const posts = sortedPosts.map((post) => ({
+const posts = sortedPosts.map((post:any) => ({
   title: post.frontmatter.title,
   description: post.frontmatter.description,
   publishDate: post.frontmatter.publishDate,

@@ -38,146 +38,171 @@ export async function getStaticPaths() {
     ...ptmPosts,
   ];
 
-  // Add debug logging
-  // // console.log(
-  //   "Generated paths:",
-  //   allPosts.map((p) => ({
-  //     slug: p.file.split("/").pop().split(".").shift(),
-  //     file: p.file,
-  //   })),
-  // );
-
-  return allPosts.map((p) => ({
+  const postRoutes = allPosts.map((p) => ({
     params: { slug: p.file.split("/").pop().split(".").shift() },
-    props: { post: p },
+    props: { post: p, type: 'post' },
   }));
+
+  // Handle standalone HTML pages
+  const htmlPagesGlob = import.meta.glob("../featured/*.html", {
+    query: "?raw",
+    eager: true,
+  });
+  
+  const htmlRoutes = Object.entries(htmlPagesGlob).map(([path, content]) => ({
+    params: { slug: path.split("/").pop()?.split(".").shift() || "" },
+    props: { htmlContent: (content as any).default, type: "html" },
+  }));
+
+  return [...postRoutes, ...htmlRoutes];
 }
 
 const { slug } = Astro.params;
+const { post, htmlContent, type = "post" } = Astro.props;
 
-// Check if post exists in props
-if (!Astro.props.post) {
-  console.error(`Post not found for slug: ${slug}`);
-  return Astro.redirect("/404");
-}
+let Content: any;
+let frontmatter: any;
+let title: string = "";
+let description: string = "";
+let publishDate: string = "";
+let image: string = "";
+let permalink: string = "";
+let category: string = "";
+let recommendedPosts: any[] = [];
 
-const { Content, frontmatter } = Astro.props.post;
-
-// Check for redirection
-const redirectMatch = findRedirect(slug);
-
-// If a redirect is found, use Astro's redirect method
-if (redirectMatch) {
-  return Astro.redirect(redirectMatch.destination);
-}
-
-const { title, description, publishDate, image } = frontmatter;
-const { slug: postSlug, readingTime } = getPostData(Astro.props.post);
-const permalink = `${Astro?.site?.href}${postSlug}`;
-
-// Check if this is a blog post or other category
-const possiblePaths = ["blog", "stories", "uncategorized", "misc", "ptm"];
-const category =
-  possiblePaths.find((path) => Astro.props.post.file.includes(`/posts/${path}/`)) ||
-  "";
-
-// Get recommended posts from the same category
-const getRecommendedPosts = async () => {
-  let categoryPosts: any;
-  if (category === "blog") {
-    const glob = import.meta.glob("../posts/blog/*.{md,mdx}", {
-      eager: true,
-    });
-    categoryPosts = Object.values(glob);
-  } else if (category === "stories") {
-    const glob = import.meta.glob("../posts/stories/*.{md,mdx}", {
-      eager: true,
-    });
-    categoryPosts = Object.values(glob);
-  } else if (category === "misc") {
-    const glob = import.meta.glob("../posts/misc/*.{md,mdx}", {
-      eager: true,
-    });
-    categoryPosts = Object.values(glob);
-  } else if (category === "ptm") {
-    const glob = import.meta.glob("../posts/ptm/*.{md,mdx}", {
-      eager: true,
-    });
-    categoryPosts = Object.values(glob);
-  } else {
-    const glob = import.meta.glob(
-      "../posts/uncategorized/*.{md,mdx}",
-      { eager: true },
-    );
-    categoryPosts = Object.values(glob);
+if (type === "post") {
+  // Check if post exists in props
+  if (!post) {
+    console.error(`Post not found for slug: ${slug}`);
+    return Astro.redirect("/404");
   }
 
-  // Filter out current post and get 2 random posts
-  return categoryPosts
-    .filter((post: any) => post.file !== Astro.props.post.file)
-    .sort(() => Math.random() - 0.5)
-    .slice(0, 2)
-    .map((post: any) => ({
-      title: post.frontmatter.title,
-      slug: post.file.split("/").pop().split(".").shift(),
-    }));
-};
+  Content = post.Content;
+  frontmatter = post.frontmatter;
 
-const recommendedPosts = await getRecommendedPosts();
----
+  // Check for redirection
+  const redirectMatch = findRedirect(slug);
 
-<BaseLayout
-  title={title}
-  description={description}
-  permalink={permalink}
-  current={category}
-  type="article"
-  publishDate={publishDate}
-  image={image}
->
-  <!-- Headings Map Component -->
-  <HeadingsMap client:load />
+  // If a redirect is found, use Astro's redirect method
+  if (redirectMatch) {
+    return Astro.redirect(redirectMatch.destination);
+  }
 
-  <header>
-    <!-- <p>{publishDate} ~ {readingTime}</p> -->
-    <p>
-      <a href={category === "blog" ? "/" : `/${category}`}>
-        {category === "blog" ? "#featured" : `#${category}`}
-      </a>
-      ~ {publishDate}
-    </p>
-    <h1>{title}</h1>
-    <hr />
-  </header>
-  <div class="container">
-    <article class="content">
-      <Content />
-    </article>
+  title = frontmatter.title;
+  description = frontmatter.description;
+  publishDate = frontmatter.publishDate;
+  image = frontmatter.image;
 
-    {
-      recommendedPosts.length > 0 && (
-        <div class="recommended-posts">
-          <h3>
-            Read more posts in{" "}
-            <a href={category === "blog" ? "/" : `/${category}`}>
-              {category === "blog" ? "#featured" : `#${category}`}
-            </a>
-          </h3>
-          <div class="recommended-grid">
-            {recommendedPosts.map((post: any) => (
-              <a href={`/${post.slug}`} class="recommended-post">
-                {post.title}
-              </a>
-            ))}
-          </div>
-        </div>
-      )
+  const postData = getPostData(post);
+  permalink = `${Astro.site?.href || ""}${postData.slug}`;
+
+  // Check if this is a blog post or other category
+  const possiblePaths = ["blog", "stories", "uncategorized", "misc", "ptm"];
+  category =
+    possiblePaths.find((path) => post.file.includes(`/posts/${path}/`)) || "";
+
+  // Get recommended posts from the same category
+  const getRecommendedPosts = async () => {
+    let categoryPosts: any;
+    if (category === "blog") {
+      const glob = import.meta.glob("../posts/blog/*.{md,mdx}", {
+        eager: true,
+      });
+      categoryPosts = Object.values(glob);
+    } else if (category === "stories") {
+      const glob = import.meta.glob("../posts/stories/*.{md,mdx}", {
+        eager: true,
+      });
+      categoryPosts = Object.values(glob);
+    } else if (category === "misc") {
+      const glob = import.meta.glob("../posts/misc/*.{md,mdx}", {
+        eager: true,
+      });
+      categoryPosts = Object.values(glob);
+    } else if (category === "ptm") {
+      const glob = import.meta.glob("../posts/ptm/*.{md,mdx}", {
+        eager: true,
+      });
+      categoryPosts = Object.values(glob);
+    } else {
+      const glob = import.meta.glob(
+        "../posts/uncategorized/*.{md,mdx}",
+        { eager: true },
+      );
+      categoryPosts = Object.values(glob);
     }
 
-    <hr />
-    <Bio />
-  </div>
-</BaseLayout>
+    // Filter out current post and get 2 random posts
+    return categoryPosts
+      .filter((p: any) => p.file !== post.file)
+      .sort(() => Math.random() - 0.5)
+      .slice(0, 2)
+      .map((p: any) => ({
+        title: p.frontmatter.title,
+        slug: p.file.split("/").pop().split(".").shift(),
+      }));
+  };
+
+  recommendedPosts = await getRecommendedPosts();
+}
+---
+
+{type === 'html' ? (
+  <Fragment set:html={htmlContent} />
+) : (
+  <BaseLayout
+    title={title}
+    description={description}
+    permalink={permalink}
+    current={category}
+    type="article"
+    publishDate={publishDate}
+    image={image}
+  >
+    <!-- Headings Map Component -->
+    <HeadingsMap client:load />
+
+    <header>
+      <!-- <p>{publishDate} ~ {readingTime}</p> -->
+      <p>
+        <a href={category === "blog" ? "/" : `/${category}`}>
+          {category === "blog" ? "#featured" : `#${category}`}
+        </a>
+        ~ {publishDate}
+      </p>
+      <h1>{title}</h1>
+      <hr />
+    </header>
+    <div class="container">
+      <article class="content">
+        <Content />
+      </article>
+
+      {
+        recommendedPosts.length > 0 && (
+          <div class="recommended-posts">
+            <h3>
+              Read more posts in{" "}
+              <a href={category === "blog" ? "/" : `/${category}`}>
+                {category === "blog" ? "#featured" : `#${category}`}
+              </a>
+            </h3>
+            <div class="recommended-grid">
+              {recommendedPosts.map((post: any) => (
+                <a href={`/${post.slug}`} class="recommended-post">
+                  {post.title}
+                </a>
+              ))}
+            </div>
+          </div>
+        )
+      }
+
+      <hr />
+      <Bio />
+    </div>
+  </BaseLayout>
+)}
 
 <style>
   header {
