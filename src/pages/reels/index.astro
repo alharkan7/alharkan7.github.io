@@ -1,0 +1,130 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import { reelsUrls, getReelEmbed } from "../../posts/reels";
+
+const reelsPerPage = 6;
+const totalPages = Math.ceil(reelsUrls.length / reelsPerPage);
+const reels = reelsUrls.slice(0, reelsPerPage);
+
+const title = "Reels";
+const description = "Collection of Instagram Reels by Al Harkan";
+const permalink = `${Astro.site?.href}reels`;
+---
+
+<BaseLayout
+  title={title}
+  description={description}
+  permalink={permalink}
+  current="reels"
+>
+  <div class="container">
+    <h1>Reels</h1>
+    <p>Trying to fit into our schedule to produce these videos; doing a small part for science communication.</p>
+    <hr />
+    
+    <div class="reels-container">
+      {reels.map((url) => (
+        <div class="reel-item">
+          <Fragment set:html={getReelEmbed(url)} />
+        </div>
+      ))}
+    </div>
+
+    <div class="pagination">
+      {
+        totalPages > 1 && (
+          <a href="/reels/2" class="next-button">
+            Next →
+          </a>
+        )
+      }
+    </div>
+  </div>
+</BaseLayout>
+
+<script>
+  function initInstagramLazyLoad() {
+    // Observer to watch for elements entering viewport
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          const el = entry.target;
+          observer.unobserve(el);
+          
+          // Switch class to allow processing
+          el.classList.remove('instagram-media-placeholder');
+          el.classList.add('instagram-media');
+          
+          // If script is not loaded, load it now
+          if (!(window as any).instgrm) {
+             if (!document.querySelector('#instgrm-embed-script')) {
+                const script = document.createElement('script');
+                script.id = 'instgrm-embed-script';
+                script.src = "//www.instagram.com/embed.js";
+                script.async = true;
+                script.defer = true;
+                document.body.appendChild(script);
+             }
+          } else {
+             // If script already loaded, process the new element
+             (window as any).instgrm.Embeds.process();
+          }
+        }
+      });
+    }, { rootMargin: '200px' });
+
+    // Find all placeholders
+    const placeholders = document.querySelectorAll('.instagram-media-placeholder');
+    placeholders.forEach(el => observer.observe(el));
+  }
+
+  document.addEventListener('DOMContentLoaded', initInstagramLazyLoad);
+  document.addEventListener('astro:page-load', initInstagramLazyLoad);
+</script>
+
+<style>
+  .reels-container {
+    display: grid;
+    gap: 1rem;
+    grid-template-columns: repeat(auto-fit, minmax(326px, 1fr));
+    justify-content: center;
+    margin-bottom: 2rem;
+  }
+
+  .reel-item {
+    display: flex;
+    justify-content: center;
+    width: 100%;
+    position: relative;
+  }
+
+  .pagination {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 0;
+  }
+
+  .next-button {
+    color: var(--text-secondary);
+    transition: all 0.2s ease;
+    font-family: var(--font-family-sans);
+    font-size: 1.2em;
+    font-weight: 700;
+    text-decoration: none;
+    box-shadow: inset 0 -0.12em 0 var(--primary-color);
+    margin-left: auto;
+    -webkit-transition:
+      box-shadow 0.2s ease-in-out,
+      color 0.2s ease-in-out;
+    transition:
+      box-shadow 0.2s ease-in-out,
+      color 0.2s ease-in-out;
+  }
+
+  .next-button:hover {
+    color: var(--primary-color);
+    box-shadow: inset 0 -1.5em 0 var(--primary-color);
+    color: #fff;
+  }
+</style>

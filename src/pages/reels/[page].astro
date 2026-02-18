@@ -1,0 +1,161 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import { reelsUrls, getReelEmbed } from "../../posts/reels";
+
+export const prerender = true;
+
+export async function getStaticPaths() {
+  const reelsPerPage = 6;
+  const totalPages = Math.ceil(reelsUrls.length / reelsPerPage);
+
+  // Generate paths for pages 2 onwards (page 1 is handled by index.astro)
+  return Array.from({ length: totalPages - 1 }, (_, i) => {
+    const page = i + 2; // Start from page 2
+    const startIndex = (page - 1) * reelsPerPage;
+    return {
+      params: { page: String(page) },
+      props: {
+        reels: reelsUrls.slice(startIndex, startIndex + reelsPerPage),
+        currentPage: page,
+        totalPages,
+      },
+    };
+  });
+}
+
+const { reels, currentPage, totalPages } = Astro.props;
+const title = "Reels";
+const description = "Collection of Instagram Reels by Al Harkan";
+const permalink = `${Astro.site?.href}reels`;
+---
+
+<BaseLayout
+  title={title}
+  description={description}
+  permalink={permalink}
+  current="reels"
+>
+  <div class="container">
+    <h1>Reels</h1>
+    <p>Trying to fit into our schedule to produce these videos; doing a small part for science communication.</p>
+    <hr />
+    
+    <div class="reels-container">
+      {reels.map((url) => (
+        <div class="reel-item">
+          <Fragment set:html={getReelEmbed(url)} />
+        </div>
+      ))}
+    </div>
+
+    <div class="pagination">
+      <a
+        href={currentPage === 2 ? "/reels" : `/reels/${currentPage - 1}`}
+        class="prev-button">← Prev</a
+      >
+      {
+        currentPage < totalPages && (
+          <a href={`/reels/${currentPage + 1}`} class="next-button">
+            Next →
+          </a>
+        )
+      }
+    </div>
+  </div>
+</BaseLayout>
+
+<script>
+  function initInstagramLazyLoad() {
+    // Observer to watch for elements entering viewport
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          const el = entry.target;
+          observer.unobserve(el);
+          
+          // Switch class to allow processing
+          el.classList.remove('instagram-media-placeholder');
+          el.classList.add('instagram-media');
+          
+          // If script is not loaded, load it now
+          if (!(window as any).instgrm) {
+             if (!document.querySelector('#instgrm-embed-script')) {
+                const script = document.createElement('script');
+                script.id = 'instgrm-embed-script';
+                script.src = "//www.instagram.com/embed.js";
+                script.async = true;
+                script.defer = true;
+                document.body.appendChild(script);
+             }
+          } else {
+             // If script already loaded, process the new element
+             (window as any).instgrm.Embeds.process();
+          }
+        }
+      });
+    }, { rootMargin: '200px' });
+
+    // Find all placeholders
+    const placeholders = document.querySelectorAll('.instagram-media-placeholder');
+    placeholders.forEach(el => observer.observe(el));
+  }
+
+  document.addEventListener('DOMContentLoaded', initInstagramLazyLoad);
+  document.addEventListener('astro:page-load', initInstagramLazyLoad);
+</script>
+
+<style>
+  .reels-container {
+    display: grid;
+    gap: 1rem;
+    grid-template-columns: repeat(auto-fit, minmax(326px, 1fr));
+    justify-content: center;
+    margin-bottom: 2rem;
+  }
+
+  .reel-item {
+    display: flex;
+    justify-content: center;
+    width: 100%;
+    position: relative;
+  }
+
+  .pagination {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 0;
+  }
+
+  .prev-button,
+  .next-button {
+    color: var(--text-secondary);
+    transition: all 0.2s ease;
+    font-family: var(--font-family-sans);
+    font-size: 1.2em;
+    font-weight: 700;
+    text-decoration: none;
+    box-shadow: inset 0 -0.12em 0 var(--primary-color);
+    -webkit-transition:
+      box-shadow 0.2s ease-in-out,
+      color 0.2s ease-in-out;
+    transition:
+      box-shadow 0.2s ease-in-out,
+      color 0.2s ease-in-out;
+  }
+
+  .prev-button:hover,
+  .next-button:hover {
+    color: var(--primary-color);
+    box-shadow: inset 0 -1.5em 0 var(--primary-color);
+    color: #fff;
+  }
+
+  .next-button {
+    margin-left: auto;
+  }
+
+  .prev-button {
+    margin-right: auto;
+  }
+</style>

@@ -232,6 +232,7 @@ const { current = "" } = Astro.props;
     <div class="dropdown-container">
       <a
         class={current === "stories" ||
+        current === "reels" ||
         current === "misc" ||
         current === "search" ||
         current === "uncategorized" ||
@@ -246,6 +247,7 @@ const { current = "" } = Astro.props;
       >
       <div class="dropdown-content">
         <a href="/bio">Profile</a>
+        <a href="/reels">Reels</a>
         <a href="/ptm">Theories</a>
         <a href="/stories">Stories</a>
         <a href="/misc">Misc.</a>
