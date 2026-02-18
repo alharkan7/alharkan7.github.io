@@ -8,25 +8,25 @@ import { findRedirect } from "../utils/redirectHandler";
 export const prerender = true;
 
 export async function getStaticPaths() {
-  const blogPostsGlob = import.meta.glob("../data/blog-posts/blog/*.{md,mdx}", {
+  const blogPostsGlob = import.meta.glob("../posts/blog/*.{md,mdx}", {
     eager: true,
   });
   const blogPosts: any = Object.values(blogPostsGlob);
   const storyPostsGlob = import.meta.glob(
-    "../data/blog-posts/stories/*.{md,mdx}",
+    "../posts/stories/*.{md,mdx}",
     { eager: true },
   );
   const storyPosts: any = Object.values(storyPostsGlob);
-  const workPostsGlob = import.meta.glob("../data/blog-posts/misc/*.{md,mdx}", {
+  const workPostsGlob = import.meta.glob("../posts/misc/*.{md,mdx}", {
     eager: true,
   });
   const workPosts: any = Object.values(workPostsGlob);
   const uncategorizedPostsGlob = import.meta.glob(
-    "../data/blog-posts/uncategorized/*.{md,mdx}",
+    "../posts/uncategorized/*.{md,mdx}",
     { eager: true },
   );
   const uncategorizedPosts: any = Object.values(uncategorizedPostsGlob);
-  const ptmPostsGlob = import.meta.glob("../data/blog-posts/ptm/*.{md,mdx}", {
+  const ptmPostsGlob = import.meta.glob("../posts/ptm/*.{md,mdx}", {
     eager: true,
   });
   const ptmPosts: any = Object.values(ptmPostsGlob);
@@ -77,40 +77,36 @@ const permalink = `${Astro?.site?.href}${postSlug}`;
 
 // Check if this is a blog post or other category
 const possiblePaths = ["blog", "stories", "uncategorized", "misc", "ptm"];
-const isBlogPost = possiblePaths.some((path) =>
-  Astro.props.post.file.includes(`blog-posts/${path}`),
-);
-
-const category = isBlogPost
-  ? Astro.props.post.file.split("blog-posts/")[1].split("/")[0]
-  : "";
+const category =
+  possiblePaths.find((path) => Astro.props.post.file.includes(`/posts/${path}/`)) ||
+  "";
 
 // Get recommended posts from the same category
 const getRecommendedPosts = async () => {
   let categoryPosts: any;
   if (category === "blog") {
-    const glob = import.meta.glob("../data/blog-posts/blog/*.{md,mdx}", {
+    const glob = import.meta.glob("../posts/blog/*.{md,mdx}", {
       eager: true,
     });
     categoryPosts = Object.values(glob);
   } else if (category === "stories") {
-    const glob = import.meta.glob("../data/blog-posts/stories/*.{md,mdx}", {
+    const glob = import.meta.glob("../posts/stories/*.{md,mdx}", {
       eager: true,
     });
     categoryPosts = Object.values(glob);
   } else if (category === "misc") {
-    const glob = import.meta.glob("../data/blog-posts/misc/*.{md,mdx}", {
+    const glob = import.meta.glob("../posts/misc/*.{md,mdx}", {
       eager: true,
     });
     categoryPosts = Object.values(glob);
   } else if (category === "ptm") {
-    const glob = import.meta.glob("../data/blog-posts/ptm/*.{md,mdx}", {
+    const glob = import.meta.glob("../posts/ptm/*.{md,mdx}", {
       eager: true,
     });
     categoryPosts = Object.values(glob);
   } else {
     const glob = import.meta.glob(
-      "../data/blog-posts/uncategorized/*.{md,mdx}",
+      "../posts/uncategorized/*.{md,mdx}",
       { eager: true },
     );
     categoryPosts = Object.values(glob);

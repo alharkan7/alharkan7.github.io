@@ -3,7 +3,7 @@
   "isDryRun": false,
   "files": [
     {
-      "path": "src/data/blog-posts/stories/pengajarmuda.md",
+      "path": "src/posts/stories/pengajarmuda.md",
       "replacements": [
         {
           "from": "/assets/blog/DSC_0042.jpg",
@@ -16,7 +16,7 @@
       ]
     },
     {
-      "path": "src/data/blog-posts/stories/minggu.md",
+      "path": "src/posts/stories/minggu.md",
       "replacements": [
         {
           "from": "/assets/blog/IMG-20170825-WA0036.jpg",
@@ -37,7 +37,7 @@
       ]
     },
     {
-      "path": "src/data/blog-posts/stories/ke-sula.md",
+      "path": "src/posts/stories/ke-sula.md",
       "replacements": [
         {
           "from": "/assets/blog/Foto-1.jpg",
@@ -106,7 +106,7 @@
       ]
     },
     {
-      "path": "src/data/blog-posts/stories/gim.md",
+      "path": "src/posts/stories/gim.md",
       "replacements": [
         {
           "from": "/assets/blog/DSC_0056.jpg",
@@ -159,7 +159,7 @@
       ]
     },
     {
-      "path": "src/data/blog-posts/stories/100haribersama.md",
+      "path": "src/posts/stories/100haribersama.md",
       "replacements": [
         {
           "from": "/assets/blog/Picture1.jpg",
@@ -180,7 +180,7 @@
       ]
     },
     {
-      "path": "src/data/blog-posts/misc/indoneswag.md",
+      "path": "src/posts/misc/indoneswag.md",
       "replacements": [
         {
           "from": "/assets/blog/Tabel-0.jpg",
@@ -225,7 +225,7 @@
       ]
     },
     {
-      "path": "src/data/blog-posts/blog/stoics.md",
+      "path": "src/posts/blog/stoics.md",
       "replacements": [
         {
           "from": "/assets/blog/stoic-virtues.webp",
@@ -246,7 +246,7 @@
       ]
     },
     {
-      "path": "src/data/blog-posts/blog/learning-paradox.md",
+      "path": "src/posts/blog/learning-paradox.md",
       "replacements": [
         {
           "from": "/assets/blog/learning-exponential-growth.webp",
@@ -259,7 +259,7 @@
       ]
     },
     {
-      "path": "src/data/blog-posts/blog/how-university-lost-its-way.md",
+      "path": "src/posts/blog/how-university-lost-its-way.md",
       "replacements": [
         {
           "from": "/assets/how-university-lost-its-way/image-copy-0.png",
@@ -324,7 +324,7 @@
       ]
     },
     {
-      "path": "src/data/blog-posts/blog/dunkerque.md",
+      "path": "src/posts/blog/dunkerque.md",
       "replacements": [
         {
           "from": "/assets/blog/dunkerque-pict-1.webp",

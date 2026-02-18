@@ -5,7 +5,7 @@ const title = "Search";
 const description = "Search Al Harkan's Blog Archives";
 const permalink = Astro?.site?.href;
 
-const allPostsGlob = import.meta.glob("../data/blog-posts/*/*.{md,mdx}", {
+const allPostsGlob = import.meta.glob("../posts/*/*.{md,mdx}", {
   eager: true,
 });
 const allPosts = Object.values(allPostsGlob) as any;

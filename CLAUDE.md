@@ -30,7 +30,7 @@ pnpm preview
 - **Output Mode**: Static (`output: 'static'` in `astro.config.mjs`)
 - **Deployment**: GitHub Pages (primary) and Vercel
 - **Authentication**: Fully client-side Firebase Auth (no server-side endpoints required)
-- **Content**: MDX files with frontmatter stored in `/src/data/blog-posts/`
+- **Content**: MDX files with frontmatter stored in `/src/posts/`
 
 ### Directory Structure
 
@@ -38,7 +38,7 @@ pnpm preview
 src/
 ├── components/          # Reusable UI components (Astro, React, Svelte)
 │   └── ProtectedRoute.astro  # Client-side auth wrapper for protected pages
-├── data/blog-posts/     # MDX content organized by category
+├── posts/     # MDX content organized by category
 │   ├── blog/           # Main blog posts
 │   ├── misc/           # Miscellaneous posts
 │   ├── ptm/            # PTM category posts
@@ -51,7 +51,7 @@ src/
 │   ├── auth.js         # Client-side Firebase Auth utilities
 │   ├── firebase.ts     # Firebase initialization
 │   └── integrations/   # Third-party service integrations
-├── pages/              # Route components mirroring blog-posts structure
+├── pages/              # Route components mirroring posts structure
 │   ├── api/           # API endpoints
 │   └── [categories]/   # Category index pages
 ├── styles/             # Global CSS
@@ -100,7 +100,7 @@ Located in `src/lib/auth.js` and `src/lib/firebase.ts`
 ## Content Management
 
 ### Blog Posts
-- Stored in `/src/data/blog-posts/[category]/` as MDX files
+- Stored in `/src/posts/[category]/` as MDX files
 - Each category has a corresponding page in `/src/pages/[category]/`
 - Frontmatter required: `title`, `description`, `pubDate`
 

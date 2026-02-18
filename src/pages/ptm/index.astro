@@ -6,7 +6,7 @@ const description = "Perspektif Teori Media";
 const permalink = Astro.site?.href ? `${Astro.site.href}ptm` : "/ptm";
 
 const postsPerPage = 10;
-const allPostsGlob = import.meta.glob("../../data/blog-posts/ptm/*.{md,mdx}", {
+const allPostsGlob = import.meta.glob("../../posts/ptm/*.{md,mdx}", {
   eager: true,
 });
 const allPosts = Object.values(allPostsGlob) as any;

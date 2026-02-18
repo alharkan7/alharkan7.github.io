@@ -8,7 +8,7 @@ const description = "On Media, Technology, and Everything in Between";
 const permalink = Astro?.site?.href;
 
 const postsPerPage = 10;
-const allPostsGlob = import.meta.glob("../data/blog-posts/blog/*.{md,mdx}", {
+const allPostsGlob = import.meta.glob("../posts/blog/*.{md,mdx}", {
   eager: true,
 });
 

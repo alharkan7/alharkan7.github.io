@@ -6,7 +6,7 @@ const description = "Miscellaneous Posts by Al Harkan";
 const permalink = Astro.site?.href ? `${Astro.site.href}misc` : "/misc";
 
 const postsPerPage = 10;
-const matches = import.meta.glob("../../data/blog-posts/misc/*.{md,mdx}", {
+const matches = import.meta.glob("../../posts/misc/*.{md,mdx}", {
   eager: true,
 });
 const allPosts = Object.entries(matches).map(([path, module]) => ({

@@ -7,7 +7,7 @@ const permalink = Astro.site?.href ? `${Astro.site.href}stories` : "/stories";
 
 const postsPerPage = 10;
 const allPostsGlob = import.meta.glob(
-  "../../data/blog-posts/stories/*.{md,mdx}",
+  "../../posts/stories/*.{md,mdx}",
   { eager: true },
 );
 const allPosts = Object.values(allPostsGlob) as any;
