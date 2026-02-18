@@ -2,6 +2,7 @@
 import BaseLayout from "../layouts/BaseLayout.astro";
 import QuickLinks from "../components/QuickLinks.astro";
 import FeaturedSection from "../components/FeaturedSection.astro";
+import { featuredProjects } from "../data/featured";
 
 const title = "Al Harkan's Blog";
 const description = "On Media, Technology, and Everything in Between";
@@ -34,63 +35,7 @@ const totalPosts = sortedPosts.length;
 const totalPages = Math.ceil(totalPosts / postsPerPage);
 const paginatedPosts = sortedPosts.slice(0, postsPerPage);
 
-// Featured projects data
-const featuredProjects = [
-  {
-    title: "Good News Garden - Playful Narrative 3D Network",
-    subtitle: "",
-    url: "https://alhrkn.vercel.app/goodnews-garden",
-    coverImage: "https://ik.imagekit.io/raihankalla/research_section_cover/goodnews-garden.png",
-  },
-  {
-    title: "Kekayaan Bahasa Nusantara",
-    subtitle: "",
-    url: "/bahasa-nusantara",
-    coverImage: "https://ik.imagekit.io/raihankalla/research_section_cover/bahasa-nusantara.png?updatedAt=1771319978903",
-  },
-  {
-    title: "Jakarta Labor Market Analysis (19K+ Job Postings)",
-    subtitle: "",
-    url: "/labor-market-analysis",
-    coverImage: "https://ik.imagekit.io/raihankalla/research_section_cover/job-market-analysis.png",
-  },
-  {
-    title: "Good News - Bibliometrics Analysis",
-    subtitle: "",
-    url: "/goodnews-bibliometrics",
-    coverImage: "https://ik.imagekit.io/raihankalla/research_section_cover/goodnews-bibliometrics.png",
-  },
-  {
-    title: "Economic Growth vs Envinromental Impact",
-    subtitle: "",
-    url: "/pdrb-iklh",
-    coverImage: "https://ik.imagekit.io/raihankalla/research_section_cover/pdrb-iklh.png",
-  },
-  {
-    title: "TurnBackHoax Analysis of 2025: Narrative 3D Network",
-    subtitle: "",
-    url: "https://alhrkn.vercel.app/hoax-network",
-    coverImage: "https://ik.imagekit.io/raihankalla/research_section_cover/hoax-2025-network.png",
-  },
-  {
-    title: "TurnBackHoax Analysis of 2024 (Topic Modeling)",
-    subtitle: "",
-    url: "/turnbackhoax-analysis",
-    coverImage: "https://ik.imagekit.io/raihankalla/research_section_cover/hoax-2024-topic-modeling.png",
-  },
-  {
-    title: "TurnBackHoax Analysis of 2024: Text Network",
-    subtitle: "",
-    url: "/turnbackhoax-text-network",
-    coverImage: "https://ik.imagekit.io/raihankalla/research_section_cover/hoax-2024-network.png",
-  },
-  {
-    title: "TurnBackHoax Analysis of 2024: Sentiment Analysis",
-    subtitle: "",
-    url: "/turnbackhoax-sentiment-analysis",
-    coverImage: "https://ik.imagekit.io/raihankalla/research_section_cover/hoax-2024-sentiment-chart.png",
-  },
-];
+// Featured projects data moved to src/data/featured.ts
 ---
 
 <BaseLayout
@@ -107,8 +52,11 @@ const featuredProjects = [
     <FeaturedSection
       sectionTitle="I Do Research for Fun"
       sectionSubtitle="I scrape, analyze or visualize data in my spare time. Here's the list of special pages showcasing the results that don't fit the blog formatting."
-      items={featuredProjects}
+      items={featuredProjects.slice(0, 4)}
     />
+    <div class="see-more-container">
+      <a href="/data" class="see-more-link">See More →</a>
+    </div>
     <h1>Featured Posts</h1>
     <hr />
     {
@@ -168,6 +116,34 @@ const featuredProjects = [
 
     hr {
       margin: 20px auto 60px auto;
+    }
+
+    .see-more-container {
+      display: flex;
+      justify-content: flex-end;
+      margin-bottom: 3rem;
+    }
+
+    .see-more-link {
+      color: var(--text-secondary);
+      transition: all 0.2s ease;
+      font-family: var(--font-family-sans);
+      font-size: 1.2em;
+      font-weight: 700;
+      text-decoration: none;
+      box-shadow: inset 0 -0.12em 0 var(--primary-color);
+      -webkit-transition:
+        box-shadow 0.2s ease-in-out,
+        color 0.2s ease-in-out;
+      transition:
+        box-shadow 0.2s ease-in-out,
+        color 0.2s ease-in-out;
+    }
+
+    .see-more-link:hover {
+      color: var(--primary-color);
+      box-shadow: inset 0 -1.5em 0 var(--primary-color);
+      color: #fff;
     }
 
     .pagination {

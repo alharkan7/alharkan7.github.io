@@ -1,0 +1,186 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import { featuredProjects } from "../data/featured";
+
+const title = "Research I did for fun";
+const description = "I scrape, analyze or visualize data in my spare time. Here's the list of special pages showcasing the results that don't fit the blog formatting.";
+const permalink = Astro.site?.href;
+---
+
+<BaseLayout
+  title={title}
+  description={description}
+  permalink={permalink ?? "/"}
+  current="data"
+>
+  <div class="container">
+    <header class="page-header">
+      <h1>{title}</h1>
+      <p class="description">{description}</p>
+    </header>
+    
+    <div class="data-grid">
+      {featuredProjects.map((project) => (
+        <a 
+          href={project.url} 
+          class="data-card" 
+          target={project.url.startsWith("http") ? "_blank" : "_self"} 
+          rel={project.url.startsWith("http") ? "noopener noreferrer" : ""}
+        >
+          <div class="card-image-wrapper">
+            <img 
+              src={project.coverImage} 
+              alt={project.title} 
+              loading="lazy"
+              class="card-image" 
+            />
+            <div class="card-overlay">
+              <span class="view-project">View →</span>
+            </div>
+          </div>
+          <div class="card-content">
+            <h3 class="card-title">{project.title}</h3>
+            {project.subtitle && <p class="card-subtitle">{project.subtitle}</p>}
+          </div>
+        </a>
+      ))}
+    </div>
+  </div>
+
+  <style>
+    .page-header {
+      margin-bottom: 3rem;
+      max-width: 800px;
+    }
+
+    h1 {
+      margin-bottom: 1rem;
+      font-size: 2.5rem;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+    }
+
+    .description {
+      font-size: 1.1rem;
+      color: var(--text-secondary);
+      line-height: 1.6;
+      max-width: 600px;
+    }
+
+    .data-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+      gap: 2rem;
+      margin-bottom: 4rem;
+    }
+
+    .data-card {
+      display: flex;
+      flex-direction: column;
+      text-decoration: none;
+      color: inherit;
+      background: var(--background-elevated, rgba(255, 255, 255, 0.05));
+      border-radius: 12px;
+      overflow: hidden;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      border: 1px solid var(--border-color, rgba(0, 0, 0, 0.1));
+      height: 100%;
+    }
+
+    .data-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 12px 24px rgba(0, 0, 0, 0.08);
+      border-color: var(--primary-color);
+    }
+
+    .card-image-wrapper {
+      position: relative;
+      aspect-ratio: 16 / 9;
+      overflow: hidden;
+      background-color: var(--background-secondary, #f5f5f5);
+    }
+
+    .card-image {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .data-card:hover .card-image {
+      transform: scale(1.05);
+    }
+
+    .card-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.4);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+
+    .data-card:hover .card-overlay {
+      opacity: 1;
+    }
+
+    .view-project {
+      color: white;
+      font-weight: 600;
+      font-size: 1rem;
+      padding: 0.5rem 1rem;
+      border: 2px solid white;
+      border-radius: 20px;
+      transform: translateY(10px);
+      transition: transform 0.3s ease;
+    }
+
+    .data-card:hover .view-project {
+      transform: translateY(0);
+    }
+
+    .card-content {
+      padding: 1.5rem;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+
+    .card-title {
+      font-family: var(--font-family-serif);
+      font-size: 1.25rem;
+      font-weight: 600;
+      line-height: 1.4;
+      margin: 0;
+      color: var(--text-primary);
+    }
+
+    .card-subtitle {
+      margin-top: 0.5rem;
+      font-size: 0.95rem;
+      color: var(--text-secondary);
+      line-height: 1.5;
+    }
+
+    @media (max-width: 600px) {
+      .data-grid {
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+      }
+
+      h1 {
+        font-size: 2rem;
+      }
+      
+      .card-overlay {
+        display: none; /* Hide overlay on mobile for cleaner look */
+      }
+    }
+  </style>
+</BaseLayout>
