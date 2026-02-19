@@ -379,12 +379,15 @@ function drawTimeline(targetId = 'chart-timeline', legendId = 'legend-timeline')
 
   // Legend
   const leg = document.getElementById(legendId);
-  if (leg) leg.innerHTML = series.map(k => `
+  if (leg) leg.innerHTML = series.map(k => {
+    const label = k === 'tv' ? 'TV' : k.charAt(0).toUpperCase() + k.slice(1);
+    return `
     <div class="legend-item">
       <div class="legend-swatch" style="background:${colors[k]};height:${k === 'internet' ? '3px' : '2px'}"></div>
-      <span>${k.charAt(0).toUpperCase() + k.slice(1)} Penetration</span>
+      <span>${label} Penetration</span>
     </div>
-  `).join('');
+  `
+  }).join('');
 }
 
 // ═══════════════════════════════════════════
