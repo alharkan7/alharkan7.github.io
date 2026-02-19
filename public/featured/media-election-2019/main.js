@@ -3,6 +3,18 @@
    Media Effects on Indonesia's 2019 Election
 ═══════════════════════════════════════════════ */
 
+// ─── SCROLL RESTORATION ─────────────────────────
+// Disable browser scroll-position restoration on mobile immediately.
+// The browser restores saved scroll offsets during page load — potentially
+// *after* DOMContentLoaded fires — which would undo our scrollTo(0) call
+// and cause the sticky viz tab bar to peek below the hero section.
+// Setting this to 'manual' here (top-level, synchronous) prevents that entirely.
+if (typeof history !== 'undefined' && 'scrollRestoration' in history) {
+  if (window.innerWidth <= 900) {
+    history.scrollRestoration = 'manual';
+  }
+}
+
 // ─── SECTION MAP ────────────────────────────────
 const SECTIONS = [
   { textId: 'section-context', vizId: 'viz-context', navIndex: 0 },
@@ -947,8 +959,10 @@ function initMobileViz() {
 
 // ─── INIT ────────────────────────────────────────
 window.addEventListener('DOMContentLoaded', () => {
+  const hash = window.location.hash; // e.g. '#section-methodology'
+
   // Only activate default "context" section if at top and no hash
-  if (!window.location.hash && window.scrollY < 50) {
+  if (!hash && window.scrollY < 50) {
     const firstPanel = document.getElementById('viz-context');
     if (firstPanel) firstPanel.classList.add('active');
     vizInitialized['viz-context'] = true;
@@ -963,8 +977,64 @@ window.addEventListener('DOMContentLoaded', () => {
   initMobileViz();
 
   if (isMobile()) {
+    // ── Fix 1: Ensure hero fills the viewport on first load ──────────────────
+    // Belt-and-suspenders: even with history.scrollRestoration = 'manual' set
+    // at the top of this file, some browsers apply scroll restoration *after*
+    // the first paint tick.  Force scroll to top in both the current frame AND
+    // a short timeout to cover that late-restoration window.
+    if (!hash) {
+      window.scrollTo({ top: 0, behavior: 'instant' });
+      // Fallback: re-assert top position after browser layout may have drifted
+      setTimeout(() => { window.scrollTo({ top: 0, behavior: 'instant' }); }, 0);
+    }
+
     // Sync mobile tab to first section immediately on mobile
     syncMobileTab(SECTIONS[0].vizId);
+
+    // ── Fix 2: Hash anchor scrolling on mobile ───────────────────────────────
+    // The browser's native hash scroll fires before the sticky viz panel has
+    // painted and established its real height, so it under-scrolls and the
+    // hero section shows instead of the requested section.  We cancel the
+    // native scroll and redo it once layout is stable.
+    if (hash) {
+      // Prevent the browser's own instant-scroll so we can drive it ourselves
+      window.scrollTo({ top: 0, behavior: 'instant' });
+
+      // Wait two animation frames for the sticky element to paint, then scroll
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+          const targetId = hash.slice(1); // strip leading '#'
+          const targetEl = document.getElementById(targetId);
+          if (!targetEl) return;
+
+          // Height of the sticky viz-column (tab bar + panels) that sits above text
+          const vizCol = document.getElementById('viz-column');
+          const stickyH = vizCol ? vizCol.offsetHeight : 0;
+
+          // Absolute document-top position of the target section
+          const absTop = targetEl.getBoundingClientRect().top + window.scrollY;
+
+          window.scrollTo({ top: Math.max(0, absTop - stickyH), behavior: 'instant' });
+
+          // Activate the matching section and viz
+          const matchedSection = SECTIONS.find(s => s.textId === targetId);
+
+          // Always ensure viz-context (timeline) is initialized, so navigating
+          // back to the first section doesn't leave a blank chart.
+          if (!vizInitialized['viz-context']) {
+            vizInitialized['viz-context'] = true;
+            drawTimeline();
+          }
+
+          if (matchedSection) {
+            switchViz(matchedSection.vizId);
+            syncMobileTab(matchedSection.vizId);
+            updateNavDots(matchedSection.navIndex);
+            _lastActiveSectionId = matchedSection.textId;
+          }
+        });
+      });
+    }
   }
 });
 

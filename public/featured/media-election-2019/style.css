@@ -171,6 +171,10 @@ body {
 #hero {
   position: relative;
   height: 100vh;
+  /* dvh = dynamic viewport height: always matches the *visible* area after
+     browser chrome (iOS Safari address bar / bottom toolbar) is applied.
+     Falls back to 100vh on browsers that don't support dvh. */
+  height: 100dvh;
   min-height: 600px;
   display: flex;
   flex-direction: column;
