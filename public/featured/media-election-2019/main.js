@@ -216,68 +216,6 @@ function animateCounter(el) {
   requestAnimationFrame(update);
 }
 
-// ─── HERO PARTICLE CANVAS ───────────────────────
-(function initHeroCanvas() {
-  const canvas = document.getElementById('hero-canvas');
-  const ctx = canvas.getContext('2d');
-  let particles = [];
-  let W, H;
-
-  function resize() {
-    W = canvas.width = canvas.offsetWidth;
-    H = canvas.height = canvas.offsetHeight;
-  }
-  resize();
-  window.addEventListener('resize', resize);
-
-  const colors = ['#1A5276', '#C0392B', '#D4AC0D']; // Blue, Red, Gold
-  for (let i = 0; i < 60; i++) {
-    particles.push({
-      x: Math.random() * 1200,
-      y: Math.random() * 800,
-      r: Math.random() * 3 + 2, // Radius 2-5
-      vx: (Math.random() - 0.5) * 0.3,
-      vy: (Math.random() - 0.5) * 0.3,
-      a: Math.random() * 0.4 + 0.2, // Opacity 0.2-0.6
-      color: colors[Math.floor(Math.random() * colors.length)]
-    });
-  }
-
-  function draw() {
-    ctx.clearRect(0, 0, W, H);
-    particles.forEach(p => {
-      ctx.beginPath();
-      ctx.arc(p.x % W, p.y % H, p.r, 0, Math.PI * 2);
-      ctx.fillStyle = p.color;
-      ctx.globalAlpha = p.a;
-      ctx.fill();
-      ctx.globalAlpha = 1.0;
-      p.x += p.vx;
-      p.y += p.vy;
-      if (p.x < 0) p.x += W;
-      if (p.y < 0) p.y += H;
-    });
-    // draw subtle connections
-    for (let i = 0; i < particles.length; i++) {
-      for (let j = i + 1; j < particles.length; j++) {
-        const dx = particles[i].x - particles[j].x;
-        const dy = particles[i].y - particles[j].y;
-        const dist = Math.sqrt(dx * dx + dy * dy);
-        if (dist < 120) {
-          ctx.beginPath();
-          ctx.moveTo(particles[i].x, particles[i].y);
-          ctx.lineTo(particles[j].x, particles[j].y);
-          ctx.strokeStyle = `rgba(44,62,80,${0.15 * (1 - dist / 120)})`;
-          ctx.lineWidth = 0.5;
-          ctx.stroke();
-        }
-      }
-    }
-    requestAnimationFrame(draw);
-  }
-  draw();
-})();
-
 // ═══════════════════════════════════════════
 // VIZ 1: MEDIA GROWTH TIMELINE
 // ═══════════════════════════════════════════
