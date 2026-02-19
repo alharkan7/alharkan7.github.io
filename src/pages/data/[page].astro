@@ -1,16 +1,38 @@
 ---
-import BaseLayout from "../layouts/BaseLayout.astro";
-import { featuredProjects } from "../data/featured";
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import { featuredProjects } from "../../data/featured";
 
+export const prerender = true;
+
+export async function getStaticPaths() {
+  const projectsPerPage = 10;
+  const totalPages = Math.ceil(featuredProjects.length / projectsPerPage);
+
+  // Generate paths for pages 2 onwards (page 1 is handled by index.astro)
+  return Array.from({ length: totalPages - 1 }, (_, i) => {
+    const page = i + 2; // Start from page 2
+    const startIndex = (page - 1) * projectsPerPage;
+    return {
+      params: { page: String(page) },
+      props: {
+        projects: featuredProjects.slice(startIndex, startIndex + projectsPerPage),
+        currentPage: page,
+        totalPages,
+      },
+    };
+  });
+}
+
+const { projects, currentPage, totalPages } = Astro.props;
 const title = "Research I did for fun";
 const description = "I scrape, analyze or visualize data in my spare time. Here's the list of special pages showcasing the results that don't fit the blog formatting.";
-const permalink = Astro.site?.href;
+const permalink = `${Astro.site?.href}data`;
 ---
 
 <BaseLayout
   title={title}
   description={description}
-  permalink={permalink ?? "/"}
+  permalink={permalink}
   current="data"
 >
   <div class="container">
@@ -18,21 +40,21 @@ const permalink = Astro.site?.href;
       <h1>{title}</h1>
       <p class="description">{description}</p>
     </header>
-    
+
     <div class="data-grid">
-      {featuredProjects.map((project) => (
-        <a 
-          href={project.url} 
-          class="data-card" 
-          target={project.url.startsWith("http") ? "_blank" : "_self"} 
+      {projects.map((project) => (
+        <a
+          href={project.url}
+          class="data-card"
+          target={project.url.startsWith("http") ? "_blank" : "_self"}
           rel={project.url.startsWith("http") ? "noopener noreferrer" : ""}
         >
           <div class="card-image-wrapper">
-            <img 
-              src={project.coverImage} 
-              alt={project.title} 
+            <img
+              src={project.coverImage}
+              alt={project.title}
               loading="lazy"
-              class="card-image" 
+              class="card-image"
             />
           </div>
           <div class="card-content">
@@ -41,6 +63,20 @@ const permalink = Astro.site?.href;
           </div>
         </a>
       ))}
+    </div>
+
+    <div class="pagination">
+      <a
+        href={currentPage === 2 ? "/data" : `/data/${currentPage - 1}`}
+        class="prev-button">← Prev</a
+      >
+      {
+        currentPage < totalPages && (
+          <a href={`/data/${currentPage + 1}`} class="next-button">
+            Next →
+          </a>
+        )
+      }
     </div>
   </div>
 
@@ -143,8 +179,45 @@ const permalink = Astro.site?.href;
       h1 {
         font-size: 2rem;
       }
-      
+    }
 
+    .pagination {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1rem 0;
+    }
+
+    .prev-button,
+    .next-button {
+      color: var(--text-secondary);
+      transition: all 0.2s ease;
+      font-family: var(--font-family-sans);
+      font-size: 1.2em;
+      font-weight: 700;
+      text-decoration: none;
+      box-shadow: inset 0 -0.12em 0 var(--primary-color);
+      -webkit-transition:
+        box-shadow 0.2s ease-in-out,
+        color 0.2s ease-in-out;
+      transition:
+        box-shadow 0.2s ease-in-out,
+        color 0.2s ease-in-out;
+    }
+
+    .prev-button:hover,
+    .next-button:hover {
+      color: var(--primary-color);
+      box-shadow: inset 0 -1.5em 0 var(--primary-color);
+      color: #fff;
+    }
+
+    .next-button {
+      margin-left: auto;
+    }
+
+    .prev-button {
+      margin-right: auto;
     }
   </style>
 </BaseLayout>
