@@ -1,27 +1,27 @@
 export const featuredProjects = [
   {
-    title: "Good News Garden - Playful Narrative 3D Network",
-    subtitle: "",
-    url: "https://alhrkn.vercel.app/goodnews-garden",
-    coverImage: "https://ik.imagekit.io/raihankalla/research_section_cover/goodnews-garden.png",
-  },
-  {
     title: "Kekayaan Bahasa Nusantara",
     subtitle: "",
     url: "/bahasa-nusantara",
     coverImage: "https://ik.imagekit.io/raihankalla/research_section_cover/bahasa-nusantara.png?updatedAt=1771319978903",
   },
   {
-    title: "Jakarta Labor Market Analysis (19K+ Job Postings)",
-    subtitle: "",
-    url: "/labor-market-analysis",
-    coverImage: "https://ik.imagekit.io/raihankalla/research_section_cover/job-market-analysis.png",
-  },
-  {
     title: "Media Effects on the 2019 Election",
     subtitle: "",
     url: "/media-election-2019",
     coverImage: "https://ik.imagekit.io/raihankalla/research_section_cover/media-election-2019.png",
+  },
+  {
+    title: "Good News Garden - Playful Narrative 3D Network",
+    subtitle: "",
+    url: "https://alhrkn.vercel.app/goodnews-garden",
+    coverImage: "https://ik.imagekit.io/raihankalla/research_section_cover/goodnews-garden.png",
+  },
+  {
+    title: "Jakarta Labor Market Analysis (19K+ Job Postings)",
+    subtitle: "",
+    url: "/labor-market-analysis",
+    coverImage: "https://ik.imagekit.io/raihankalla/research_section_cover/job-market-analysis.png",
   },
   {
     title: "Economic Growth vs Envinromental Impact",

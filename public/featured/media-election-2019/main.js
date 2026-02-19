@@ -1004,7 +1004,37 @@ function initMobileViz() {
   if (toggleBtn && vizColumn) {
     toggleBtn.addEventListener('click', (e) => {
       e.stopPropagation();
+      const isCollapsing = !vizColumn.classList.contains('viz-collapsed');
       vizColumn.classList.toggle('viz-collapsed');
+
+      // The resize handle sets inline height/minHeight on #viz-panels-container.
+      // Inline styles beat class-based CSS, so the .viz-collapsed rules (height:0)
+      // would have no effect and leave a large blank area.
+      // Fix: zero out inline styles when collapsing; restore saved value on expand.
+      const container = document.getElementById('viz-panels-container');
+      if (container) {
+        if (isCollapsing) {
+          // Temporarily override inline styles so CSS .viz-collapsed rules win
+          container.style.height = '0';
+          container.style.minHeight = '0';
+        } else {
+          // Restore: apply saved height if one was persisted by the resize handle
+          try {
+            const saved = parseInt(localStorage.getItem('elec-viz-h'), 10);
+            if (!isNaN(saved)) {
+              container.style.height = saved + 'px';
+              container.style.minHeight = saved + 'px';
+            } else {
+              // Fall back to CSS-driven height (remove inline styles)
+              container.style.height = '';
+              container.style.minHeight = '';
+            }
+          } catch (_) {
+            container.style.height = '';
+            container.style.minHeight = '';
+          }
+        }
+      }
     });
   }
 }

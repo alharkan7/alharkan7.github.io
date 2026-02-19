@@ -1256,8 +1256,7 @@ body {
   }
 
   .hero-cta {
-    padding: 10px 24px;
-    font-size: 0.8rem;
+    display: none;
   }
 
   /* Nav */
