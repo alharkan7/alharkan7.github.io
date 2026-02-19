@@ -100,6 +100,26 @@ body {
   justify-content: space-between;
 }
 
+.nav-brand-group {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.nav-home-icon {
+  display: flex;
+  align-items: center;
+  color: var(--scholarly-blue);
+  opacity: 0.6;
+  transition: opacity var(--transition-fast), transform var(--transition-fast);
+}
+
+.nav-home-icon:hover {
+  opacity: 1;
+  color: var(--accent-blue);
+  transform: scale(1.1);
+}
+
 .nav-logo {
   font-family: var(--font-sans);
   font-weight: 600;
@@ -1083,6 +1103,22 @@ body {
 
   #mobile-tab-bar::-webkit-scrollbar {
     display: none;
+  }
+
+  .mob-home-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    position: sticky;
+    left: 0;
+    z-index: 20;
+    background: var(--paper-dark);
+    border-right: 1px solid var(--border);
+    color: var(--ink-muted);
+  }
+
+  .mob-home-icon:hover {
+    color: var(--accent-blue);
   }
 
   .mob-tab {
