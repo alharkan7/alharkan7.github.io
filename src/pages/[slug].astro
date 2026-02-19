@@ -43,7 +43,7 @@ export async function getStaticPaths() {
     props: { post: p, type: 'post' },
   }));
 
-  // Handle standalone HTML pages
+  // Handle standalone HTML pages (flat files in src/featured/*.html)
   const htmlPagesGlob = import.meta.glob("../featured/*.html", {
     query: "?raw",
     eager: true,
@@ -54,7 +54,24 @@ export async function getStaticPaths() {
     props: { htmlContent: (content as any).default, type: "html" },
   }));
 
-  return [...postRoutes, ...htmlRoutes];
+  // Handle subfolder HTML pages (src/featured/[name]/index.html)
+  // Static assets for these pages go in public/featured/[name]/
+  const htmlSubfolderGlob = import.meta.glob("../featured/*/index.html", {
+    query: "?raw",
+    eager: true,
+  });
+
+  const htmlSubfolderRoutes = Object.entries(htmlSubfolderGlob).map(([path, content]) => {
+    // path looks like: ../featured/media-election-2019/index.html
+    const parts = path.split("/");
+    const folderName = parts[parts.length - 2]; // e.g. "media-election-2019"
+    return {
+      params: { slug: folderName },
+      props: { htmlContent: (content as any).default, type: "html" },
+    };
+  });
+
+  return [...postRoutes, ...htmlRoutes, ...htmlSubfolderRoutes];
 }
 
 const { slug } = Astro.params;

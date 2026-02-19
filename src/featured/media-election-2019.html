@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Beyond the Screen — Media Effects on Indonesia's 2019 Election</title>
+    <meta name="description"
+        content="A scrollytelling analysis of how media consumption shaped voter turnout and vote direction in Indonesia's 2019 Legislative Election. Master's Thesis by Ali Al Harkan, Universitas Indonesia.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,600;0,700;1,400&family=Inter:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <link rel="stylesheet" href="/featured/media-election-2019/style.css">
+</head>
+
+<body>
+
+    <!-- Progress Bar -->
+    <div id="progress-bar"></div>
+
+    <!-- Navigation -->
+    <nav id="main-nav">
+        <div class="nav-inner">
+            <span class="nav-logo">Beyond the Screen</span>
+            <div class="nav-sections">
+                <a href="#section-context" class="nav-dot" data-label="Context"></a>
+                <a href="#section-problem" class="nav-dot" data-label="Research"></a>
+                <a href="#section-methodology" class="nav-dot" data-label="Method"></a>
+                <a href="#section-finding1" class="nav-dot" data-label="Finding 1"></a>
+                <a href="#section-finding2" class="nav-dot" data-label="Finding 2"></a>
+                <a href="#section-bigpicture" class="nav-dot" data-label="Big Picture"></a>
+                <a href="#section-conclusion" class="nav-dot" data-label="Conclusion"></a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- ═══════════════════════════════════════════════
+     SECTION 1: HERO
+═══════════════════════════════════════════════ -->
+    <section id="hero">
+        <div class="hero-bg" id="hero-canvas-container">
+            <canvas id="hero-canvas"></canvas>
+            <div class="hero-overlay"></div>
+        </div>
+        <div class="hero-content">
+            <div class="hero-label">Master's Thesis Summary</div>
+            <h1 class="hero-title">Beyond the <span class="hero-accent">Screen</span></h1>
+            <p class="hero-sub">Media Effects on Voter Turnout &amp; Vote Direction<br>in Indonesia's 2019 Legislative
+                Election</p>
+            <p class="hero-authors">Ali Al Harkan · Universitas Indonesia</p>
+            <p class="hero-teaser">In 2019, Indonesia held one of the most complex single-day elections in the world.
+                Against a backdrop of 17,000 islands and a booming digital landscape, a critical question emerged:
+                <em>Does the media we consume actually dictate how we vote?</em>
+            </p>
+            <a href="#section-context" class="hero-cta">
+                <!-- <span>Begin the Analysis</span> -->
+                <svg viewBox="0 0 24 24" width="20" height="20">
+                    <path d="M12 4v16m0 0l-6-6m6 6l6-6" stroke="currentColor" stroke-width="2" fill="none"
+                        stroke-linecap="round" />
+                </svg>
+            </a>
+        </div>
+        <div class="hero-stats">
+            <div class="hero-stat"><span class="stat-num" data-target="190">0</span><span class="stat-unit">M</span>
+                <div class="stat-label">Eligible Voters</div>
+            </div>
+            <div class="hero-stat"><span class="stat-num" data-target="34">0</span><span class="stat-unit"></span>
+                <div class="stat-label">Provinces</div>
+            </div>
+            <div class="hero-stat"><span class="stat-num" data-target="32">0</span><span class="stat-unit"></span>
+                <div class="stat-label">Regression Models</div>
+            </div>
+            <div class="hero-stat"><span class="stat-num" data-target="1362">0</span><span class="stat-unit"></span>
+                <div class="stat-label">Media Companies</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════════
+     SIDECAR LAYOUT WRAPPER
+═══════════════════════════════════════════════ -->
+    <div id="sidecar-wrapper">
+
+        <!-- LEFT: Scrollable Text Column -->
+        <div id="text-column">
+
+            <!-- Section 2: Context -->
+            <div class="scroll-section" id="section-context">
+                <div class="section-label">Section 01</div>
+                <h2>The New Democratic Landscape</h2>
+                <p>Since the 1998 <em>Reformasi</em>, Indonesia's media landscape has undergone a radical
+                    transformation. The repeal of restrictive laws birthed an ecosystem of <strong>1,362 press
+                        companies</strong> across print, broadcast, and cyber/digital media.</p>
+                <p>Today, traditional TV and radio coexist with a massive surge in internet users. As media becomes the
+                    "fourth pillar" of Indonesian democracy, it serves as the primary bridge between political parties
+                    and the public.</p>
+                <p>But in an era of information saturation, we must ask: <strong>Does increased media access lead to
+                        higher democratic participation, or simply more noise?</strong></p>
+                <div class="data-source-tag">Source: BPS Indonesia, Kominfo, 2000–2019</div>
+            </div>
+
+            <!-- Section 3: Research Problem -->
+            <div class="scroll-section" id="section-problem">
+                <div class="section-label">Section 02</div>
+                <h2>Challenging the Traditional Models</h2>
+                <p>Academic studies of Indonesian voters typically rely on three pillars:</p>
+                <ol class="research-list">
+                    <li><strong>Sociological:</strong> The "Columbia School" approach — how religion, ethnicity, and
+                        class bind voters to their groups.</li>
+                    <li><strong>Psychological:</strong> Loyalties to specific party figures or historical "Downsian"
+                        utility.</li>
+                    <li><strong>Rational Choice:</strong> Economic benefits and government performance.</li>
+                </ol>
+                <p>However, external factors — specifically <strong>Media Effects</strong> — are often relegated to the
+                    sidelines. This research integrates media consumption into these traditional models, using aggregate
+                    data from all <strong>34 Provinces</strong> to see the "big picture" of the 2019 legislative race.
+                </p>
+                <div class="data-source-tag">Source: Academic literature review, CSIS surveys</div>
+            </div>
+
+            <!-- Section 4: Methodology -->
+            <div class="scroll-section" id="section-methodology">
+                <div class="section-label">Section 03</div>
+                <h2>The Statistical Engine</h2>
+                <p>To uncover these hidden relationships, we utilized <strong>SEM-PLS</strong> (Structural Equation
+                    Modeling Partial Least Square). This technique allowed us to test and estimate complex relationships
+                    between multiple variables simultaneously.</p>
+                <p>We executed <strong>32 distinct test models</strong>, analyzing how provincial trends in media
+                    consumption (TV, Radio, Newspaper, Internet, and Google Search) correlated with the performance of
+                    major parties like PDIP, Gerindra, and PKB.</p>
+                <p>By using aggregate data from BPS and KPU, we move from "what people say" to <em>"what the numbers
+                        show"</em> across the entire archipelago.</p>
+                <div class="data-source-tag">Source: BPS Statistics Indonesia, KPU Election Commission 2019</div>
+            </div>
+
+            <!-- Section 5: Finding 1 -->
+            <div class="scroll-section" id="section-finding1">
+                <div class="section-label">Finding 01</div>
+                <h2>The Surprising Power of Radio</h2>
+                <p>In the digital age, we expect the Internet to be the primary driver of participation. However, our
+                    data suggests otherwise.</p>
+                <p>The effect of the Internet on <strong>Voter Turnout</strong> was found to be <em>weak</em>. Instead,
+                    <strong>Radio</strong> emerged as a significant positive predictor. In provinces where more citizens
+                    listened to the radio, participation in the 2019 election was consistently higher.
+                </p>
+                <p>This suggests that radio remains a potent, perhaps overlooked, tool for civic mobilization in
+                    Indonesia's more remote or traditional regions.</p>
+                <div class="finding-callout">
+                    <div>Radio listeners showed a <strong>Strong Positive Effect (β=0.612)</strong> on turnout compared
+                        to low-radio
+                        provinces, controlling for other variables.</div>
+                </div>
+                <div class="data-source-tag">Source: KPU 2019 Turnout Data, BPS Media Survey</div>
+            </div>
+
+            <!-- Section 6: Finding 2 -->
+            <div class="scroll-section" id="section-finding2">
+                <div class="section-label">Finding 02</div>
+                <h2>Targeted Influences</h2>
+                <p>Media effects are not a "blanket" influence; they are highly fragmented across different political
+                    parties:</p>
+                <ul class="party-list">
+                    <li>
+                        <span class="party-badge google">G</span>
+                        <div><strong>Google Search:</strong> Higher search volumes were significant predictors for
+                            <strong>Gerindra</strong> and <strong>PKB</strong> support.
+                        </div>
+                    </li>
+                    <li>
+                        <span class="party-badge tv">T</span>
+                        <div><strong>Television:</strong> Remains the primary vehicle for parties like
+                            <strong>Nasdem</strong>.
+                        </div>
+                    </li>
+                    <li>
+                        <span class="party-badge radio">R</span>
+                        <div><strong>Radio:</strong> Showed a specific link to support for <strong>Demokrat</strong>.
+                        </div>
+                    </li>
+                </ul>
+                <p>This confirms that different media platforms serve as "triggers" for different segments of the
+                    electorate. The "echo chamber" in Indonesia isn't one big room — it's a series of smaller,
+                    media-specific corridors.</p>
+                <div class="data-source-tag">Source: KPU 2019 Party Vote Shares, Google Trends, BPS</div>
+            </div>
+
+            <!-- Section 7: Big Picture -->
+            <div class="scroll-section" id="section-bigpicture">
+                <div class="section-label">Finding 03</div>
+                <h2>The Sum is Greater than the Parts</h2>
+                <p>Media alone is rarely the decider. However, when we look at the <strong>Combined Model</strong> —
+                    merging Media with Sociology (Religion/Ethnicity) and Economics (Poverty) — the predictive power
+                    skyrockets.</p>
+                <p>For <strong>PDIP</strong>, the combined model explained a staggering <strong>83.9%</strong> of the
+                    variance in provincial vote direction. This proves that media acts as a <em>"multiplier"</em> for
+                    existing social and economic conditions.</p>
+                <p>It doesn't replace the voter's identity; <strong>it reinforces it.</strong></p>
+                <div class="finding-callout highlight-red">
+                    <div><strong>R² = 83.9%</strong> for PDIP in the Combined Model — one of the highest predictive fits
+                        in Indonesian electoral research.</div>
+                </div>
+                <div class="data-source-tag">Source: SEM-PLS Model Output, SmartPLS 3.0</div>
+            </div>
+
+            <!-- Section 8: Conclusion -->
+            <div class="scroll-section" id="section-conclusion">
+                <div class="section-label">Section 08</div>
+                <h2>A Call for Granular Data</h2>
+                <p>Our findings show that media effects in 2019 were fragmented and often weak at a provincial level.
+                    This suggests that the "battle for the voter" happens at a much more <strong>local scale</strong>.
+                </p>
+                <p>To improve future research and democratic transparency, we recommend:</p>
+                <ol class="research-list">
+                    <li><strong>Shifting to District-Level Analysis:</strong> Provincial data masks local nuances; we
+                        need Kabupaten/Kota granularity.</li>
+                    <li><strong>Expanding Data Access:</strong> Public access to Indonesian statistical data must be
+                        improved for more sophisticated aggregate research.</li>
+                    <li><strong>Active Monitoring:</strong> Stakeholders should actively monitor media's "trigger"
+                        effects to ensure a balanced democratic discourse.</li>
+                </ol>
+                <div class="data-source-tag">Source: Research Recommendations, UI Graduate Program</div>
+            </div>
+
+        </div><!-- end #text-column -->
+
+        <!-- RIGHT: Sticky Visualization Column -->
+        <div id="viz-column">
+            <div id="viz-sticky">
+
+                <!-- Mobile-only: Tab bar + chevron toggle (hidden on desktop via CSS) -->
+                <div id="mobile-viz-topbar">
+                    <div id="mobile-tab-bar">
+                        <button class="mob-tab active" data-viz="viz-context">Media Growth</button>
+                        <button class="mob-tab" data-viz="viz-problem">Variables</button>
+                        <button class="mob-tab" data-viz="viz-methodology">SEM Model</button>
+                        <button class="mob-tab" data-viz="viz-finding1">Radio & Turnout</button>
+                        <button class="mob-tab" data-viz="viz-finding2">Party Matrix</button>
+                        <button class="mob-tab" data-viz="viz-bigpicture">R² Power</button>
+                        <button class="mob-tab" data-viz="viz-conclusion">Province Map</button>
+                    </div>
+                    <button id="viz-toggle" aria-label="Toggle visualization">
+                        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
+                            stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                            <polyline points="18 15 12 9 6 15"></polyline>
+                        </svg>
+                    </button>
+                </div>
+
+                <!-- Panels container (explicit height on mobile) -->
+                <div id="viz-panels-container">
+
+                    <!-- Viz 1: Media Growth Timeline -->
+                    <div class="viz-panel active" id="viz-context">
+                        <div class="viz-title">Indonesia's Media Growth, 2000–2019</div>
+                        <svg id="chart-timeline"></svg>
+                        <div class="viz-legend" id="legend-timeline"></div>
+                        <div class="viz-caption">Internet penetration surpassed radio listenership around 2015, creating
+                            a
+                            dual-media landscape heading into the 2019 elections.</div>
+                    </div>
+
+                    <!-- Viz 2: Variables Bubble Map -->
+                    <div class="viz-panel" id="viz-problem">
+                        <div class="viz-title">The Research Variable Map</div>
+                        <svg id="chart-bubbles"></svg>
+                        <div class="viz-caption">Three categories of independent variables — Media, Sociological, and
+                            Economic-Political — orbiting two outcome constructs.</div>
+                    </div>
+
+                    <!-- Viz 3: SEM-PLS DAG -->
+                    <div class="viz-panel" id="viz-methodology">
+                        <div class="viz-title">SEM-PLS Path Model (Simplified)</div>
+                        <svg id="chart-sem"></svg>
+                        <div class="viz-caption">Animated paths show causal direction between media variables and
+                            electoral
+                            outcomes. Line thickness represents path coefficient magnitude.</div>
+                    </div>
+
+                    <!-- Viz 4: Scatterplot -->
+                    <div class="viz-panel" id="viz-finding1">
+                        <div class="viz-title">Radio vs. Voter Turnout — 34 Provinces</div>
+                        <svg id="chart-scatter"></svg>
+                        <div class="viz-caption">Each point is a province. The upward trend for Radio consumption
+                            contrasts
+                            with the flat trend for Internet, revealing radio's unexpected civic power.</div>
+                    </div>
+
+                    <!-- Viz 5: Party Media Matrix -->
+                    <div class="viz-panel" id="viz-finding2">
+                        <div class="viz-title">Media–Party Significance Matrix</div>
+                        <div id="chart-matrix"></div>
+                        <div class="viz-caption">Highlighted cells indicate statistically significant relationships (p
+                            &lt;
+                            0.05). Each media platform triggers support for different parties.</div>
+                    </div>
+
+                    <!-- Viz 6: R² Bar Chart -->
+                    <div class="viz-panel" id="viz-bigpicture">
+                        <div class="viz-title">Explaining Power (R²) — Media vs. Combined Model</div>
+                        <svg id="chart-bars"></svg>
+                        <div class="viz-caption">The combined model that integrates media with sociological and economic
+                            variables dramatically outperforms media-only models.</div>
+                    </div>
+
+                    <!-- Viz 7: Indonesia Map -->
+                    <div class="viz-panel" id="viz-conclusion">
+                        <div class="viz-title">From Provincial to District-Level Analysis</div>
+                        <div id="chart-map"></div>
+                        <div class="viz-caption">Future research should zoom into Kabupaten/Kota level data to uncover
+                            the
+                            truly local dynamics shaping Indonesian democracy.</div>
+                    </div>
+
+                </div><!-- end #viz-panels-container -->
+
+            </div><!-- end #viz-sticky -->
+        </div><!-- end #viz-column -->
+
+    </div><!-- end #sidecar-wrapper -->
+
+    <!-- ═══════════════════════════════════════════════
+     FOOTER
+
+═══════════════════════════════════════════════ -->
+    <footer id="main-footer">
+        <div class="footer-inner">
+            <div class="footer-thesis">
+                <div class="footer-label">Full Thesis</div>
+                <p><em>Efek Media terhadap Voter Turnout dan Vote Direction: Analisis Perilaku Pemilih pada Pemilihan
+                        Umum Legislatif Indonesia 2019</em></p>
+            </div>
+            <div class="footer-meta">
+                <p><strong>Research by:</strong> Ali Al Harkan</p>
+                <p><strong>Institution:</strong> Universitas Indonesia</p>
+                <p><strong>Program:</strong> Graduate Program in Communication Science</p>
+            </div>
+            <div class="footer-actions">
+                <a href="https://lib.ui.ac.id/detail?id=20499855&lokasi=lokal" target="_blank"
+                    class="footer-btn">Download Full PDF</a>
+                <a href="mailto:alharkan7@gmail.com" class="footer-btn secondary">Contact Researchers</a>
+            </div>
+            <div class="footer-bottom">
+                <p>Data sources: BPS Indonesia · General Election Commission · Google Trends · Ministry of Communication
+                    and Information</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="/featured/media-election-2019/main.js"></script>
+</body>
+
+</html>
