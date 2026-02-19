@@ -112,6 +112,12 @@ body {
   color: var(--scholarly-blue);
   opacity: 0.6;
   transition: opacity var(--transition-fast), transform var(--transition-fast);
+  font-size: 0.875rem; /* Match nav-logo size */
+}
+
+.nav-home-icon svg {
+  width: 1.35em;
+  height: 1.35em;
 }
 
 .nav-home-icon:hover {
@@ -1105,7 +1111,8 @@ body {
     display: none;
   }
 
-  .mob-home-icon {
+  /* Use higher specificity or !important to override .mob-tab background: transparent */
+  .mob-tab.mob-home-icon {
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -1115,9 +1122,18 @@ body {
     background: var(--paper-dark);
     border-right: 1px solid var(--border);
     color: var(--ink-muted);
+    /* Ensure icon matches text height (~11px) */
+    font-size: 0.68rem;
+    padding-left: 12px;
+    padding-right: 12px;
   }
 
-  .mob-home-icon:hover {
+  .mob-tab.mob-home-icon svg {
+    width: 1.5em;
+    height: 1.5em;
+  }
+
+  .mob-tab.mob-home-icon:hover {
     color: var(--accent-blue);
   }
 
