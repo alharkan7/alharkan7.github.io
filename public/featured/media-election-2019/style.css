@@ -747,21 +747,35 @@ body {
   flex: 1;
   display: flex;
   align-items: center;
+  /* center the square grid when container is taller */
   justify-content: center;
   min-height: 0;
   position: relative;
+  overflow: hidden;
 }
 
 .map-visual {
   display: grid;
   grid-template-columns: repeat(6, 1fr);
+  /* 6 equal rows — height is driven by the aspect-ratio below */
+  grid-template-rows: repeat(6, 1fr);
   gap: 8px;
   width: 100%;
   max-width: 480px;
+  /* aspect-ratio: 1 makes the grid always square.
+     height: auto lets the aspect-ratio determine height from width.
+     max-height: 100% caps it to the container height.
+     Per CSS spec, when max-height fires on an aspect-ratio element,
+     the browser ALSO reduces width to maintain the ratio — so the grid
+     shrinks proportionally, stays square, and never overflows. */
+  height: auto;
+  max-height: 100%;
+  aspect-ratio: 1;
 }
 
 .province-cell {
-  aspect-ratio: 1;
+  /* aspect-ratio: 1 removed — cell height is now driven by grid-template-rows,
+     so the grid fits its container instead of imposing its own height */
   border-radius: 6px;
   display: flex;
   align-items: center;
@@ -977,6 +991,10 @@ body {
   display: none;
 }
 
+#viz-resize-handle {
+  display: none;
+}
+
 #viz-panels-container {
   /* On desktop, container is transparent — panels use position:absolute inside viz-sticky */
   position: absolute;
@@ -1136,6 +1154,43 @@ body {
     /* overrides base min-height — min-height beats max-height in CSS */
     opacity: 0;
     pointer-events: none;
+  }
+
+  /* Hide resize handle when viz is collapsed */
+  #viz-column.viz-collapsed #viz-resize-handle {
+    display: none;
+  }
+
+  /* ── Resize handle ── */
+  #viz-resize-handle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 22px;
+    background: var(--paper-dark);
+    border-bottom: 2px solid var(--border);
+    cursor: ns-resize;
+    touch-action: none;
+    user-select: none;
+    -webkit-user-select: none;
+    position: relative;
+    z-index: 1;
+  }
+
+  .viz-resize-pill {
+    width: 32px;
+    height: 4px;
+    border-radius: 3px;
+    background: var(--ink-muted);
+    opacity: 0.35;
+    transition: opacity 0.2s ease, width 0.2s ease, background 0.2s ease;
+  }
+
+  #viz-resize-handle:hover .viz-resize-pill,
+  #viz-resize-handle.is-dragging .viz-resize-pill {
+    opacity: 0.75;
+    width: 48px;
+    background: var(--accent-blue);
   }
 
   /* Panels: keep position:absolute inside the container */

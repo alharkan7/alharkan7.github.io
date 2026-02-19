@@ -62,7 +62,15 @@ function updateActiveSectionMobile() {
   // the sticky viz.
   const activeLine = readingTop + (readingBottom - readingTop) * 0.3;
 
-  let active = null;
+  // ── Early first-section trigger ───────────────────────────────────────────
+  // On mobile the viz is sticky-ABOVE the text. The viz panel becomes 25%
+  // visible when scrollY ≈ vizHeight × 0.25. The text section-context only
+  // reaches the activeLine when scrollY ≈ 0.7 × innerHeight + 90 — a ~600 px
+  // gap during which the viz is fully on screen but the chart stays blank.
+  // Pre-seeding active=SECTIONS[0] when the viz is ≥25% visible fires
+  // drawTimeline() as soon as the user sees the chart area.
+  let active = window.scrollY >= stickyH * 0.25 ? SECTIONS[0] : null;
+
   for (const s of SECTIONS) {
     const el = document.getElementById(s.textId);
     if (!el) continue;
@@ -94,7 +102,13 @@ function updateActiveSectionMobile() {
 // Only attached when NOT on mobile (checked after DOM ready in initDesktop).
 const observerOptions = {
   root: null,
-  rootMargin: '-25% 0px -45% 0px',
+  // Active zone: top 10% → 50% of viewport.
+  // Sections become active as they enter the LOWER half of the viewport
+  // (crossing the 50% mark), giving the user the full remaining section scroll
+  // to watch the visualization animate — not just the last 30%.
+  // This also fixes the first viz firing too early: it now fires when the user
+  // scrolls section-context into view rather than at page load.
+  rootMargin: '-10% 0px -50% 0px',
   threshold: 0,
 };
 
@@ -122,19 +136,27 @@ SECTIONS.forEach(s => {
 
 // ─── VIZ SWITCHER ───────────────────────────────
 function switchViz(nextVizId) {
-  if (nextVizId === currentViz) return;
-  const current = document.getElementById(currentViz);
-  const next = document.getElementById(nextVizId);
-  if (!current || !next) return;
+  const needsInit = !vizInitialized[nextVizId];
 
-  current.classList.remove('active');
-  current.classList.add('exiting');
-  setTimeout(() => current.classList.remove('exiting'), 900);
+  // Skip entirely only if we're already showing this viz AND it's already drawn.
+  // When needsInit is true we must still call initViz even if currentViz matches
+  // (e.g. viz-context is the default active panel but hasn't been animated yet).
+  if (nextVizId === currentViz && !needsInit) return;
 
-  next.classList.add('active');
-  currentViz = nextVizId;
+  if (nextVizId !== currentViz) {
+    const current = document.getElementById(currentViz);
+    const next = document.getElementById(nextVizId);
+    if (!current || !next) return;
 
-  if (!vizInitialized[nextVizId]) {
+    current.classList.remove('active');
+    current.classList.add('exiting');
+    setTimeout(() => current.classList.remove('exiting'), 900);
+
+    next.classList.add('active');
+    currentViz = nextVizId;
+  }
+
+  if (needsInit) {
     vizInitialized[nextVizId] = true;
     initViz(nextVizId);
   }
@@ -390,12 +412,15 @@ function drawBubbles(targetId = 'chart-bubbles') {
     { label: 'TV', cat: 'media', angle: -100, dist: 190, r: 30, color: '#2E86AB' },
     { label: 'Radio', cat: 'media', angle: -140, dist: 185, r: 30, color: '#2E86AB' },
     { label: 'Internet', cat: 'media', angle: -60, dist: 195, r: 30, color: '#2E86AB' },
-    { label: 'Newspaper', cat: 'media', angle: -175, dist: 175, r: 26, color: '#5DADE2' },
+    // Newspaper: pushed to -160°/dist208 so it clears Voter Turnout (107px > 74px radii-sum)
+    // and is well separated from Literacy. r increased to 30 so the full word fits inside.
+    { label: 'Newspaper', cat: 'media', angle: -160, dist: 208, r: 30, color: '#5DADE2' },
     { label: 'Google', cat: 'media', angle: -20, dist: 180, r: 26, color: '#5DADE2' },
     { label: 'Religion', cat: 'socio', angle: 70, dist: 180, r: 28, color: '#1E8449' },
     { label: 'Ethnicity', cat: 'socio', angle: 110, dist: 190, r: 28, color: '#1E8449' },
     { label: 'Poverty', cat: 'econ', angle: 145, dist: 185, r: 26, color: '#D4AC0D' },
-    { label: 'Literacy', cat: 'econ', angle: 170, dist: 180, r: 26, color: '#D4AC0D' },
+    // Literacy: pushed to 163°/dist200 — 100px from Voter Turnout, 134px from Newspaper
+    { label: 'Literacy', cat: 'econ', angle: 163, dist: 200, r: 26, color: '#D4AC0D' },
   ];
 
   const toRad = d => d * Math.PI / 180;
@@ -429,25 +454,37 @@ function drawBubbles(targetId = 'chart-bubbles') {
       .text(d => d);
   });
 
-  // Variable bubbles
+  // Variable bubbles — supports multi-line labels via '\n'
   vars.forEach((v, i) => {
     const vx = cx + Math.cos(toRad(v.angle)) * v.dist;
     const vy = cy + Math.sin(toRad(v.angle)) * v.dist;
     const g = svg.append('g').attr('transform', `translate(${vx},${vy})`).attr('opacity', 0);
     g.transition().delay(i * 80 + 200).duration(500).attr('opacity', 1);
     g.append('circle').attr('r', v.r).attr('fill', v.color).attr('opacity', 0.85);
-    g.append('text').attr('text-anchor', 'middle').attr('dominant-baseline', 'middle')
+
+    const lines = v.label.split('\n');
+    const textEl = g.append('text')
+      .attr('text-anchor', 'middle').attr('dominant-baseline', 'middle')
       .style('font-family', 'Inter,sans-serif').style('font-size', '9.5px').style('font-weight', '600')
-      .attr('fill', 'white').attr('pointer-events', 'none').text(v.label);
+      .attr('fill', 'white').attr('pointer-events', 'none');
+    if (lines.length === 1) {
+      textEl.text(v.label);
+    } else {
+      textEl.selectAll('tspan').data(lines).join('tspan')
+        .attr('x', 0).attr('dy', (_, j) => j === 0 ? '-0.4em' : '1.2em')
+        .text(d => d);
+    }
   });
 
-  // Category labels
-  svg.append('text').attr('x', cx - 30).attr('y', 30)
+  // Category labels — anchored to corners where no bubbles exist
+  // "MEDIA VARIABLES" → top-left (TV bubble is upper-centre so shifting left clears it)
+  svg.append('text').attr('x', 12).attr('y', 18)
     .attr('fill', '#2E86AB').style('font-family', 'Inter,sans-serif').style('font-size', '11px')
-    .style('font-weight', '700').attr('text-anchor', 'middle').text('MEDIA VARIABLES');
-  svg.append('text').attr('x', cx + 60).attr('y', H - 20)
+    .style('font-weight', '700').attr('text-anchor', 'start').text('MEDIA VARIABLES');
+  // "SOCIOLOGICAL + ECONOMIC" → bottom-right (Ethnicity/Religion bubbles are bottom-centre/left)
+  svg.append('text').attr('x', W - 12).attr('y', H - 8)
     .attr('fill', '#1E8449').style('font-family', 'Inter,sans-serif').style('font-size', '11px')
-    .style('font-weight', '700').attr('text-anchor', 'middle').text('SOCIOLOGICAL + ECONOMIC');
+    .style('font-weight', '700').attr('text-anchor', 'end').text('SOCIOLOGICAL + ECONOMIC');
 }
 
 // ═══════════════════════════════════════════
@@ -833,10 +870,10 @@ function drawBars(targetId = 'chart-bars') {
 
   // 83.9% annotation
   svg.append('text')
-    .attr('x', x0('PDIP') + x0.bandwidth() / 2).attr('y', y(83.9) - 18)
+    .attr('x', x0('PDIP') + x1('combined') + x1.bandwidth() / 2).attr('y', y(83.9) - 18)
     .attr('text-anchor', 'middle').attr('fill', '#C0392B')
     .style('font-family', 'Inter,sans-serif').style('font-size', '11px').style('font-weight', '700')
-    .text('83.9% ★').attr('opacity', 0).transition().delay(1000).attr('opacity', 1);
+    .text('★').attr('opacity', 0).transition().delay(1000).attr('opacity', 1);
 
   // Legend
   const legG = svg.append('g').attr('transform', `translate(0,${iH + 50})`);
@@ -887,9 +924,24 @@ function drawMap(containerId = 'chart-map') {
     grid.appendChild(cell);
   });
 
-  // Scale note
+  // Scale note — frosted badge so text stays readable when overlapping cells
   const note = document.createElement('div');
-  note.style.cssText = 'position:absolute;right:0;bottom:0;font-family:Inter,sans-serif;font-size:11px;color:#888;text-align:right;';
+  note.style.cssText = [
+    'position:absolute',
+    'right:0',
+    'bottom:0',
+    'font-family:Inter,sans-serif',
+    'font-size:11px',
+    'color:#2c3e50',          // darker text for legibility on any background
+    'text-align:right',
+    'line-height:1.5',
+    'padding:5px 8px',
+    'border-radius:8px',
+    'background:color-mix(in srgb, #f0ede7 70%, transparent)',
+    'backdrop-filter:blur(4px)',
+    '-webkit-backdrop-filter:blur(4px)',
+    // 'box-shadow:-1px -1px 0 rgba(255,255,255,0.4)',
+  ].join(';');
   note.innerHTML = '🔵 Darker = Higher Turnout<br>Hover each province for details';
 
   container.innerHTML = '';
@@ -957,24 +1009,112 @@ function initMobileViz() {
   }
 }
 
+// ─── MOBILE VIZ RESIZE HANDLE ──────────────────────────────
+// Lets the user drag the bottom edge of the viz panel area up/down
+// to set a preferred height. Saved to localStorage for persistence.
+function initVizResize() {
+  const handle = document.getElementById('viz-resize-handle');
+  const container = document.getElementById('viz-panels-container');
+  if (!handle || !container) return;
+
+  // ─ Desktop guard ──────────────────────────────────────────────────────────
+  // On desktop, #viz-panels-container uses `position:absolute; inset:0` to fill
+  // the full sticky column height. If a mobile-set inline height exists (from a
+  // previous mobile session stored in localStorage), CSS will honour the inline
+  // height over the inset:0 stretch, breaking the full-height layout.
+  // Clear any stale inline styles and exit — no drag listeners needed on desktop.
+  if (!isMobile()) {
+    container.style.height = '';
+    container.style.minHeight = '';
+    container.style.transition = '';
+    return;
+  }
+
+  const VIZ_MIN_H = 300;   // never shrink below this many px
+  const VIZ_MAX_RATIO = 0.70;  // never exceed 70 % of viewport height
+  const STORAGE_KEY = 'elec-viz-h';
+
+  let dragging = false;
+  let startY = 0;
+  let startH = 0;
+
+  function clamp(h) {
+    return Math.min(Math.round(window.innerHeight * VIZ_MAX_RATIO),
+      Math.max(VIZ_MIN_H, h));
+  }
+
+  function applyHeight(h, animate) {
+    container.style.transition = animate ? '' : 'none';
+    container.style.height = h + 'px';
+    container.style.minHeight = h + 'px';
+  }
+
+  // ─ Restore saved height (mobile only) ────────────────────────────────────
+  try {
+    const saved = parseInt(localStorage.getItem(STORAGE_KEY), 10);
+    if (!isNaN(saved)) applyHeight(clamp(saved), false);
+  } catch (_) { }
+
+  // ─ Drag start ──────────────────────────────────────────────────────────────
+  handle.addEventListener('pointerdown', (e) => {
+    dragging = true;
+    startY = e.clientY;
+    startH = container.offsetHeight;
+    handle.setPointerCapture(e.pointerId);
+    handle.classList.add('is-dragging');
+    applyHeight(startH, false);
+    e.preventDefault();
+  });
+
+  // ─ Drag move ───────────────────────────────────────────────────────────────
+  handle.addEventListener('pointermove', (e) => {
+    if (!dragging) return;
+    applyHeight(clamp(startH + (e.clientY - startY)), false);
+  });
+
+  // ─ Drag end ────────────────────────────────────────────────────────────────
+  function onDragEnd() {
+    if (!dragging) return;
+    dragging = false;
+    handle.classList.remove('is-dragging');
+    container.style.transition = '';
+    try { localStorage.setItem(STORAGE_KEY, container.offsetHeight); } catch (_) { }
+  }
+  handle.addEventListener('pointerup', onDragEnd);
+  handle.addEventListener('pointercancel', onDragEnd);
+}
+
+
 // ─── INIT ────────────────────────────────────────
 window.addEventListener('DOMContentLoaded', () => {
   const hash = window.location.hash; // e.g. '#section-methodology'
 
-  // Only activate default "context" section if at top and no hash
+  // Only activate default "context" section if at top and no hash.
+  // We mark the panel .active and the section .is-active so the layout is
+  // correct on page load, but we do NOT pre-draw the timeline animation here.
+  // The IntersectionObserver will call switchViz('viz-context') → initViz when
+  // the user scrolls section-context into the active zone (past the hero), so
+  // the animation plays fresh and the user can actually watch it.
   if (!hash && window.scrollY < 50) {
     const firstPanel = document.getElementById('viz-context');
     if (firstPanel) firstPanel.classList.add('active');
-    vizInitialized['viz-context'] = true;
-    setTimeout(() => drawTimeline(), 300);
+    // vizInitialized['viz-context'] intentionally NOT set here so the observer
+    // triggers drawTimeline() at the right scroll moment instead of on page load.
 
     const firstSection = document.getElementById(SECTIONS[0].textId);
     if (firstSection) firstSection.classList.add('is-active');
-    _lastActiveSectionId = SECTIONS[0].textId;
+    // On desktop: pre-set _lastActiveSectionId so the IntersectionObserver drives
+    // viz-context initialization at the right scroll moment (our observer fix above).
+    // On mobile: leave _lastActiveSectionId as null so the scroll tracker fires
+    // switchViz('viz-context') on the very first scroll event at section-context,
+    // which triggers drawTimeline() correctly. If we pre-set it on mobile the
+    // tracker would see no change and skip the switchViz call entirely.
+    if (!isMobile()) _lastActiveSectionId = SECTIONS[0].textId;
   }
 
   // Always init mobile UI (CSS hides it on desktop — no harm binding always)
   initMobileViz();
+  initVizResize(); // drag handle to resize viz panel height
 
   if (isMobile()) {
     // ── Fix 1: Ensure hero fills the viewport on first load ──────────────────

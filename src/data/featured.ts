@@ -18,6 +18,12 @@ export const featuredProjects = [
     coverImage: "https://ik.imagekit.io/raihankalla/research_section_cover/job-market-analysis.png",
   },
   {
+    title: "Media Effects on the 2019 Election",
+    subtitle: "",
+    url: "/media-election-2019",
+    coverImage: "https://ik.imagekit.io/raihankalla/research_section_cover/media-election-2019.png",
+  },
+  {
     title: "Economic Growth vs Envinromental Impact",
     subtitle: "",
     url: "/pdrb-iklh",
