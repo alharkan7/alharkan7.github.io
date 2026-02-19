@@ -230,14 +230,16 @@ function animateCounter(el) {
   resize();
   window.addEventListener('resize', resize);
 
-  for (let i = 0; i < 90; i++) {
+  const colors = ['#1A5276', '#C0392B', '#D4AC0D']; // Blue, Red, Gold
+  for (let i = 0; i < 60; i++) {
     particles.push({
       x: Math.random() * 1200,
       y: Math.random() * 800,
-      r: Math.random() * 2.5 + 0.5,
+      r: Math.random() * 3 + 2, // Radius 2-5
       vx: (Math.random() - 0.5) * 0.3,
       vy: (Math.random() - 0.5) * 0.3,
-      a: Math.random() * 0.5 + 0.15,
+      a: Math.random() * 0.4 + 0.2, // Opacity 0.2-0.6
+      color: colors[Math.floor(Math.random() * colors.length)]
     });
   }
 
@@ -246,8 +248,10 @@ function animateCounter(el) {
     particles.forEach(p => {
       ctx.beginPath();
       ctx.arc(p.x % W, p.y % H, p.r, 0, Math.PI * 2);
-      ctx.fillStyle = `rgba(44,62,80,${p.a * 0.35})`;
+      ctx.fillStyle = p.color;
+      ctx.globalAlpha = p.a;
       ctx.fill();
+      ctx.globalAlpha = 1.0;
       p.x += p.vx;
       p.y += p.vy;
       if (p.x < 0) p.x += W;
@@ -259,11 +263,11 @@ function animateCounter(el) {
         const dx = particles[i].x - particles[j].x;
         const dy = particles[i].y - particles[j].y;
         const dist = Math.sqrt(dx * dx + dy * dy);
-        if (dist < 100) {
+        if (dist < 120) {
           ctx.beginPath();
           ctx.moveTo(particles[i].x, particles[i].y);
           ctx.lineTo(particles[j].x, particles[j].y);
-          ctx.strokeStyle = `rgba(44,62,80,${0.06 * (1 - dist / 100)})`;
+          ctx.strokeStyle = `rgba(44,62,80,${0.15 * (1 - dist / 120)})`;
           ctx.lineWidth = 0.5;
           ctx.stroke();
         }
