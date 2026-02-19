@@ -100,6 +100,32 @@ body {
   justify-content: space-between;
 }
 
+.nav-brand-group {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.nav-home-icon {
+  display: flex;
+  align-items: center;
+  color: var(--scholarly-blue);
+  opacity: 0.6;
+  transition: opacity var(--transition-fast), transform var(--transition-fast);
+  font-size: 0.875rem; /* Match nav-logo size */
+}
+
+.nav-home-icon svg {
+  width: 1.35em;
+  height: 1.35em;
+}
+
+.nav-home-icon:hover {
+  opacity: 1;
+  color: var(--accent-blue);
+  transform: scale(1.1);
+}
+
 .nav-logo {
   font-family: var(--font-sans);
   font-weight: 600;
@@ -1083,6 +1109,32 @@ body {
 
   #mobile-tab-bar::-webkit-scrollbar {
     display: none;
+  }
+
+  /* Use higher specificity or !important to override .mob-tab background: transparent */
+  .mob-tab.mob-home-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    position: sticky;
+    left: 0;
+    z-index: 20;
+    background: var(--paper-dark);
+    border-right: 1px solid var(--border);
+    color: var(--ink-muted);
+    /* Ensure icon matches text height (~11px) */
+    font-size: 0.68rem;
+    padding-left: 12px;
+    padding-right: 12px;
+  }
+
+  .mob-tab.mob-home-icon svg {
+    width: 1.5em;
+    height: 1.5em;
+  }
+
+  .mob-tab.mob-home-icon:hover {
+    color: var(--accent-blue);
   }
 
   .mob-tab {
