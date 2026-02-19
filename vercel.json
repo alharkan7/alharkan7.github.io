@@ -1,6 +1,11 @@
 {
     "redirects": [
         {
+            "source": "/page/:slug",
+            "destination": "/:slug",
+            "permanent": true
+        },
+        {
             "permanent": true,
             "destination": "https://twitter.com/alhrkn/status/1526933166597935105",
             "source": "/menara-gading"
