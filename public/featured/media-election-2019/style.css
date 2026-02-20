@@ -691,86 +691,54 @@ body {
 }
 
 /* ═══════════════════════════════════════════════
-   SECTION 6: PARTY MATRIX
+   SECTION 6: PARTY MATRIX (SVG)
 ═══════════════════════════════════════════════ */
-#chart-matrix {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  min-height: 0;
-  overflow: auto;
-}
+/* Note: #chart-matrix uses standard .viz-panel svg styling */
 
-.matrix-table {
-  width: 100%;
-  border-collapse: collapse;
-}
-
-.matrix-table th {
+.matrix-label {
   font-family: var(--font-sans);
-  font-size: 0.75rem;
+  font-size: 11px;
   font-weight: 600;
-  color: var(--scholarly-blue);
-  padding: 10px 12px;
-  text-align: center;
-  border-bottom: 2px solid var(--border);
-  letter-spacing: 0.04em;
+  fill: var(--scholarly-blue);
 }
 
-.matrix-table th:first-child {
-  text-align: left;
-  padding-left: 4px;
-}
-
-.matrix-table td {
-  padding: 10px 12px;
-  text-align: center;
-  border-bottom: 1px solid var(--border);
+.matrix-header {
   font-family: var(--font-sans);
-  font-size: 0.78rem;
-  color: var(--ink-muted);
+  font-size: 11px;
+  font-weight: 600;
+  fill: var(--scholarly-blue);
+  text-anchor: middle;
 }
 
-.matrix-table td:first-child {
-  text-align: left;
-  padding-left: 4px;
-  font-weight: 600;
-  color: var(--scholarly-blue);
-  font-size: 0.8rem;
+.matrix-cell-rect {
+  rx: 4;
+  /* Rounded corners */
+  transition: opacity 0.4s ease;
 }
 
-.matrix-cell {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 44px;
-  height: 32px;
-  border-radius: 5px;
-  font-size: 0.7rem;
-  font-weight: 600;
-  transition: all 0.5s ease;
+.matrix-cell-rect.sig {
+  fill: var(--political-red);
+}
+
+.matrix-cell-rect.not-sig {
+  fill: rgba(0, 0, 0, 0.05);
+}
+
+.matrix-cell-text {
   font-family: var(--font-sans);
+  font-size: 10px;
+  font-weight: 700;
+  text-anchor: middle;
+  dominant-baseline: middle;
+  pointer-events: none;
 }
 
-.matrix-cell.sig {
-  background: var(--political-red);
-  color: white;
+.matrix-cell-text.sig {
+  fill: white;
 }
 
-.matrix-cell.not-sig {
-  background: rgba(0, 0, 0, 0.05);
-  color: var(--ink-muted);
-}
-
-.matrix-cell.hidden {
-  opacity: 0;
-  transform: scale(0.5);
-}
-
-.matrix-cell.revealed {
-  opacity: 1;
-  transform: scale(1);
+.matrix-cell-text.not-sig {
+  fill: var(--ink-muted);
 }
 
 /* ═══════════════════════════════════════════════

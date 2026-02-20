@@ -697,9 +697,17 @@ function drawScatter(targetId = 'chart-scatter', tooltipParent = '#viz-finding1'
 // ═══════════════════════════════════════════
 // VIZ 5: PARTY MEDIA MATRIX
 // ═══════════════════════════════════════════
-function drawMatrix(containerId = 'chart-matrix') {
-  const container = document.getElementById(containerId);
-  if (!container) return;
+function drawMatrix(targetId = 'chart-matrix') {
+  const el = document.getElementById(targetId);
+  if (!el) return;
+  // Fixed dimensions for viewBox scaling
+  const W = 600;
+  const H = 400;
+  // Margins: Left for Party names (needs substantial width), Top for Media headers
+  const M = { top: 60, right: 20, bottom: 20, left: 100 };
+  const iW = W - M.left - M.right;
+  const iH = H - M.top - M.bottom;
+
   const parties = ['PDIP', 'Gerindra', 'PKS', 'Nasdem', 'PKB', 'Demokrat', 'Golkar'];
   const media = ['TV', 'Radio', 'Newspaper', 'Internet', 'Google'];
 
@@ -716,37 +724,75 @@ function drawMatrix(containerId = 'chart-matrix') {
     Golkar: { TV: null, Radio: null, Newspaper: null, Internet: null, Google: null },
   };
 
-  const table = document.createElement('table');
-  table.className = 'matrix-table';
+  const svg = d3.select(el).attr('viewBox', `0 0 ${W} ${H}`);
+  svg.selectAll('*').remove(); // Clear previous render
 
-  // Header
-  const thead = table.createTHead();
-  const hrow = thead.insertRow();
-  const th0 = document.createElement('th'); th0.textContent = 'Party'; hrow.appendChild(th0);
-  media.forEach(m => {
-    const th = document.createElement('th');
-    th.textContent = m; hrow.appendChild(th);
-  });
+  const g = svg.append('g').attr('transform', `translate(${M.left},${M.top})`);
 
-  // Body
-  const tbody = table.createTBody();
+  // Scales
+  const x = d3.scaleBand()
+    .domain(media)
+    .range([0, iW])
+    .padding(0.15);
+
+  const y = d3.scaleBand()
+    .domain(parties)
+    .range([0, iH])
+    .padding(0.2);
+
+  // Column Headers (Media)
+  svg.append('g').attr('transform', `translate(${M.left}, ${M.top - 10})`)
+    .selectAll('text')
+    .data(media)
+    .join('text')
+    .attr('x', d => x(d) + x.bandwidth() / 2)
+    .attr('class', 'matrix-header')
+    .text(d => d);
+
+  // Row Headers (Parties)
+  svg.append('g').attr('transform', `translate(${M.left - 10}, ${M.top})`)
+    .selectAll('text')
+    .data(parties)
+    .join('text')
+    .attr('y', d => y(d) + y.bandwidth() / 2)
+    .attr('class', 'matrix-label')
+    .attr('text-anchor', 'end')
+    .attr('dominant-baseline', 'middle')
+    .text(d => d);
+
+  // Matrix Cells
   parties.forEach((party, pi) => {
-    const row = tbody.insertRow();
-    const td0 = row.insertCell(); td0.textContent = party;
     media.forEach((m, mi) => {
-      const td = row.insertCell();
       const val = sigData[party][m];
-      const cell = document.createElement('div');
-      cell.className = 'matrix-cell hidden ' + (val ? 'sig' : 'not-sig');
-      cell.textContent = val || '—';
-      cell.title = val ? `β=${val}, p<0.05` : 'Not significant';
-      td.appendChild(cell);
-      setTimeout(() => cell.classList.add('revealed'), (pi * media.length + mi) * 80 + 300);
+      const isSig = !!val;
+      const cellG = g.append('g')
+        .attr('transform', `translate(${x(m)}, ${y(party)})`)
+        .attr('opacity', 0); // Start hidden for animation
+
+      // Cell Rect
+      cellG.append('rect')
+        .attr('width', x.bandwidth())
+        .attr('height', y.bandwidth())
+        .attr('class', `matrix-cell-rect ${isSig ? 'sig' : 'not-sig'}`);
+
+      // Cell Text
+      cellG.append('text')
+        .attr('x', x.bandwidth() / 2)
+        .attr('y', y.bandwidth() / 2)
+        .attr('class', `matrix-cell-text ${isSig ? 'sig' : 'not-sig'}`)
+        .text(val || '—');
+
+      // Tooltip (using SVG title)
+      cellG.append('title')
+        .text(val ? `β=${val}, p<0.05` : 'Not significant');
+
+      // Animate reveal
+      cellG.transition()
+        .delay((pi * media.length + mi) * 80 + 300)
+        .duration(500)
+        .attr('opacity', 1);
     });
   });
-
-  container.innerHTML = '';
-  container.appendChild(table);
 }
 
 // ═══════════════════════════════════════════
