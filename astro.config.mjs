@@ -18,6 +18,7 @@ export default defineConfig({
         "'self'",
         "'unsafe-inline'",
         "'unsafe-eval'",
+        'd3js.org',
         'platform.twitter.com',
         'apis.google.com',
         '*.firebaseapp.com',
