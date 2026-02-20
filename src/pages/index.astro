@@ -2,7 +2,7 @@
 import BaseLayout from "../layouts/BaseLayout.astro";
 import QuickLinks from "../components/QuickLinks.astro";
 import FeaturedSection from "../components/FeaturedSection.astro";
-import { featuredProjects } from "../data/featured";
+import { featuredProjects } from "../content/featured";
 
 const title = "Al Harkan's Blog";
 const description = "On Media, Technology, and Everything in Between";
@@ -35,7 +35,7 @@ const totalPosts = sortedPosts.length;
 const totalPages = Math.ceil(totalPosts / postsPerPage);
 const paginatedPosts = sortedPosts.slice(0, postsPerPage);
 
-// Featured projects data moved to src/data/featured.ts
+// Featured projects data moved to src/content/featured.ts
 ---
 
 <BaseLayout

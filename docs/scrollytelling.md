@@ -12,14 +12,14 @@ The reference implementation is:
 - Layout: [src/components/scrolly/ScrollyTemplate.astro](../src/components/scrolly/ScrollyTemplate.astro)
 - Runtime entry: [src/scripts/scrolly/scrolly-entry.ts](../src/scripts/scrolly/scrolly-entry.ts)
 - Runtime logic: [src/scripts/scrolly/scrolly-runtime.ts](../src/scripts/scrolly/scrolly-runtime.ts)
-- Page data: [src/data/scrolly/scrolly-example.ts](../src/data/scrolly/scrolly-example.ts)
+- Page data: [src/content/scrolly-example.ts](../src/content/scrolly-example.ts)
 - Viz modules: [src/scripts/scrolly/viz](../src/scripts/scrolly/viz)
 
 ## What You Create For A New Story
 
 For a new page at `/ai-explainer` you typically add **two** files:
 - `src/pages/ai-explainer.astro` (the route)
-- `src/data/scrolly/ai-explainer.ts` (the story content + section definitions)
+- `src/content/ai-explainer.ts` (the story content + section definitions)
 
 You only add new visualization code if you need a visualization type that does not exist yet.
 
@@ -41,8 +41,8 @@ In short, it is a “thin shell” around shared building blocks.
 
 ### 2) Create the page-data file
 
-Create `src/data/scrolly/ai-explainer.ts` using the same shape as:
-- [src/data/scrolly/scrolly-example.ts](../src/data/scrolly/scrolly-example.ts)
+Create `src/content/ai-explainer.ts` using the same shape as:
+- [src/content/scrolly-example.ts](../src/content/scrolly-example.ts)
 
 The data file is the single source of truth for:
 - `metadata`: title/description/brand/home link
@@ -91,7 +91,7 @@ Data flow:
 - The runtime reads that JSON and passes it into the viz renderer.
 
 Reference implementation:
-- Page data: [src/data/scrolly/scrolly-example.ts](../src/data/scrolly/scrolly-example.ts)
+- Page data: [src/content/scrolly-example.ts](../src/content/scrolly-example.ts)
 - Layout embed: [src/components/scrolly/ScrollyTemplate.astro](../src/components/scrolly/ScrollyTemplate.astro)
 - Runtime pass-through: [src/scripts/scrolly/scrolly-runtime.ts](../src/scripts/scrolly/scrolly-runtime.ts)
 
@@ -122,7 +122,7 @@ If you introduce a new viz key and need id-based styling, extend that mapping.
 
 Recommended locations:
 - Routes: `src/pages/*.astro`
-- Scrolly page data: `src/data/scrolly/*.ts`
+- Scrolly page data: `src/content/*.ts`
 - Shared layout: `src/components/scrolly/ScrollyTemplate.astro`
 - Shared runtime: `src/scripts/scrolly/scrolly-runtime.ts`
 - Shared viz types: `src/scripts/scrolly/viz/*.ts`

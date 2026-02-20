@@ -441,12 +441,13 @@
 
         async function loadData() {
             try {
-                const response = await fetch('/bibliometric_analysis_results.json');
+                const response = await fetch('/components/goodnews-bibliometrics/bibliometric_analysis_results.json');
+                if (!response.ok) throw new Error(`HTTP ${response.status}`);
                 data = await response.json();
                 renderDashboard();
             } catch (error) {
                 console.error('Error loading data:', error);
-                document.getElementById('statsGrid').innerHTML = '<div class="loading" style="color: #f43f5e;">Error loading data. Make sure bibliometric_analysis_results.json is in the same directory.</div>';
+                document.getElementById('statsGrid').innerHTML = '<div class="loading" style="color: #f43f5e;">Error loading data. Make sure bibliometric_analysis_results.json exists at /components/goodnews-bibliometrics/.</div>';
             }
         }
 

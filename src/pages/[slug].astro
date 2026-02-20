@@ -62,7 +62,7 @@ export async function getStaticPaths() {
   });
 
   const htmlSubfolderRoutes = Object.entries(htmlSubfolderGlob).map(([path, content]) => {
-    // path looks like: ../featured/media-election-2019/index.html
+    // path looks like: ../components/media-election-2019/index.html
     const parts = path.split("/");
     const folderName = parts[parts.length - 2]; // e.g. "media-election-2019"
     return {

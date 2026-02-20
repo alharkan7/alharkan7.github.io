@@ -1,6 +1,6 @@
 ---
 import ScrollyTemplate from "../components/scrolly/ScrollyTemplate.astro";
-import page from "../data/scrolly/scrolly-example";
+import page from "../content/scrolly-example";
 ---
 
 <!DOCTYPE html>
@@ -17,7 +17,7 @@ import page from "../data/scrolly/scrolly-example";
       rel="stylesheet"
     />
     <script is:inline src="https://d3js.org/d3.v7.min.js"></script>
-    <link rel="stylesheet" href="/featured/media-election-2019/style.css" />
+    <link rel="stylesheet" href="/components/scrolly-example/style.css" />
   </head>
   <body>
     <ScrollyTemplate page={page} />
