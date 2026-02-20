@@ -81,7 +81,7 @@ async function initViz(panelEl: HTMLElement) {
   if (vizKey === "bubbles" && mount.svg) return render({ mountEl: mount.svg, props });
   if (vizKey === "sem" && mount.svg) return render({ mountEl: mount.svg, props });
   if (vizKey === "scatter" && mount.svg) return render({ mountEl: mount.svg, panelEl, props });
-  if (vizKey === "matrix" && mount.div) return render({ mountEl: mount.div, props });
+  if (vizKey === "matrix" && mount.svg) return render({ mountEl: mount.svg, props });
   if (vizKey === "bars" && mount.svg) return render({ mountEl: mount.svg, props });
   if (vizKey === "map" && mount.div) return render({ mountEl: mount.div, props });
 }
