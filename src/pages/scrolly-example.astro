@@ -1,0 +1,27 @@
+---
+import ScrollyTemplate from "../components/scrolly/ScrollyTemplate.astro";
+import page from "../data/scrolly/scrolly-example";
+import runtimeUrl from "../scripts/scrolly/scrolly-entry.ts?url";
+---
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{page.metadata.title}</title>
+    <meta name="description" content={page.metadata.description} />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,600;0,700;1,400&family=Inter:wght@300;400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <link rel="stylesheet" href="/featured/media-election-2019/style.css" />
+  </head>
+  <body>
+    <ScrollyTemplate page={page} />
+    <script type="module" src={runtimeUrl}></script>
+  </body>
+</html>

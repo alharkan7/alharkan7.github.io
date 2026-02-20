@@ -1,0 +1,180 @@
+---
+type VizMountKind = "svg" | "div";
+
+type ScrollyViz = {
+  key: string;
+  title: string;
+  captionHtml?: string;
+  mount: VizMountKind;
+  legend?: boolean;
+  props?: unknown;
+};
+
+type ScrollySection = {
+  id: string;
+  navLabel: string;
+  mobileLabel: string;
+  contentHtml: string;
+  viz: ScrollyViz;
+};
+
+type ScrollyPage = {
+  metadata: {
+    title: string;
+    description: string;
+    brand: string;
+    homeNavUrl: string;
+  };
+  hero: {
+    label: string;
+    titleHtml: string;
+    subtitleHtml: string;
+    authorsHtml: string;
+    teaserHtml: string;
+    ctaHref: string;
+    stats: Array<{ target: number; unit?: string; label: string }>;
+  };
+  sections: ScrollySection[];
+  footerHtml: string;
+};
+
+const { page } = Astro.props as { page: ScrollyPage };
+
+const vizMountId = (key: string): string | undefined => {
+  const map: Record<string, string> = {
+    timeline: "chart-timeline",
+    bubbles: "chart-bubbles",
+    sem: "chart-sem",
+    scatter: "chart-scatter",
+    matrix: "chart-matrix",
+    bars: "chart-bars",
+    map: "chart-map",
+  };
+  return map[key];
+};
+
+const vizLegendId = (key: string): string | undefined => {
+  const map: Record<string, string> = { timeline: "legend-timeline" };
+  return map[key];
+};
+
+const safeJson = (v: unknown) => JSON.stringify(v ?? null).replaceAll("</script>", "<\\/script>");
+---
+
+<div id="progress-bar"></div>
+
+<nav id="main-nav">
+  <div class="nav-inner">
+    <div class="nav-brand-group">
+      <a href={page.metadata.homeNavUrl} class="nav-home-icon" aria-label="Back to Data">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+          <polyline points="9 22 9 12 15 12 15 22"></polyline>
+        </svg>
+      </a>
+      <span class="nav-logo">{page.metadata.brand}</span>
+    </div>
+    <div class="nav-sections">
+      {page.sections.map((s) => (
+        <a href={`#section-${s.id}`} class="nav-dot" data-label={s.navLabel}></a>
+      ))}
+    </div>
+  </div>
+</nav>
+
+<section id="hero">
+  <div class="hero-bg">
+    <div class="hero-pattern"></div>
+    <div class="hero-overlay"></div>
+  </div>
+  <div class="hero-content">
+    <div class="hero-label">{page.hero.label}</div>
+    <h1 class="hero-title">
+      <Fragment set:html={page.hero.titleHtml} />
+    </h1>
+    <p class="hero-sub">
+      <Fragment set:html={page.hero.subtitleHtml} />
+    </p>
+    <p class="hero-authors">
+      <Fragment set:html={page.hero.authorsHtml} />
+    </p>
+    <p class="hero-teaser">
+      <Fragment set:html={page.hero.teaserHtml} />
+    </p>
+    <a href={page.hero.ctaHref} class="hero-cta">
+      <svg viewBox="0 0 24 24" width="20" height="20">
+        <path d="M12 4v16m0 0l-6-6m6 6l6-6" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" />
+      </svg>
+    </a>
+  </div>
+  <div class="hero-stats">
+    {page.hero.stats.map((stat) => (
+      <div class="hero-stat">
+        <span class="stat-num" data-target={stat.target}>0</span>
+        <span class="stat-unit">{stat.unit || ""}</span>
+        <div class="stat-label">{stat.label}</div>
+      </div>
+    ))}
+  </div>
+</section>
+
+<div id="sidecar-wrapper">
+  <div id="text-column">
+    {page.sections.map((s) => (
+      <div class="scroll-section" id={`section-${s.id}`} data-viz-id={`viz-${s.id}`}>
+        <Fragment set:html={s.contentHtml} />
+      </div>
+    ))}
+  </div>
+
+  <div id="viz-column">
+    <div id="viz-sticky" data-storage-key={`scrolly-${page.metadata.brand.toLowerCase().replaceAll(" ", "-")}-viz-h`}>
+      <div id="mobile-viz-topbar">
+        <div id="mobile-tab-bar">
+          <a href={page.metadata.homeNavUrl} class="mob-tab mob-home-icon" aria-label="Back to Data">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+              <polyline points="9 22 9 12 15 12 15 22"></polyline>
+            </svg>
+          </a>
+          {page.sections.map((s, i) => (
+            <button class={`mob-tab${i === 0 ? " active" : ""}`} data-viz={`viz-${s.id}`}>{s.mobileLabel}</button>
+          ))}
+        </div>
+        <button id="viz-toggle" aria-label="Toggle visualization">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="18 15 12 9 6 15"></polyline>
+          </svg>
+        </button>
+      </div>
+
+      <div id="viz-panels-container">
+        {page.sections.map((s, i) => (
+          <div class={`viz-panel${i === 0 ? " active" : ""}`} id={`viz-${s.id}`} data-viz-key={s.viz.key}>
+            <div class="viz-title">{s.viz.title}</div>
+            {s.viz.mount === "svg" ? (
+              <svg data-viz-mount="svg" id={vizMountId(s.viz.key)}></svg>
+            ) : (
+              <div data-viz-mount="div" id={vizMountId(s.viz.key)}></div>
+            )}
+            <script type="application/json" data-viz-props set:html={safeJson(s.viz.props)}></script>
+            {s.viz.legend ? <div class="viz-legend" data-viz-legend id={vizLegendId(s.viz.key)}></div> : null}
+            {s.viz.captionHtml ? (
+              <div class="viz-caption">
+                <Fragment set:html={s.viz.captionHtml} />
+              </div>
+            ) : null}
+          </div>
+        ))}
+      </div>
+
+      <div id="viz-resize-handle" aria-label="Drag to resize visualization">
+        <div class="viz-resize-pill"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<footer id="main-footer">
+  <Fragment set:html={page.footerHtml} />
+</footer>
