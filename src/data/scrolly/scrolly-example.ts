@@ -254,7 +254,7 @@ const page = {
         title: "Media–Party Significance Matrix",
         captionHtml:
           "Highlighted cells indicate statistically significant relationships (p &lt; 0.05). Each media platform triggers support for different parties.",
-        mount: "div",
+        mount: "svg",
         props: {
           parties: ["PDIP", "Gerindra", "PKS", "Nasdem", "PKB", "Demokrat", "Golkar"],
           media: ["TV", "Radio", "Newspaper", "Internet", "Google"],
