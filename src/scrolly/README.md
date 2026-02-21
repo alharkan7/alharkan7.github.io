@@ -106,7 +106,7 @@ In your `sections[]`, set `viz.key` to one of the built-in keys currently suppor
 - `timeline`, `bubbles`, `sem`, `scatter`, `matrix`, `bars`, `map`
 
 Those keys correspond to modules under:
-- `src/scripts/scrolly/viz/*.ts`
+- `src/scrolly/viz/*.ts`
 
 ## Viz Data: `viz.props`
 
@@ -124,7 +124,7 @@ This makes it easy to reuse the same viz module (“template”) with different 
 If you need a brand-new visualization type (example: `sankey`):
 
 1) Create a new module:
-- `src/scripts/scrolly/viz/sankey.ts`
+- `src/scrolly/viz/sankey.ts`
 
 2) Register it in the runtime loader map:
 - Edit [scrolly-runtime.ts](./scrolly-runtime.ts) and add:
@@ -185,7 +185,7 @@ The runtime is not running. Check:
 
 Check:
 - The section’s `viz.key` matches a loader entry in `scrolly-runtime.ts`
-- The viz module exists in `src/scripts/scrolly/viz/`
+- The viz module exists in `src/scrolly/viz/`
 - The section provides the expected `viz.props` shape for that viz
 - Any required global libraries are loaded (example: D3 script tag)
 

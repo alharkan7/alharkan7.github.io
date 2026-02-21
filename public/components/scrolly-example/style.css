@@ -226,11 +226,11 @@ body {
 .hero-pattern {
   position: absolute;
   inset: 0;
-  opacity: 0.8;
+  opacity: 1;
   background-image:
-    linear-gradient(rgba(77, 225, 255, 0.12) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255, 77, 157, 0.10) 1px, transparent 1px);
-  background-size: 40px 40px;
+    linear-gradient(rgba(77, 225, 255, 0.22) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 77, 157, 0.18) 1px, transparent 1px);
+  background-size: 34px 34px;
   background-position: center top;
 }
 
@@ -239,7 +239,8 @@ body {
   inset: 0;
   background: radial-gradient(circle at center,
       transparent 0%,
-      var(--paper) 92%);
+      color-mix(in srgb, var(--paper) 72%, transparent) 70%,
+      var(--paper) 100%);
 }
 
 .hero-content {
@@ -886,13 +887,14 @@ body {
   text-decoration: none;
   text-align: center;
   transition: all var(--transition-fast);
-  background: var(--accent-blue);
-  color: white;
-  border: 1.5px solid transparent;
+  background: color-mix(in srgb, var(--accent-blue) 18%, transparent);
+  color: var(--ink);
+  border: 1px solid color-mix(in srgb, var(--accent-blue) 28%, transparent);
 }
 
 .footer-btn:hover {
-  background: #1F618D;
+  background: color-mix(in srgb, var(--accent-blue) 24%, transparent);
+  border-color: color-mix(in srgb, var(--accent-blue) 40%, transparent);
   transform: translateY(-1px);
 }
 

@@ -9,6 +9,14 @@ export default function renderSEM({ mountEl, props }: SemArgs) {
 
   mountEl.replaceChildren();
 
+  const rootStyles = getComputedStyle(document.documentElement);
+  const paper = rootStyles.getPropertyValue("--paper").trim() || "#070A12";
+  const ink = rootStyles.getPropertyValue("--ink").trim() || "#F3F6FF";
+  const inkMuted = rootStyles.getPropertyValue("--ink-muted").trim() || "#7E8AB8";
+  const scholarlyBlue = rootStyles.getPropertyValue("--scholarly-blue").trim() || "#DDE6FF";
+  const accentBlue = rootStyles.getPropertyValue("--accent-blue").trim() || "#4DE1FF";
+  const politicalRed = rootStyles.getPropertyValue("--political-red").trim() || "#FF4D9D";
+
   const W = 600;
   const H = 400;
   const svg = d3.select(mountEl).attr("viewBox", `0 0 ${W} ${H}`);
@@ -26,7 +34,7 @@ export default function renderSEM({ mountEl, props }: SemArgs) {
       .attr("orient", "auto")
       .append("path")
       .attr("d", "M0,-5L10,0L0,5")
-      .attr("fill", t === "sig" ? "#C0392B" : "#AAA");
+      .attr("fill", t === "sig" ? politicalRed : inkMuted);
   });
 
   const fallbackNodes = [
@@ -71,7 +79,7 @@ export default function renderSEM({ mountEl, props }: SemArgs) {
       .append("path")
       .attr("d", `M${x1},${y1} C${mx},${y1} ${mx},${y2} ${x2},${y2}`)
       .attr("fill", "none")
-      .attr("stroke", p.sig ? "#C0392B" : "#CCC")
+      .attr("stroke", p.sig ? politicalRed : "rgba(255,255,255,0.18)")
       .attr("stroke-width", p.sig ? 2.5 : 1.5)
       .attr("stroke-dasharray", p.sig ? "none" : "5,4")
       .attr("marker-end", `url(#arrow-${p.sig ? "sig" : "insig"})`)
@@ -101,11 +109,11 @@ export default function renderSEM({ mountEl, props }: SemArgs) {
       .attr("y", (y1 + y2) / 2 - 5)
       .attr("text-anchor", "middle")
       .style("paint-order", "stroke")
-      .style("stroke", "#F9F8F5")
+      .style("stroke", paper)
       .style("stroke-width", "3px")
       .style("stroke-linecap", "butt")
       .style("stroke-linejoin", "miter")
-      .attr("fill", p.sig ? "#C0392B" : "#AAA")
+      .attr("fill", p.sig ? politicalRed : inkMuted)
       .style("font-family", "Inter,sans-serif")
       .style("font-size", "9.5px")
       .style("font-weight", p.sig ? "700" : "400")
@@ -141,14 +149,14 @@ export default function renderSEM({ mountEl, props }: SemArgs) {
       .text((d: string) => d);
   });
 
-  svg.append("circle").attr("cx", 20).attr("cy", H - 20).attr("r", 5).attr("fill", "#C0392B");
+  svg.append("circle").attr("cx", 20).attr("cy", H - 20).attr("r", 5).attr("fill", politicalRed);
   svg
     .append("text")
     .attr("x", 30)
     .attr("y", H - 16)
     .style("font-size", "10px")
     .style("font-family", "Inter,sans-serif")
-    .attr("fill", "#666")
+    .attr("fill", scholarlyBlue)
     .text(legend.sigLabel);
   svg
     .append("line")
@@ -156,7 +164,7 @@ export default function renderSEM({ mountEl, props }: SemArgs) {
     .attr("x2", 170)
     .attr("y1", H - 20)
     .attr("y2", H - 20)
-    .attr("stroke", "#CCC")
+    .attr("stroke", "rgba(255,255,255,0.18)")
     .attr("stroke-dasharray", "4,3")
     .attr("stroke-width", 1.5);
   svg
@@ -165,6 +173,6 @@ export default function renderSEM({ mountEl, props }: SemArgs) {
     .attr("y", H - 16)
     .style("font-size", "10px")
     .style("font-family", "Inter,sans-serif")
-    .attr("fill", "#AAA")
+    .attr("fill", inkMuted)
     .text(legend.insigLabel);
 }

@@ -300,7 +300,7 @@ const page = {
             { party: "PKB", media: 28.3, combined: 72.7 },
             { party: "Demokrat", media: 21.4, combined: 34.7 },
           ],
-          colors: { media: "#2C3E50", combined: "#C0392B" },
+          colors: { media: "var(--accent-blue)", combined: "var(--political-red)" },
           highlight: { party: "PDIP", key: "combined", value: 83.9 },
         },
       },

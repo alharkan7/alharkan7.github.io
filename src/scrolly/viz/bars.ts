@@ -9,6 +9,11 @@ export default function renderBars({ mountEl, props }: BarsArgs) {
 
   mountEl.replaceChildren();
 
+  const rootStyles = getComputedStyle(document.documentElement);
+  const inkMuted = rootStyles.getPropertyValue("--ink-muted").trim() || "#7E8AB8";
+  const accentBlue = rootStyles.getPropertyValue("--accent-blue").trim() || "#4DE1FF";
+  const politicalRed = rootStyles.getPropertyValue("--political-red").trim() || "#FF4D9D";
+
   const W = 600;
   const H = 400;
   const M = { top: 20, right: 30, bottom: 80, left: 60 };
@@ -39,7 +44,7 @@ export default function renderBars({ mountEl, props }: BarsArgs) {
   svg.append("g").attr("class", "axis").attr("transform", `translate(0,${iH})`).call(d3.axisBottom(x0));
   svg.append("g").attr("class", "axis").call(d3.axisLeft(y).ticks(5).tickFormat((d: number) => d + "%"));
 
-  const colors: Record<string, string> = (props?.colors || { media: "#2C3E50", combined: "#C0392B" }) as Record<string, string>;
+  const colors: Record<string, string> = (props?.colors || { media: accentBlue, combined: politicalRed }) as Record<string, string>;
   const highlight = props?.highlight as { party: string; key: string; value: number } | undefined;
 
   data.forEach((d: any, di: number) => {
@@ -113,7 +118,7 @@ export default function renderBars({ mountEl, props }: BarsArgs) {
       .attr("y", 9)
       .style("font-size", "10px")
       .style("font-family", "Inter,sans-serif")
-      .attr("fill", "#666")
+      .attr("fill", inkMuted)
       .text(label);
   });
 }

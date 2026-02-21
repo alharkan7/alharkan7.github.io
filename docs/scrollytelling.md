@@ -10,10 +10,10 @@ The reference implementation is:
 - Live example: https://raihankalla.id/scrolly-example
 - Route: [src/pages/scrolly-example.astro](../src/pages/scrolly-example.astro)
 - Layout: [src/components/scrolly/ScrollyTemplate.astro](../src/components/scrolly/ScrollyTemplate.astro)
-- Runtime entry: [src/scripts/scrolly/scrolly-entry.ts](../src/scripts/scrolly/scrolly-entry.ts)
-- Runtime logic: [src/scripts/scrolly/scrolly-runtime.ts](../src/scripts/scrolly/scrolly-runtime.ts)
+- Runtime entry: [src/scrolly/scrolly-entry.ts](../src/scrolly/scrolly-entry.ts)
+- Runtime logic: [src/scrolly/scrolly-runtime.ts](../src/scrolly/scrolly-runtime.ts)
 - Page data: [src/content/scrolly-example.ts](../src/content/scrolly-example.ts)
-- Viz modules: [src/scripts/scrolly/viz](../src/scripts/scrolly/viz)
+- Viz modules: [src/scrolly/viz](../src/scrolly/viz)
 
 ## What You Create For A New Story
 
@@ -71,7 +71,7 @@ This is important because URL hashes use the `section-*` ids:
 Each section’s `viz.key` chooses which viz renderer module to load.
 
 Currently supported keys are defined by the runtime loader map in:
-- [src/scripts/scrolly/scrolly-runtime.ts](../src/scripts/scrolly/scrolly-runtime.ts)
+- [src/scrolly/scrolly-runtime.ts](../src/scrolly/scrolly-runtime.ts)
 
 Examples (from the election demo):
 - `timeline`, `bubbles`, `sem`, `scatter`, `matrix`, `bars`, `map`
@@ -93,17 +93,17 @@ Data flow:
 Reference implementation:
 - Page data: [src/content/scrolly-example.ts](../src/content/scrolly-example.ts)
 - Layout embed: [src/components/scrolly/ScrollyTemplate.astro](../src/components/scrolly/ScrollyTemplate.astro)
-- Runtime pass-through: [src/scripts/scrolly/scrolly-runtime.ts](../src/scripts/scrolly/scrolly-runtime.ts)
+- Runtime pass-through: [src/scrolly/scrolly-runtime.ts](../src/scrolly/scrolly-runtime.ts)
 
 ### 5) Add a new viz type (only when needed)
 
 If you need a brand new viz type (say `sankey`):
 
 1) Add a new module:
-- `src/scripts/scrolly/viz/sankey.ts`
+- `src/scrolly/viz/sankey.ts`
 
 2) Register it in the loader map:
-- Edit [src/scripts/scrolly/scrolly-runtime.ts](../src/scripts/scrolly/scrolly-runtime.ts) to add a loader entry:
+- Edit [src/scrolly/scrolly-runtime.ts](../src/scrolly/scrolly-runtime.ts) to add a loader entry:
   - `sankey: () => import("./viz/sankey")`
 
 3) Use it in page data:
@@ -124,15 +124,15 @@ Recommended locations:
 - Routes: `src/pages/*.astro`
 - Scrolly page data: `src/content/*.ts`
 - Shared layout: `src/components/scrolly/ScrollyTemplate.astro`
-- Shared runtime: `src/scripts/scrolly/scrolly-runtime.ts`
-- Shared viz types: `src/scripts/scrolly/viz/*.ts`
+- Shared runtime: `src/scrolly/scrolly-runtime.ts`
+- Shared viz types: `src/scrolly/viz/*.ts`
 
 If you want a viz that’s truly page-specific and not reusable, you can still put it in a page-namespaced folder, but then you’ll also need to change the runtime loader to point to that path. The current setup optimizes for reuse across multiple stories.
 
 ## Common Pitfalls
 
 - **The runtime doesn’t run:** make sure the route includes the module script:
-  - `src="/src/scripts/scrolly/scrolly-entry.ts"` (dev) or the equivalent built asset in production
+  - `src="/src/scrolly/scrolly-entry.ts"` (dev) or the equivalent built asset in production
 - **Hash anchors don’t work on hard reload:** sections must use ids like `section-...`, and the runtime preserves the initial hash before scroll tracking updates it.
 - **A viz is blank:** confirm:
   - The section uses the right `viz.key`

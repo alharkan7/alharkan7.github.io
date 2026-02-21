@@ -7,6 +7,11 @@ export default function renderMap({ mountEl, props }: MapArgs) {
   const d3 = (globalThis as any).d3;
   if (!d3) return;
 
+  const rootStyles = getComputedStyle(document.documentElement);
+  const paperDark = rootStyles.getPropertyValue("--paper-dark").trim() || "#0E1428";
+  const ink = rootStyles.getPropertyValue("--ink").trim() || "#F3F6FF";
+  const inkMuted = rootStyles.getPropertyValue("--ink-muted").trim() || "#7E8AB8";
+
   const fallbackProvinces = [
     "Aceh",
     "Sumut",
@@ -81,12 +86,12 @@ export default function renderMap({ mountEl, props }: MapArgs) {
     "bottom:0",
     "font-family:Inter,sans-serif",
     "font-size:11px",
-    "color:#2c3e50",
+    `color:${inkMuted}`,
     "text-align:right",
     "line-height:1.5",
     "padding:5px 8px",
     "border-radius:8px",
-    "background:color-mix(in srgb, #f0ede7 70%, transparent)",
+    `background:color-mix(in srgb, ${paperDark} 70%, transparent)`,
     "backdrop-filter:blur(4px)",
     "-webkit-backdrop-filter:blur(4px)",
   ].join(";");
