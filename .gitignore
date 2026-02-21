@@ -23,3 +23,9 @@ pnpm-debug.log*
 # YouTube API credentials
 client_secrets.json
 token.pickle
+
+# IDE
+.vscode/
+
+# Deno (unused - project uses pnpm)
+deno.lock
