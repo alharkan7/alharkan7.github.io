@@ -175,14 +175,17 @@ function setupTabs() {
             const timelineControls = document.getElementById('timeline-controls');
             const filterControls = document.getElementById('filter-controls');
             const playBtn = document.getElementById('play-year-btn');
+            const mobileToggles = document.getElementById('mobile-toggles');
             
             if (state.activeTab === 'main-view') {
                 timelineControls.classList.remove('hidden');
                 filterControls.classList.add('hidden');
+                if (mobileToggles) mobileToggles.classList.remove('hidden');
                 // playBtn visibility is handled by renderMainChart
             } else {
                 timelineControls.classList.add('hidden');
                 filterControls.classList.remove('hidden');
+                if (mobileToggles) mobileToggles.classList.add('hidden');
                 if (playBtn) playBtn.style.display = 'none';
             }
             
