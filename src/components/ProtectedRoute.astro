@@ -1,4 +1,6 @@
+---
 import LoadingScreen from './LoadingScreen.astro';
+---
 
 <div id="protected-route-container">
   <div class="fixed inset-0 flex items-center justify-center bg-white">
@@ -17,7 +19,7 @@ import LoadingScreen from './LoadingScreen.astro';
   document.addEventListener('DOMContentLoaded', async () => {
     try {
       const authenticated = await isAuthenticated();
-      
+
       if (!authenticated) {
         // Redirect to login page if not authenticated
         window.location.href = '/login';
@@ -41,4 +43,4 @@ import LoadingScreen from './LoadingScreen.astro';
     0% { transform: rotate(0deg); }
     100% { transform: rotate(360deg); }
   }
-</style> 
+</style>
