@@ -1,7 +1,5 @@
 ---
 import BaseLayout from "../layouts/BaseLayout.astro";
-
-let error = "";
 ---
 
 <BaseLayout
@@ -11,55 +9,48 @@ let error = "";
 >
   <div class="container">
     <div class="min-h-[80vh] flex flex-col items-center justify-center">
-      <div class="w-full max-w-md bg-white p-8 rounded-lg shadow-lg">
-        <h1 class="login-title">Login</h1>
-
-        {error && <p class="error-message">{error}</p>}
+      <div class="login-card">
+        <h1 class="login-title">Welcome back</h1>
+        <p class="login-subtitle">Sign in to access protected content</p>
 
         <form id="login-form" class="login-form">
           <div class="input-group">
+            <label for="username" class="input-label">Email</label>
             <input
               type="email"
               id="username"
               name="username"
-              placeholder="Email"
+              placeholder="you@example.com"
               required
               class="login-input"
+              autocomplete="email"
             />
+            <label for="password" class="input-label">Password</label>
             <input
               type="password"
               id="password"
               name="password"
-              placeholder="Password"
+              placeholder="••••••••"
               required
               class="login-input"
+              autocomplete="current-password"
             />
           </div>
 
-          <button type="submit" class="login-button"> Sign in </button>
+          <div id="error-container"></div>
+
+          <button type="submit" class="login-button" id="submit-btn">
+            <span class="btn-text">Sign in</span>
+            <span class="btn-spinner">
+              <svg class="spinner" width="20" height="20" viewBox="0 0 24 24">
+                <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" fill="none" opacity="0.25"/>
+                <path d="M12 2A10 10 0 0 1 22 12" stroke="currentColor" stroke-width="4" fill="none">
+                  <animateTransform attributeName="transform" type="rotate" from="0 12 12" to="360 12 12" dur="1s" repeatCount="indefinite"/>
+                </path>
+              </svg>
+            </span>
+          </button>
         </form>
-        <!-- <div class="divider">or</div>
-        <button id="google-login" class="google-login-button">
-          <svg class="google-icon" width="18" height="18" viewBox="0 0 18 18">
-            <path
-              fill="#4285F4"
-              d="M17.64 9.205c0-.639-.057-1.252-.164-1.841H9v3.481h4.844a4.14 4.14 0 0 1-1.796 2.716v2.259h2.908c1.702-1.567 2.684-3.875 2.684-6.615z"
-            ></path>
-            <path
-              fill="#34A853"
-              d="M9 18c2.43 0 4.467-.806 5.956-2.18l-2.908-2.259c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332A8.997 8.997 0 0 0 9 18z"
-            ></path>
-            <path
-              fill="#FBBC05"
-              d="M3.964 10.71A5.41 5.41 0 0 1 3.682 9c0-.593.102-1.17.282-1.71V4.958H.957A8.996 8.996 0 0 0 0 9c0 1.452.348 2.827.957 4.042l3.007-2.332z"
-            ></path>
-            <path
-              fill="#EA4335"
-              d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0A8.997 8.997 0 0 0 .957 4.958L3.964 7.29C4.672 5.163 6.656 3.58 9 3.58z"
-            ></path>
-          </svg>
-          Sign in with Google
-        </button> -->
       </div>
     </div>
   </div>
@@ -76,188 +67,274 @@ let error = "";
     }
   });
 
-  // Handle email/password login
+  // User-friendly error messages
+  const errorMessages = {
+    'auth/invalid-credential': 'Invalid email or password. Please try again.',
+    'auth/invalid-email': 'Please enter a valid email address.',
+    'auth/user-not-found': 'No account found with this email.',
+    'auth/wrong-password': 'Incorrect password. Please try again.',
+    'auth/email-already-in-use': 'An account with this email already exists.',
+    'auth/weak-password': 'Password should be at least 6 characters.',
+    'auth/too-many-requests': 'Too many failed attempts. Please try again later.',
+    'auth/user-disabled': 'This account has been disabled.',
+    'auth/operation-not-allowed': 'Email/password login is not enabled.',
+    'auth/network-request-failed': 'Network error. Please check your connection.',
+    'auth/internal-error': 'An internal error occurred. Please try again.',
+    'auth/invalid-api-key': 'Server configuration error. Please contact support.',
+    'auth/unauthenticated-domain': 'This domain is not authorized for login.',
+  };
+
+  const getErrorMessage = (error) => {
+    if (error.code && errorMessages[error.code]) {
+      return errorMessages[error.code];
+    }
+    if (error.message) {
+      const message = error.message.toLowerCase();
+      if (message.includes('network') || message.includes('fetch')) {
+        return 'Network error. Please check your connection.';
+      }
+      if (message.includes('timeout')) {
+        return 'Request timed out. Please try again.';
+      }
+    }
+    return 'Something went wrong. Please try again.';
+  };
+
+  const showError = (message) => {
+    const container = document.getElementById('error-container');
+    if (!container) return;
+
+    container.innerHTML = `<div class="error-message shake">${message}</div>`;
+
+    // Remove shake animation after it plays
+    setTimeout(() => {
+      const errorEl = container.querySelector('.error-message');
+      errorEl?.classList.remove('shake');
+    }, 500);
+  };
+
+  const clearError = () => {
+    const container = document.getElementById('error-container');
+    if (container) container.innerHTML = '';
+  };
+
+  const setLoading = (loading) => {
+    const btn = document.getElementById('submit-btn');
+    const btnText = btn?.querySelector('.btn-text');
+    const btnSpinner = btn?.querySelector('.btn-spinner');
+    const emailInput = document.getElementById('username');
+    const passwordInput = document.getElementById('password');
+
+    if (btn && btnText && btnSpinner) {
+      btn.disabled = loading;
+      if (loading) {
+        btnText.style.display = 'none';
+        btnSpinner.style.display = 'inline';
+        emailInput?.setAttribute('disabled', 'true');
+        passwordInput?.setAttribute('disabled', 'true');
+      } else {
+        btnText.style.display = 'inline';
+        btnSpinner.style.display = 'none';
+        emailInput?.removeAttribute('disabled');
+        passwordInput?.removeAttribute('disabled');
+      }
+    }
+  };
+
+  // Clear error when user starts typing
+  document.getElementById('username')?.addEventListener('input', clearError);
+  document.getElementById('password')?.addEventListener('input', clearError);
+
+  // Handle login form submission
   const loginForm = document.getElementById("login-form");
   loginForm?.addEventListener("submit", async (e) => {
     e.preventDefault();
-    const email = (document.getElementById("username") as HTMLInputElement).value;
-    const password = (document.getElementById("password") as HTMLInputElement).value;
+    clearError();
+
+    const email = document.getElementById("username")?.value;
+    const password = document.getElementById("password")?.value;
+
+    // Basic validation
+    if (!email || !password) {
+      showError('Please fill in all fields.');
+      return;
+    }
+
+    setLoading(true);
 
     try {
       const result = await login(email, password);
-      
+
       if (!result.success) {
         throw result.error;
       }
 
+      // Successful login - redirect will happen
       window.location.href = "/uncategorized";
-    } catch (error: any) {
+    } catch (error) {
       console.error("Login error:", error);
-      let errorMessage = "Authentication failed";
+      showError(getErrorMessage(error));
 
-      // Handle Firebase Auth specific errors
-      if (error.code) {
-        switch (error.code) {
-          case 'auth/user-not-found':
-            errorMessage = "No account exists with this email. Please check your email or sign up.";
-            break;
-          case 'auth/wrong-password':
-            errorMessage = "Incorrect password. Please try again.";
-            break;
-          case 'auth/invalid-email':
-            errorMessage = "Invalid email format. Please enter a valid email address.";
-            break;
-          case 'auth/too-many-requests':
-            errorMessage = "Too many failed login attempts. Please try again later.";
-            break;
-          default:
-            errorMessage = error.message || "Authentication failed";
-        }
-      }
-      
-      // Remove any existing error messages
-      const existingError = document.querySelector(".error-message");
-      if (existingError) {
-        existingError.remove();
-      }
-
-      // Add new error message
-      const errorDiv = document.createElement("div");
-      errorDiv.className = "error-message";
-      errorDiv.textContent = errorMessage;
-      document.querySelector(".login-form")?.insertAdjacentElement("beforebegin", errorDiv);
+      // Shake animation on the form
+      const card = document.querySelector('.login-card');
+      card?.classList.add('shake');
+      setTimeout(() => card?.classList.remove('shake'), 500);
+    } finally {
+      setLoading(false);
     }
   });
 </script>
 
 <style>
-  /* Make styles more specific to override global styles */
-  .container .login-title {
-    @apply text-4xl font-bold mb-8 text-center text-gray-800;
+  /* Login card */
+  .login-card {
+    width: 100%;
+    max-width: 420px;
+    padding: 2.5rem;
+    background: var(--background-alt);
+    border-radius: 1rem;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  }
+
+  .login-title {
     font-family: var(--font-family-sans);
-    font-size: 2.5rem;
+    font-size: 2rem;
+    font-weight: 700;
+    text-align: center;
+    margin-bottom: 0.5rem;
+    color: var(--text-main);
+  }
+
+  .login-subtitle {
+    text-align: center;
+    color: var(--text-secondary);
+    margin-bottom: 2rem;
+    font-size: 0.95rem;
+  }
+
+  /* Error message */
+  #error-container {
+    width: 100%;
+  }
+
+  .error-message {
+    padding: 0.6rem 0.8rem;
+    margin-top: 1rem;
+    margin-bottom: 0.5rem;
+    background: rgba(239, 68, 68, 0.1);
+    border: 1px solid rgba(239, 68, 68, 0.3);
+    border-radius: 0.5rem;
+    color: #ef4444;
+    font-size: 0.85rem;
     text-align: center;
   }
 
-  .container .error-message {
-    @apply text-red-500 mb-6 text-center;
-    font-size: 1rem;
-    text-align: center;
+  /* Shake animation */
+  @keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    20%, 60% { transform: translateX(-4px); }
+    40%, 80% { transform: translateX(4px); }
   }
 
-  .container .login-form {
+  .shake {
+    animation: shake 0.4s ease-in-out;
+  }
+
+  /* Form */
+  .login-form {
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: center;
     width: 100%;
-    max-width: 400px;
-    margin: 0 auto;
-    padding: 20px;
-    background: #f9f9f9;
-    border-radius: 15px;
-    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
   }
 
-  .container .input-group {
+  .input-group {
     width: 100%;
     display: flex;
     flex-direction: column;
-    gap: 15px;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
   }
 
-  .container .login-input {
+  .input-label {
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--text-main);
+    margin-left: 0.5rem;
+  }
+
+  .login-input {
     width: 100%;
-    padding: 15px;
+    padding: 0.875rem 1rem;
     font-size: 1rem;
-    border: 1px solid #ccc;
-    border-radius: 25px;
+    border: 1px solid var(--text-secondary);
+    border-radius: 0.75rem;
     outline: none;
-    transition: border-color 0.3s ease;
-  }
-
-  .container .login-input:focus {
-    border-color: var(--primary-color);
-  }
-
-  .container .login-button {
-    width: 100%;
-    padding: 15px;
-    font-size: 1.2rem;
-    /* color: white; */
-    background: -va(--background-body);
-    border: 1px solid;
-    border-radius: 25px;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-    margin-top: 25px;
-  }
-
-  .container .login-button:hover {
-    background: var(--primary-color);
-  }
-
-  .container .login-button:active {
-    background: var(--primary-color);
-  }
-
-  .divider {
-    @apply my-6 text-center text-gray-500;
-    position: relative;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 100%;
-    max-width: 400px;
-    margin: 20px auto;
-  }
-
-  .divider::before,
-  .divider::after {
-    content: "";
-    position: absolute;
-    height: 1px;
-    background-color: #e5e7eb;
-    width: calc(50% - 20px);
-  }
-
-  .divider::before {
-    left: 0;
-  }
-
-  .divider::after {
-    right: 0;
-  }
-
-  .google-login-button {
-    width: 100%;
-    max-width: 400px;
-    padding: 15px;
-    font-size: 1.2rem;
     background: var(--background-body);
-    border: 1px solid;
-    border-radius: 25px;
+    color: var(--text-main);
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  }
+
+  .login-input:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(13, 148, 136, 0.1);
+  }
+
+  .login-input:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+
+  .login-input::placeholder {
+    color: var(--text-secondary);
+    opacity: 0.7;
+  }
+
+  /* Button */
+  .login-button {
+    position: relative;
+    width: 100%;
+    padding: 0.875rem 1rem;
+    font-size: 1rem;
+    font-weight: 600;
+    background: var(--primary-color);
+    color: white;
+    border: none;
+    border-radius: 0.75rem;
     cursor: pointer;
-    transition: background-color 0.3s ease;
-    margin: 0 auto;
+    transition: all 0.2s ease;
+    margin-top: 0.5rem;
+    font-family: var(--font-family-sans);
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 10px;
-    color: var(--text-primary);
+    gap: 0.5rem;
   }
 
-  .google-login-button:hover {
-    background: var(--primary-color);
+  .login-button:hover:not(:disabled) {
+    opacity: 0.9;
+    transform: translateY(-1px);
   }
 
-  .google-login-button:active {
-    background: var(--primary-color);
+  .login-button:active:not(:disabled) {
+    transform: translateY(0);
   }
 
-  .google-icon {
-    @apply flex-shrink-0;
-    width: 18px;
-    height: 18px;
+  .login-button:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+  }
+
+  .btn-spinner {
+    display: none;
+  }
+
+  .spinner {
+    animation: spin 1s linear infinite;
+  }
+
+  @keyframes spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
   }
 </style>

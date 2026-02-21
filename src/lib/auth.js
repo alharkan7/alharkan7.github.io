@@ -1,4 +1,5 @@
 import { auth } from './firebase';
+import { signInWithEmailAndPassword, signOut } from 'firebase/auth';
 
 /**
  * Handles user authentication and session management using client-side Firebase
@@ -28,15 +29,15 @@ export const getCurrentUser = () => {
 // Login with email/password
 export const login = async (email, password) => {
   try {
-    const result = await auth.signInWithEmailAndPassword(email, password);
-    
+    const result = await signInWithEmailAndPassword(auth, email, password);
+
     // Store auth info in localStorage for static site compatibility
     localStorage.setItem('authUser', JSON.stringify({
       uid: result.user.uid,
       email: result.user.email,
       lastLogin: new Date().toISOString()
     }));
-    
+
     return { success: true, user: result.user };
   } catch (error) {
     return { success: false, error };
@@ -46,7 +47,7 @@ export const login = async (email, password) => {
 // Logout
 export const logout = async () => {
   try {
-    await auth.signOut();
+    await signOut(auth);
     localStorage.removeItem('authUser');
     return { success: true };
   } catch (error) {

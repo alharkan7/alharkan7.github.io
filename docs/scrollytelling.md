@@ -9,7 +9,7 @@ This repo supports reusable “scrollytelling” pages built with Astro (Option 
 The reference implementation is:
 - Live example: https://raihankalla.id/scrolly-example
 - Route: [src/pages/scrolly-example.astro](../src/pages/scrolly-example.astro)
-- Layout: [src/components/scrolly/ScrollyTemplate.astro](../src/components/scrolly/ScrollyTemplate.astro)
+- Layout: [src/components/ScrollyTemplate.astro](../src/components/ScrollyTemplate.astro)
 - Runtime entry: [src/scrolly/scrolly-entry.ts](../src/scrolly/scrolly-entry.ts)
 - Runtime logic: [src/scrolly/scrolly-runtime.ts](../src/scrolly/scrolly-runtime.ts)
 - Page data: [src/content/scrolly-example.ts](../src/content/scrolly-example.ts)
@@ -92,7 +92,7 @@ Data flow:
 
 Reference implementation:
 - Page data: [src/content/scrolly-example.ts](../src/content/scrolly-example.ts)
-- Layout embed: [src/components/scrolly/ScrollyTemplate.astro](../src/components/scrolly/ScrollyTemplate.astro)
+- Layout embed: [src/components/ScrollyTemplate.astro](../src/components/ScrollyTemplate.astro)
 - Runtime pass-through: [src/scrolly/scrolly-runtime.ts](../src/scrolly/scrolly-runtime.ts)
 
 ### 5) Add a new viz type (only when needed)
@@ -114,7 +114,7 @@ If you need a brand new viz type (say `sankey`):
 
 Some of the original election CSS targets specific ids like `#chart-matrix` and `#chart-map`.
 The shared template assigns these ids automatically based on `viz.key`:
-- See the id mapping in [src/components/scrolly/ScrollyTemplate.astro](../src/components/scrolly/ScrollyTemplate.astro)
+- See the id mapping in [src/components/ScrollyTemplate.astro](../src/components/ScrollyTemplate.astro)
 
 If you introduce a new viz key and need id-based styling, extend that mapping.
 
@@ -123,7 +123,7 @@ If you introduce a new viz key and need id-based styling, extend that mapping.
 Recommended locations:
 - Routes: `src/pages/*.astro`
 - Scrolly page data: `src/content/*.ts`
-- Shared layout: `src/components/scrolly/ScrollyTemplate.astro`
+- Shared layout: `src/components/ScrollyTemplate.astro`
 - Shared runtime: `src/scrolly/scrolly-runtime.ts`
 - Shared viz types: `src/scrolly/viz/*.ts`
 

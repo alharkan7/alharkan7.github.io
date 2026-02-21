@@ -1,5 +1,6 @@
 ---
 import BaseLayout from "../../layouts/BaseLayout.astro";
+import ProtectedRoute from "../../components/ProtectedRoute.astro";
 
 const title = "Uncategorized";
 const description = "Uncategorized Posts by Al Harkan";
@@ -42,6 +43,8 @@ const paginatedPosts = sortedPosts.slice(0, postsPerPage);
   permalink={permalink ?? "/"}
   current="uncategorized"
 >
+  <ProtectedRoute />
+
   <div class="container">
     <h1>Uncategorized</h1>
     <hr />
