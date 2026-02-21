@@ -158,10 +158,10 @@ function processData(rawData) {
 }
 
 function setupTabs() {
-    const tabs = document.querySelectorAll('.tab-btn');
+    const tabs = document.querySelectorAll('button.tab-btn');
     tabs.forEach(tab => {
         tab.addEventListener('click', () => {
-            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            document.querySelectorAll('button.tab-btn').forEach(b => b.classList.remove('active'));
             document.querySelectorAll('.tab-pane').forEach(c => c.classList.remove('active'));
             
             tab.classList.add('active');

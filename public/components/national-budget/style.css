@@ -105,6 +105,18 @@ body {
     color: white;
 }
 
+.tab-home {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 6px 10px;
+    text-decoration: none;
+}
+
+.tab-home svg {
+    display: block;
+}
+
 /* Header Controls */
 .header-controls {
     display: flex;
@@ -536,6 +548,12 @@ body {
         white-space: nowrap; /* Prevent tab text wrap */
         width: 100%; /* Ensure width is respected in flex */
         min-width: 0; /* Allow shrinking below content size if needed */
+    }
+
+    .tab-home {
+        flex: 0 0 auto;
+        width: auto;
+        padding: 8px 12px;
     }
     
     .header-controls {
