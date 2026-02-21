@@ -24,6 +24,12 @@ export const featuredProjects = [
     coverImage: "https://ik.imagekit.io/raihankalla/research_section_cover/job-market-analysis.png",
   },
   {
+    title: "National Budget Progression",
+    subtitle: "",
+    url: "/national-budget",
+    coverImage: "https://ik.imagekit.io/raihankalla/research_section_cover/national-budget.png",
+  },
+  {
     title: "Economic Growth vs Envinromental Impact",
     subtitle: "",
     url: "/pdrb-iklh",
