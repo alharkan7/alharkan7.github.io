@@ -1,6 +1,6 @@
 ---
 import BaseLayout from "../layouts/BaseLayout.astro";
-// import bookmarksDataUntyped from "../../public/os-bookmarks/chrome_bookmarks.json" assert { type: "json" };
+// import bookmarksDataUntyped from "../../scripts/os-bookmarks/chrome_bookmarks.json" assert { type: "json" };
 import { createClient } from "@supabase/supabase-js";
 import fs from "fs";
 import path from "path";
@@ -353,7 +353,8 @@ async function getChromeBookmarksFromSupabase(): Promise<{
 }
 
 // Use ComponentBookmarkNode for type safety with the component
-const { roots: bookmarkRoots, lastUpdatedAt } = await getChromeBookmarksFromSupabase();
+const { roots: bookmarkRoots, lastUpdatedAt } =
+    await getChromeBookmarksFromSupabase();
 
 let lastUpdateDate = lastUpdatedAt || "Unknown";
 

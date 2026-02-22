@@ -25,7 +25,7 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install -r public/os-bookmarks/requirements.txt # Adjust path if needed
+          pip install -r scripts/os-bookmarks/requirements.txt # Adjust path if needed
 
       - name: Run script to fetch data
         env:
@@ -42,7 +42,7 @@ jobs:
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
           SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
           VERCEL_DEPLOY_HOOK_URL: ${{ secrets.VERCEL_DEPLOY_HOOK_URL }} # Add your Vercel deploy hook secret here
-        run: python public/os-bookmarks/get_liked_videos.py # Adjust path if needed
+        run: python scripts/os-bookmarks/get_liked_videos.py # Adjust path if needed
 
       # Data is stored in Supabase database, not in JSON files
       # The Python script handles Supabase updates and Vercel deployment trigger

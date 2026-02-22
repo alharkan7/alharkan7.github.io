@@ -7,12 +7,18 @@ This is the source code for [raihankalla.id](https://www.raihankalla.id), my per
 
 ```
 ├── public/
-│   └── assets/
+├── scripts/
 ├── src/
 │   ├── components/
 │   ├── content/
+│   ├── featured/
 │   ├── layouts/
-│   └── pages/
+│   ├── lib/
+│   ├── pages/
+│   ├── posts/
+│   ├── scrolly/
+│   ├── styles/
+│   └── utils/
 ├── astro.config.mjs
 ├── package.json
 └── tsconfig.json
@@ -21,19 +27,23 @@ This is the source code for [raihankalla.id](https://www.raihankalla.id), my per
 ## 🧞 Technologies Used
 
 - [Astro](https://astro.build)
+- [React](https://react.dev/) & [Svelte](https://svelte.dev/)
 - [TypeScript](https://www.typescriptlang.org/)
 - [Tailwind CSS](https://tailwindcss.com)
 - [MDX](https://mdxjs.com)
+- [Firebase Auth](https://firebase.google.com/docs/auth)
+- [Supabase](https://supabase.com/)
 
 ## ✨ Features
 
 - ⚡️ Fast performance with Astro's static site generation
-- 📝 Write posts in MDX format
-- 🎨 Tailwind CSS for styling
-- 🌙 Dark mode support
+- 📝 Write posts in Markdown/MDX format
+- 🎨 Tailwind CSS for styling with a clean, dark-mode ready design
+- 🧩 Multi-framework architecture (React, Svelte, Astro)
+- 🔒 Client-side authentication via Firebase
 - 📱 Responsive design
-- 🔍 SEO optimized
-- 📊 Analytics integration
+- 📜 Immersive scrollytelling experiences
+- 🔍 SEO optimized & Analytics integration (Vercel)
 - 🎯 TypeScript for type safety
 
 ## 🛠️ Development
@@ -73,7 +83,7 @@ This will generate a static site in the `dist/` directory.
 
 ## 📝 Writing Content
 
-Posts are written in MDX format and stored in `src/content/blog/`. Each post should include frontmatter with the following fields:
+Posts are written in MDX/Markdown format and stored in subdirectories under `src/posts/` (e.g., `blog/`, `misc/`, `uncategorized/`, etc.). Each post should include frontmatter with fields such as:
 
 ```yaml
 ---
