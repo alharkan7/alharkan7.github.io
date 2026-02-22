@@ -2,7 +2,7 @@
     --font-heading: 'Merriweather', serif;
     --font-body: 'Inter', sans-serif;
     --font-mono: 'Roboto Mono', monospace;
-    
+
     --color-bg: #F8F9FA;
     --color-surface: #FFFFFF;
     --color-text-primary: #1A202C;
@@ -28,14 +28,20 @@ body {
     margin: 0;
     padding: 0;
     height: 100vh;
-    overflow: hidden; /* Prevent body scroll */
+    height: 100dvh;
+    /* Fallback for browsers not supporting dvh */
+    overflow: hidden;
+    /* Prevent body scroll on desktop */
+    overflow-x: hidden;
 }
 
 .app-container {
     display: flex;
     flex-direction: column;
     height: 100vh;
-    width: 100vw;
+    height: 100dvh;
+    width: 100%;
+    max-width: 100vw;
 }
 
 /* --- Header --- */
@@ -48,7 +54,8 @@ body {
     align-items: center;
     padding: 0 20px;
     flex-shrink: 0;
-    position: relative; /* For absolute centering of nav */
+    position: relative;
+    /* For absolute centering of nav */
 }
 
 .header-left {
@@ -73,7 +80,8 @@ body {
     transform: translateX(-50%);
     display: flex;
     background: var(--color-surface);
-    border: 2px solid var(--color-accent); /* Stark outline */
+    border: 2px solid var(--color-accent);
+    /* Stark outline */
     border-radius: 6px;
     overflow: hidden;
 }
@@ -84,7 +92,8 @@ body {
     padding: 6px 16px;
     background: transparent;
     border: none;
-    border-right: 1px solid var(--color-accent); /* Divider */
+    border-right: 1px solid var(--color-accent);
+    /* Divider */
     border-radius: 0;
     color: var(--color-accent);
     cursor: pointer;
@@ -132,7 +141,8 @@ body {
     align-items: center;
     gap: 0;
     background: var(--color-bg);
-    border: 2px solid var(--color-accent); /* Stark outline */
+    border: 2px solid var(--color-accent);
+    /* Stark outline */
     border-radius: 6px;
     padding: 0;
     overflow: hidden;
@@ -199,7 +209,9 @@ body {
 /* --- Main Content --- */
 .app-content {
     flex: 1;
-    overflow: hidden; /* Content fits exactly */
+    overflow-y: auto;
+    overflow-x: hidden;
+    -webkit-overflow-scrolling: touch;
     position: relative;
     padding: 16px;
 }
@@ -217,7 +229,8 @@ body {
 /* Layouts */
 .pane-layout {
     display: grid;
-    grid-template-columns: 1fr 280px; /* Sidebar fixed width */
+    grid-template-columns: 1fr 280px;
+    /* Sidebar fixed width */
     gap: 16px;
     height: 100%;
 }
@@ -240,8 +253,10 @@ body {
 .chart-wrapper {
     flex: 1;
     width: 100%;
-    min-height: 0; /* Important for flex child to shrink */
+    min-height: 0;
+    /* Important for flex child to shrink */
     position: relative;
+    touch-action: none;
 }
 
 .chart-header-inline {
@@ -284,7 +299,8 @@ body {
     flex-shrink: 0;
 }
 
-.summary-card h3, .legend-card h3 {
+.summary-card h3,
+.legend-card h3 {
     font-size: 0.75rem;
     text-transform: uppercase;
     color: var(--color-text-muted);
@@ -353,7 +369,8 @@ body {
 
 /* Tooltip */
 .tooltip {
-    position: absolute;
+    position: fixed;
+    /* Use fixed so viewport-clamping with clientX/Y works correctly */
     background: rgba(26, 32, 44, 0.95);
     backdrop-filter: blur(4px);
     color: white;
@@ -362,15 +379,18 @@ body {
     font-family: var(--font-body);
     font-size: 0.8rem;
     pointer-events: none;
-    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
     z-index: 1000;
-    border: 1px solid rgba(255,255,255,0.1);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    max-width: min(280px, 90vw);
+    /* Prevent very wide tooltips */
+    word-wrap: break-word;
 }
 
 .tooltip h4 {
     margin: 0 0 4px 0;
     font-size: 0.85rem;
-    border-bottom: 1px solid rgba(255,255,255,0.2);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
     padding-bottom: 2px;
 }
 
@@ -416,11 +436,13 @@ body {
     justify-content: center;
     cursor: pointer;
     padding: 0;
-    margin-right: 8px; /* Space between toggles */
+    margin-right: 8px;
+    /* Space between toggles */
     transition: all 0.2s;
 }
 
-.icon-btn-box:hover, .icon-btn-box.active {
+.icon-btn-box:hover,
+.icon-btn-box.active {
     background: var(--color-accent);
     color: white;
 }
@@ -444,8 +466,13 @@ body {
 }
 
 /* Tab Text Visibility */
-.desktop-text { display: inline; }
-.mobile-text { display: none; }
+.desktop-text {
+    display: inline;
+}
+
+.mobile-text {
+    display: none;
+}
 
 /* Responsive */
 @media (max-width: 1024px) {
@@ -454,20 +481,25 @@ body {
         flex-wrap: wrap;
         padding: 10px 20px;
         gap: 10px;
-        justify-content: center; /* Center items when wrapped */
+        justify-content: center;
+        /* Center items when wrapped */
     }
 
     .header-left {
         order: 1;
-        margin-right: auto; /* Push others to right if space permits */
+        margin-right: auto;
+        /* Push others to right if space permits */
     }
 
     .tab-navigation {
         position: static;
         transform: none;
-        order: 3; /* Move to new line if needed, or middle */
-        margin: 5px auto; /* Center it */
-        width: auto; /* Let it shrink/grow naturally */
+        order: 3;
+        /* Move to new line if needed, or middle */
+        margin: 5px auto;
+        /* Center it */
+        width: auto;
+        /* Let it shrink/grow naturally */
         max-width: 100%;
     }
 
@@ -477,7 +509,8 @@ body {
     }
 
     /* Force new line for tabs if screen is too narrow but not yet mobile */
-    .header-left, .header-controls {
+    .header-left,
+    .header-controls {
         flex-shrink: 0;
     }
 
@@ -485,48 +518,71 @@ body {
         grid-template-columns: 1fr;
         grid-template-rows: 1fr auto;
     }
+
     .sidebar {
         height: auto;
         flex-direction: row;
-        justify-content: space-between; /* Add spacing */
+        justify-content: space-between;
+        /* Add spacing */
     }
+
     .summary-card {
-        min-width: 200px; /* Ensure reasonable width */
+        min-width: 200px;
+        /* Ensure reasonable width */
     }
+
     .scrollable-legend {
-        max-height: 150px; /* Slightly larger on tablet */
+        max-height: 150px;
+        /* Slightly larger on tablet */
     }
 }
 
 @media (max-width: 768px) {
-    /* Header Stacked Layout */
+
+    /* Content Padding Reset for Mobile */
+    .app-content {
+        padding: 10px 0 0 0;
+        /* Remove side padding */
+    }
+
     .app-header {
         flex-direction: column;
         height: auto;
         padding: 10px 16px;
         gap: 10px;
-        align-items: stretch; /* Stretch items to full width */
+        align-items: stretch;
+        /* Stretch items to full width */
     }
 
     /* Tab Text Switching */
-    .desktop-text { display: none; }
-    .mobile-text { display: inline; }
+    .desktop-text {
+        display: none;
+    }
+
+    .mobile-text {
+        display: inline;
+    }
 
     .header-left {
         width: 100%;
         justify-content: center;
         margin-bottom: 5px;
-        margin-right: 0; /* Reset from tablet override */
-        padding-top: 10px; /* Add space from top of screen */
+        margin-right: 0;
+        /* Reset from tablet override */
+        padding-top: 10px;
+        /* Add space from top of screen */
     }
 
     .app-title {
-        white-space: nowrap; /* Prevent text wrapping */
+        white-space: nowrap;
+        /* Prevent text wrapping */
         text-align: center;
         line-height: 1.2;
-        font-size: 0.9rem; /* Reduce font size to fit */
+        font-size: 0.9rem;
+        /* Reduce font size to fit */
         overflow: hidden;
-        text-overflow: ellipsis; /* Add ellipsis if it still overflows */
+        text-overflow: ellipsis;
+        /* Add ellipsis if it still overflows */
         width: 100%;
         display: block;
     }
@@ -536,18 +592,24 @@ body {
         transform: none;
         width: 100%;
         margin: 5px 0;
-        order: 2; /* Reset order for mobile stack */
-        display: flex; /* Ensure flex context */
+        order: 2;
+        /* Reset order for mobile stack */
+        display: flex;
+        /* Ensure flex context */
     }
-    
+
     .tab-btn {
-        flex: 1 1 0px; /* Force even distribution with 0 basis */
+        flex: 1 1 0px;
+        /* Force even distribution with 0 basis */
         text-align: center;
         padding: 8px 4px;
         font-size: 0.8rem;
-        white-space: nowrap; /* Prevent tab text wrap */
-        width: 100%; /* Ensure width is respected in flex */
-        min-width: 0; /* Allow shrinking below content size if needed */
+        white-space: nowrap;
+        /* Prevent tab text wrap */
+        width: 100%;
+        /* Ensure width is respected in flex */
+        min-width: 0;
+        /* Allow shrinking below content size if needed */
     }
 
     .tab-home {
@@ -555,7 +617,7 @@ body {
         width: auto;
         padding: 8px 12px;
     }
-    
+
     .header-controls {
         width: 100%;
         flex-wrap: nowrap;
@@ -566,9 +628,10 @@ body {
     .mobile-only {
         display: flex;
         align-items: center;
-        flex: 0 0 auto; /* Don't grow */
+        flex: 0 0 auto;
+        /* Don't grow */
     }
-    
+
     #mobile-toggles {
         gap: 8px;
     }
@@ -589,14 +652,15 @@ body {
         flex: 1 1 auto;
         min-width: 0;
     }
-    
+
     .control-wrapper {
         width: 100%;
         flex: 1 1 auto;
         min-width: 0;
     }
-    
-    .component-select-clean, #year-select {
+
+    .component-select-clean,
+    #year-select {
         width: 100%;
         flex: 1 1 auto;
         min-width: 0;
@@ -616,20 +680,19 @@ body {
         padding-right: 44px;
     }
 
-    /* Content Padding Reset for Mobile */
-    .app-content {
-        padding: 10px 0 0 0; /* Remove side padding */
-    }
+
 
     .chart-container {
         border-left: none;
         border-right: none;
         border-radius: 0;
-        padding: 10px 0; /* Vertical padding only */
+        padding: 10px 0;
+        /* Vertical padding only */
     }
 
     .chart-header-inline {
-        padding: 0 16px 10px 16px; /* Restore padding for text */
+        padding: 0 16px 10px 16px;
+        /* Restore padding for text */
         flex-direction: column;
         align-items: flex-start;
         gap: 4px;
@@ -637,23 +700,30 @@ body {
 
     /* Sidebar Stacked Layout for Mobile */
     .sidebar {
-        display: block; /* Restore block to allow fixed children */
+        display: block;
+        /* Restore block to allow fixed children */
         height: 0;
-        overflow: visible; /* Allow popups to overflow */
+        overflow: visible;
+        /* Allow popups to overflow */
         padding: 0;
         margin: 0;
-        width: 0; /* Remove width influence */
-        position: relative; /* Context for children if needed */
-        flex-direction: column; /* Reset flex */
-        gap: 0; /* Reset gap */
+        width: 0;
+        /* Remove width influence */
+        position: relative;
+        /* Context for children if needed */
+        flex-direction: column;
+        /* Reset flex */
+        gap: 0;
+        /* Reset gap */
     }
-    
+
     /* Hide Cards by default */
-    .summary-card, .legend-card {
+    .summary-card,
+    .legend-card {
         display: none;
         width: auto;
     }
-    
+
     /* Popup State */
     .card.popup-active {
         display: block;
@@ -664,17 +734,17 @@ body {
         z-index: 2000;
         width: 90vw;
         max-width: 350px;
-        box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
         border: 1px solid var(--color-accent);
         max-height: 80vh;
         overflow-y: auto;
         background: var(--color-surface);
     }
-    
+
     .close-card-btn {
         display: block;
     }
-    
+
     /* Backdrop for popup */
     .popup-backdrop {
         position: fixed;
@@ -682,11 +752,11 @@ body {
         left: 0;
         width: 100vw;
         height: 100vh;
-        background: rgba(0,0,0,0.5);
+        background: rgba(0, 0, 0, 0.5);
         z-index: 1999;
         display: none;
     }
-    
+
     .popup-backdrop.active {
         display: block;
     }
@@ -695,17 +765,24 @@ body {
     .app-footer {
         height: auto;
         flex-direction: column;
-        gap: 2px; /* Reduce gap from 8px */
-        padding: 8px 16px; /* Slightly tighter padding */
+        gap: 2px;
+        /* Reduce gap from 8px */
+        padding: 8px 16px;
+        /* Slightly tighter padding */
         text-align: center;
+        flex-shrink: 0;
+        /* Ensure footer is always rendered */
     }
-    
+
     .footer-right {
-        order: 1; /* Right text on top */
-        margin-bottom: 0; /* Remove bottom margin */
+        order: 1;
+        /* Right text on top */
+        margin-bottom: 0;
+        /* Remove bottom margin */
     }
-    
+
     .footer-left {
-        order: 2; /* Left text below */
+        order: 2;
+        /* Left text below */
     }
 }
