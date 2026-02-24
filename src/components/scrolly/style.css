@@ -188,6 +188,13 @@ body.scrollytelling-theme.light-theme {
   color: var(--ink-muted);
 }
 
+/* Light Theme Tooltip Overrides */
+.light-theme .d3-tooltip,
+.light-theme .province-cell .tooltip {
+  background: var(--ink);
+  color: var(--paper);
+}
+
 ::selection {
   background: var(--accent-blue);
   color: var(--paper);

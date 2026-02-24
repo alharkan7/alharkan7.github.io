@@ -99,7 +99,7 @@ export default function renderScatter({ mountEl, panelEl, props }: ScatterArgs) 
     .attr("text-anchor", "middle")
     .style("font-family", "Inter,sans-serif")
     .style("font-size", "11px")
-    .attr("fill", "#666")
+    .attr("fill", "var(--ink-muted)")
     .text("Radio Consumption (% population)");
   svg
     .append("text")
@@ -109,7 +109,7 @@ export default function renderScatter({ mountEl, panelEl, props }: ScatterArgs) 
     .attr("text-anchor", "middle")
     .style("font-family", "Inter,sans-serif")
     .style("font-size", "11px")
-    .attr("fill", "#666")
+    .attr("fill", "var(--ink-muted)")
     .text("Voter Turnout (%)");
 
   const xVals = provinces.map((d) => d.radio);
@@ -149,9 +149,9 @@ export default function renderScatter({ mountEl, panelEl, props }: ScatterArgs) 
       .attr("cx", x(d.radio))
       .attr("cy", y(d.turnout))
       .attr("r", 0)
-      .attr("fill", islandColors[d.island] || "#666")
+      .attr("fill", islandColors[d.island] || "var(--ink-muted)")
       .attr("opacity", 0.8)
-      .attr("stroke", "white")
+      .attr("stroke", "var(--paper)")
       .attr("stroke-width", 1.2)
       .on("mouseover", function (this: SVGCircleElement, evt: any) {
         d3.select(this).attr("r", 9).attr("opacity", 1);
@@ -203,7 +203,7 @@ export default function renderScatter({ mountEl, panelEl, props }: ScatterArgs) 
       .attr("y", i * 18 + 4)
       .style("font-size", "9px")
       .style("font-family", "Inter,sans-serif")
-      .attr("fill", "#666")
+      .attr("fill", "var(--ink-muted)")
       .text(isl);
   });
 }
