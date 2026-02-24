@@ -8,7 +8,7 @@ export const featuredProjects = [
   {
     title: "Media Effects on the 2019 Election",
     subtitle: "",
-    url: "/scrolly-demo",
+    url: "/media-election-2019",
     coverImage: "https://ik.imagekit.io/raihankalla/research_section_cover/media-election-2019.png",
   },
   {
