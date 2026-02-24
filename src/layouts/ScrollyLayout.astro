@@ -80,12 +80,12 @@ const safeJson = (v: any) => JSON.stringify(v ?? null).replaceAll("</script>", "
 
     <script is:inline>
       (function() {
-        const theme = localStorage.getItem('scrolly-theme') || 'dark';
+        const theme = localStorage.getItem('scrolly-theme') || 'light';
         document.body.classList.toggle('light-theme', theme === 'light');
       })();
     </script>
   </head>
-  <body class="scrollytelling-theme">
+  <body class="scrollytelling-theme light-theme">
     <div id="progress-bar"></div>
 
     <nav id="main-nav">
