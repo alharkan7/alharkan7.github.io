@@ -1,0 +1,7 @@
+---
+const { id } = Astro.props;
+---
+
+<div class="scroll-section" id={`section-${id}`} data-viz-id={`viz-${id}`}>
+  <slot />
+</div>

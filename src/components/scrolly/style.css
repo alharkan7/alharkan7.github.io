@@ -41,14 +41,14 @@ html {
   font-size: 16px;
 }
 
-body {
+body.scrollytelling-theme {
   background:
     radial-gradient(1200px 700px at 50% -10%, rgba(77, 225, 255, 0.14), transparent 60%),
     radial-gradient(900px 600px at 90% 10%, rgba(255, 77, 157, 0.12), transparent 55%),
-    var(--paper);
-  color: var(--ink);
-  font-family: var(--font-serif);
-  line-height: 1.75;
+    var(--paper) !important;
+  color: var(--ink) !important;
+  font-family: var(--font-serif) !important;
+  line-height: 1.75 !important;
   /* overflow-x: clip (not hidden) — clip does NOT create a containing block,
      so position:fixed elements (nav, progress-bar) keep working on iOS Safari.
      'hidden' silently breaks fixed positioning on iOS when set on body/html. */
@@ -312,6 +312,7 @@ body {
 .hero-cta {
   display: inline-flex;
   align-items: center;
+  justify-content: center;
   gap: 10px;
   background: transparent;
   border: 1.5px solid var(--accent-blue);
@@ -321,8 +322,10 @@ body {
   font-weight: 500;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  padding: 13px 28px;
-  border-radius: 40px;
+  padding: 13px;
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
   text-decoration: none;
   transition: all var(--transition-fast);
 }
@@ -485,19 +488,35 @@ body {
 }
 
 /* Lists */
-.research-list,
-.party-list {
+.scroll-section ol:not([class]),
+.scroll-section ul:not([class]) {
   margin: 14px 0 20px 0;
-  padding-left: 20px;
+  padding-left: 1.25rem;
+  list-style-position: outside;
 }
 
-.research-list li,
-.party-list li {
+.scroll-section ol:not([class]) {
+  list-style-type: decimal;
+}
+
+.scroll-section ul:not([class]) {
+  list-style-type: disc;
+}
+
+.scroll-section ol:not([class]) li,
+.scroll-section ul:not([class]) li {
   font-family: var(--font-serif);
   font-size: 1rem;
   line-height: 1.75;
   color: var(--ink-light);
   margin-bottom: 10px;
+  display: list-item;
+}
+
+.research-list,
+.party-list {
+  margin: 14px 0 20px 0;
+  padding-left: 20px;
 }
 
 /* Party List */
@@ -510,6 +529,7 @@ body {
   display: flex;
   align-items: flex-start;
   gap: 12px;
+  margin-bottom: 24px;
 }
 
 .party-badge {

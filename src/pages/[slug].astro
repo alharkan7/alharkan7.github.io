@@ -30,12 +30,17 @@ export async function getStaticPaths() {
     eager: true,
   });
   const ptmPosts: any = Object.values(ptmPostsGlob);
+  const scrollyPostsGlob = import.meta.glob("../posts/scrolly/*.{md,mdx}", {
+    eager: true,
+  });
+  const scrollyPosts: any = Object.values(scrollyPostsGlob);
   const allPosts = [
     ...blogPosts,
     ...storyPosts,
     ...workPosts,
     ...uncategorizedPosts,
     ...ptmPosts,
+    ...scrollyPosts,
   ];
 
   const postRoutes = allPosts.map((p) => ({
@@ -75,8 +80,9 @@ export async function getStaticPaths() {
 }
 
 const { slug } = Astro.params;
-const { post, htmlContent, type = "post" } = Astro.props;
+const { post, htmlContent, type: initialType = "post" } = Astro.props;
 
+let type = initialType;
 let Content: any;
 let frontmatter: any;
 let title: string = "";
@@ -114,13 +120,21 @@ if (type === "post") {
   permalink = `${Astro.site?.href || ""}${postData.slug}`;
 
   // Check if this is a blog post or other category
-  const possiblePaths = ["blog", "stories", "uncategorized", "misc", "ptm"];
+  const possiblePaths = ["blog", "stories", "uncategorized", "misc", "ptm", "scrolly"];
   category =
     possiblePaths.find((path) => post.file.includes(`/posts/${path}/`)) || "";
 
+  // Check if it's a scrolly post to handle layout differently
+  const isScrolly = category === "scrolly" || (frontmatter.layout && (frontmatter.layout.includes("ScrollyLayout") || frontmatter.layout.includes("ScrollyTemplate")));
+
+  if (isScrolly) {
+    type = "scrolly";
+  }
+
   // Get recommended posts from the same category
   const getRecommendedPosts = async () => {
-    let categoryPosts: any;
+    if (isScrolly) return [];
+    let categoryPosts: any[] = [];
     if (category === "blog") {
       const glob = import.meta.glob("../posts/blog/*.{md,mdx}", {
         eager: true,
@@ -142,14 +156,12 @@ if (type === "post") {
       });
       categoryPosts = Object.values(glob);
     } else {
-      const glob = import.meta.glob(
-        "../posts/uncategorized/*.{md,mdx}",
-        { eager: true },
-      );
+      const glob = import.meta.glob("../posts/uncategorized/*.{md,mdx}", {
+        eager: true,
+      });
       categoryPosts = Object.values(glob);
     }
 
-    // Filter out current post and get 2 random posts
     return categoryPosts
       .filter((p: any) => p.file !== post.file)
       .sort(() => Math.random() - 0.5)
@@ -166,6 +178,8 @@ if (type === "post") {
 
 {type === 'html' ? (
   <Fragment set:html={htmlContent} />
+) : type === 'scrolly' ? (
+  <Content />
 ) : (
   <BaseLayout
     title={title}

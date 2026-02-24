@@ -1,0 +1,120 @@
+---
+layout: ../../layouts/ScrollyLayout.astro
+configId: scrolly-demo
+---
+
+import ScrollySection from '../../components/scrolly/ScrollySection.astro';
+
+<ScrollySection id="context">
+  <div class="section-label">Section 01</div>
+  ## The New Democratic Landscape
+  
+  Since the 1998 *Reformasi*, Indonesia's media landscape has undergone a radical transformation. The repeal of restrictive laws birthed an ecosystem of **1,362 press companies** across print, broadcast, and cyber/digital media.
+  
+  Today, traditional TV and radio coexist with a massive surge in internet users. As media becomes the "fourth pillar" of Indonesian democracy, it serves as the primary bridge between political parties and the public.
+  
+  But in an era of information saturation, we must ask: **Does increased media access lead to higher democratic participation, or simply more noise?**
+  
+  <div class="data-source-tag">Source: BPS Indonesia, Kominfo, 2000–2019</div>
+</ScrollySection>
+
+<ScrollySection id="problem">
+  <div class="section-label">Section 02</div>
+  ## Challenging the Traditional Models
+  
+  Academic studies of Indonesian voters typically rely on three pillars:
+  
+  1. **Sociological:** The "Columbia School" approach — how religion, ethnicity, and class bind voters to their groups.
+  2. **Psychological:** Loyalties to specific party figures or historical "Downsian" utility.
+  3. **Rational Choice:** Economic benefits and government performance.
+  
+  However, external factors — specifically **Media Effects** — are often relegated to the sidelines. This research integrates media consumption into these traditional models, using aggregate data from all **34 Provinces** to see the "big picture" of the 2019 legislative race.
+  
+  <div class="data-source-tag">Source: Academic literature review, CSIS surveys</div>
+</ScrollySection>
+
+<ScrollySection id="methodology">
+  <div class="section-label">Section 03</div>
+  ## The Statistical Engine
+  
+  To uncover these hidden relationships, we utilized **SEM-PLS** (Structural Equation Modeling Partial Least Square). This technique allowed us to test and estimate complex relationships between multiple variables simultaneously.
+  
+  We executed **32 distinct test models**, analyzing how provincial trends in media consumption (TV, Radio, Newspaper, Internet, and Google Search) correlated with the performance of major parties like PDIP, Gerindra, and PKB.
+  
+  By using aggregate data from BPS and KPU, we move from "what people say" to *"what the numbers show"* across the entire archipelago.
+  
+  <div class="data-source-tag">Source: BPS Statistics Indonesia, KPU Election Commission 2019</div>
+</ScrollySection>
+
+<ScrollySection id="finding1">
+  <div class="section-label">Finding 01</div>
+  ## The Surprising Power of Radio
+  
+  In the digital age, we expect the Internet to be the primary driver of participation. However, our data suggests otherwise.
+  
+  The effect of the Internet on **Voter Turnout** was found to be *weak*. Instead, **Radio** emerged as a significant positive predictor. In provinces where more citizens listened to the radio, participation in the 2019 election was consistently higher.
+  
+  This suggests that radio remains a potent, perhaps overlooked, tool for civic mobilization in Indonesia's more remote or traditional regions.
+  
+  <div class="finding-callout">
+    <div>Radio listeners showed a **Strong Positive Effect (β=0.612)** on turnout compared to low-radio provinces, controlling for other variables.</div>
+  </div>
+  <div class="data-source-tag">Source: KPU 2019 Turnout Data, BPS Media Survey</div>
+</ScrollySection>
+
+<ScrollySection id="finding2">
+  <div class="section-label">Finding 02</div>
+  ## Targeted Influences
+  
+  Media effects are not a "blanket" influence; they are highly fragmented across different political parties:
+  
+  <ul class="party-list">
+    <li>
+      <span class="party-badge google">G</span>
+      <div>**Google Search:** Higher search volumes were significant predictors for **Gerindra** and **PKB** support.</div>
+    </li>
+    <li>
+      <span class="party-badge tv">T</span>
+      <div>**Television:** Remains the primary vehicle for parties like **Nasdem**.</div>
+    </li>
+    <li>
+      <span class="party-badge radio">R</span>
+      <div>**Radio:** Showed a specific link to support for **Demokrat**.</div>
+    </li>
+  </ul>
+  
+  This confirms that different media platforms serve as "triggers" for different segments of the electorate. The "echo chamber" in Indonesia isn't one big room — it's a series of smaller, media-specific corridors.
+  
+  <div class="data-source-tag">Source: KPU 2019 Party Vote Shares, Google Trends, BPS</div>
+</ScrollySection>
+
+<ScrollySection id="bigpicture">
+  <div class="section-label">Finding 03</div>
+  ## The Sum is Greater than the Parts
+  
+  Media alone is rarely the decider. However, when we look at the **Combined Model** — merging Media with Sociology (Religion/Ethnicity) and Economics (Poverty) — the predictive power skyrockets.
+  
+  For **PDIP**, the combined model explained a staggering **83.9%** of the variance in provincial vote direction. This proves that media acts as a *"multiplier"* for existing social and economic conditions.
+  
+  It doesn't replace the voter's identity; **it reinforces it.**
+  
+  <div class="finding-callout highlight-red">
+    <div>**R² = 83.9%** for PDIP in the Combined Model — one of the highest predictive fits in Indonesian electoral research.</div>
+  </div>
+  <div class="data-source-tag">Source: SEM-PLS Model Output, SmartPLS 3.0</div>
+</ScrollySection>
+
+<ScrollySection id="conclusion">
+  <div class="section-label">Section 08</div>
+  ## A Call for Granular Data
+  
+  Our findings show that media effects in 2019 were fragmented and often weak at a provincial level. This suggests that the "battle for the voter" happens at a much more **local scale**.
+  
+  To improve future research and democratic transparency, we recommend:
+  
+  1. **Shifting to District-Level Analysis:** Provincial data masks local nuances; we need Kabupaten/Kota granularity.
+  2. **Expanding Data Access:** Public access to Indonesian statistical data must be improved for more sophisticated aggregate research.
+  3. **Active Monitoring:** Stakeholders should actively monitor media's "trigger" effects to ensure a balanced democratic discourse.
+  
+  <div class="data-source-tag">Source: Research Recommendations, UI Graduate Program</div>
+</ScrollySection>
