@@ -25,6 +25,24 @@
   --transition-fast: 0.3s ease;
 }
 
+body.light-theme {
+  --paper: #F9F8F5;
+  --paper-dark: #F0EDE7;
+  --ink: #1A1A2E;
+  --ink-light: #4A4A6A;
+  --ink-muted: #8A8AA0;
+  --scholarly-blue: #2C3E50;
+  --accent-blue: #1A5276;
+  --political-red: #C0392B;
+  --political-red-light: #E74C3C;
+  --gold: #D4AC0D;
+  --success-green: #1E8449;
+  --border: rgba(44, 62, 80, 0.12);
+  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.06);
+  --shadow-md: 0 8px 32px rgba(0, 0, 0, 0.10);
+  --shadow-lg: 0 24px 64px rgba(0, 0, 0, 0.14);
+}
+
 /* ═══════════════════════════════════════════════
    RESET & BASE
 ═══════════════════════════════════════════════ */
@@ -55,9 +73,128 @@ body.scrollytelling-theme {
   overflow-x: clip;
 }
 
+body.scrollytelling-theme.light-theme {
+  background: var(--paper) !important;
+}
+
+.light-theme .hero-bg {
+  background:
+    radial-gradient(900px 560px at 15% 10%, rgba(26, 82, 118, 0.05), transparent 55%),
+    radial-gradient(800px 520px at 85% 15%, rgba(192, 57, 43, 0.04), transparent 55%),
+    var(--paper);
+}
+
+.light-theme .hero-pattern {
+  background-image:
+    linear-gradient(rgba(26, 82, 118, 0.06) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(192, 57, 43, 0.05) 1px, transparent 1px);
+}
+
+.light-theme .hero-overlay {
+  background: radial-gradient(circle at center,
+      transparent 0%,
+      color-mix(in srgb, var(--paper) 40%, transparent) 70%,
+      var(--paper) 100%);
+}
+
+.light-theme .hero-stats {
+  background: rgba(240, 237, 231, 0.85);
+}
+
+.light-theme .finding-callout {
+  background: rgba(26, 82, 118, 0.06);
+}
+
+.light-theme .finding-callout.highlight-red {
+  background: rgba(192, 57, 43, 0.06);
+}
+
+.light-theme #mobile-viz-topbar {
+  background: var(--paper-dark);
+  border-bottom-color: var(--border);
+}
+
+.light-theme #mobile-tab-bar {
+  background: var(--paper-dark);
+}
+
+.light-theme .mob-tab.active {
+  background: var(--paper);
+  color: var(--accent-blue);
+}
+
+/* Light Theme Matrix Overrides */
+.light-theme .matrix-cell-rect.not-sig {
+  fill: rgba(0, 0, 0, 0.05);
+}
+
+.light-theme .matrix-cell-text.not-sig {
+  fill: var(--ink-muted);
+}
+
+/* Light Theme Footer Overrides */
+.light-theme #main-footer {
+  background: var(--paper-dark);
+  border-top-color: var(--border);
+}
+
+.light-theme .footer-label {
+  color: var(--ink-muted);
+}
+
+.light-theme .footer-thesis p {
+  color: var(--ink);
+}
+
+.light-theme .footer-meta p {
+  color: var(--ink-light);
+}
+
+.light-theme .footer-meta strong {
+  color: var(--ink);
+}
+
+.light-theme .footer-btn {
+  background: var(--accent-blue);
+  color: white;
+  border-color: var(--accent-blue);
+  box-shadow: 0 4px 12px rgba(26, 82, 118, 0.12);
+}
+
+.light-theme .footer-btn:hover {
+  background: linear-gradient(135deg, var(--accent-blue), var(--political-red));
+  border-color: transparent;
+  color: white;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(26, 82, 118, 0.24);
+}
+
+.light-theme .footer-btn.secondary {
+  border-color: var(--border);
+  color: var(--ink-light);
+}
+
+.light-theme .footer-btn.secondary:hover {
+  background: var(--paper);
+  border-color: var(--accent-blue);
+  color: var(--accent-blue);
+}
+
+.light-theme .footer-bottom {
+  border-top-color: var(--border);
+}
+
+.light-theme .footer-bottom p {
+  color: var(--ink-muted);
+}
+
 ::selection {
   background: var(--accent-blue);
   color: var(--paper);
+}
+
+.light-theme ::selection {
+  color: #fff;
 }
 
 /* ═══════════════════════════════════════════════
@@ -96,6 +233,10 @@ body.scrollytelling-theme {
   box-shadow: var(--shadow-sm);
 }
 
+body.light-theme #main-nav.scrolled {
+  background: rgba(249, 248, 245, 0.95);
+}
+
 .nav-inner {
   width: 100%;
   display: flex;
@@ -107,6 +248,12 @@ body.scrollytelling-theme {
   display: flex;
   align-items: center;
   gap: 12px;
+}
+
+.nav-controls-group {
+  display: flex;
+  align-items: center;
+  gap: 24px;
 }
 
 .nav-home-icon {
@@ -127,6 +274,56 @@ body.scrollytelling-theme {
   opacity: 1;
   color: var(--accent-blue);
   transform: scale(1.1);
+}
+
+.nav-theme-toggle {
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  color: var(--scholarly-blue);
+  opacity: 0.6;
+  transition: opacity var(--transition-fast), transform var(--transition-fast);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.35em;
+  height: 1.35em;
+  font-size: 0.875rem; /* Match nav-home-icon proportion */
+}
+
+.nav-theme-toggle svg {
+  width: 100%;
+  height: 100%;
+}
+
+.nav-theme-toggle:hover {
+  opacity: 1;
+  color: var(--accent-blue);
+  transform: scale(1.1);
+}
+
+.nav-theme-toggle .sun-icon {
+  display: block;
+}
+
+.nav-theme-toggle .moon-icon {
+  display: none;
+}
+
+body.light-theme .nav-theme-toggle .sun-icon {
+  display: none;
+}
+
+body.light-theme .nav-theme-toggle .moon-icon {
+  display: block;
+}
+
+.light-theme .nav-dot::after {
+  background: rgba(240, 237, 231, 0.95);
+  color: var(--ink);
+  box-shadow: var(--shadow-sm);
+  border: 1px solid var(--border);
 }
 
 .nav-logo {
@@ -273,6 +470,13 @@ body.scrollytelling-theme {
 
 .hero-accent {
   background: linear-gradient(135deg, var(--accent-blue), var(--political-red));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.light-theme .hero-accent {
+  background: linear-gradient(135deg, #1A5276, #C0392B);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;

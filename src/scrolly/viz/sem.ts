@@ -34,7 +34,7 @@ export default function renderSEM({ mountEl, props }: SemArgs) {
       .attr("orient", "auto")
       .append("path")
       .attr("d", "M0,-5L10,0L0,5")
-      .attr("fill", t === "sig" ? politicalRed : inkMuted);
+      .attr("fill", t === "sig" ? "var(--political-red)" : "var(--ink-muted)");
   });
 
   const fallbackNodes = [
@@ -79,7 +79,7 @@ export default function renderSEM({ mountEl, props }: SemArgs) {
       .append("path")
       .attr("d", `M${x1},${y1} C${mx},${y1} ${mx},${y2} ${x2},${y2}`)
       .attr("fill", "none")
-      .attr("stroke", p.sig ? politicalRed : "rgba(255,255,255,0.18)")
+      .attr("stroke", p.sig ? "var(--political-red)" : "var(--border)")
       .attr("stroke-width", p.sig ? 2.5 : 1.5)
       .attr("stroke-dasharray", p.sig ? "none" : "5,4")
       .attr("marker-end", `url(#arrow-${p.sig ? "sig" : "insig"})`)
@@ -109,11 +109,11 @@ export default function renderSEM({ mountEl, props }: SemArgs) {
       .attr("y", (y1 + y2) / 2 - 5)
       .attr("text-anchor", "middle")
       .style("paint-order", "stroke")
-      .style("stroke", paper)
+      .style("stroke", "var(--paper)")
       .style("stroke-width", "3px")
       .style("stroke-linecap", "butt")
       .style("stroke-linejoin", "miter")
-      .attr("fill", p.sig ? politicalRed : inkMuted)
+      .attr("fill", p.sig ? "var(--political-red)" : "var(--ink-muted)")
       .style("font-family", "Inter,sans-serif")
       .style("font-size", "9.5px")
       .style("font-weight", p.sig ? "700" : "400")
@@ -149,14 +149,14 @@ export default function renderSEM({ mountEl, props }: SemArgs) {
       .text((d: string) => d);
   });
 
-  svg.append("circle").attr("cx", 20).attr("cy", H - 20).attr("r", 5).attr("fill", politicalRed);
+  svg.append("circle").attr("cx", 20).attr("cy", H - 20).attr("r", 5).attr("fill", "var(--political-red)");
   svg
     .append("text")
     .attr("x", 30)
     .attr("y", H - 16)
     .style("font-size", "10px")
     .style("font-family", "Inter,sans-serif")
-    .attr("fill", scholarlyBlue)
+    .attr("fill", "var(--scholarly-blue)")
     .text(legend.sigLabel);
   svg
     .append("line")
@@ -164,7 +164,7 @@ export default function renderSEM({ mountEl, props }: SemArgs) {
     .attr("x2", 170)
     .attr("y1", H - 20)
     .attr("y2", H - 20)
-    .attr("stroke", "rgba(255,255,255,0.18)")
+    .attr("stroke", "var(--border)")
     .attr("stroke-dasharray", "4,3")
     .attr("stroke-width", 1.5);
   svg
@@ -173,6 +173,6 @@ export default function renderSEM({ mountEl, props }: SemArgs) {
     .attr("y", H - 16)
     .style("font-size", "10px")
     .style("font-family", "Inter,sans-serif")
-    .attr("fill", inkMuted)
+    .attr("fill", "var(--ink-muted)")
     .text(legend.insigLabel);
 }
