@@ -70,12 +70,8 @@ async function init() {
             state.resizeTimer = setTimeout(resize, 100);
         });
 
-        // Initial Render
-        // Trigger auto-play for initial tab
-        setTimeout(() => {
-            renderActiveTab();
-            playIntroAnimation();
-        }, 100);
+        // Trigger intro animation for initial tab if needed
+        playIntroAnimation();
 
     } catch (error) {
         console.error("Error loading data:", error);
@@ -207,7 +203,7 @@ function setupTabs() {
     d3.select("#global-component-select").on("change", function () {
         state.selectedComponent = this.value;
         renderActiveTab();
-        playIntroAnimation();
+        playIntroAnimation(true); // Trigger foreground re-animation
     });
 
     // Keyboard Navigation
@@ -305,24 +301,39 @@ function renderActiveTab() {
     }
 }
 
-function playIntroAnimation() {
-    if (state.introPlayed[state.activeTab]) return;
-    // NOTE: for main-view, introPlayed is set inside renderTrendChart after animation begins.
-    // For other tabs, set it here before running the clip animation.
+function playIntroAnimation(isFilterChange = false) {
+    if (!isFilterChange && state.introPlayed[state.activeTab]) return;
 
     if (state.activeTab === 'main-view') {
-        // renderTrendChart will set introPlayed once animation is triggered
+        if (isFilterChange) return; // Main view handles its own year-based updates
         renderMainChart();
         return;
     }
 
-    state.introPlayed[state.activeTab] = true; // Mark as played for non-main tabs
+    if (!isFilterChange) {
+        state.introPlayed[state.activeTab] = true;
+    }
 
     const duration = 1500;
     const ease = d3.easeCubicOut;
 
-    let clipId = "#mixed-clip-rect";
-    if (state.activeTab === 'area-view') clipId = "#area-clip-rect";
+    let clipId = "#mixed-fg-clip-rect";
+    if (state.activeTab === 'area-view') clipId = "#area-fg-clip-rect";
+
+    // If it's a filter change, we only animate the foreground clip
+    // If it's the first load, we animate both bg and fg (handled by separate clips)
+    
+    if (!isFilterChange) {
+        // First load: animate background too if needed
+        // For Mixed/Area views, we'll keep background static or animate once
+        let bgClipId = state.activeTab === 'mixed-view' ? "#mixed-bg-clip-rect" : "#area-bg-clip-rect";
+        d3.select(bgClipId)
+            .attr("width", 0)
+            .transition()
+            .duration(duration)
+            .ease(ease)
+            .attr("width", width);
+    }
 
     d3.select(clipId)
         .attr("width", 0)
@@ -398,6 +409,7 @@ function renderMainChart() {
 
     let svg = container.select("svg");
     let g;
+    let defs;
 
     if (svg.empty()) {
         let translateX = margin.left;
@@ -412,19 +424,21 @@ function renderMainChart() {
             .attr("width", width + margin.left + margin.right)
             .attr("height", height + margin.top + margin.bottom);
 
+        defs = svg.append("defs");
+
         g = svg.append("g")
             .attr("transform", `translate(${translateX},${translateY})`);
 
         if (!isTreemap) {
             // Clip path for bars to prevent drawing outside axes when zoomed
-            svg.append("defs").append("clipPath")
+            defs.append("clipPath")
                 .attr("id", "main-clip")
                 .append("rect")
                 .attr("width", width)
                 .attr("height", height);
 
             // Clip path for X-axis (allow labels below chart)
-            svg.append("defs").append("clipPath")
+            defs.append("clipPath")
                 .attr("id", "xaxis-clip")
                 .append("rect")
                 .attr("width", width)
@@ -432,13 +446,15 @@ function renderMainChart() {
         }
     } else {
         g = svg.select("g");
+        defs = svg.select("defs");
+        if (defs.empty()) defs = svg.append("defs");
     }
 
     if (!isTreemap) {
         // Trend View: Full Redraw for simplicity in Zoom (or optimize later)
         // Since we didn't clear container, we must clear group content if it's a re-render
         g.html("");
-        renderTrendChart(g);
+        renderTrendChart(g, defs);
         updateLegend(state.yearRange[1]);
     } else {
         const treemapWidth = (width + margin.left + margin.right) - 20;
@@ -448,7 +464,7 @@ function renderMainChart() {
     }
 }
 
-function renderTrendChart(svg) {
+function renderTrendChart(svg, defs) {
     // 1. Stacked Bar Chart for All Years
     const xBase = d3.scaleBand()
         .domain(state.data.map(d => d.year))
@@ -527,9 +543,6 @@ function renderTrendChart(svg) {
     });
 
     // Join Year Groups
-    // We will use clip-paths to animate the whole stack growing up
-    const defs = svg.append("defs");
-
     const groups = content.selectAll(".year-group")
         .data(yearGroupsData, d => d.year)
         .enter().append("g")
@@ -537,14 +550,12 @@ function renderTrendChart(svg) {
         .attr("transform", d => `translate(${x(d.year)}, 0)`);
 
     // Create unique clip-path for each year group
-    // Note: The clip-path is relative to the group's coordinate system (if userSpaceOnUse is default, but we are inside a transform)
-    // Actually, clipPath units default to userSpaceOnUse.
-    // If we apply clip-path to the <g transform="...">, the clip path coordinates are in the <g>'s local space.
-    // So x=0 is the left edge of the bar bandwidth.
-
     groups.each(function (d, i) {
         const year = d.year;
         const clipId = `clip-trend-${year}`;
+
+        // Remove existing clipPath for this year to avoid duplicates
+        defs.select(`#${clipId}`).remove();
 
         const clipRect = defs.append("clipPath")
             .attr("id", clipId)
@@ -571,8 +582,12 @@ function renderTrendChart(svg) {
 
         d3.select(this).attr("clip-path", `url(#${clipId})`);
     });
+
     // Mark intro as played AFTER animation is triggered for this group
-    state.introPlayed['main-view'] = true;
+    // But ONLY if it was false (to avoid setting it true on zoom)
+    if (!state.introPlayed['main-view']) {
+        state.introPlayed['main-view'] = true;
+    }
 
     // Add Rects (Full height immediately, revealed by clip-path)
     groups.selectAll("rect")
@@ -748,16 +763,25 @@ function renderMixedChart() {
         .append("g")
         .attr("transform", `translate(${margin.left},${margin.top})`);
 
-    // Define Clip Path
-    svg.append("defs").append("clipPath")
-        .attr("id", "mixed-clip")
+    // Define Clip Paths
+    const defs = svg.append("defs");
+
+    defs.append("clipPath")
+        .attr("id", "mixed-bg-clip")
         .append("rect")
-        .attr("id", "mixed-clip-rect")
+        .attr("id", "mixed-bg-clip-rect")
+        .attr("width", width)
+        .attr("height", height);
+
+    defs.append("clipPath")
+        .attr("id", "mixed-fg-clip")
+        .append("rect")
+        .attr("id", "mixed-fg-clip-rect")
         .attr("width", width)
         .attr("height", height);
 
     // Clip path for X-axis (allow labels below chart)
-    svg.append("defs").append("clipPath")
+    defs.append("clipPath")
         .attr("id", "mixed-xaxis-clip")
         .append("rect")
         .attr("width", width)
@@ -814,11 +838,12 @@ function renderMixedChart() {
     svg.append("g").attr("class", "grid")
         .call(d3.axisLeft(yBar).ticks(5).tickSize(-width).tickFormat("")).select(".domain").remove();
 
-    // Content Group with Clip Path
-    const content = svg.append("g").attr("clip-path", "url(#mixed-clip)");
+    // Content Groups
+    const bgContent = svg.append("g").attr("clip-path", "url(#mixed-bg-clip)");
+    const fgContent = svg.append("g").attr("clip-path", "url(#mixed-fg-clip)");
 
-    // Bars (Total APBN)
-    content.selectAll(".bar-total")
+    // Bars (Total APBN) - Put in bgContent
+    bgContent.selectAll(".bar-total")
         .data(data)
         .enter().append("rect")
         .attr("class", "bar-total")
@@ -847,7 +872,7 @@ function renderMixedChart() {
                 .y(d => yLine(d[`pct_${key}`] || 0))
                 .curve(d3.curveMonotoneX);
 
-            content.append("path")
+            fgContent.append("path")
                 .datum(data)
                 .attr("fill", "none")
                 .attr("stroke", color(key))
@@ -869,7 +894,7 @@ function renderMixedChart() {
                     select.property("value", key);
                     // Re-render
                     renderActiveTab();
-                    playIntroAnimation();
+                    playIntroAnimation(true); // Trigger re-animation
                 });
         });
     } else {
@@ -879,14 +904,14 @@ function renderMixedChart() {
             .y(d => yLine(d[`pct_${compKey}`] || 0))
             .curve(d3.curveMonotoneX);
 
-        content.append("path")
+        fgContent.append("path")
             .datum(data)
             .attr("fill", "none")
             .attr("stroke", color(compKey))
             .attr("stroke-width", 3)
             .attr("d", line);
 
-        content.selectAll(".dot")
+        fgContent.selectAll(".dot")
             .data(data)
             .enter().append("circle")
             .attr("cx", d => x(d.year) + x.bandwidth() / 2)
@@ -945,16 +970,25 @@ function renderAreaChart() {
         .append("g")
         .attr("transform", `translate(${margin.left},${margin.top})`);
 
-    // Define Clip Path
-    svg.append("defs").append("clipPath")
-        .attr("id", "area-clip")
+    // Define Clip Paths
+    const defs = svg.append("defs");
+
+    defs.append("clipPath")
+        .attr("id", "area-bg-clip")
         .append("rect")
-        .attr("id", "area-clip-rect")
+        .attr("id", "area-bg-clip-rect")
+        .attr("width", width)
+        .attr("height", height);
+
+    defs.append("clipPath")
+        .attr("id", "area-fg-clip")
+        .append("rect")
+        .attr("id", "area-fg-clip-rect")
         .attr("width", width)
         .attr("height", height);
 
     // Clip path for X-axis
-    svg.append("defs").append("clipPath")
+    defs.append("clipPath")
         .attr("id", "area-xaxis-clip")
         .append("rect")
         .attr("width", width)
@@ -1000,10 +1034,25 @@ function renderAreaChart() {
     svg.append("g").attr("class", "grid")
         .call(d3.axisLeft(y).ticks(5).tickSize(-width).tickFormat("")).select(".domain").remove();
 
-    const content = svg.append("g").attr("clip-path", "url(#area-clip)");
+    // Content Groups
+    const bgContent = svg.append("g").attr("clip-path", "url(#area-bg-clip)");
+    const fgContent = svg.append("g").attr("clip-path", "url(#area-fg-clip)");
+
+    // Background Area (Total APBN) - Always in bgContent
+    const areaTotal = d3.area()
+        .x(d => x(d.year))
+        .y0(height)
+        .y1(d => y(d.total))
+        .curve(d3.curveMonotoneX);
+
+    bgContent.append("path")
+        .datum(data)
+        .attr("fill", "#E2E8F0")
+        .attr("d", areaTotal)
+        .attr("opacity", 0.6);
 
     if (isAll) {
-        // Full Stacked Area
+        // Full Stacked Area - in fgContent
         const stack = d3.stack()
             .keys(state.keys) // All keys
             .order(d3.stackOrderNone)
@@ -1011,7 +1060,7 @@ function renderAreaChart() {
 
         const series = stack(data);
 
-        content.selectAll(".layer")
+        fgContent.selectAll(".layer")
             .data(series)
             .enter().append("path")
             .attr("class", "layer")
@@ -1042,34 +1091,20 @@ function renderAreaChart() {
             });
 
     } else {
-        // Single Focus Stacked Area
-        const areaTotal = d3.area()
-            .x(d => x(d.year))
-            .y0(height)
-            .y1(d => y(d.total))
-            .curve(d3.curveMonotoneX);
-
-        content.append("path")
-            .datum(data)
-            .attr("fill", "#E2E8F0")
-            .attr("d", areaTotal)
-            .attr("opacity", 0.6);
-
+        // Single Focus Area - in fgContent
         const areaComp = d3.area()
             .x(d => x(d.year))
             .y0(height)
             .y1(d => y(d[compKey]))
             .curve(d3.curveMonotoneX);
 
-        content.append("path")
+        fgContent.append("path")
             .datum(data)
             .attr("fill", color(compKey))
             .attr("d", areaComp)
             .attr("opacity", 0.85);
 
         // Interactive Overlay logic...
-        // Note: Bisect needs to work on the ORIGINAL domain usually?
-        // Or invert from the zoomed scale.
         const bisect = d3.bisector(d => d.year).left;
         const focus = svg.append("g").style("display", "none");
 
