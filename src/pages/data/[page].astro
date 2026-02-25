@@ -55,10 +55,10 @@ const permalink = `${Astro.site?.href}data`;
               loading="lazy"
               class="card-image"
             />
+            {project.type && <span class="card-type">{project.type}</span>}
           </div>
           <div class="card-content">
             <h3 class="card-title">{project.title}</h3>
-            {project.type && <span class="card-type">{project.type}</span>}
             {project.subtitle && <p class="card-subtitle">{project.subtitle}</p>}
           </div>
         </a>
@@ -102,8 +102,8 @@ const permalink = `${Astro.site?.href}data`;
 
     .data-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
-      gap: 2rem;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 2rem 1.5rem;
       margin-bottom: 4rem;
     }
 
@@ -112,79 +112,90 @@ const permalink = `${Astro.site?.href}data`;
       flex-direction: column;
       text-decoration: none;
       color: inherit;
-      background: var(--background-elevated, rgba(255, 255, 255, 0.05));
-      border-radius: 12px;
+      transition: all 0.2s ease;
+      border-radius: 8px;
       overflow: hidden;
-      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-      border: 1px solid var(--border-color, rgba(0, 0, 0, 0.1));
       height: 100%;
     }
 
     .data-card:hover {
       transform: translateY(-4px);
-      box-shadow: 0 12px 24px rgba(0, 0, 0, 0.08);
-      border-color: var(--primary-color);
+    }
+
+    .data-card:hover .card-title {
+      color: var(--primary-color);
     }
 
     .card-image-wrapper {
-      position: relative;
+      width: 100%;
       aspect-ratio: 16 / 9;
+      background-color: var(--background-elevated, rgba(0, 0, 0, 0.05));
+      border-radius: 8px;
       overflow: hidden;
-      background-color: var(--background-secondary, #f5f5f5);
+      margin-bottom: 0.5rem;
+      border: 1px solid var(--border-color);
+      position: relative;
     }
 
     .card-image {
       width: 100%;
       height: 100%;
       object-fit: cover;
-      transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+      transition: transform 0.3s ease;
     }
 
     .data-card:hover .card-image {
       transform: scale(1.05);
     }
 
-
+    .card-type {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      background-color: var(--background-elevated, rgba(255, 255, 255, 0.9));
+      color: var(--primary-color);
+      font-family: var(--font-family-sans);
+      font-weight: 700;
+      font-size: 0.65rem;
+      padding: 0.25rem 0.6rem;
+      text-transform: capitalize;
+      letter-spacing: 0.05em;
+      border-radius: 0 8px 0 8px;
+      z-index: 1;
+      pointer-events: none;
+      backdrop-filter: blur(4px);
+    }
 
     .card-content {
-      padding: 1.5rem;
-      flex: 1;
       display: flex;
       flex-direction: column;
-      justify-content: center;
     }
 
     .card-title {
       font-family: var(--font-family-serif);
-      font-size: 1rem;
       font-weight: 600;
-      line-height: 1.4;
-      margin: 0;
+      font-size: 1.1rem;
       color: var(--text-primary);
-    }
-
-    .card-type {
-      font-family: var(--font-family-sans);
-      font-weight: 600;
-      font-size: 0.8rem;
-      color: var(--primary-color);
-      text-transform: capitalize;
+      transition: color 0.2s ease;
       margin-top: 0.25rem;
-      display: block;
-      letter-spacing: 0.05em;
+      margin-bottom: 0;
+      line-height: 1.5;
     }
 
     .card-subtitle {
-      margin-top: 0.5rem;
-      font-size: 0.85rem;
+      font-family: var(--font-family-sans);
+      font-weight: 400;
       color: var(--text-secondary);
+      font-size: 0.95rem;
       line-height: 1.5;
+      margin: 0;
+      margin-top: 0.5rem;
     }
 
     @media (max-width: 600px) {
       .data-grid {
         grid-template-columns: 1fr;
-        gap: 1.5rem;
+        gap: 1.75rem 1rem;
       }
 
       h1 {

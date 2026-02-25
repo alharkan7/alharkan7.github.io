@@ -43,7 +43,7 @@ const { sectionTitle, sectionSubtitle, items } = Astro.props;
   .featured-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-    gap: 1.5rem;
+    gap: 2rem 1.5rem;
   }
 
   .featured-item {
@@ -72,6 +72,7 @@ const { sectionTitle, sectionSubtitle, items } = Astro.props;
     overflow: hidden;
     margin-bottom: 0.5rem;
     border: 1px solid var(--border-color);
+    position: relative;
   }
 
   .featured-image {
@@ -96,20 +97,27 @@ const { sectionTitle, sectionSubtitle, items } = Astro.props;
     font-size: 1.1rem;
     color: var(--text-primary);
     transition: color 0.2s ease;
-    margin-top: 0.5rem;
+    margin-top: 0.25rem;
     margin-bottom: 0;
     line-height: 1.5;
   }
 
   .featured-item-type {
-    font-family: var(--font-family-sans);
-    font-weight: 600;
-    font-size: 0.8rem;
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    background-color: var(--background-elevated, rgba(255, 255, 255, 0.9));
     color: var(--primary-color);
+    font-family: var(--font-family-sans);
+    font-weight: 700;
+    font-size: 0.65rem;
+    padding: 0.25rem 0.6rem;
     text-transform: capitalize;
-    margin-top: 0.25rem;
-    display: block;
     letter-spacing: 0.05em;
+    border-radius: 0 8px 0 8px;
+    z-index: 1;
+    pointer-events: none;
+    backdrop-filter: blur(4px);
   }
 
   .featured-item-subtitle {
@@ -137,7 +145,7 @@ const { sectionTitle, sectionSubtitle, items } = Astro.props;
 
     .featured-grid {
       grid-template-columns: 1fr;
-      gap: 1rem;
+      gap: 1.75rem 1rem;
     }
   }
 </style>
@@ -164,10 +172,10 @@ const { sectionTitle, sectionSubtitle, items } = Astro.props;
               class="featured-image"
               loading="lazy"
             />
+            {item.type && <span class="featured-item-type">{item.type}</span>}
           </div>
           <div class="featured-content">
             <h3 class="featured-item-title">{item.title}</h3>
-            {item.type && <span class="featured-item-type">{item.type}</span>}
             {item.subtitle && <p class="featured-item-subtitle">{item.subtitle}</p>}
           </div>
         </a>
