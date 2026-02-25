@@ -2,6 +2,7 @@
 export interface FeaturedItem {
   title: string;
   subtitle: string;
+  type?: string;
   url: string;
   coverImage: string;
 }
@@ -87,7 +88,6 @@ const { sectionTitle, sectionSubtitle, items } = Astro.props;
   .featured-content {
     display: flex;
     flex-direction: column;
-    gap: 0.5rem;
   }
 
   .featured-item-title {
@@ -97,8 +97,19 @@ const { sectionTitle, sectionSubtitle, items } = Astro.props;
     color: var(--text-primary);
     transition: color 0.2s ease;
     margin-top: 0.5rem;
-    margin-bottom: 1rem;
+    margin-bottom: 0;
     line-height: 1.5;
+  }
+
+  .featured-item-type {
+    font-family: var(--font-family-sans);
+    font-weight: 600;
+    font-size: 0.8rem;
+    color: var(--primary-color);
+    text-transform: capitalize;
+    margin-top: 0.25rem;
+    display: block;
+    letter-spacing: 0.05em;
   }
 
   .featured-item-subtitle {
@@ -108,6 +119,7 @@ const { sectionTitle, sectionSubtitle, items } = Astro.props;
     font-size: 0.95rem;
     line-height: 1.5;
     margin: 0;
+    margin-top: 0.5rem;
   }
 
   @media screen and (max-width: 520px) {
@@ -155,6 +167,7 @@ const { sectionTitle, sectionSubtitle, items } = Astro.props;
           </div>
           <div class="featured-content">
             <h3 class="featured-item-title">{item.title}</h3>
+            {item.type && <span class="featured-item-type">{item.type}</span>}
             {item.subtitle && <p class="featured-item-subtitle">{item.subtitle}</p>}
           </div>
         </a>

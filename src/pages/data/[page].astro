@@ -58,6 +58,7 @@ const permalink = `${Astro.site?.href}data`;
           </div>
           <div class="card-content">
             <h3 class="card-title">{project.title}</h3>
+            {project.type && <span class="card-type">{project.type}</span>}
             {project.subtitle && <p class="card-subtitle">{project.subtitle}</p>}
           </div>
         </a>
@@ -160,6 +161,17 @@ const permalink = `${Astro.site?.href}data`;
       line-height: 1.4;
       margin: 0;
       color: var(--text-primary);
+    }
+
+    .card-type {
+      font-family: var(--font-family-sans);
+      font-weight: 600;
+      font-size: 0.8rem;
+      color: var(--primary-color);
+      text-transform: capitalize;
+      margin-top: 0.25rem;
+      display: block;
+      letter-spacing: 0.05em;
     }
 
     .card-subtitle {
