@@ -53,6 +53,13 @@ const colorMap = {
 const fallbackColors = d3.schemeTableau10;
 const color = (key) => colorMap[key] || fallbackColors[state.keys.indexOf(key) % fallbackColors.length];
 
+// Helper for robust clip-path referencing on mobile
+function getClipUrl(id) {
+    // Some mobile browsers fail with plain #id if there's a base tag or complex routing
+    // Using absolute-path-based fragment is more robust
+    const path = window.location.pathname + window.location.search;
+    return `url(${path}#${id})`;
+}
 
 // Initialization
 async function init() {
@@ -70,8 +77,13 @@ async function init() {
             state.resizeTimer = setTimeout(resize, 100);
         });
 
-        // Trigger intro animation for initial tab if needed
-        playIntroAnimation();
+        // Use requestAnimationFrame to ensure the initial layout is complete
+        // before starting the intro animation, which is more reliable on mobile.
+        requestAnimationFrame(() => {
+            setTimeout(() => {
+                playIntroAnimation();
+            }, 50);
+        });
 
     } catch (error) {
         console.error("Error loading data:", error);
@@ -305,8 +317,14 @@ function playIntroAnimation(isFilterChange = false) {
     if (!isFilterChange && state.introPlayed[state.activeTab]) return;
 
     if (state.activeTab === 'main-view') {
-        if (isFilterChange) return; // Main view handles its own year-based updates
+        if (isFilterChange) return;
         renderMainChart();
+        return;
+    }
+
+    // Ensure we have valid dimensions before animating
+    if (width <= 0) {
+        setTimeout(() => playIntroAnimation(isFilterChange), 100);
         return;
     }
 
@@ -317,17 +335,11 @@ function playIntroAnimation(isFilterChange = false) {
     const duration = 1500;
     const ease = d3.easeCubicOut;
 
-    let clipId = "#mixed-fg-clip-rect";
-    if (state.activeTab === 'area-view') clipId = "#area-fg-clip-rect";
+    let clipId = state.activeTab === 'mixed-view' ? "mixed-fg-clip-rect" : "area-fg-clip-rect";
 
-    // If it's a filter change, we only animate the foreground clip
-    // If it's the first load, we animate both bg and fg (handled by separate clips)
-    
     if (!isFilterChange) {
-        // First load: animate background too if needed
-        // For Mixed/Area views, we'll keep background static or animate once
-        let bgClipId = state.activeTab === 'mixed-view' ? "#mixed-bg-clip-rect" : "#area-bg-clip-rect";
-        d3.select(bgClipId)
+        let bgClipId = state.activeTab === 'mixed-view' ? "mixed-bg-clip-rect" : "area-bg-clip-rect";
+        d3.select(`#${bgClipId}`)
             .attr("width", 0)
             .transition()
             .duration(duration)
@@ -335,7 +347,7 @@ function playIntroAnimation(isFilterChange = false) {
             .attr("width", width);
     }
 
-    d3.select(clipId)
+    d3.select(`#${clipId}`)
         .attr("width", 0)
         .transition()
         .duration(duration)
@@ -489,7 +501,7 @@ function renderTrendChart(svg, defs) {
     // X-axis needs to be clipped horizontally but allow labels below
     const xAxis = d3.axisBottom(x).tickValues(x.domain().filter((d, i) => !(i % 2))).tickSize(0).tickPadding(10);
     const xAxisG = axesGroup.append("g")
-        .attr("clip-path", "url(#xaxis-clip)")
+        .attr("clip-path", getClipUrl("xaxis-clip"))
         .attr("transform", `translate(0,${height})`)
         .call(xAxis);
 
@@ -514,7 +526,9 @@ function renderTrendChart(svg, defs) {
         .call(d3.axisLeft(y).ticks(5).tickSize(-width).tickFormat("")).select(".domain").remove();
 
     // Group for Bars with Clip Path
-    const content = svg.append("g").attr("clip-path", "url(#main-clip)");
+    const content = svg.append("g")
+        .attr("clip-path", getClipUrl("main-clip"))
+        .style("will-change", "transform");
 
     // Stack Data
     const stack = d3.stack()
@@ -580,7 +594,9 @@ function renderTrendChart(svg, defs) {
             clipRect.attr("y", 0);
         }
 
-        d3.select(this).attr("clip-path", `url(#${clipId})`);
+        d3.select(this)
+            .attr("clip-path", getClipUrl(clipId))
+            .style("will-change", "transform");
     });
 
     // Mark intro as played AFTER animation is triggered for this group
@@ -811,7 +827,7 @@ function renderMixedChart() {
     const axesGroup = svg.append("g");
     const xAxis = d3.axisBottom(x).tickValues(x.domain().filter((d, i) => !(i % 2))).tickSize(0).tickPadding(10);
     const xAxisG = axesGroup.append("g")
-        .attr("clip-path", "url(#mixed-xaxis-clip)")
+        .attr("clip-path", getClipUrl("mixed-xaxis-clip"))
         .attr("transform", `translate(0,${height})`)
         .call(xAxis);
 
@@ -839,8 +855,12 @@ function renderMixedChart() {
         .call(d3.axisLeft(yBar).ticks(5).tickSize(-width).tickFormat("")).select(".domain").remove();
 
     // Content Groups
-    const bgContent = svg.append("g").attr("clip-path", "url(#mixed-bg-clip)");
-    const fgContent = svg.append("g").attr("clip-path", "url(#mixed-fg-clip)");
+    const bgContent = svg.append("g")
+        .attr("clip-path", getClipUrl("mixed-bg-clip"))
+        .style("will-change", "transform");
+    const fgContent = svg.append("g")
+        .attr("clip-path", getClipUrl("mixed-fg-clip"))
+        .style("will-change", "transform");
 
     // Bars (Total APBN) - Put in bgContent
     bgContent.selectAll(".bar-total")
@@ -1012,7 +1032,7 @@ function renderAreaChart() {
     const axesGroup = svg.append("g");
     const xAxis = d3.axisBottom(x).tickFormat(d3.format("d")).tickSize(0).tickPadding(10);
     const xAxisG = axesGroup.append("g")
-        .attr("clip-path", "url(#area-xaxis-clip)")
+        .attr("clip-path", getClipUrl("area-xaxis-clip"))
         .attr("transform", `translate(0,${height})`)
         .call(xAxis);
 
@@ -1035,8 +1055,12 @@ function renderAreaChart() {
         .call(d3.axisLeft(y).ticks(5).tickSize(-width).tickFormat("")).select(".domain").remove();
 
     // Content Groups
-    const bgContent = svg.append("g").attr("clip-path", "url(#area-bg-clip)");
-    const fgContent = svg.append("g").attr("clip-path", "url(#area-fg-clip)");
+    const bgContent = svg.append("g")
+        .attr("clip-path", getClipUrl("area-bg-clip"))
+        .style("will-change", "transform");
+    const fgContent = svg.append("g")
+        .attr("clip-path", getClipUrl("area-fg-clip"))
+        .style("will-change", "transform");
 
     // Background Area (Total APBN) - Always in bgContent
     const areaTotal = d3.area()
