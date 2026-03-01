@@ -97,4 +97,11 @@ export const featuredProjects = [
     url: "/BRIN-CrossTab-Analysis",
     coverImage: "https://ik.imagekit.io/raihankalla/research_section_cover/green-finance-3.png",
   },
+  {
+    title: "Human Capital Development Plan Dashboard",
+    subtitle: "",
+    type: "analysis",
+    url: "/hcdp-dashboard",
+    coverImage: "https://ik.imagekit.io/raihankalla/research_section_cover/hcdp-dashboard.png",
+  }
 ];

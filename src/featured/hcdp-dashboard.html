@@ -1,0 +1,4734 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HCDP Dashboard — Data Exploration & Analysis</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Keep stylesheets linked dynamically or inline them using the build script -->
+    <style>
+:root {
+    --primary: #0f365e;
+    /* Navy Blue */
+    --primary-light: #1b4f84;
+    --accent: #d97706;
+    /* Refined Gold */
+    --accent-hover: #b45309;
+    --bg-body: #f1f5f9;
+    /* Slate 100 */
+    --bg-card: #ffffff;
+    --text-main: #0f172a;
+    /* Slate 900 */
+    --text-muted: #64748b;
+    /* Slate 500 */
+    --border: #e2e8f0;
+    --radius: 10px;
+    --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
+    --shadow-hover: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1);
+    --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    --max-width: 1280px;
+}
+
+[data-theme="dark"] {
+    --primary: #38bdf8;
+    --primary-light: #0284c7;
+    --accent: #fbbf24;
+    --bg-body: #0f172a;
+    --bg-card: #1e293b;
+    --text-main: #f8fafc;
+    --text-muted: #94a3b8;
+    --border: #334155;
+}
+
+[data-theme="dark"] .kpi-card {
+    background: linear-gradient(180deg, #1e293b 0%, #0f172a 100%);
+}
+
+[data-theme="dark"] select.form-control {
+    background-color: var(--bg-card);
+    color: var(--text-main);
+}
+
+[data-theme="dark"] tr:hover td {
+    background-color: #334155;
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    background-color: var(--bg-body);
+    color: var(--text-main);
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+}
+
+/* ─── Navigation ─── */
+header {
+    background-color: var(--bg-card);
+    color: var(--text-main);
+    border-bottom: 1px solid var(--border);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+}
+
+.header-container {
+    max-width: var(--max-width);
+    margin: 0 auto;
+    padding: 1.5rem 1.5rem 1.25rem 1.5rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+}
+
+.header-title h1 {
+    font-size: 1.75rem;
+    font-weight: 800;
+    color: var(--primary);
+    letter-spacing: -0.025em;
+    margin-bottom: 0.25rem;
+}
+
+.header-title p {
+    font-size: 0.875rem;
+    color: var(--text-muted);
+    font-weight: 500;
+}
+
+.header-meta {
+    text-align: right;
+    font-size: 0.875rem;
+    color: var(--text-muted);
+    font-weight: 500;
+    padding-bottom: 0.25rem;
+}
+
+.header-controls {
+    display: flex;
+    gap: 0.75rem;
+    align-items: center;
+    padding-bottom: 0.25rem;
+}
+
+.control-btn {
+    background: none;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    color: var(--text-muted);
+    padding: 0.4rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: var(--transition);
+}
+
+.control-btn:hover {
+    color: var(--primary);
+    background-color: var(--bg-body);
+}
+
+nav.tabs {
+    max-width: var(--max-width);
+    margin: 0 auto;
+    padding: 0 1.5rem;
+    display: flex;
+    overflow-x: auto;
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+    border-top: 1px solid var(--border);
+    background-color: var(--bg-card);
+}
+
+nav.tabs::-webkit-scrollbar {
+    display: none;
+}
+
+.tab-btn {
+    background: none;
+    border: none;
+    color: var(--text-muted);
+    font-size: 0.9rem;
+    font-weight: 600;
+    padding: 1rem 1.25rem;
+    cursor: pointer;
+    white-space: nowrap;
+    border-bottom: 3px solid transparent;
+    transition: var(--transition);
+}
+
+.tab-btn:hover {
+    color: var(--primary);
+    background-color: var(--bg-body);
+}
+
+.tab-btn.active {
+    color: var(--primary);
+    border-bottom-color: var(--primary);
+    background-color: transparent;
+}
+
+/* ─── Main Content ─── */
+main {
+    max-width: var(--max-width);
+    margin: 2.5rem auto;
+    padding: 0 1.5rem;
+    min-height: 80vh;
+}
+
+.tab-content {
+    display: none;
+    animation: fadeIn 0.4s ease-out;
+}
+
+.tab-content.active {
+    display: block;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.section-header {
+    margin-bottom: 2rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.section-header h2 {
+    font-size: 1.75rem;
+    font-weight: 800;
+    color: var(--primary);
+    letter-spacing: -0.025em;
+}
+
+/* ─── Grid & Cards ─── */
+.grid-kpi {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 1.25rem;
+    margin-bottom: 2.5rem;
+}
+
+.card {
+    background-color: var(--bg-card);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    padding: 1.5rem;
+    border: 1px solid var(--border);
+    transition: var(--transition);
+}
+
+.card:hover {
+    box-shadow: var(--shadow-hover);
+    border-color: #cbd5e1;
+}
+
+.kpi-card {
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 1.75rem 1rem;
+    background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
+    position: relative;
+    overflow: hidden;
+}
+
+.kpi-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background-color: transparent;
+    transition: var(--transition);
+}
+
+.kpi-card:hover::before {
+    background-color: var(--primary);
+}
+
+.kpi-value {
+    /* Fluid typography prevents overflow for large amounts */
+    font-size: clamp(1.5rem, 2.5vw, 2.25rem);
+    font-weight: 800;
+    color: var(--primary);
+    margin-bottom: 0.5rem;
+    line-height: 1.1;
+    word-break: break-word;
+    /* Crucial for IDR Billions */
+    letter-spacing: -0.025em;
+}
+
+.kpi-label {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    line-height: 1.2;
+}
+
+.grid-charts {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(450px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 2.5rem;
+}
+
+@media (max-width: 768px) {
+    .grid-charts {
+        grid-template-columns: 1fr;
+    }
+}
+
+.chart-card {
+    display: flex;
+    flex-direction: column;
+}
+
+.chart-header {
+    margin-bottom: 1.25rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.chart-header h3 {
+    font-size: 1.125rem;
+    font-weight: 700;
+    color: var(--primary);
+}
+
+.chart-container {
+    position: relative;
+    height: 320px;
+    width: 100%;
+    flex-grow: 1;
+}
+
+.chart-container-large {
+    height: 420px;
+}
+
+/* ─── Tables ─── */
+.table-container {
+    overflow-x: auto;
+    border-radius: var(--radius);
+    border: 1px solid var(--border);
+    margin-bottom: 1.5rem;
+    background: var(--bg-card);
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    text-align: left;
+}
+
+th,
+td {
+    padding: 1rem 1.25rem;
+    border-bottom: 1px solid var(--border);
+    font-size: 0.875rem;
+}
+
+th {
+    background-color: var(--bg-body);
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    color: var(--primary);
+    letter-spacing: 0.05em;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+}
+
+tr:last-child td {
+    border-bottom: none;
+}
+
+tr:hover td {
+    background-color: #f8fafc;
+}
+
+/* ─── Utilities ─── */
+.text-right {
+    text-align: right;
+}
+
+.text-center {
+    text-align: center;
+}
+
+.flex {
+    display: flex;
+}
+
+.gap-4 {
+    gap: 1rem;
+}
+
+.mb-4 {
+    margin-bottom: 1.5rem;
+}
+
+select.form-control {
+    padding: 0.625rem 2.5rem 0.625rem 1.25rem;
+    border: 1px solid #cbd5e1;
+    border-radius: var(--radius);
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--text-main);
+    background-color: #ffffff;
+    outline: none;
+    width: 100%;
+    max-width: 350px;
+    cursor: pointer;
+    transition: var(--transition);
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%2364748b'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 1rem center;
+    background-size: 1.25rem;
+}
+
+select.form-control:focus {
+    border-color: var(--primary-light);
+    box-shadow: 0 0 0 3px rgba(27, 79, 132, 0.1);
+}
+
+/* ─── Footer ─── */
+.app-footer {
+    background-color: var(--bg-card);
+    border-top: 1px solid var(--border);
+    padding: 0.75rem 0;
+    margin-top: auto;
+}
+
+.footer-container {
+    max-width: var(--max-width);
+    margin: 0 auto;
+    padding: 0 1.5rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    color: var(--text-muted);
+    font-size: 0.875rem;
+}
+
+.footer-credit a {
+    color: var(--primary);
+    font-weight: 600;
+    text-decoration: none;
+    transition: var(--transition);
+}
+
+.footer-credit a:hover {
+    color: var(--accent);
+}
+
+.footer-timestamp {
+    font-weight: 500;
+}
+
+@media print {
+
+    header,
+    nav,
+    footer {
+        display: none !important;
+    }
+
+    main {
+        margin: 0;
+        padding: 0;
+        background: white;
+    }
+
+    body {
+        background: white;
+    }
+
+    .card {
+        box-shadow: none;
+        border: 1px solid #e2e8f0;
+        page-break-inside: avoid;
+    }
+
+    .tab-content {
+        display: block !important;
+        page-break-after: always;
+    }
+}
+</style>
+</head>
+
+<body>
+
+    <div id="password-overlay" class="password-overlay">
+        <div class="password-modal">
+            <div class="password-icon">🔒</div>
+            <h2>Protected Content</h2>
+            <p>This page is password protected. Please enter the password to continue.</p>
+            <form id="password-form" onsubmit="checkPassword(event)">
+                <input type="password" id="password-input" placeholder="Enter password" autocomplete="off" autofocus>
+                <button type="submit">Unlock</button>
+            </form>
+            <p style="margin-top: 15px; font-size: 0.9em;">
+                <a href="/data" style="color: var(--text-muted); text-decoration: none;">← Back to Home</a>
+            </p>
+            <p id="password-error" class="password-error"></p>
+        </div>
+    </div>
+
+    <style>
+        .password-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: var(--bg-body);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 10000;
+        }
+
+        .password-overlay.hidden {
+            display: none;
+        }
+
+        .password-modal {
+            background: var(--bg-card);
+            padding: 40px 32px;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border);
+            text-align: center;
+            max-width: 420px;
+            width: 90%;
+            animation: modalSlideIn 0.3s ease;
+        }
+
+        @keyframes modalSlideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-8px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .password-icon {
+            font-size: 2.25rem;
+            margin-bottom: 16px;
+        }
+
+        .password-modal h2 {
+            font-size: 1.3rem;
+            color: var(--text-main);
+            margin-bottom: 6px;
+            font-weight: 700;
+        }
+
+        .password-modal p {
+            color: var(--text-muted);
+            font-size: 0.95rem;
+            margin-bottom: 18px;
+        }
+
+        .password-modal form {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .password-modal input {
+            padding: 12px 14px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            font-size: 1rem;
+            font-family: inherit;
+            transition: border-color 0.2s, box-shadow 0.2s;
+            outline: none;
+        }
+
+        .password-modal input:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(15, 54, 94, 0.1);
+        }
+
+        .password-modal button {
+            padding: 12px 18px;
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            font-family: inherit;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .password-modal button:hover {
+            background-color: var(--primary-light);
+        }
+
+        .password-error {
+            color: #c0392b;
+            font-weight: 600;
+            font-size: 0.9rem;
+            min-height: 20px;
+        }
+
+        .content-hidden header,
+        .content-hidden nav,
+        .content-hidden main,
+        .content-hidden footer {
+            display: none !important;
+        }
+    </style>
+
+    <script>
+        const PROTECTED_PASSWORD = 'hcdp2026';
+
+        function checkPassword(e) {
+            e.preventDefault();
+            const input = document.getElementById('password-input');
+            const error = document.getElementById('password-error');
+            if (input.value === PROTECTED_PASSWORD) {
+                const overlay = document.getElementById('password-overlay');
+                overlay.classList.add('hidden');
+                document.body.classList.remove('content-hidden');
+            } else {
+                error.textContent = 'Incorrect password. Please try again.';
+                input.value = '';
+                input.focus();
+                const modal = document.querySelector('.password-modal');
+                modal.style.animation = 'none';
+                modal.offsetHeight;
+                modal.style.animation = 'shake 0.4s ease';
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', function () {
+            document.body.classList.add('content-hidden');
+            const shakeStyle = document.createElement('style');
+            shakeStyle.textContent = `
+                @keyframes shake {
+                    0%, 100% { transform: translateX(0); }
+                    20%, 60% { transform: translateX(-5px); }
+                    40%, 80% { transform: translateX(5px); }
+                }
+            `;
+            document.head.appendChild(shakeStyle);
+        });
+    </script>
+
+    <header>
+        <div class="header-container">
+            <div class="header-title">
+                <h1>HCDP Dashboard</h1>
+                <p>Human Capital Development Plan — Data Exploration & Analysis</p>
+            </div>
+            <div class="header-controls">
+                <button id="theme-toggle" class="control-btn" title="Toggle Theme">
+                    <svg id="theme-icon-light" xmlns="http://www.w3.org/2000/svg" width="20" height="20"
+                        viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round" style="display: none;">
+                        <circle cx="12" cy="12" r="5"></circle>
+                        <line x1="12" y1="1" x2="12" y2="3"></line>
+                        <line x1="12" y1="21" x2="12" y2="23"></line>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                        <line x1="1" y1="12" x2="3" y2="12"></line>
+                        <line x1="21" y1="12" x2="23" y2="12"></line>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                    </svg>
+                    <svg id="theme-icon-dark" xmlns="http://www.w3.org/2000/svg" width="20" height="20"
+                        viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                    </svg>
+                </button>
+                <button id="lang-toggle" class="control-btn" title="Toggle Language">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <line x1="2" y1="12" x2="22" y2="12"></line>
+                        <path
+                            d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z">
+                        </path>
+                    </svg>
+                    <span id="lang-label" style="margin-left:5px;font-size:14px;font-weight:600;">ID</span>
+                </button>
+            </div>
+        </div>
+        <nav class="tabs" id="tab-nav">
+            <button class="tab-btn active" data-target="tab-overview">Overview</button>
+            <button class="tab-btn" data-target="tab-competency">Competency</button>
+            <button class="tab-btn" data-target="tab-methods">Development Methods</button>
+            <button class="tab-btn" data-target="tab-technical">Technical Training</button>
+            <button class="tab-btn" data-target="tab-functional">Functional & Edu</button>
+            <button class="tab-btn" data-target="tab-budget">Budget & Resources</button>
+            <button class="tab-btn" data-target="tab-cross">Cross-Analysis</button>
+            <button class="tab-btn" data-target="tab-skpd">SKPD Profiles</button>
+        </nav>
+    </header>
+
+    <main>
+        <!-- TAB 1: OVERVIEW -->
+        <section id="tab-overview" class="tab-content active">
+            <div class="section-header">
+                <h2>Executive Overview</h2>
+            </div>
+
+            <div class="grid-kpi">
+                <div class="card kpi-card">
+                    <div class="kpi-value" id="kpi-total-emp">-</div>
+                    <div class="kpi-label">Total Employees</div>
+                </div>
+                <div class="card kpi-card">
+                    <div class="kpi-value" id="kpi-survey-resp">-</div>
+                    <div class="kpi-label">Survey Respondents</div>
+                </div>
+                <div class="card kpi-card">
+                    <div class="kpi-value" id="kpi-response-rate">-</div>
+                    <div class="kpi-label">Response Rate</div>
+                </div>
+                <div class="card kpi-card">
+                    <div class="kpi-value" id="kpi-plan-entries">-</div>
+                    <div class="kpi-label">Employees in Plan</div>
+                </div>
+                <div class="card kpi-card">
+                    <div class="kpi-value" id="kpi-total-budget">-</div>
+                    <div class="kpi-label">Total Est. Budget (Rp)</div>
+                </div>
+            </div>
+
+            <div class="grid-charts">
+                <div class="card chart-card">
+                    <div class="chart-header">
+                        <h3>Position Type Distribution</h3>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="chart-position-dist"></canvas>
+                    </div>
+                </div>
+
+                <div class="card chart-card">
+                    <div class="chart-header">
+                        <h3>Top 10 SKPDs by Employee Count</h3>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="chart-skpd-dist"></canvas>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- TAB 2: COMPETENCY -->
+        <section id="tab-competency" class="tab-content">
+            <div class="section-header">
+                <h2>Competency Assessment</h2>
+            </div>
+
+            <div class="grid-kpi"
+                style="grid-template-columns: repeat(2, 1fr); max-width: 600px; margin: 0 auto 2.5rem auto;">
+                <div class="card kpi-card">
+                    <div class="kpi-value" id="kpi-comp-ada">-</div>
+                    <div class="kpi-label">With Assessment</div>
+                </div>
+                <div class="card kpi-card">
+                    <div class="kpi-value" id="kpi-comp-tidak">-</div>
+                    <div class="kpi-label">Without Assessment</div>
+                </div>
+            </div>
+
+            <div class="card chart-card mb-4">
+                <div class="chart-header">
+                    <h3>Average Competency Scores (Current vs Target)</h3>
+                </div>
+                <div class="chart-container chart-container-large">
+                    <canvas id="chart-competency-scores"></canvas>
+                </div>
+            </div>
+
+            <div class="card chart-card">
+                <div class="chart-header">
+                    <h3>Top Competency Gaps Identified</h3>
+                </div>
+                <div class="table-container" style="max-height: 400px;">
+                    <table id="table-gap-words">
+                        <thead>
+                            <tr>
+                                <th>Word / Topic</th>
+                                <th class="text-right">Frequency</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Injected via JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- TAB 3: DEVELOPMENT METHODS -->
+        <section id="tab-methods" class="tab-content">
+            <div class="section-header">
+                <h2>Development Methods & Analysis Sources</h2>
+            </div>
+
+            <div class="grid-charts">
+                <div class="card chart-card">
+                    <div class="chart-header">
+                        <h3>Top Recommended Methods</h3>
+                    </div>
+                    <div class="chart-container chart-container-large">
+                        <canvas id="chart-methods"></canvas>
+                    </div>
+                </div>
+
+                <div class="card chart-card">
+                    <div class="chart-header">
+                        <h3>Analysis Source Utilization</h3>
+                    </div>
+                    <div class="chart-container chart-container-large">
+                        <canvas id="chart-sources"></canvas>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- TAB 4: TECHNICAL TRAINING -->
+        <section id="tab-technical" class="tab-content">
+            <div class="section-header">
+                <h2>Technical Training Demand</h2>
+            </div>
+
+            <div class="grid-charts">
+                <div class="card chart-card" style="grid-column: span 2;">
+                    <div class="chart-header">
+                        <h3>Top 20 Training Topics</h3>
+                    </div>
+                    <div class="chart-container chart-container-large">
+                        <canvas id="chart-top-topics"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <div class="grid-charts">
+                <div class="card chart-card">
+                    <div class="chart-header">
+                        <h3>Demand by Category</h3>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="chart-training-categories"></canvas>
+                    </div>
+                </div>
+
+                <div class="card chart-card">
+                    <div class="chart-header">
+                        <h3>Category Summary</h3>
+                    </div>
+                    <div class="table-container" style="height: 300px;">
+                        <table id="table-training-categories">
+                            <thead>
+                                <tr>
+                                    <th>Category</th>
+                                    <th class="text-right">Topics</th>
+                                    <th class="text-right">Total Demand</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <!-- Injected via JS -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- TAB 5: FUNCTIONAL & EDUCATION -->
+        <section id="tab-functional" class="tab-content">
+            <div class="section-header">
+                <h2>Functional Training & Formal Education</h2>
+            </div>
+
+            <div class="grid-charts">
+                <div class="card chart-card">
+                    <div class="chart-header">
+                        <h3>Functional Training Status (Coverage)</h3>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="chart-functional-coverage"></canvas>
+                    </div>
+                </div>
+
+                <div class="card chart-card">
+                    <div class="chart-header">
+                        <h3>Formal Education Upgrade Needs (by Level)</h3>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="chart-education-demand"></canvas>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- TAB 6: BUDGET & RESOURCES -->
+        <section id="tab-budget" class="tab-content">
+            <div class="section-header">
+                <h2>Budget & Resources</h2>
+            </div>
+
+            <div class="grid-charts">
+                <div class="card chart-card">
+                    <div class="chart-header">
+                        <h3>Funding Source Distribution</h3>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="chart-funding-source"></canvas>
+                    </div>
+                </div>
+
+                <div class="card chart-card">
+                    <div class="chart-header">
+                        <h3>Internal vs External Provider</h3>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="chart-provider"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card chart-card mb-4">
+                <div class="chart-header">
+                    <h3>Top 15 SKPDs by Estimated Budget (Rp)</h3>
+                </div>
+                <div class="chart-container chart-container-large">
+                    <canvas id="chart-budget-skpd"></canvas>
+                </div>
+            </div>
+
+            <div class="card chart-card">
+                <div class="chart-header">
+                    <h3>Activities by Target Year</h3>
+                </div>
+                <div class="chart-container">
+                    <canvas id="chart-timeline"></canvas>
+                </div>
+            </div>
+        </section>
+
+        <!-- TAB 7: CROSS-ANALYSIS -->
+        <section id="tab-cross" class="tab-content">
+            <div class="section-header">
+                <h2>Cross-Analysis & Segmentation</h2>
+            </div>
+
+            <div class="grid-kpi">
+                <div class="card kpi-card">
+                    <div class="kpi-value" id="kpi-survey-only">-</div>
+                    <div class="kpi-label">Survey Only</div>
+                </div>
+                <div class="card kpi-card">
+                    <div class="kpi-value" id="kpi-in-both">-</div>
+                    <div class="kpi-label">In Both</div>
+                </div>
+                <div class="card kpi-card">
+                    <div class="kpi-value" id="kpi-plan-only">-</div>
+                    <div class="kpi-label">Plan Only</div>
+                </div>
+                <div class="card kpi-card">
+                    <div class="kpi-value" id="kpi-coverage-gap">-</div>
+                    <div class="kpi-label">Survey Dropout Rate</div>
+                </div>
+            </div>
+
+            <div class="grid-charts">
+                <div class="card chart-card">
+                    <div class="chart-header">
+                        <h3>Employee Development Clusters</h3>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="chart-segmentation"></canvas>
+                    </div>
+                </div>
+
+                <div class="card chart-card">
+                    <div class="chart-header">
+                        <h3>Cluster Profiles (Averages)</h3>
+                    </div>
+                    <div class="table-container" style="height: 300px;">
+                        <table id="table-segmentation">
+                            <thead>
+                                <tr>
+                                    <th>Segment</th>
+                                    <th class="text-right">Methods</th>
+                                    <th class="text-right">Topics</th>
+                                    <th class="text-right">Edu Upgrades</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <!-- Injected via JS -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- TAB 8: SKPD PROFILES -->
+        <section id="tab-skpd" class="tab-content">
+            <div id="skpd-filter-row" class="section-header flex"
+                style="align-items: center; justify-content: space-between; position: sticky; top: 0; background-color: var(--bg-body); z-index: 90; padding: 1.5rem 0 1rem 0; margin-top: -1.5rem; border-bottom: 1px solid var(--border);">
+                <h2 id="skpd-title"
+                    style="margin: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 60%;">
+                    Department (SKPD) Profiles</h2>
+                <select id="skpd-selector" class="form-control" style="flex-shrink: 0; margin-left: 1rem;">
+                    <!-- Injected via JS -->
+                </select>
+            </div>
+
+            <div id="skpd-details" style="display: none;">
+                <div class="grid-kpi">
+                    <div class="card kpi-card">
+                        <div class="kpi-value" id="skpd-emp">-</div>
+                        <div class="kpi-label">Employees in Plan</div>
+                    </div>
+                    <div class="card kpi-card">
+                        <div class="kpi-value" id="skpd-budget">-</div>
+                        <div class="kpi-label">Total Budget (Rp)</div>
+                    </div>
+                    <div class="card kpi-card">
+                        <div class="kpi-value" id="skpd-activities">-</div>
+                        <div class="kpi-label">Total Activities</div>
+                    </div>
+                </div>
+
+                <div class="grid-charts">
+                    <div class="card chart-card">
+                        <div class="chart-header">
+                            <h3>Top Development Methods</h3>
+                        </div>
+                        <div class="table-container" style="max-height: 250px;">
+                            <table id="table-skpd-methods">
+                                <tbody></tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <div class="card chart-card">
+                        <div class="chart-header">
+                            <h3>Top Training Topics</h3>
+                        </div>
+                        <div class="table-container" style="max-height: 250px;">
+                            <table id="table-skpd-topics">
+                                <tbody></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div id="skpd-empty" class="card text-center" style="padding: 4rem;">
+                <p style="color: var(--text-muted); font-size: 1.1rem;">Select an SKPD from the dropdown above to view
+                    its detailed profile.</p>
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="app-footer">
+        <div class="footer-container">
+            <div class="footer-credit">
+                Created by <a href="https://raihankalla.id" target="_blank" rel="noopener noreferrer">@alhrkn</a>
+            </div>
+            <div class="footer-timestamp" id="last-updated">
+                <!-- Injected via JS -->
+            </div>
+        </div>
+    </footer>
+
+    <!-- Chart.js CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <!-- DASHBOARD DATA INJECTION (will be resolved/written externally) -->
+    <script>
+const dashboardData = {
+  "demographics": {
+    "total_employees": 13714,
+    "survey_respondents": 8130,
+    "worksheet_employees": 2874,
+    "response_rate_pct": 59.3,
+    "skpd_count": 29,
+    "role_distribution": {
+      "ASN": 8411,
+      "ATASAN LANGSUNG": 2065,
+      "BAGIAN KEPEGAWAIAN/PERENCANAAN": 156,
+      "MONITORING & REKAPITULASI": 133
+    },
+    "skpd_distribution": {
+      "RSJ SAMLIH": 1436,
+      "DISHUT": 1136,
+      "BAPENDA": 476,
+      "PERTANIAN": 423,
+      "DINKES": 249,
+      "BKD": 188,
+      "RSGM": 147,
+      "PUPR": 145,
+      "DISPORA": 122,
+      "INSPEKTORAT": 112,
+      "SATPOL": 110,
+      "DESDM": 100,
+      "DLH": 83,
+      "BPKAD": 68,
+      "BPSDM": 67,
+      "DISNAKERTRANS": 67,
+      "BIRO ADBANG": 66,
+      "BIRO ADPIM": 64,
+      "DISHUB": 54,
+      "DISBUNAK": 52,
+      "DMPTSP": 43,
+      "PERINDUSTRIAN": 41,
+      "DISDAG": 40,
+      "DISDUKCAPIL": 40,
+      "BRIDA": 39,
+      "DISPERKIM": 36,
+      "DPPPAKB": 36,
+      "DISKOMINFO": 34,
+      "BAKESBANGPOL": 25
+    },
+    "position_type_distribution": {
+      "FUNGSIONAL": 10074,
+      "PELAKSANA": 2380,
+      "STRUKTURAL": 1249
+    },
+    "nip_overlap": {
+      "form_sheets": 7819,
+      "worksheet_sheets": 2539,
+      "worksheet_form": 2106
+    }
+  },
+  "competency": {
+    "assessment_coverage": {
+      "TIDAK ADA": 7745,
+      "ADA": 666
+    },
+    "score_statistics": {
+      "Integritas": {
+        "count": 666.0,
+        "mean": 2.0262,
+        "std": 0.6371,
+        "min": 0.315,
+        "25%": 1.75,
+        "50%": 2.0,
+        "75%": 2.25,
+        "max": 5.2501
+      },
+      "Kerjasama": {
+        "count": 666.0,
+        "mean": 2.0167,
+        "std": 0.6452,
+        "min": 0.1,
+        "25%": 1.75,
+        "50%": 2.0,
+        "75%": 2.25,
+        "max": 6.7501
+      },
+      "Komunikasi": {
+        "count": 666.0,
+        "mean": 2.0952,
+        "std": 0.5924,
+        "min": 0.1,
+        "25%": 2.0,
+        "50%": 2.0,
+        "75%": 2.25,
+        "max": 5.2501
+      },
+      "Orientasi Pada Hasil": {
+        "count": 666.0,
+        "mean": 2.0705,
+        "std": 0.6075,
+        "min": 0.1,
+        "25%": 1.75,
+        "50%": 2.0,
+        "75%": 2.25,
+        "max": 5.2501
+      },
+      "Pelayanan Publik": {
+        "count": 666.0,
+        "mean": 2.1126,
+        "std": 0.5904,
+        "min": 1.0,
+        "25%": 1.75,
+        "50%": 2.0,
+        "75%": 2.2688,
+        "max": 5.2501
+      },
+      "Pengembangan Diri dan Orang Lain": {
+        "count": 666.0,
+        "mean": 2.0747,
+        "std": 0.5537,
+        "min": 0.75,
+        "25%": 2.0,
+        "50%": 2.0,
+        "75%": 2.25,
+        "max": 5.0
+      },
+      "Mengelola Perubahan": {
+        "count": 666.0,
+        "mean": 2.0321,
+        "std": 0.6101,
+        "min": 0.3072,
+        "25%": 1.75,
+        "50%": 2.0,
+        "75%": 2.25,
+        "max": 5.0
+      },
+      "Pengambilan Keputusan": {
+        "count": 666.0,
+        "mean": 2.0307,
+        "std": 0.6298,
+        "min": 0.33,
+        "25%": 1.75,
+        "50%": 2.0,
+        "75%": 2.25,
+        "max": 5.0
+      },
+      "Perekat Bangsa": {
+        "count": 666.0,
+        "mean": 2.0631,
+        "std": 0.5855,
+        "min": 0.1,
+        "25%": 2.0,
+        "50%": 2.0,
+        "75%": 2.25,
+        "max": 5.0
+      }
+    },
+    "score_distributions": {
+      "Integritas": {
+        "bins": [
+          "0.0-0.5",
+          "0.5-1.0",
+          "1.0-1.5",
+          "1.5-2.0",
+          "2.0-2.5",
+          "2.5-3.0",
+          "3.0-3.5"
+        ],
+        "counts": [
+          2,
+          2,
+          108,
+          127,
+          306,
+          36,
+          85
+        ]
+      },
+      "Kerjasama": {
+        "bins": [
+          "0.0-0.5",
+          "0.5-1.0",
+          "1.0-1.5",
+          "1.5-2.0",
+          "2.0-2.5",
+          "2.5-3.0",
+          "3.0-3.5"
+        ],
+        "counts": [
+          2,
+          0,
+          145,
+          57,
+          339,
+          46,
+          77
+        ]
+      },
+      "Komunikasi": {
+        "bins": [
+          "0.0-0.5",
+          "0.5-1.0",
+          "1.0-1.5",
+          "1.5-2.0",
+          "2.0-2.5",
+          "2.5-3.0",
+          "3.0-3.5"
+        ],
+        "counts": [
+          2,
+          0,
+          88,
+          66,
+          378,
+          43,
+          89
+        ]
+      },
+      "Orientasi Pada Hasil": {
+        "bins": [
+          "0.0-0.5",
+          "0.5-1.0",
+          "1.0-1.5",
+          "1.5-2.0",
+          "2.0-2.5",
+          "2.5-3.0",
+          "3.0-3.5"
+        ],
+        "counts": [
+          1,
+          1,
+          89,
+          135,
+          300,
+          59,
+          81
+        ]
+      },
+      "Pelayanan Publik": {
+        "bins": [
+          "0.0-0.5",
+          "0.5-1.0",
+          "1.0-1.5",
+          "1.5-2.0",
+          "2.0-2.5",
+          "2.5-3.0",
+          "3.0-3.5"
+        ],
+        "counts": [
+          0,
+          0,
+          66,
+          119,
+          337,
+          56,
+          88
+        ]
+      },
+      "Pengembangan Diri dan Orang Lain": {
+        "bins": [
+          "0.0-0.5",
+          "0.5-1.0",
+          "1.0-1.5",
+          "1.5-2.0",
+          "2.0-2.5",
+          "2.5-3.0",
+          "3.0-3.5"
+        ],
+        "counts": [
+          0,
+          1,
+          100,
+          62,
+          369,
+          66,
+          68
+        ]
+      },
+      "Mengelola Perubahan": {
+        "bins": [
+          "0.0-0.5",
+          "0.5-1.0",
+          "1.0-1.5",
+          "1.5-2.0",
+          "2.0-2.5",
+          "2.5-3.0",
+          "3.0-3.5"
+        ],
+        "counts": [
+          1,
+          0,
+          130,
+          51,
+          355,
+          70,
+          59
+        ]
+      },
+      "Pengambilan Keputusan": {
+        "bins": [
+          "0.0-0.5",
+          "0.5-1.0",
+          "1.0-1.5",
+          "1.5-2.0",
+          "2.0-2.5",
+          "2.5-3.0",
+          "3.0-3.5"
+        ],
+        "counts": [
+          2,
+          0,
+          133,
+          55,
+          342,
+          43,
+          91
+        ]
+      },
+      "Perekat Bangsa": {
+        "bins": [
+          "0.0-0.5",
+          "0.5-1.0",
+          "1.0-1.5",
+          "1.5-2.0",
+          "2.0-2.5",
+          "2.5-3.0",
+          "3.0-3.5"
+        ],
+        "counts": [
+          1,
+          0,
+          104,
+          58,
+          375,
+          58,
+          70
+        ]
+      }
+    },
+    "target_statistics": {
+      "Integritas": {
+        "count": 79.0,
+        "mean": 2.2504,
+        "std": 0.7816,
+        "min": -1.0,
+        "25%": 2.0,
+        "50%": 2.4,
+        "75%": 2.7003,
+        "max": 5.0
+      },
+      "Kerjasama": {
+        "count": 80.0,
+        "mean": 2.2511,
+        "std": 0.7084,
+        "min": -0.25,
+        "25%": 2.0,
+        "50%": 2.4002,
+        "75%": 2.7003,
+        "max": 4.0
+      },
+      "Komunikasi": {
+        "count": 80.0,
+        "mean": 2.2149,
+        "std": 0.8336,
+        "min": -0.75,
+        "25%": 2.0,
+        "50%": 2.4,
+        "75%": 2.7,
+        "max": 5.0
+      },
+      "Orientasi Pada Hasil": {
+        "count": 80.0,
+        "mean": 2.2971,
+        "std": 0.6404,
+        "min": -0.25,
+        "25%": 2.0,
+        "50%": 2.4,
+        "75%": 2.7,
+        "max": 4.0
+      },
+      "Pelayanan Publik": {
+        "count": 81.0,
+        "mean": 2.2713,
+        "std": 0.7428,
+        "min": -0.25,
+        "25%": 2.0,
+        "50%": 2.4,
+        "75%": 2.7,
+        "max": 5.0
+      },
+      "Pengembangan Diri dan Orang Lain": {
+        "count": 80.0,
+        "mean": 2.2583,
+        "std": 0.7209,
+        "min": -0.25,
+        "25%": 2.0,
+        "50%": 2.4,
+        "75%": 2.7,
+        "max": 5.0
+      },
+      "Mengelola Perubahan": {
+        "count": 81.0,
+        "mean": 2.2245,
+        "std": 0.7314,
+        "min": -0.25,
+        "25%": 2.0,
+        "50%": 2.4,
+        "75%": 2.7,
+        "max": 4.0
+      }
+    },
+    "gap_analysis": {
+      "Integritas": {
+        "mean_gap": -0.1056,
+        "median_gap": 0.0,
+        "positive_gap_pct": 16.5,
+        "count": 79
+      },
+      "Kerjasama": {
+        "mean_gap": -0.0956,
+        "median_gap": 0.0,
+        "positive_gap_pct": 7.5,
+        "count": 80
+      },
+      "Komunikasi": {
+        "mean_gap": -0.0956,
+        "median_gap": 0.0,
+        "positive_gap_pct": 6.2,
+        "count": 80
+      },
+      "Orientasi Pada Hasil": {
+        "mean_gap": -0.0699,
+        "median_gap": 0.0,
+        "positive_gap_pct": 10.0,
+        "count": 80
+      },
+      "Pelayanan Publik": {
+        "mean_gap": -0.0846,
+        "median_gap": 0.0,
+        "positive_gap_pct": 9.9,
+        "count": 81
+      },
+      "Pengembangan Diri dan Orang Lain": {
+        "mean_gap": -0.0821,
+        "median_gap": 0.0,
+        "positive_gap_pct": 5.0,
+        "count": 80
+      },
+      "Mengelola Perubahan": {
+        "mean_gap": -0.0877,
+        "median_gap": 0.0,
+        "positive_gap_pct": 8.6,
+        "count": 81
+      }
+    }
+  },
+  "gap_text": {
+    "ISU/FAKTA GAP": {
+      "total_entries": 7118,
+      "top_words": [
+        {
+          "word": "belum",
+          "count": 2492
+        },
+        {
+          "word": "pendidikan",
+          "count": 1974
+        },
+        {
+          "word": "diklat",
+          "count": 1298
+        },
+        {
+          "word": "pelatihan",
+          "count": 1269
+        },
+        {
+          "word": "mengikuti",
+          "count": 1252
+        },
+        {
+          "word": "keperawatan",
+          "count": 1152
+        },
+        {
+          "word": "kompetensi",
+          "count": 634
+        },
+        {
+          "word": "pernah",
+          "count": 586
+        },
+        {
+          "word": "sertifikat",
+          "count": 532
+        },
+        {
+          "word": "manajemen",
+          "count": 443
+        },
+        {
+          "word": "jabatan",
+          "count": 403
+        },
+        {
+          "word": "pim",
+          "count": 394
+        },
+        {
+          "word": "pendidik",
+          "count": 390
+        },
+        {
+          "word": "iii",
+          "count": 379
+        },
+        {
+          "word": "pembelajaran",
+          "count": 377
+        },
+        {
+          "word": "ners",
+          "count": 350
+        },
+        {
+          "word": "guru",
+          "count": 349
+        },
+        {
+          "word": "fungsional",
+          "count": 344
+        },
+        {
+          "word": "bahasa",
+          "count": 313
+        },
+        {
+          "word": "kesehatan",
+          "count": 310
+        },
+        {
+          "word": "teknik",
+          "count": 307
+        },
+        {
+          "word": "btcls",
+          "count": 305
+        },
+        {
+          "word": "sertifikasi",
+          "count": 302
+        },
+        {
+          "word": "teknis",
+          "count": 295
+        },
+        {
+          "word": "profesi",
+          "count": 257
+        },
+        {
+          "word": "kurangnya",
+          "count": 254
+        },
+        {
+          "word": "kurang",
+          "count": 250
+        },
+        {
+          "word": "memiliki",
+          "count": 247
+        },
+        {
+          "word": "administrasi",
+          "count": 221
+        },
+        {
+          "word": "bidang",
+          "count": 208
+        }
+      ]
+    },
+    "Output Yang Diharapkan": {
+      "total_entries": 7128,
+      "top_words": [
+        {
+          "word": "pendidikan",
+          "count": 3091
+        },
+        {
+          "word": "pelatihan",
+          "count": 2709
+        },
+        {
+          "word": "diklat",
+          "count": 1536
+        },
+        {
+          "word": "jabatan",
+          "count": 1221
+        },
+        {
+          "word": "bidang",
+          "count": 1166
+        },
+        {
+          "word": "manajemen",
+          "count": 990
+        },
+        {
+          "word": "keperawatan",
+          "count": 926
+        },
+        {
+          "word": "kompetensi",
+          "count": 889
+        },
+        {
+          "word": "tugas",
+          "count": 844
+        },
+        {
+          "word": "fungsional",
+          "count": 747
+        },
+        {
+          "word": "relevan",
+          "count": 713
+        },
+        {
+          "word": "administrasi",
+          "count": 675
+        },
+        {
+          "word": "guru",
+          "count": 601
+        },
+        {
+          "word": "lain",
+          "count": 573
+        },
+        {
+          "word": "btcls",
+          "count": 570
+        },
+        {
+          "word": "teknik",
+          "count": 562
+        },
+        {
+          "word": "sosial",
+          "count": 537
+        },
+        {
+          "word": "minimal",
+          "count": 533
+        },
+        {
+          "word": "pembelajaran",
+          "count": 505
+        },
+        {
+          "word": "diploma",
+          "count": 502
+        },
+        {
+          "word": "mengikuti",
+          "count": 488
+        },
+        {
+          "word": "teknis",
+          "count": 485
+        },
+        {
+          "word": "ekonomi",
+          "count": 439
+        },
+        {
+          "word": "meningkatkan",
+          "count": 427
+        },
+        {
+          "word": "hukum",
+          "count": 418
+        },
+        {
+          "word": "satu",
+          "count": 418
+        },
+        {
+          "word": "strata",
+          "count": 408
+        },
+        {
+          "word": "pemerintahan",
+          "count": 402
+        },
+        {
+          "word": "peningkatan",
+          "count": 382
+        },
+        {
+          "word": "pendidik",
+          "count": 373
+        }
+      ]
+    }
+  },
+  "development_methods": {
+    "method_totals": {
+      "BIMBINGAN TEKNIS": 11752,
+      "PELATIHAN FUNGSIONAL": 6507,
+      "SEMINAR ATAU LOKAKARYA": 4838,
+      "BELAJAR MANDIRI": 2930,
+      "SOSIALISASI": 2911,
+      "PELATIHAN TEKNIS MANAJERIAL": 2617,
+      "KURSUS": 2574,
+      "MAGANG/SIT-IN/PRAKTIK KERJA": 2104,
+      "E-LEARNING": 2052,
+      "COACHING": 1933,
+      "PENUGASAN": 1671,
+      "BENCHMARKING/STUDY VISIT": 1664,
+      "MENTORING": 860,
+      "PELATIHAN SOSIO - KULTURAL": 437,
+      "TEAM BUILDING": 360
+    },
+    "agreement_analysis": {
+      "PELATIHAN TEKNIS MANAJERIAL": {
+        "employees_recommended": 1611,
+        "avg_sources": 1.62,
+        "multi_source_pct": 59.5
+      },
+      "PELATIHAN FUNGSIONAL": {
+        "employees_recommended": 3689,
+        "avg_sources": 1.76,
+        "multi_source_pct": 72.1
+      },
+      "PELATIHAN SOSIO - KULTURAL": {
+        "employees_recommended": 316,
+        "avg_sources": 1.38,
+        "multi_source_pct": 36.1
+      },
+      "SEMINAR ATAU LOKAKARYA": {
+        "employees_recommended": 2911,
+        "avg_sources": 1.66,
+        "multi_source_pct": 60.2
+      },
+      "KURSUS": {
+        "employees_recommended": 1698,
+        "avg_sources": 1.52,
+        "multi_source_pct": 48.4
+      },
+      "BIMBINGAN TEKNIS": {
+        "employees_recommended": 6232,
+        "avg_sources": 1.89,
+        "multi_source_pct": 73.3
+      },
+      "SOSIALISASI": {
+        "employees_recommended": 1834,
+        "avg_sources": 1.59,
+        "multi_source_pct": 52.9
+      },
+      "PENUGASAN": {
+        "employees_recommended": 1112,
+        "avg_sources": 1.5,
+        "multi_source_pct": 45.1
+      },
+      "MAGANG/SIT-IN/PRAKTIK KERJA": {
+        "employees_recommended": 1243,
+        "avg_sources": 1.69,
+        "multi_source_pct": 53.3
+      },
+      "BENCHMARKING/STUDY VISIT": {
+        "employees_recommended": 1077,
+        "avg_sources": 1.55,
+        "multi_source_pct": 52.8
+      },
+      "COACHING": {
+        "employees_recommended": 1264,
+        "avg_sources": 1.53,
+        "multi_source_pct": 50.1
+      },
+      "MENTORING": {
+        "employees_recommended": 613,
+        "avg_sources": 1.4,
+        "multi_source_pct": 39.5
+      },
+      "E-LEARNING": {
+        "employees_recommended": 1383,
+        "avg_sources": 1.48,
+        "multi_source_pct": 45.8
+      },
+      "BELAJAR MANDIRI": {
+        "employees_recommended": 1942,
+        "avg_sources": 1.51,
+        "multi_source_pct": 45.9
+      },
+      "TEAM BUILDING": {
+        "employees_recommended": 238,
+        "avg_sources": 1.51,
+        "multi_source_pct": 47.9
+      }
+    },
+    "source_activity": {
+      "SKJ": 7819,
+      "ASPIRASI": 7819,
+      "ATASAN": 1938,
+      "PERENCANA": 148
+    }
+  },
+  "analysis_sources": {
+    "source_rates": {
+      "UKOM": {
+        "count": 620,
+        "rate_pct": 4.5
+      },
+      "SKJ": {
+        "count": 7401,
+        "rate_pct": 54.0
+      },
+      "ASPIRASI": {
+        "count": 7818,
+        "rate_pct": 57.0
+      },
+      "EKSPEKTASI PIMPINAN": {
+        "count": 1938,
+        "rate_pct": 14.1
+      },
+      "KINERJA": {
+        "count": 340,
+        "rate_pct": 2.5
+      },
+      "RENSTRA": {
+        "count": 146,
+        "rate_pct": 1.1
+      }
+    },
+    "sources_per_employee": {
+      "0": 5752,
+      "2": 5209,
+      "3": 1867,
+      "1": 451,
+      "4": 385,
+      "5": 47,
+      "6": 3
+    },
+    "avg_sources_per_employee": 1.33,
+    "source_correlation": {
+      "UKOM": {
+        "UKOM": 1.0,
+        "SKJ": 0.178,
+        "ASPIRASI": 0.188,
+        "EKSPEKTASI PIMPINAN": 0.023,
+        "KINERJA": 0.019,
+        "RENSTRA": 0.029
+      },
+      "SKJ": {
+        "UKOM": 0.178,
+        "SKJ": 1.0,
+        "ASPIRASI": 0.94,
+        "EKSPEKTASI PIMPINAN": 0.307,
+        "KINERJA": 0.109,
+        "RENSTRA": 0.049
+      },
+      "ASPIRASI": {
+        "UKOM": 0.188,
+        "SKJ": 0.94,
+        "ASPIRASI": 1.0,
+        "EKSPEKTASI PIMPINAN": 0.302,
+        "KINERJA": 0.111,
+        "RENSTRA": 0.048
+      },
+      "EKSPEKTASI PIMPINAN": {
+        "UKOM": 0.023,
+        "SKJ": 0.307,
+        "ASPIRASI": 0.302,
+        "EKSPEKTASI PIMPINAN": 1.0,
+        "KINERJA": 0.393,
+        "RENSTRA": 0.119
+      },
+      "KINERJA": {
+        "UKOM": 0.019,
+        "SKJ": 0.109,
+        "ASPIRASI": 0.111,
+        "EKSPEKTASI PIMPINAN": 0.393,
+        "KINERJA": 1.0,
+        "RENSTRA": 0.093
+      },
+      "RENSTRA": {
+        "UKOM": 0.029,
+        "SKJ": 0.049,
+        "ASPIRASI": 0.048,
+        "EKSPEKTASI PIMPINAN": 0.119,
+        "KINERJA": 0.093,
+        "RENSTRA": 1.0
+      }
+    }
+  },
+  "technical_training": {
+    "categories": {
+      "Kesehatan": {
+        "total_demand": 786,
+        "topics": [
+          {
+            "topic": "BTCLS",
+            "total_demand": 478,
+            "employees": 478
+          },
+          {
+            "topic": "ATLS",
+            "total_demand": 117,
+            "employees": 117
+          },
+          {
+            "topic": "Perawatan Luka",
+            "total_demand": 78,
+            "employees": 78
+          },
+          {
+            "topic": "Gawat Darurat",
+            "total_demand": 51,
+            "employees": 51
+          },
+          {
+            "topic": "ACLS",
+            "total_demand": 24,
+            "employees": 24
+          },
+          {
+            "topic": "Resusitasi",
+            "total_demand": 24,
+            "employees": 24
+          },
+          {
+            "topic": "Teknis Keperawatan",
+            "total_demand": 8,
+            "employees": 8
+          },
+          {
+            "topic": "Pediatri",
+            "total_demand": 5,
+            "employees": 5
+          },
+          {
+            "topic": "BLS",
+            "total_demand": 1,
+            "employees": 1
+          },
+          {
+            "topic": "Standar Implementasi Keperawatan",
+            "total_demand": 0,
+            "employees": 0
+          },
+          {
+            "topic": "Standar Luaran Keperawatan",
+            "total_demand": 0,
+            "employees": 0
+          },
+          {
+            "topic": "Ilmu Gizi Kuliner",
+            "total_demand": 0,
+            "employees": 0
+          },
+          {
+            "topic": "Hygiene Sanitasi Penjamah Makanan",
+            "total_demand": 0,
+            "employees": 0
+          },
+          {
+            "topic": "Faklin TTK",
+            "total_demand": 0,
+            "employees": 0
+          },
+          {
+            "topic": "Hemodialisis",
+            "total_demand": 0,
+            "employees": 0
+          },
+          {
+            "topic": "GELS",
+            "total_demand": 0,
+            "employees": 0
+          },
+          {
+            "topic": "Penanganan Trauma",
+            "total_demand": 0,
+            "employees": 0
+          },
+          {
+            "topic": "Pengembangan Komunikasi Dokter",
+            "total_demand": 0,
+            "employees": 0
+          },
+          {
+            "topic": "Telemedicine",
+            "total_demand": 0,
+            "employees": 0
+          },
+          {
+            "topic": "Teknologi Keperawatan",
+            "total_demand": 0,
+            "employees": 0
+          }
+        ]
+      },
+      "Administrasi Pemerintahan": {
+        "total_demand": 480,
+        "topics": [
+          {
+            "topic": "Administrasi",
+            "total_demand": 210,
+            "employees": 210
+          },
+          {
+            "topic": "Tata Naskah Dinas",
+            "total_demand": 178,
+            "employees": 178
+          },
+          {
+            "topic": "Arsip",
+            "total_demand": 48,
+            "employees": 48
+          },
+          {
+            "topic": "Pelayanan Publik",
+            "total_demand": 40,
+            "employees": 40
+          },
+          {
+            "topic": "Penyusunan SOP",
+            "total_demand": 3,
+            "employees": 3
+          },
+          {
+            "topic": "Legal Drafting",
+            "total_demand": 1,
+            "employees": 1
+          },
+          {
+            "topic": "Digitalisasi Arsip",
+            "total_demand": 0,
+            "employees": 0
+          },
+          {
+            "topic": "Standart Operasonal Prosedur",
+            "total_demand": 0,
+            "employees": 0
+          },
+          {
+            "topic": "Manajemen Resiko",
+            "total_demand": 0,
+            "employees": 0
+          },
+          {
+            "topic": "Pengawasan Internal",
+            "total_demand": 0,
+            "employees": 0
+          },
+          {
+            "topic": "Digitalisasi Administrasi",
+            "total_demand": 0,
+            "employees": 0
+          }
+        ]
+      },
+      "Penggunaan Aplikasi Digital": {
+        "total_demand": 437,
+        "topics": [
+          {
+            "topic": "Excel",
+            "total_demand": 267,
+            "employees": 267
+          },
+          {
+            "topic": "Microsoft Office",
+            "total_demand": 69,
+            "employees": 69
+          },
+          {
+            "topic": "Words",
+            "total_demand": 67,
+            "employees": 67
+          },
+          {
+            "topic": "Canva",
+            "total_demand": 20,
+            "employees": 20
+          },
+          {
+            "topic": "Power Point",
+            "total_demand": 11,
+            "employees": 11
+          },
+          {
+            "topic": "Srikandi",
+            "total_demand": 3,
+            "employees": 3
+          }
+        ]
+      },
+      "Soft Skill": {
+        "total_demand": 182,
+        "topics": [
+          {
+            "topic": "Komunikasi",
+            "total_demand": 129,
+            "employees": 129
+          },
+          {
+            "topic": "Public Speaking",
+            "total_demand": 44,
+            "employees": 44
+          },
+          {
+            "topic": "Fotografi",
+            "total_demand": 4,
+            "employees": 4
+          },
+          {
+            "topic": "Videografi",
+            "total_demand": 3,
+            "employees": 3
+          },
+          {
+            "topic": "Karya Tulis Ilmiah",
+            "total_demand": 2,
+            "employees": 2
+          }
+        ]
+      },
+      "Manajemen Organisasi": {
+        "total_demand": 155,
+        "topics": [
+          {
+            "topic": "Kepegawaian",
+            "total_demand": 131,
+            "employees": 131
+          },
+          {
+            "topic": "Sakip",
+            "total_demand": 16,
+            "employees": 16
+          },
+          {
+            "topic": "Perencanaan Anggaran",
+            "total_demand": 7,
+            "employees": 7
+          },
+          {
+            "topic": "Perencanaan Renstra",
+            "total_demand": 1,
+            "employees": 1
+          },
+          {
+            "topic": "Manajemen Kinerja",
+            "total_demand": 0,
+            "employees": 0
+          },
+          {
+            "topic": "Anjab ABK",
+            "total_demand": 0,
+            "employees": 0
+          }
+        ]
+      },
+      "Teknologi Informasi": {
+        "total_demand": 128,
+        "topics": [
+          {
+            "topic": "Sistem Informasi",
+            "total_demand": 76,
+            "employees": 76
+          },
+          {
+            "topic": "BASIS DATA",
+            "total_demand": 23,
+            "employees": 23
+          },
+          {
+            "topic": "Pemrograman",
+            "total_demand": 9,
+            "employees": 9
+          },
+          {
+            "topic": "Analisis Data",
+            "total_demand": 8,
+            "employees": 8
+          },
+          {
+            "topic": "Desain Grafis",
+            "total_demand": 7,
+            "employees": 7
+          },
+          {
+            "topic": "Data Manajemen",
+            "total_demand": 2,
+            "employees": 2
+          },
+          {
+            "topic": "Cloud Computing",
+            "total_demand": 2,
+            "employees": 2
+          },
+          {
+            "topic": "Python",
+            "total_demand": 1,
+            "employees": 1
+          },
+          {
+            "topic": "Cyber Security (Keamanan Siber)",
+            "total_demand": 0,
+            "employees": 0
+          },
+          {
+            "topic": "Manajemen Jaringan",
+            "total_demand": 0,
+            "employees": 0
+          },
+          {
+            "topic": "Big Data",
+            "total_demand": 0,
+            "employees": 0
+          },
+          {
+            "topic": "Administrasi Basis Data",
+            "total_demand": 0,
+            "employees": 0
+          },
+          {
+            "topic": "Administrasi Basis Data_2",
+            "total_demand": 0,
+            "employees": 0
+          }
+        ]
+      },
+      "Keuangan": {
+        "total_demand": 99,
+        "topics": [
+          {
+            "topic": "Bendahara",
+            "total_demand": 31,
+            "employees": 31
+          },
+          {
+            "topic": "Laporan Keuangan",
+            "total_demand": 21,
+            "employees": 21
+          },
+          {
+            "topic": "Pengelolaan Keuangan",
+            "total_demand": 19,
+            "employees": 19
+          },
+          {
+            "topic": "Akuntansi",
+            "total_demand": 17,
+            "employees": 17
+          },
+          {
+            "topic": "Administrasi Keuangan",
+            "total_demand": 11,
+            "employees": 11
+          },
+          {
+            "topic": "Dana Alokasi Khusus (DAK)",
+            "total_demand": 0,
+            "employees": 0
+          }
+        ]
+      },
+      "Pendidikan": {
+        "total_demand": 95,
+        "topics": [
+          {
+            "topic": "Literasi",
+            "total_demand": 60,
+            "employees": 60
+          },
+          {
+            "topic": "Manajemen Kelas",
+            "total_demand": 14,
+            "employees": 14
+          },
+          {
+            "topic": "Numerasi",
+            "total_demand": 8,
+            "employees": 8
+          },
+          {
+            "topic": "Pengembangan Kurikulum",
+            "total_demand": 4,
+            "employees": 4
+          },
+          {
+            "topic": "Teknologi Pembelajaran",
+            "total_demand": 4,
+            "employees": 4
+          },
+          {
+            "topic": "Pembelajaran berbasis Proyek",
+            "total_demand": 3,
+            "employees": 3
+          },
+          {
+            "topic": "Pengembangan Media Ajar",
+            "total_demand": 1,
+            "employees": 1
+          },
+          {
+            "topic": "Pembelajaran Inovatif",
+            "total_demand": 1,
+            "employees": 1
+          },
+          {
+            "topic": "Penilaian dan Evaluasi",
+            "total_demand": 0,
+            "employees": 0
+          },
+          {
+            "topic": "Pembelajaran Daring'",
+            "total_demand": 0,
+            "employees": 0
+          },
+          {
+            "topic": "Pendidikan Karakter",
+            "total_demand": 0,
+            "employees": 0
+          },
+          {
+            "topic": "Pembelajaran BerbasiS STEM",
+            "total_demand": 0,
+            "employees": 0
+          }
+        ]
+      },
+      "Lain lain": {
+        "total_demand": 40,
+        "topics": [
+          {
+            "topic": "Barang dan Jasa",
+            "total_demand": 22,
+            "employees": 22
+          },
+          {
+            "topic": "Bencana",
+            "total_demand": 18,
+            "employees": 18
+          }
+        ]
+      }
+    },
+    "top_20_topics": [
+      {
+        "topic": "Kesehatan_BTCLS",
+        "demand": 478
+      },
+      {
+        "topic": "Penggunaan Aplikasi Digital_Excel",
+        "demand": 267
+      },
+      {
+        "topic": "Administrasi Pemerintahan_Administrasi",
+        "demand": 210
+      },
+      {
+        "topic": "Administrasi Pemerintahan_Tata Naskah Dinas",
+        "demand": 178
+      },
+      {
+        "topic": "Manajemen Organisasi_Kepegawaian",
+        "demand": 131
+      },
+      {
+        "topic": "Soft Skill_Komunikasi",
+        "demand": 129
+      },
+      {
+        "topic": "Kesehatan_ATLS",
+        "demand": 117
+      },
+      {
+        "topic": "Kesehatan_Perawatan Luka",
+        "demand": 78
+      },
+      {
+        "topic": "Teknologi Informasi_Sistem Informasi",
+        "demand": 76
+      },
+      {
+        "topic": "Penggunaan Aplikasi Digital_Microsoft Office",
+        "demand": 69
+      },
+      {
+        "topic": "Penggunaan Aplikasi Digital_Words",
+        "demand": 67
+      },
+      {
+        "topic": "Pendidikan_Literasi",
+        "demand": 60
+      },
+      {
+        "topic": "Kesehatan_Gawat Darurat",
+        "demand": 51
+      },
+      {
+        "topic": "Administrasi Pemerintahan_Arsip",
+        "demand": 48
+      },
+      {
+        "topic": "Soft Skill_Public Speaking",
+        "demand": 44
+      },
+      {
+        "topic": "Administrasi Pemerintahan_Pelayanan Publik",
+        "demand": 40
+      },
+      {
+        "topic": "Keuangan_Bendahara",
+        "demand": 31
+      },
+      {
+        "topic": "Kesehatan_ACLS",
+        "demand": 24
+      },
+      {
+        "topic": "Kesehatan_Resusitasi",
+        "demand": 24
+      },
+      {
+        "topic": "Teknologi Informasi_BASIS DATA",
+        "demand": 23
+      }
+    ],
+    "category_summary": [
+      {
+        "category": "Kesehatan",
+        "total_demand": 786,
+        "topic_count": 20
+      },
+      {
+        "category": "Administrasi Pemerintahan",
+        "total_demand": 480,
+        "topic_count": 11
+      },
+      {
+        "category": "Penggunaan Aplikasi Digital",
+        "total_demand": 437,
+        "topic_count": 6
+      },
+      {
+        "category": "Soft Skill",
+        "total_demand": 182,
+        "topic_count": 5
+      },
+      {
+        "category": "Manajemen Organisasi",
+        "total_demand": 155,
+        "topic_count": 6
+      },
+      {
+        "category": "Teknologi Informasi",
+        "total_demand": 128,
+        "topic_count": 13
+      },
+      {
+        "category": "Keuangan",
+        "total_demand": 99,
+        "topic_count": 6
+      },
+      {
+        "category": "Pendidikan",
+        "total_demand": 95,
+        "topic_count": 12
+      },
+      {
+        "category": "Lain lain",
+        "total_demand": 40,
+        "topic_count": 2
+      }
+    ]
+  },
+  "functional_training": {
+    "coverage": {
+      "ada": 3689,
+      "tidak_ada": 10025,
+      "coverage_pct": 26.9
+    },
+    "gap_by_position_type": {
+      "FUNGSIONAL": {
+        "ada": 3397,
+        "total": 10074,
+        "coverage_pct": 33.7
+      },
+      "PELAKSANA": {
+        "ada": 219,
+        "total": 2380,
+        "coverage_pct": 9.2
+      },
+      "STRUKTURAL": {
+        "ada": 68,
+        "total": 1249,
+        "coverage_pct": 5.4
+      }
+    },
+    "gap_by_position": {
+      "GURU": {
+        "ada": 1581,
+        "total": 6231,
+        "coverage_pct": 25.4
+      },
+      "PERAWAT": {
+        "ada": 786,
+        "total": 1539,
+        "coverage_pct": 51.1
+      },
+      "PRANATA KOMPUTER": {
+        "ada": 91,
+        "total": 203,
+        "coverage_pct": 44.8
+      },
+      "BIDAN": {
+        "ada": 90,
+        "total": 188,
+        "coverage_pct": 47.9
+      },
+      "DOKTER": {
+        "ada": 80,
+        "total": 178,
+        "coverage_pct": 44.9
+      },
+      "PRANATA LABORATORIUM KESEHATAN": {
+        "ada": 39,
+        "total": 163,
+        "coverage_pct": 23.9
+      },
+      "ASISTEN APOTEKER": {
+        "ada": 65,
+        "total": 118,
+        "coverage_pct": 55.1
+      },
+      "PENGENDALI ORGANISME PENGGANGGU TUMBUHAN": {
+        "ada": 63,
+        "total": 93,
+        "coverage_pct": 67.7
+      },
+      "NUTRISIONIS": {
+        "ada": 47,
+        "total": 87,
+        "coverage_pct": 54.0
+      },
+      "POLISI KEHUTANAN": {
+        "ada": 32,
+        "total": 68,
+        "coverage_pct": 47.1
+      },
+      "PENYULUH KEHUTANAN": {
+        "ada": 19,
+        "total": 58,
+        "coverage_pct": 32.8
+      },
+      "RADIOGRAFER": {
+        "ada": 37,
+        "total": 53,
+        "coverage_pct": 69.8
+      },
+      "PENYULUH PERTANIAN": {
+        "ada": 43,
+        "total": 50,
+        "coverage_pct": 86.0
+      },
+      "APOTEKER": {
+        "ada": 15,
+        "total": 50,
+        "coverage_pct": 30.0
+      },
+      "PENGAWAS BENIH TANAMAN": {
+        "ada": 32,
+        "total": 49,
+        "coverage_pct": 65.3
+      }
+    },
+    "gap_by_level": {
+      "AHLI MADYA": {
+        "ada": 527,
+        "total": 2033,
+        "coverage_pct": 25.9
+      },
+      "AHLI MUDA": {
+        "ada": 721,
+        "total": 2311,
+        "coverage_pct": 31.2
+      },
+      "AHLI PERTAMA": {
+        "ada": 1232,
+        "total": 3861,
+        "coverage_pct": 31.9
+      },
+      "AHLI UTAMA": {
+        "ada": 11,
+        "total": 34,
+        "coverage_pct": 32.4
+      },
+      "MAHIR": {
+        "ada": 173,
+        "total": 339,
+        "coverage_pct": 51.0
+      },
+      "PEMULA": {
+        "ada": 36,
+        "total": 48,
+        "coverage_pct": 75.0
+      },
+      "PENYELIA": {
+        "ada": 157,
+        "total": 405,
+        "coverage_pct": 38.8
+      },
+      "TERAMPIL": {
+        "ada": 540,
+        "total": 1043,
+        "coverage_pct": 51.8
+      }
+    }
+  },
+  "education": {
+    "demand_by_source": {
+      "SKJ": {
+        "D-IV": 273,
+        "S-1": 2093,
+        "S-2": 1589,
+        "S-3": 203,
+        "DOKTER SPESIALIS": 32,
+        "DOKTER SUB SPESIALIS": 51
+      },
+      "ASPIRASI": {
+        "D-IV": 291,
+        "S-1": 2115,
+        "S-2": 1845,
+        "S-3": 211,
+        "DOKTER SPESIALIS": 39,
+        "DOKTER SUB SPESIALIS": 51
+      },
+      "ATASAN": {
+        "D-IV": 10,
+        "S-1": 111,
+        "S-2": 93,
+        "S-3": 13,
+        "DOKTER SPESIALIS": 13,
+        "DOKTER SUB SPESIALIS": 22
+      }
+    },
+    "total_demand": {
+      "D-IV": 574,
+      "S-1": 4319,
+      "S-2": 3527,
+      "S-3": 427,
+      "DOKTER SPESIALIS": 84,
+      "DOKTER SUB SPESIALIS": 124
+    },
+    "source_agreement": {
+      "D-IV": {
+        "any_source": 335,
+        "multi_source": 238,
+        "agreement_pct": 71.0
+      },
+      "S-1": {
+        "any_source": 2461,
+        "multi_source": 1800,
+        "agreement_pct": 73.1
+      },
+      "S-2": {
+        "any_source": 2159,
+        "multi_source": 1326,
+        "agreement_pct": 61.4
+      },
+      "S-3": {
+        "any_source": 259,
+        "multi_source": 163,
+        "agreement_pct": 62.9
+      },
+      "DOKTER SPESIALIS": {
+        "any_source": 44,
+        "multi_source": 30,
+        "agreement_pct": 68.2
+      },
+      "DOKTER SUB SPESIALIS": {
+        "any_source": 54,
+        "multi_source": 49,
+        "agreement_pct": 90.7
+      }
+    }
+  },
+  "budget": {
+    "total_budget_worksheet": 65768699059.0,
+    "budget_stats_worksheet": {
+      "count": 4334.0,
+      "mean": 15175057.4663,
+      "std": 20394750.8666,
+      "min": 0.0,
+      "25%": 5000000.0,
+      "50%": 10000000.0,
+      "75%": 15000000.0,
+      "max": 500000000.0
+    },
+    "budget_by_skpd": {
+      "RSJ SAMLIH": 31900000000.0,
+      "DISHUT": 12557180000.0,
+      "PERTANIAN": 4855000000.0,
+      "BKD": 3126000000.0,
+      "DINKES": 1658849999.0,
+      "DESDM": 1357000000.0,
+      "PUPR": 1255000000.0,
+      "DISNAKERTRANS": 1119000000.0,
+      "BRIDA": 1083949000.0,
+      "RSGM": 781020005.0,
+      "BAPENDA": 745900000.0,
+      "BIRO ADBANG": 726500000.0,
+      "DLH": 702000000.0,
+      "DISHUB": 690000000.0,
+      "BPSDM": 583300000.0,
+      "DMPTSP": 480500000.0,
+      "BPKAD": 400000000.0,
+      "DISPERKIM": 308500000.0,
+      "DISKOMINFO": 286000055.0,
+      "DISPORA": 283000000.0,
+      "BAKESBANGPOL": 237000000.0,
+      "DPPPAKB": 219000000.0,
+      "DISBUNAK": 165000000.0,
+      "BIRO ADPIM": 125000000.0,
+      "DISDUKCAPIL": 124000000.0,
+      "INSPEKTORAT": 0.0,
+      "PERINDUSTRIAN": 0.0,
+      "DISDAG": 0.0,
+      "SATPOL": 0.0
+    },
+    "budget_by_method": {
+      "Diklat Teknis": 12513529014.0,
+      "Coaching": 7991000000.0,
+      "Bimbingan Teknis": 5065900000.0,
+      "Mentoring": 4885000000.0,
+      "Workshop": 4816300000.0,
+      "E-learning": 3840000000.0,
+      "Benchmarking": 3364000000.0,
+      "Diklat Fungsional": 3350300000.0,
+      "Magang/sit-in/praktik kerja": 3035000000.0,
+      "Pelatihan Manajerial": 1643500020.0,
+      "Bimbingan teknis": 1430000000.0,
+      "Pelatihan fungsional": 1255000000.0,
+      "Penugasan": 1125000000.0,
+      "Seminar atau lokakarya": 1120000000.0,
+      "Kursus": 1010500000.0
+    },
+    "funding_source": {
+      "APBD": 7526,
+      "MANDIRI": 284,
+      "NON APBD": 209
+    },
+    "cost_per_jp": {
+      "count": 2832.0,
+      "mean": 485456.5282,
+      "std": 759350.7438,
+      "min": 0.0,
+      "25%": 166666.6667,
+      "50%": 400000.0,
+      "75%": 500000.0,
+      "max": 15625000.0
+    }
+  },
+  "institutional_capacity": {
+    "training_provider": {
+      "Internal": 2680,
+      "Eksternal": 2605,
+      "internel": 1,
+      "BKD": 1
+    },
+    "institution_preferences": [
+      {
+        "institution": "BPSDMD PEMERINTAH PROVINSI KALIMANTAN SELATAN",
+        "count": 5568
+      },
+      {
+        "institution": "LEMBAGA PEMERINTAH LAINNYA",
+        "count": 3477
+      },
+      {
+        "institution": "KEMENTERIAN",
+        "count": 3011
+      },
+      {
+        "institution": "PIHAK KE 3",
+        "count": 2380
+      },
+      {
+        "institution": "MANDIRI",
+        "count": 996
+      }
+    ]
+  },
+  "timeline": {
+    "year_distribution": {
+      "2026": 2734,
+      "2025": 1730,
+      "2027": 272,
+      "2028": 238,
+      "2029": 200,
+      "2030": 166,
+      "2012": 1
+    },
+    "activities_by_year_method": [
+      {
+        "year": 2012,
+        "Metode Pengembangan": "Diklat Teknis",
+        "count": 1
+      },
+      {
+        "year": 2025,
+        "Metode Pengembangan": "Diklat Teknis",
+        "count": 248
+      },
+      {
+        "year": 2025,
+        "Metode Pengembangan": "Bimbingan Teknis",
+        "count": 190
+      },
+      {
+        "year": 2025,
+        "Metode Pengembangan": "Pelatihan Manajerial",
+        "count": 107
+      },
+      {
+        "year": 2025,
+        "Metode Pengembangan": "Coaching",
+        "count": 99
+      },
+      {
+        "year": 2025,
+        "Metode Pengembangan": "Mentoring",
+        "count": 85
+      },
+      {
+        "year": 2025,
+        "Metode Pengembangan": "Pelatihan fungsional",
+        "count": 81
+      },
+      {
+        "year": 2025,
+        "Metode Pengembangan": "Seminar atau lokakarya",
+        "count": 79
+      },
+      {
+        "year": 2025,
+        "Metode Pengembangan": "Sosialisasi",
+        "count": 75
+      },
+      {
+        "year": 2025,
+        "Metode Pengembangan": "Diklat Fungsional",
+        "count": 70
+      },
+      {
+        "year": 2025,
+        "Metode Pengembangan": " Bimbingan Teknis",
+        "count": 68
+      },
+      {
+        "year": 2025,
+        "Metode Pengembangan": "E-learning ",
+        "count": 64
+      },
+      {
+        "year": 2025,
+        "Metode Pengembangan": "Bimbingan teknis",
+        "count": 55
+      },
+      {
+        "year": 2025,
+        "Metode Pengembangan": "Kursus",
+        "count": 55
+      },
+      {
+        "year": 2025,
+        "Metode Pengembangan": " Bimbingan Teknis ",
+        "count": 41
+      },
+      {
+        "year": 2025,
+        "Metode Pengembangan": "Bimbingan teknis ",
+        "count": 33
+      },
+      {
+        "year": 2025,
+        "Metode Pengembangan": "Workshop",
+        "count": 29
+      },
+      {
+        "year": 2025,
+        "Metode Pengembangan": " Pelatihan Manajerial",
+        "count": 28
+      },
+      {
+        "year": 2025,
+        "Metode Pengembangan": "E-Learning",
+        "count": 22
+      },
+      {
+        "year": 2025,
+        "Metode Pengembangan": "Self Development",
+        "count": 18
+      },
+      {
+        "year": 2025,
+        "Metode Pengembangan": "Benchmarking",
+        "count": 16
+      },
+      {
+        "year": 2025,
+        "Metode Pengembangan": "Seminar",
+        "count": 16
+      },
+      {
+        "year": 2025,
+        "Metode Pengembangan": "Pelatihan teknis manajerial",
+        "count": 14
+      },
+      {
+        "year": 2025,
+        "Metode Pengembangan": " Diklat Fungsional",
+        "count": 12
+      },
+      {
+        "year": 2025,
+        "Metode Pengembangan": "Pelatihan Klasikal Lainnya - Klasikal",
+        "count": 12
+      },
+      {
+        "year": 2025,
+        "Metode Pengembangan": "Belajar mandiri ",
+        "count": 11
+      },
+      {
+        "year": 2025,
+        "Metode Pengembangan": "Diklat Fungsional - Klasikal",
+        "count": 11
+      },
+      {
+        "year": 2025,
+        "Metode Pengembangan": " Seminar",
+        "count": 10
+      },
+      {
+        "year": 2025,
+        "Metode Pengembangan": "Diklat Teknis - Klasikal",
+        "count": 10
+      },
+      {
+        "year": 2025,
+        "Metode Pengembangan": "Pelatihan Klasikal Lainnya",
+        "count": 10
+      },
+      {
+        "year": 2025,
+        "Metode Pengembangan": "Diklat Struktural (Khusus Struktural)",
+        "count": 9
+      },
+      {
+        "year": 2025,
+        "Metode Pengembangan": "Seminar atau lokakarya ",
+        "count": 9
+      },
+      {
+        "year": 2025,
+        "Metode Pengembangan": "E-learning",
+        "count": 8
+      },
+      {
+        "year": 2025,
+        "Metode Pengembangan": "Magang",
+        "count": 8
+      },
+      {
+        "year": 2025,
+        "Metode Pengembangan": "Seminar - Klasikal",
+        "count": 8
+      },
+      {
+        "year": 2025,
+        "Metode Pengembangan": " Kursus",
+        "count": 7
+      },
+      {
+        "year": 2025,
+        "Metode Pengembangan": "Belajar mandiri",
+        "count": 7
+      },
+      {
+        "year": 2025,
+        "Metode Pengembangan": "Pelatihan Sosial Kultural",
+        "count": 7
+      },
+      {
+        "year": 2025,
+        "Metode Pengembangan": "Penugasan",
+        "count": 7
+      },
+      {
+        "year": 2025,
+        "Metode Pengembangan": "Workshop - Klasikal",
+        "count": 7
+      },
+      {
+        "year": 2025,
+        "Metode Pengembangan": "Mentoring ",
+        "count": 6
+      },
+      {
+        "year": 2025,
+        "Metode Pengembangan": "Pelatihan sosio - kultural",
+        "count": 6
+      },
+      {
+        "year": 2025,
+        "Metode Pengembangan": "Bimbingan Teknis - Klasikal",
+        "count": 5
+      },
+      {
+        "year": 2025,
+        "Metode Pengembangan": "Magang/sit-in/praktik kerja",
+        "count": 5
+      },
+      {
+        "year": 2025,
+        "Metode Pengembangan": "Outbond",
+        "count": 5
+      },
+      {
+        "year": 2025,
+        "Metode Pengembangan": "Coaching ",
+        "count": 4
+      },
+      {
+        "year": 2025,
+        "Metode Pengembangan": "Benchmarking ",
+        "count": 3
+      },
+      {
+        "year": 2025,
+        "Metode Pengembangan": "Kursus ",
+        "count": 3
+      },
+      {
+        "year": 2025,
+        "Metode Pengembangan": "Pelatihan Nonklasikal Lainnya",
+        "count": 3
+      },
+      {
+        "year": 2025,
+        "Metode Pengembangan": " Pelatihan Manajerial ",
+        "count": 2
+      }
+    ]
+  },
+  "employee_profiles": {
+    "dataset_sizes": {
+      "metode": 13714,
+      "sumber": 13714,
+      "diklat": 13714,
+      "pelatihan": 13714,
+      "pendidikan": 13714
+    },
+    "employees_with_methods": 7963,
+    "employees_with_training_needs": 1851,
+    "avg_topics_per_employee": 1.3,
+    "employees_with_education_needs": 4988
+  },
+  "segmentation": {
+    "segment_counts": {
+      "Maintenance": 5751,
+      "Leadership-Track": 4599,
+      "Moderate": 3283,
+      "Technical-Focus": 79,
+      "High-Need": 2
+    },
+    "segment_profiles": {
+      "High-Need": {
+        "avg_methods": 5.0,
+        "avg_topics": 5.0,
+        "avg_edu_upgrades": 2.0
+      },
+      "Leadership-Track": {
+        "avg_methods": 6.16,
+        "avg_topics": 0.28,
+        "avg_edu_upgrades": 1.82
+      },
+      "Maintenance": {
+        "avg_methods": 0.0,
+        "avg_topics": 0.0,
+        "avg_edu_upgrades": 0.0
+      },
+      "Moderate": {
+        "avg_methods": 4.97,
+        "avg_topics": 0.26,
+        "avg_edu_upgrades": 0.19
+      },
+      "Technical-Focus": {
+        "avg_methods": 7.23,
+        "avg_topics": 3.15,
+        "avg_edu_upgrades": 0.9
+      }
+    }
+  },
+  "alignment": {
+    "survey_respondents": 8130,
+    "plan_entries": 2874,
+    "in_both": 2106,
+    "survey_only": 6024,
+    "plan_only": 768,
+    "coverage_gap_pct": 74.1
+  },
+  "skpd_profiles": {
+    "BAKESBANGPOL": {
+      "employee_count": 25,
+      "activity_count": 25,
+      "total_budget": 237000000.0,
+      "top_methods": {
+        "Pelatihan Manajerial": 9,
+        "Bimbingan Teknis": 7,
+        "Seminar": 2,
+        "Diklat Teknis": 1,
+        "Sosialisasi": 1
+      },
+      "provider_split": {
+        "Internal": 24,
+        "Eksternal": 1
+      },
+      "top_topics": {
+        "STANDAR KOMPETENSI JABATAN": 5,
+        "STANDAR KOMPETENSI JABATAN ": 2,
+        "INTEGRITAS - 2 ": 2,
+        "Diklat Change Management-Diklat Standar Kompetensi Jabatan": 1,
+        "STANDAR KOMPETENSI JABATAN - Melanjutkan Pendidikan yg linear dengan jabatan Men": 1
+      },
+      "avg_jp": 18.9,
+      "total_jp": 472.0
+    },
+    "BAPENDA": {
+      "employee_count": 357,
+      "activity_count": 476,
+      "total_budget": 745900000.0,
+      "top_methods": {
+        "Bimbingan Teknis": 133,
+        " Bimbingan Teknis": 78,
+        " Bimbingan Teknis ": 43,
+        " Pelatihan Manajerial": 38,
+        "Pelatihan Manajerial": 33
+      },
+      "provider_split": {
+        "Internal": 421,
+        "Eksternal": 39
+      },
+      "top_topics": {
+        "Bimbingan Teknis (Bimtek) mengenai perpajakan": 13,
+        " ASPIRASI PRIBADI - Mengikuti Pelatihan Klasikal": 13,
+        "Pelatihan Komunikasi Efektif": 12,
+        "Pelatihan Etika dan Integritas": 11,
+        "Bimbingan & Pelatihan penulisan dan pembuatan tata naskah dinas serta surat - me": 8
+      },
+      "avg_jp": 21.6,
+      "total_jp": 4789.0
+    },
+    "BIRO ADBANG": {
+      "employee_count": 24,
+      "activity_count": 66,
+      "total_budget": 726500000.0,
+      "top_methods": {
+        "Diklat Teknis": 16,
+        "Seminar": 14,
+        "Bimbingan Teknis": 13,
+        "Mentoring": 9,
+        "Workshop": 8
+      },
+      "provider_split": {
+        "Internal": 55,
+        "Eksternal": 11
+      },
+      "top_topics": {
+        "mentoring Proses bisnis/SOP ": 8,
+        "Publik Speaking": 4,
+        "Mastering Microsoft Excel": 3,
+        "Komunikasi asertif.": 2,
+        "Programming with Flutter": 2
+      },
+      "avg_jp": 19.6,
+      "total_jp": 1296.0
+    },
+    "BIRO ADPIM": {
+      "employee_count": 40,
+      "activity_count": 64,
+      "total_budget": 125000000.0,
+      "top_methods": {
+        "Diklat Teknis": 13,
+        "Bimbingan Teknis": 11,
+        "Pelatihan Manajerial": 11,
+        "E-Learning": 7,
+        "Diklat Struktural (Khusus Struktural)": 3
+      },
+      "provider_split": {
+        "Internal": 44
+      },
+      "top_topics": {
+        "Pelatihan Komunikasi Efektif": 5,
+        "Pelatihan Tata Naskah Dinas": 4,
+        "Pelatihan Pengadaan Barang dan Jasa Pemerintah": 3,
+        "Pelatihan Manajemen Resiko SPBE": 3,
+        "Pelatihan Public Speaking": 3
+      },
+      "avg_jp": 66.2,
+      "total_jp": 2912.0
+    },
+    "BKD": {
+      "employee_count": 78,
+      "activity_count": 188,
+      "total_budget": 3126000000.0,
+      "top_methods": {
+        "Bimbingan Teknis": 48,
+        "Pelatihan Manajerial": 28,
+        "Sosialisasi": 17,
+        "Diklat Fungsional": 14,
+        "Coaching": 13
+      },
+      "provider_split": {
+        "Eksternal": 185,
+        "Internal": 3
+      },
+      "top_topics": {
+        "Melakukan peningkatan kompetensi berupa melanjutkan Studi Jenjang Magister, dan ": 9,
+        "Penguatan Peran ASN melalui Pelatihan dan Pengembangan Berbagai Aspek : Perencan": 5,
+        " melanjutkan pendidikan S2   Melaksanakan pelatihan tata naskah dinas": 5,
+        " Pengambilan Keputusan: coaching dan mentoring, dengan fokus [1] analisa alterna": 5,
+        " Mengikuti Diklat Fungsional Pranata Komputer   Mengikuti pelatihan atau bimbing": 5
+      },
+      "avg_jp": 40.6,
+      "total_jp": 7422.0
+    },
+    "BPKAD": {
+      "employee_count": 68,
+      "activity_count": 68,
+      "total_budget": 400000000.0,
+      "top_methods": {
+        "Pelatihan Klasikal Lainnya": 46,
+        "Diklat Struktural (Khusus Struktural)": 11,
+        "Bimbingan Teknis": 9,
+        "Diklat Teknis": 2
+      },
+      "provider_split": {
+        "Eksternal": 67
+      },
+      "top_topics": {
+        "Pelatihan Penyusuna Anggaran": 10,
+        "Bimbingan Teknis Penatausahaan dan Pelaporan Keuangan": 9,
+        "Pelatihan Pengelolaan BMD": 8,
+        "Pelatihan Etika Pelayanan dan Integritas": 8,
+        "Pelatihan Pengelolaan Penatausahaan Keuangan dan Aset": 5
+      },
+      "avg_jp": 26.0,
+      "total_jp": 1740.0
+    },
+    "BPSDM": {
+      "employee_count": 67,
+      "activity_count": 67,
+      "total_budget": 583300000.0,
+      "top_methods": {
+        "Diklat Teknis": 29,
+        "Coaching": 15,
+        "Workshop": 13,
+        "Self Development": 7,
+        "Kursus": 1
+      },
+      "provider_split": {
+        "Eksternal": 44,
+        "Internal": 23
+      },
+      "top_topics": {
+        "Pelatihan Active Listening Skill": 3,
+        "Praktek Melaksanakan Tugas-Tugas": 2,
+        "Aktif Melakukan Pengembangan Diri ": 2,
+        "Pelatihan Revolusi Mental Untuk Pelayanan Publik": 2,
+        "Pelatihan Membangun Komitmen Kerja": 2
+      },
+      "avg_jp": 41.8,
+      "total_jp": 2802.0
+    },
+    "BRIDA": {
+      "employee_count": 37,
+      "activity_count": 39,
+      "total_budget": 1083949000.0,
+      "top_methods": {
+        "Bimbingan Teknis": 14,
+        "Diklat Teknis": 12,
+        "Diklat Fungsional": 3,
+        "Pelatihan Manajerial": 3,
+        "Diklat Struktural (Khusus Struktural)": 2
+      },
+      "provider_split": {
+        "Eksternal": 36,
+        "Internal": 3
+      },
+      "top_topics": {
+        "Bimbingan Teknis Keuangan": 4,
+        "Diklat Teknis Pertanian": 3,
+        "Diklat Teknis Manajerial": 3,
+        "Bimbingan Teknis Aset": 2,
+        "Diklat Teknis Informatika": 2
+      },
+      "avg_jp": 97.4,
+      "total_jp": 3800.0
+    },
+    "DESDM": {
+      "employee_count": 100,
+      "activity_count": 100,
+      "total_budget": 1357000000.0,
+      "top_methods": {
+        "Bimbingan Teknis": 62,
+        "WORKSHOP,KURSUS, BIMBINGAN TEKNIS, SELF DEVELOPMENT": 10,
+        "Diklat Struktural (Khusus Struktural)": 7,
+        "Pelatihan Manajerial": 4,
+        "PELATIHAN MANAJERIAL,BIMBINGAN TEKNIS, SOSIALISASI,KURSUS, E-LEARNING ": 4
+      },
+      "provider_split": {
+        "Eksternal": 99,
+        "Internal": 1
+      },
+      "top_topics": {
+        "Bimtek tentang operator pelayanan operasional": 6,
+        "Diklat Pim.Tk.IV / PKP": 6,
+        "bimtek tentang penelaah teknis kebijakan dan tentang pertambangan": 4,
+        "WORKSHOP,KURSUS, BIMBINGAN TEKNIS MANAJEMEN KEPEGAWAIAN": 3,
+        "Bimtek tentang penelaah teknis kebijakan dan tentang ketenagalistrikan": 3
+      },
+      "avg_jp": 20.3,
+      "total_jp": 2030.0
+    },
+    "DINKES": {
+      "employee_count": 190,
+      "activity_count": 249,
+      "total_budget": 1658849999.0,
+      "top_methods": {
+        "Diklat Teknis": 70,
+        "Diklat Fungsional": 43,
+        "Workshop": 43,
+        "Bimbingan Teknis": 30,
+        "Pelatihan Klasikal Lainnya": 18
+      },
+      "provider_split": {
+        "Eksternal": 207,
+        "Internal": 42
+      },
+      "top_topics": {
+        "BTCLS( Basic Trauma and Cardiac Life Support)": 5,
+        "Diklat Fungsional Asisten Apoteker": 3,
+        "Diklat Administrator Kesehatan": 3,
+        "Public Speaking": 3,
+        "Diklat Fungsional Epidemiolog Kesehatan Ahli Pertama": 2
+      },
+      "avg_jp": 52.0,
+      "total_jp": 12948.0
+    },
+    "DISBUNAK": {
+      "employee_count": 52,
+      "activity_count": 52,
+      "total_budget": 165000000.0,
+      "top_methods": {
+        "Diklat Teknis": 26,
+        "Bimbingan Teknis": 11,
+        "Diklat Fungsional": 6,
+        "Diklat Struktural (Khusus Struktural)": 4,
+        "Outbond": 2
+      },
+      "provider_split": {
+        "Eksternal": 33,
+        "Internal": 19
+      },
+      "top_topics": {
+        "DIKLAT MANAJEMEN KEPEGAWAIAN": 3,
+        "Diklat Keuangan": 2,
+        "Diklat Konstruksi Bangunan Pertanian": 2,
+        "DIKLAT BENDAHARA, DIKLAT KEUANGAN, DIKLAT BLUD": 2,
+        "Diklat Kearsipan": 2
+      },
+      "avg_jp": 25.2,
+      "total_jp": 1311.0
+    },
+    "DISDAG": {
+      "employee_count": 38,
+      "activity_count": 40,
+      "total_budget": 0.0,
+      "top_methods": {
+        "Bimbingan Teknis": 25,
+        "Diklat Teknis": 13,
+        "Magang": 1,
+        "Diklat Fungsional": 1
+      },
+      "provider_split": {
+        "Eksternal": 40
+      },
+      "top_topics": {
+        "Pelatihan Manajemen Risiko": 4,
+        "Pelatihan Pelayanan Excelent": 4,
+        "Fasilitasi Perizinan dan Tata Niaga Ekspor-Impor": 3,
+        "Kearsipan": 3,
+        "Diklat Etika dan Integritas ASN": 3
+      },
+      "avg_jp": 27.7,
+      "total_jp": 1080.0
+    },
+    "DISDUKCAPIL": {
+      "employee_count": 28,
+      "activity_count": 40,
+      "total_budget": 124000000.0,
+      "top_methods": {
+        "Diklat Teknis": 16,
+        "Diklat Struktural (Khusus Struktural)": 6,
+        "Bimbingan Teknis": 4,
+        "Bimbingan Di Tempat Kerja": 3,
+        "Pelatihan Nonklasikal Lainnya": 2
+      },
+      "provider_split": {
+        "Eksternal": 11,
+        "Internal": 6,
+        "BKD": 1
+      },
+      "top_topics": {
+        "Diklat PIM  TK. II ": 4,
+        "On The Job Training ": 3,
+        "pengasaan Materi Tata Cara Pelayanan Pencatatan Sipil": 2,
+        "Pelatihan Kepemimoinan Pengawas (PKP) ": 2,
+        "Pelatihan Soft Skill ": 2
+      },
+      "avg_jp": 574.3,
+      "total_jp": 10338.0
+    },
+    "DISHUB": {
+      "employee_count": 54,
+      "activity_count": 54,
+      "total_budget": 690000000.0,
+      "top_methods": {
+        "Bimbingan Teknis": 38,
+        "Pelatihan Manajerial": 7,
+        "Kursus": 5,
+        "Seminar": 2,
+        "Sosialisasi": 1
+      },
+      "provider_split": {
+        "Internal": 54
+      },
+      "top_topics": {
+        "STANDAR KOMPETENSI JABATAN - BIMBINGAN TEKNIS  STANDAR KOMPETENSI JABATAN - BIMB": 13,
+        "STANDAR KOMPETENSI JABATAN - BIMBINGAN TEKNIS, SOSIALISASI, PENUGASAN  STANDAR K": 4,
+        "STANDAR KOMPETENSI JABATAN - PELATIHAN TEKNIS MANAJERIAL, BIMBINGAN TEKNIS, PENU": 4,
+        "STANDAR KOMPETENSI JABATAN - BIMBINGAN TEKNIS, SOSIALISASI  STANDAR KOMPETENSI J": 2,
+        "STANDAR KOMPETENSI JABATAN - KURSUS, BIMBINGAN TEKNIS, PENUGASAN  STANDAR KOMPET": 2
+      },
+      "avg_jp": 22.7,
+      "total_jp": 1226.0
+    },
+    "DISHUT": {
+      "employee_count": 305,
+      "activity_count": 1136,
+      "total_budget": 12557180000.0,
+      "top_methods": {
+        "Diklat Teknis": 549,
+        "Workshop": 388,
+        "Bimbingan Teknis": 71,
+        "Diklat Fungsional": 37,
+        "Sosialisasi": 18
+      },
+      "provider_split": {
+        "Internal": 806,
+        "Eksternal": 326,
+        "internel": 1
+      },
+      "top_topics": {
+        "Pelatihan Pemetaan ": 27,
+        "Workshop Analisis Pemetaan Tematik": 23,
+        "Pembuatan Produk Hukum": 18,
+        "Pelatihan Menembak Bagi Polhut dan Pembina Polhut": 17,
+        "Bimbingan Tenis Peraturan Bidang Kepegawaian": 16
+      },
+      "avg_jp": 34.4,
+      "total_jp": 38420.0
+    },
+    "DISKOMINFO": {
+      "employee_count": 31,
+      "activity_count": 34,
+      "total_budget": 286000055.0,
+      "top_methods": {
+        "Diklat Teknis": 14,
+        "Bimbingan Teknis": 8,
+        "Pelatihan Manajerial": 5,
+        "Workshop": 3,
+        "Diklat Struktural (Khusus Struktural)": 2
+      },
+      "provider_split": {
+        "Eksternal": 34
+      },
+      "top_topics": {
+        "Public Speaking, Master of Ceremony": 1,
+        "Strategi dan Tata Kelola Pemerintahan, Manajemen Perubahan dan Kinerja Organisas": 1,
+        "Administrasi umum": 1,
+        "Manajemen": 1,
+        "Keahlian Pranata Komputer Terampil": 1
+      },
+      "avg_jp": 47.5,
+      "total_jp": 1616.0
+    },
+    "DISNAKERTRANS": {
+      "employee_count": 67,
+      "activity_count": 67,
+      "total_budget": 1119000000.0,
+      "top_methods": {
+        "Bimbingan Teknis": 18,
+        "Pelatihan Manajerial": 18,
+        "Diklat Fungsional": 17,
+        "Sosialisasi": 4,
+        "Kursus": 3
+      },
+      "provider_split": {
+        "Internal": 43,
+        "Eksternal": 24
+      },
+      "top_topics": {
+        "Pelatihan tata naskah dinas": 3,
+        "pelatihan tata naskah dinas": 2,
+        "Pendidikan dan pelatihan tata naskah dinas": 2,
+        "Pengayaan tentang model manajemen talenta": 2,
+        "Diklat Change Management": 1
+      },
+      "avg_jp": 23.3,
+      "total_jp": 1536.0
+    },
+    "DISPERKIM": {
+      "employee_count": 26,
+      "activity_count": 36,
+      "total_budget": 308500000.0,
+      "top_methods": {
+        "Diklat Teknis": 14,
+        "Bimbingan Teknis": 6,
+        "Diklat Struktural (Khusus Struktural)": 5,
+        "Coaching": 4,
+        "Pelatihan Manajerial": 3
+      },
+      "provider_split": {
+        "Eksternal": 30,
+        "Internal": 6
+      },
+      "top_topics": {
+        "Pelayanan Publik": 2,
+        "Perencanaan Wilayah dan Kota (Urban Design)": 1,
+        "Pelatihan mengenai ranah Perencanaan, Keuangan dan Aset, termasuk pengadaan bara": 1,
+        "Diklat Dasar Keamanan Siber dan Persandian": 1,
+        "Keuangan": 1
+      },
+      "avg_jp": 72.2,
+      "total_jp": 2600.0
+    },
+    "DISPORA": {
+      "employee_count": 56,
+      "activity_count": 122,
+      "total_budget": 283000000.0,
+      "top_methods": {
+        "Bimbingan Teknis": 106,
+        "Pelatihan Klasikal Lainnya": 9,
+        "Diklat Struktural (Khusus Struktural)": 4,
+        "Kursus": 2,
+        "Coaching": 1
+      },
+      "provider_split": {
+        "Eksternal": 122
+      },
+      "top_topics": {
+        " Tata Naskah Dinas": 12,
+        "Team Building / Capacity Building": 8,
+        "Mind Setting": 7,
+        "Personal Goal Setting": 7,
+        "Pendidikan yang linier dengan jabatan ": 7
+      },
+      "avg_jp": 18.0,
+      "total_jp": 2200.0
+    },
+    "DLH": {
+      "employee_count": 44,
+      "activity_count": 83,
+      "total_budget": 702000000.0,
+      "top_methods": {
+        "Diklat Teknis": 33,
+        "Bimbingan Teknis": 18,
+        "Self Development": 16,
+        "Pelatihan Manajerial": 12,
+        "E-Learning": 2
+      },
+      "provider_split": {
+        "Eksternal": 51,
+        "Internal": 32
+      },
+      "top_topics": {
+        "Pengembangan Diri / Melanjutkan pendidikan yang sesuai linear dengan jabatan ": 15,
+        "Diklat Change Management": 5,
+        "Peningkatan Kompetensi Manajerial /Kompetensi SDM": 5,
+        "Pengembangan kapasitas dan pengembangan sistem informasi": 5,
+        "Kebijakan Keuangan Pusat dan Daerah": 4
+      },
+      "avg_jp": 16.5,
+      "total_jp": 1322.0
+    },
+    "DMPTSP": {
+      "employee_count": 43,
+      "activity_count": 43,
+      "total_budget": 480500000.0,
+      "top_methods": {
+        "Bimbingan Teknis": 21,
+        "Diklat Teknis": 12,
+        "Diklat Fungsional": 3,
+        "Sosialisasi": 3,
+        "Seminar": 2
+      },
+      "provider_split": {
+        "Eksternal": 42,
+        "Internal": 1
+      },
+      "top_topics": {
+        "Penanaman Modal": 8,
+        "Tata Cara dan Mekanisme Perizinan bagi Pelaku Usaha dan Pemangku Kepentingan": 3,
+        "Pengelolaan Keuangan": 2,
+        "Pengelolaan Teknologi Informasi": 2,
+        "Kearsipan": 2
+      },
+      "avg_jp": 16.2,
+      "total_jp": 696.0
+    },
+    "DPPPAKB": {
+      "employee_count": 36,
+      "activity_count": 36,
+      "total_budget": 219000000.0,
+      "top_methods": {
+        "Diklat Teknis": 25,
+        "Bimbingan Teknis": 6,
+        "Benchmarking": 2,
+        "Diklat Struktural (Khusus Struktural)": 1,
+        "Community Of Practices": 1
+      },
+      "provider_split": {
+        "Internal": 36
+      },
+      "top_topics": {
+        "Pelatihan Manajemen Kasus Anak": 6,
+        "Diklat PBJ Level 1–3": 3,
+        "Bimbingan Teknis Sistem Peringatan Dini Kependudukan ": 2,
+        "Integrated Managerial Competency Development Program (IMCDP)": 1,
+        " Bimbingan Teknis Terkait Aplikasi": 1
+      },
+      "avg_jp": 32.0,
+      "total_jp": 1152.0
+    },
+    "INSPEKTORAT": {
+      "employee_count": 108,
+      "activity_count": 112,
+      "total_budget": 0.0,
+      "top_methods": {
+        "Diklat Teknis": 81,
+        "Pelatihan Manajerial": 16,
+        "Diklat Fungsional": 7
+      },
+      "provider_split": {
+        "Internal": 77,
+        "Eksternal": 27
+      },
+      "top_topics": {
+        "Pelatihan Audit Dasar": 49,
+        "SMAP": 15,
+        "Pelatihan Pengelolaan Dana BSOP Batch 2": 8,
+        "Peran Konsultasi Bagi Auditor": 6,
+        "Pengawasan penerapan SPM Angkatan III ": 2
+      },
+      "avg_jp": 41.7,
+      "total_jp": 4337.0
+    },
+    "PERINDUSTRIAN": {
+      "employee_count": 41,
+      "activity_count": 41,
+      "total_budget": 0.0,
+      "top_methods": {
+        "Diklat Teknis": 36,
+        "Diklat Struktural (Khusus Struktural)": 5
+      },
+      "provider_split": {
+        "Internal": 41
+      },
+      "top_topics": {
+        "Pelatihan Anti Fraud Awareness": 10,
+        "Pelatihan Sistem Informasi dan Multimedia": 8,
+        "Diklat Peningkatan Kapasitas Aparatur Industri": 5,
+        "Diklatpim Tingkat IV": 4,
+        "Pelatihan Analisis Kebijakan Publik": 4
+      },
+      "avg_jp": 146.6,
+      "total_jp": 6012.0
+    },
+    "PERTANIAN": {
+      "employee_count": 310,
+      "activity_count": 423,
+      "total_budget": 4855000000.0,
+      "top_methods": {
+        "Diklat Teknis": 235,
+        "Bimbingan Teknis": 62,
+        "Diklat Fungsional": 37,
+        "Diklat Struktural (Khusus Struktural)": 23,
+        "Self Development": 22
+      },
+      "provider_split": {
+        "Internal": 142,
+        "Eksternal": 140
+      },
+      "top_topics": {
+        "Pengawasan dan Sertifikasi Benih TPH": 76,
+        "Diklat Dasar PPPK": 58,
+        "Diklat Manajemen Ketahanan Pangan": 14,
+        "Melanjutkan Pendidikan yang linear dengan jabatan": 11,
+        "Pelatihan Pengelolaan Penatausahaan Keuangan dan Aset": 10
+      },
+      "avg_jp": 33.8,
+      "total_jp": 13480.0
+    },
+    "PUPR": {
+      "employee_count": 145,
+      "activity_count": 145,
+      "total_budget": 1255000000.0,
+      "top_methods": {
+        "Diklat Teknis": 140,
+        "Diklat Struktural (Khusus Struktural)": 3,
+        "Pelatihan Klasikal Lainnya": 2
+      },
+      "provider_split": {
+        "Internal": 129,
+        "Eksternal": 16
+      },
+      "top_topics": {
+        " Mengikuti pendidikan dan pelatihan sesuai jabatan ": 50,
+        "Pelatihan Manajemen Keuangan": 4,
+        "Pelatihan Lapis Pondasi Agregat": 3,
+        "Pelatihan Teknisi Beton Aspal": 3,
+        "SNI ISO/IEC 17025:2017": 3
+      },
+      "avg_jp": 41.0,
+      "total_jp": 5859.0
+    },
+    "RSGM": {
+      "employee_count": 133,
+      "activity_count": 147,
+      "total_budget": 781020005.0,
+      "top_methods": {
+        "Diklat Fungsional - Klasikal": 40,
+        "Workshop - Klasikal": 31,
+        "Seminar - Klasikal": 20,
+        "Pelatihan Klasikal Lainnya - Klasikal": 16,
+        "Diklat Teknis - Klasikal": 11
+      },
+      "provider_split": {
+        "Eksternal": 134,
+        "Internal": 13
+      },
+      "top_topics": {
+        "Kerjasama - Pelatihan/Seminar/Workshop/Kursus/Penataran lainnya terkait dengan: ": 17,
+        "Pelayanan Publik - Self development practices: praktek melaksanakan tugas-tugas ": 16,
+        "Pengembangan Diri dan Orang Lain - Pelatihan/Seminar/Workshop/Kursus/Penataran l": 14,
+        "Pelayanan Publik - Pelatihan/Seminar/Workshop/Kursus/Penataran lainnya terkait: ": 12,
+        "Integritas - Pelatihan/Seminar/Workshop/Kursus/Penataran lainnya terkait: Memban": 11
+      },
+      "avg_jp": 23.4,
+      "total_jp": 3346.0
+    },
+    "RSJ SAMLIH": {
+      "employee_count": 265,
+      "activity_count": 1436,
+      "total_budget": 31900000000.0,
+      "top_methods": {
+        "Coaching": 282,
+        "Mentoring": 214,
+        "E-learning ": 122,
+        "Seminar atau lokakarya": 106,
+        "Pelatihan fungsional": 103
+      },
+      "provider_split": {
+        "Eksternal": 886,
+        "Internal": 550
+      },
+      "top_topics": {
+        "Pelatihan BTCLS ": 96,
+        "Pendidikan S2": 87,
+        "Mengikuti pelatihan BTCLS ": 75,
+        "Pelatihan BTCLS  ": 36,
+        "Pendidikan S1": 27
+      }
+    },
+    "SATPOL": {
+      "employee_count": 108,
+      "activity_count": 110,
+      "total_budget": 0.0,
+      "top_methods": {
+        "Diklat Teknis": 61,
+        "Sosialisasi": 37,
+        "E-Learning": 7,
+        "Diklat Struktural (Khusus Struktural)": 2,
+        "Bimbingan Teknis": 2
+      },
+      "provider_split": {
+        "Internal": 109
+      },
+      "top_topics": {
+        "Pelatihan Penguatan Tekhnis Tugas Damkar": 41,
+        "Seminar/Sosialisasi/Workshop/Dialog": 37,
+        "Diklat Dasar Pol PP": 16,
+        "ASN Future": 7,
+        "Blanded Learning": 2
+      },
+      "avg_jp": 50.7,
+      "total_jp": 5522.0
+    }
+  },
+  "_metadata": {
+    "generated_at": "2026-02-27T08:30:22.793835",
+    "source_files": {
+      "form_responses": 10765,
+      "metode_pengembangan": 13714,
+      "sumber_analisis": 13714,
+      "diklat_teknis": 13714,
+      "pelatihan_fungsional": 13714,
+      "pendidikan": 13714,
+      "worksheet": 5499
+    }
+  }
+};
+</script>
+
+    <!-- INTERACTIVITY & CHART RENDERING -->
+    <script>
+window.translationsData = {
+    "en": {
+        "HCDP Dashboard": "HCDP Dashboard",
+        "Human Capital Development Plan — Data Exploration & Analysis": "Human Capital Development Plan — Data Exploration & Analysis",
+        "Overview": "Overview",
+        "Competency": "Competency",
+        "Development Methods": "Development Methods",
+        "Technical Training": "Technical Training",
+        "Functional & Edu": "Functional & Edu",
+        "Budget & Resources": "Budget & Resources",
+        "Cross-Analysis": "Cross-Analysis",
+        "SKPD Profiles": "SKPD Profiles",
+        "Executive Overview": "Executive Overview",
+        "Total Employees": "Total Employees",
+        "Survey Respondents": "Survey Respondents",
+        "Response Rate": "Response Rate",
+        "Employees in Plan": "Employees in Plan",
+        "Total Est. Budget (Rp)": "Total Est. Budget (Rp)",
+        "Position Type Distribution": "Position Type Distribution",
+        "Top 10 SKPDs by Employee Count": "Top 10 SKPDs by Employee Count",
+        "Competency Assessment": "Competency Assessment",
+        "With Assessment": "With Assessment",
+        "Without Assessment": "Without Assessment",
+        "Average Competency Scores (Current vs Target)": "Average Competency Scores (Current vs Target)",
+        "Top Competency Gaps Identified": "Top Competency Gaps Identified",
+        "Word / Topic": "Word / Topic",
+        "Frequency": "Frequency",
+        "Development Methods & Analysis Sources": "Development Methods & Analysis Sources",
+        "Top Recommended Methods": "Top Recommended Methods",
+        "Analysis Source Utilization": "Analysis Source Utilization",
+        "Technical Training Demand": "Technical Training Demand",
+        "Top 20 Training Topics": "Top 20 Training Topics",
+        "Demand by Category": "Demand by Category",
+        "Category Summary": "Category Summary",
+        "Category": "Category",
+        "Topics": "Topics",
+        "Total Demand": "Total Demand",
+        "Functional Training & Formal Education": "Functional Training & Formal Education",
+        "Functional Training Status (Coverage)": "Functional Training Status (Coverage)",
+        "Formal Education Upgrade Needs (by Level)": "Formal Education Upgrade Needs (by Level)",
+        "Funding Source Distribution": "Funding Source Distribution",
+        "Internal vs External Provider": "Internal vs External Provider",
+        "Top 15 SKPDs by Estimated Budget (Rp)": "Top 15 SKPDs by Estimated Budget (Rp)",
+        "Activities by Target Year": "Activities by Target Year",
+        "Cross-Analysis & Segmentation": "Cross-Analysis & Segmentation",
+        "Survey Only": "Survey Only",
+        "In Both": "In Both",
+        "Plan Only": "Plan Only",
+        "Survey Dropout Rate": "Survey Dropout Rate",
+        "Employee Development Clusters": "Employee Development Clusters",
+        "Cluster Profiles (Averages)": "Cluster Profiles (Averages)",
+        "Segment": "Segment",
+        "Methods": "Methods",
+        "Edu Upgrades": "Edu Upgrades",
+        "Department (SKPD) Profiles": "Department (SKPD) Profiles",
+        "Total Activities": "Total Activities",
+        "Total Budget (Rp)": "Total Budget (Rp)",
+        "Top Development Methods": "Top Development Methods",
+        "Top Training Topics": "Top Training Topics",
+        "Select an SKPD from the dropdown above to view its detailed profile.": "Select an SKPD from the dropdown above to view its detailed profile.",
+        "No data available": "No data available",
+        "Created by": "Created by",
+        "-- Select an SKPD --": "-- Select an SKPD --",
+        "Generated:": "Version:",
+        "Target Avg Score": "Target Avg Score",
+        "Current Avg Score": "Current Avg Score",
+        "Recommendations": "Recommendations",
+        "Utilization Count": "Utilization Count",
+        "Demand": "Demand",
+        "Ada Diklat (Have)": "Ada Diklat (Have)",
+        "Tidak Ada (Mising)": "Tidak Ada (Mising)",
+        "Upgrade Requirements": "Upgrade Requirements",
+        "Activities Planned": "Activities Planned",
+        "Employees": "Employees",
+        "Budget (Rp)": "Budget (Rp)"
+    },
+    "id": {
+        "HCDP Dashboard": "Dasbor HCDP",
+        "Human Capital Development Plan — Data Exploration & Analysis": "Human Capital Development Plan — Eksplorasi & Analisis Data",
+        "Overview": "Ringkasan",
+        "Competency": "Kompetensi",
+        "Development Methods": "Metode Pengembangan",
+        "Technical Training": "Pelatihan Teknis",
+        "Functional & Edu": "Fungsional & Pend",
+        "Budget & Resources": "Anggaran & Sumber Daya",
+        "Cross-Analysis": "Analisis Lintas",
+        "SKPD Profiles": "Profil SKPD",
+        "Executive Overview": "Ringkasan Eksekutif",
+        "Total Employees": "Total Pegawai",
+        "Survey Respondents": "Responden Survei",
+        "Response Rate": "Tingkat Respons",
+        "Employees in Plan": "Pegawai dlm Rencana",
+        "Total Est. Budget (Rp)": "Total Est. Anggaran (Rp)",
+        "Position Type Distribution": "Distribusi Jenis Jabatan",
+        "Top 10 SKPDs by Employee Count": "10 SKPD Teratas (Jumlah Pegawai)",
+        "Competency Assessment": "Penilaian Kompetensi",
+        "With Assessment": "Dengan Penilaian",
+        "Without Assessment": "Tanpa Penilaian",
+        "Average Competency Scores (Current vs Target)": "Rata-rata Skor Kompetensi (Saat Ini vs Target)",
+        "Top Competency Gaps Identified": "Kesenjangan Kompetensi Teratas",
+        "Word / Topic": "Kata / Topik",
+        "Frequency": "Frekuensi",
+        "Development Methods & Analysis Sources": "Metode Pengembangan & Sumber Analisis",
+        "Top Recommended Methods": "Metode yang Direkomendasikan",
+        "Analysis Source Utilization": "Pemanfaatan Sumber Analisis",
+        "Technical Training Demand": "Kebutuhan Pelatihan Teknis",
+        "Top 20 Training Topics": "20 Topik Pelatihan Teratas",
+        "Demand by Category": "Kebutuhan Berdasarkan Kategori",
+        "Category Summary": "Ringkasan Kategori",
+        "Category": "Kategori",
+        "Topics": "Topik",
+        "Total Demand": "Total Kebutuhan",
+        "Functional Training & Formal Education": "Pelatihan Fungsional & Pendidikan Formal",
+        "Functional Training Status (Coverage)": "Status Pelatihan Fungsional",
+        "Formal Education Upgrade Needs (by Level)": "Kebutuhan Peningkatan Pendidikan Tinggi",
+        "Funding Source Distribution": "Distribusi Sumber Dana",
+        "Internal vs External Provider": "Penyedia Internal vs Eksternal",
+        "Top 15 SKPDs by Estimated Budget (Rp)": "15 SKPD Teratas (Estimasi Anggaran)",
+        "Activities by Target Year": "Aktivitas Berdasarkan Tahun",
+        "Cross-Analysis & Segmentation": "Analisis Lintas & Segmentasi",
+        "Survey Only": "Hanya Survei",
+        "In Both": "Di Keduanya",
+        "Plan Only": "Hanya Rencana",
+        "Survey Dropout Rate": "Tingkat Dropout Survei",
+        "Employee Development Clusters": "Klaster Pengembangan Pegawai",
+        "Cluster Profiles (Averages)": "Profil Klaster (Rata-rata)",
+        "Segment": "Segmen",
+        "Methods": "Metode",
+        "Edu Upgrades": "Peningkatan Pend",
+        "Department (SKPD) Profiles": "Profil Departemen (SKPD)",
+        "Total Activities": "Total Aktivitas",
+        "Total Budget (Rp)": "Total Anggaran (Rp)",
+        "Top Development Methods": "Metode Pengembangan Teratas",
+        "Top Training Topics": "Topik Pelatihan Teratas",
+        "Select an SKPD from the dropdown above to view its detailed profile.": "Pilih SKPD dari menu dropdown di atas untuk melihat profil rinci.",
+        "No data available": "Tidak ada data tersedia",
+        "Created by": "Dibuat oleh",
+        "-- Select an SKPD --": "-- Pilih SKPD --",
+        "Generated:": "Versi:",
+        "Target Avg Score": "Target Rata-rata Skor",
+        "Current Avg Score": "Rata-rata Skor Saat Ini",
+        "Recommendations": "Rekomendasi",
+        "Utilization Count": "Jumlah Pemanfaatan",
+        "Demand": "Kebutuhan",
+        "Ada Diklat (Have)": "Ada Diklat",
+        "Tidak Ada (Mising)": "Tidak Ada",
+        "Upgrade Requirements": "Persyaratan Peningkatan",
+        "Activities Planned": "Aktivitas Direncanakan",
+        "Employees": "Pegawai",
+        "Budget (Rp)": "Anggaran (Rp)"
+    }
+};
+</script>
+<script>
+const colorsLight = {
+    primary: '#0f365e',
+    'primary-light': '#1b4f84',
+    teal: '#0284c7',
+    amber: '#d97706',
+    red: '#b91c1c',
+    green: '#166534',
+    purple: '#4f46e5',
+    pink: '#be185d',
+    palette: [
+        '#0f365e', '#1b4f84', '#0284c7', '#0369a1',
+        '#d97706', '#b45309', '#f59e0b', '#64748b',
+        '#475569', '#334155', '#94a3b8', '#cbd5e1'
+    ]
+};
+
+const colorsDark = {
+    primary: '#38bdf8',
+    'primary-light': '#7dd3fc',
+    teal: '#38bdf8',
+    amber: '#fbbf24',
+    red: '#f87171',
+    green: '#4ade80',
+    purple: '#818cf8',
+    pink: '#f472b6',
+    palette: [
+        '#38bdf8', '#0ea5e9', '#0284c7', '#0369a1',
+        '#fbbf24', '#f59e0b', '#d97706', '#94a3b8',
+        '#64748b', '#475569', '#334155', '#1e293b'
+    ]
+};
+
+let colors = colorsLight;
+
+// Format helpers
+const formatNumber = (num) => new Intl.NumberFormat('id-ID').format(num);
+const formatCurrency = (num) => new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(num).replace('Rp', '').trim();
+
+// Add i18n & Theme state
+let translations = {};
+let currentLang = 'id';
+let isDarkMode = false;
+const renderedTabs = {};
+let data;
+
+function T(text) {
+    if (translations[currentLang] && translations[currentLang][text]) {
+        return translations[currentLang][text];
+    }
+    return text;
+}
+
+document.addEventListener('DOMContentLoaded', async () => {
+    if (!dashboardData || Object.keys(dashboardData).length === 0) {
+        alert("Dashboard data is missing. Please build the dashboard to inject JSON data.");
+        return;
+    }
+
+    data = dashboardData;
+
+    // Load translations
+
+    if (window.translationsData) {
+        translations = window.translationsData;
+        tagTranslateableNodes(document.body);
+    } else {
+        try {
+            const resp = await fetch('js/translations.json');
+            if (resp.ok) {
+                translations = await resp.json();
+                tagTranslateableNodes(document.body);
+            }
+        } catch (e) {}
+    }
+
+    // Register default chart configurations
+    Chart.defaults.font.family = "'Inter', system-ui, -apple-system, sans-serif";
+    Chart.defaults.color = '#64748b'; // Slate 500
+    Chart.defaults.plugins.tooltip.backgroundColor = 'rgba(15, 54, 94, 0.95)'; // Navy semi-transparent
+    Chart.defaults.plugins.tooltip.titleFont = { size: 14, weight: 'bold' };
+    Chart.defaults.plugins.tooltip.padding = 10;
+    Chart.defaults.responsive = true;
+    Chart.defaults.maintainAspectRatio = false;
+
+    initThemeAndLang();
+    // initially apply transl
+    applyTranslations();
+
+    initTabs();
+    populateMetrics();
+    initSkpdSelector();
+
+    // Auto-render the first tab
+    renderChartsForTab('tab-overview');
+});
+
+// tags the nodes
+function tagTranslateableNodes(root) {
+    const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, null, false);
+    let node;
+    const nodesToTag = [];
+    while (node = walker.nextNode()) {
+        if (node.parentElement && node.parentElement.tagName !== 'SCRIPT' && node.parentElement.tagName !== 'STYLE') {
+            let txt = node.nodeValue.trim();
+            if (translations['en'] && translations['en'][txt]) {
+                nodesToTag.push({ node: node, key: txt });
+            }
+        }
+    }
+    nodesToTag.forEach(item => {
+        item.node._i18nKey = item.key;
+    });
+}
+
+function applyTranslations() {
+    const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT, null, false);
+    let node;
+    while (node = walker.nextNode()) {
+        if (node._i18nKey && translations[currentLang] && translations[currentLang][node._i18nKey]) {
+            node.nodeValue = translations[currentLang][node._i18nKey];
+        }
+    }
+
+    // Translate the empty table rows if they exist
+    document.querySelectorAll('.text-center.text-muted').forEach(el => {
+        if (el.textContent === 'No data available' || el.textContent === 'Tidak ada data tersedia') {
+            el.textContent = T('No data available');
+        }
+    });
+
+    // Select default option logic update
+    const defaultOption = document.querySelector('#skpd-selector option[value=""]');
+    if (defaultOption) {
+        defaultOption.textContent = T('-- Select an SKPD --');
+    }
+}
+
+function initThemeAndLang() {
+    const themeBtn = document.getElementById('theme-toggle');
+    const langBtn = document.getElementById('lang-toggle');
+
+    themeBtn.addEventListener('click', () => {
+        isDarkMode = !isDarkMode;
+        document.documentElement.setAttribute('data-theme', isDarkMode ? 'dark' : 'light');
+        document.getElementById('theme-icon-light').style.display = isDarkMode ? 'block' : 'none';
+        document.getElementById('theme-icon-dark').style.display = isDarkMode ? 'none' : 'block';
+
+        // Update Chart JS colors dynamically
+        colors = isDarkMode ? colorsDark : colorsLight;
+        Chart.defaults.color = isDarkMode ? '#94a3b8' : '#64748b';
+        if (Chart.defaults.scale && Chart.defaults.scale.grid) {
+            Chart.defaults.scale.grid.color = isDarkMode ? '#334155' : '#e2e8f0';
+        }
+
+        reRenderCharts();
+    });
+
+    langBtn.addEventListener('click', () => {
+        currentLang = currentLang === 'en' ? 'id' : 'en';
+        document.getElementById('lang-label').textContent = currentLang.toUpperCase();
+
+        applyTranslations();
+        populateMetrics(); // update injected JS translations
+        reRenderCharts();
+    });
+}
+
+function reRenderCharts() {
+    for (let id in Chart.instances) {
+        Chart.instances[id].destroy();
+    }
+    Object.keys(renderedTabs).forEach(k => renderedTabs[k] = false);
+    const activeTabBtn = document.querySelector('.tab-btn.active');
+    if (activeTabBtn) {
+        renderChartsForTab(activeTabBtn.getAttribute('data-target'));
+    }
+}
+
+// ─── Tabs Logic ───
+function initTabs() {
+    const btns = document.querySelectorAll('.tab-btn');
+    const contents = document.querySelectorAll('.tab-content');
+
+    btns.forEach(btn => {
+        btn.addEventListener('click', () => {
+            // Remove active class
+            btns.forEach(b => b.classList.remove('active'));
+            contents.forEach(c => c.classList.remove('active'));
+
+            // Add active class
+            btn.classList.add('active');
+            const targetId = btn.getAttribute('data-target');
+            document.getElementById(targetId).classList.add('active');
+
+            // Render charts for the activated tab (Lazy load)
+            renderChartsForTab(targetId);
+
+            // Scroll to the top to reset scroll pos and prevent a blank-looking tab
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
+    });
+}
+
+// ─── Populate KPIs and Tables ───
+function populateMetrics() {
+    // Header Timestamp
+    if (data._metadata && data._metadata.generated_at) {
+        const date = new Date(data._metadata.generated_at);
+        const options = { day: '2-digit', month: 'short', year: 'numeric' };
+        document.getElementById('last-updated').textContent = `${T('Generated:')} ${date.toLocaleDateString('en-GB', options)}`;
+    }
+
+    // Overview KPIs
+    document.getElementById('kpi-total-emp').textContent = formatNumber(data.demographics.total_employees);
+    document.getElementById('kpi-survey-resp').textContent = formatNumber(data.demographics.survey_respondents);
+    document.getElementById('kpi-response-rate').textContent = data.demographics.response_rate_pct + '%';
+    document.getElementById('kpi-plan-entries').textContent = formatNumber(data.demographics.worksheet_employees);
+
+    const totalBudget = data.budget?.total_budget_worksheet || 0;
+    document.getElementById('kpi-total-budget').textContent = formatCurrency(totalBudget);
+
+    // Competency
+    const compAda = data.competency?.assessment_coverage['ADA'] || 0;
+    const compTidak = data.competency?.assessment_coverage['TIDAK ADA'] || (data.demographics.survey_respondents - compAda);
+    document.getElementById('kpi-comp-ada').textContent = formatNumber(compAda);
+    document.getElementById('kpi-comp-tidak').textContent = formatNumber(compTidak);
+
+    // Cross Analysis
+    document.getElementById('kpi-survey-only').textContent = formatNumber(data.alignment?.survey_only || 0);
+    document.getElementById('kpi-in-both').textContent = formatNumber(data.alignment?.in_both || 0);
+    document.getElementById('kpi-plan-only').textContent = formatNumber(data.alignment?.plan_only || 0);
+    document.getElementById('kpi-coverage-gap').textContent = (data.alignment?.coverage_gap_pct || 0) + '%';
+
+    // Top Competency Gap Words Table
+    const gapWordsTbody = document.querySelector('#table-gap-words tbody');
+    gapWordsTbody.innerHTML = ''; // prevent duplicate appending on lang toggle
+    const gapWords = data.gap_text?.['ISU/FAKTA GAP']?.top_words || [];
+    gapWords.slice(0, 15).forEach(item => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `<td>${item.word}</td><td class="text-right">${formatNumber(item.count)}</td>`;
+        gapWordsTbody.appendChild(tr);
+    });
+
+    // Category Summary Table
+    const catTbody = document.querySelector('#table-training-categories tbody');
+    catTbody.innerHTML = '';
+    const catSummary = data.technical_training?.category_summary || [];
+    catSummary.forEach(item => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+            <td>${item.category}</td>
+            <td class="text-right">${formatNumber(item.topic_count)}</td>
+            <td class="text-right"><strong>${formatNumber(item.total_demand)}</strong></td>
+        `;
+        catTbody.appendChild(tr);
+    });
+
+    // Segmentation Profiles Table
+    const segTbody = document.querySelector('#table-segmentation tbody');
+    segTbody.innerHTML = '';
+    const segProfiles = data.segmentation?.segment_profiles || {};
+    Object.entries(segProfiles).forEach(([seg, prof]) => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+            <td><strong>${seg}</strong></td>
+            <td class="text-right">${prof.avg_methods}</td>
+            <td class="text-right">${prof.avg_topics}</td>
+            <td class="text-right">${prof.avg_edu_upgrades}</td>
+        `;
+        segTbody.appendChild(tr);
+    });
+}
+
+
+// ─── Render Charts by Tab ───
+// This fixes the issue of hidden charts rendering with 0 width/height
+function renderChartsForTab(tabId) {
+    if (renderedTabs[tabId]) return; // Already rendered
+
+    switch (tabId) {
+        case 'tab-overview':
+            renderOverviewCharts();
+            break;
+        case 'tab-competency':
+            renderCompetencyCharts();
+            break;
+        case 'tab-methods':
+            renderMethodsCharts();
+            break;
+        case 'tab-technical':
+            renderTechnicalCharts();
+            break;
+        case 'tab-functional':
+            renderFunctionalCharts();
+            break;
+        case 'tab-budget':
+            renderBudgetCharts();
+            break;
+        case 'tab-cross':
+            renderCrossCharts();
+            break;
+    }
+
+    renderedTabs[tabId] = true;
+}
+
+function renderOverviewCharts() {
+    // 1. Position Type Distribution (Doughnut)
+    const posDist = data.demographics?.position_type_distribution || {};
+    new Chart(document.getElementById('chart-position-dist'), {
+        type: 'doughnut',
+        data: {
+            labels: Object.keys(posDist),
+            datasets: [{
+                data: Object.values(posDist),
+                backgroundColor: colors.palette,
+                borderWidth: 0
+            }]
+        },
+        options: { cutout: '70%', plugins: { legend: { position: 'right' } } }
+    });
+
+    // 2. SKPD Distribution (Horizontal Bar)
+    const skpdDist = data.demographics?.skpd_distribution || {};
+    const topSkpds = Object.entries(skpdDist).sort((a, b) => b[1] - a[1]).slice(0, 10);
+    new Chart(document.getElementById('chart-skpd-dist'), {
+        type: 'bar',
+        data: {
+            labels: topSkpds.map(x => x[0]),
+            datasets: [{
+                label: T('Employees'),
+                data: topSkpds.map(x => x[1]),
+                backgroundColor: colors.teal
+            }]
+        },
+        options: { indexAxis: 'y' }
+    });
+}
+
+function renderCompetencyCharts() {
+    // 3. Competency Scores (Grouped Bar)
+    const compStats = data.competency?.score_statistics || {};
+    const tgtStats = data.competency?.target_statistics || {};
+    const compDims = Object.keys(compStats);
+
+    new Chart(document.getElementById('chart-competency-scores'), {
+        type: 'bar',
+        data: {
+            labels: compDims.map(d => d.replace(/dan/g, '&\n').substring(0, 25)),
+            datasets: [
+                {
+                    label: T('Current Avg Score'),
+                    data: compDims.map(d => compStats[d]?.mean || 0),
+                    backgroundColor: colors['primary-light'] || '#2c3950'
+                },
+                {
+                    label: T('Target Avg Score'),
+                    data: compDims.map(d => tgtStats[d]?.mean || 0),
+                    backgroundColor: colors.amber
+                }
+            ]
+        },
+        options: {
+            scales: { y: { beginAtZero: true, max: 3 } }
+        }
+    });
+}
+
+function renderMethodsCharts() {
+    // 4. Methods (Horizontal Bar)
+    const methods = data.development_methods?.method_totals || {};
+    const methodsSorted = Object.entries(methods).sort((a, b) => b[1] - a[1]);
+    new Chart(document.getElementById('chart-methods'), {
+        type: 'bar',
+        data: {
+            labels: methodsSorted.map(x => x[0]),
+            datasets: [{
+                label: T('Recommendations'),
+                data: methodsSorted.map(x => x[1]),
+                backgroundColor: colors.teal
+            }]
+        },
+        options: { indexAxis: 'y' }
+    });
+
+    // 5. Sources (Radar)
+    const sources = data.analysis_sources?.source_rates || {};
+    const srcNames = Object.keys(sources);
+    new Chart(document.getElementById('chart-sources'), {
+        type: 'radar',
+        data: {
+            labels: srcNames,
+            datasets: [{
+                label: T('Utilization Count'),
+                data: srcNames.map(s => sources[s]?.count || 0),
+                backgroundColor: 'rgba(14, 165, 233, 0.2)',
+                borderColor: colors.teal,
+                pointBackgroundColor: colors.teal,
+            }]
+        },
+        options: {
+            elements: { line: { borderWidth: 3 } },
+            scales: {
+                r: {
+                    ticks: {
+                        backdropColor: isDarkMode ? '#1e293b' : 'rgba(255, 255, 255, 0.75)', /* Matches dark mode card background */
+                        color: isDarkMode ? '#94a3b8' : '#64748b' /* Enhances text visibility */
+                    },
+                    grid: {
+                        color: isDarkMode ? '#334155' : '#e2e8f0'
+                    },
+                    angleLines: {
+                        color: isDarkMode ? '#334155' : '#e2e8f0'
+                    }
+                }
+            }
+        }
+    });
+}
+
+function renderTechnicalCharts() {
+    // 6. Top Technical Training Topics (Bar)
+    const topics = data.technical_training?.top_20_topics || [];
+    new Chart(document.getElementById('chart-top-topics'), {
+        type: 'bar',
+        data: {
+            labels: topics.map(x => x.topic),
+            datasets: [{
+                label: T('Demand'),
+                data: topics.map(x => x.demand),
+                backgroundColor: colors['primary-light'] || '#2c3950'
+            }]
+        },
+        options: {
+            indexAxis: 'y',
+            scales: { x: { beginAtZero: true } }
+        }
+    });
+
+    // 7. Training Demand by Category (Doughnut)
+    const tCat = data.technical_training?.category_summary || [];
+    new Chart(document.getElementById('chart-training-categories'), {
+        type: 'doughnut',
+        data: {
+            labels: tCat.map(x => x.category),
+            datasets: [{
+                data: tCat.map(x => x.total_demand),
+                backgroundColor: colors.palette,
+                borderWidth: 0
+            }]
+        },
+        options: { plugins: { legend: { position: 'right' } } }
+    });
+}
+
+function renderFunctionalCharts() {
+    // 8. Functional Coverage (Pie)
+    const fCov = data.functional_training?.coverage || {};
+    new Chart(document.getElementById('chart-functional-coverage'), {
+        type: 'pie',
+        data: {
+            labels: [T('Ada Diklat (Have)'), T('Tidak Ada (Mising)')],
+            datasets: [{
+                data: [fCov.ada || 0, fCov.tidak_ada || 0],
+                backgroundColor: [colors.teal, colors.amber],
+                borderWidth: 0
+            }]
+        }
+    });
+
+    // 9. Education Demand (Bar)
+    const eduDem = data.education?.total_demand || {};
+    new Chart(document.getElementById('chart-education-demand'), {
+        type: 'bar',
+        data: {
+            labels: Object.keys(eduDem),
+            datasets: [{
+                label: T('Upgrade Requirements'),
+                data: Object.values(eduDem),
+                backgroundColor: colors.teal
+            }]
+        }
+    });
+}
+
+function renderBudgetCharts() {
+    // 10. Funding Source (Pie)
+    const funding = data.budget?.funding_source || {};
+    new Chart(document.getElementById('chart-funding-source'), {
+        type: 'pie',
+        data: {
+            labels: Object.keys(funding),
+            datasets: [{
+                data: Object.values(funding),
+                backgroundColor: colors.palette,
+                borderWidth: 0
+            }]
+        },
+        options: { plugins: { legend: { position: 'right' } } }
+    });
+
+    // 11. Provider (Pie)
+    const provider = data.institutional_capacity?.training_provider || {};
+    new Chart(document.getElementById('chart-provider'), {
+        type: 'pie',
+        data: {
+            labels: Object.keys(provider),
+            datasets: [{
+                data: Object.values(provider),
+                backgroundColor: [colors.teal, colors.amber],
+                borderWidth: 0
+            }]
+        }
+    });
+
+    // 12. Budget by SKPD (Horizontal Bar)
+    const bSkpd = data.budget?.budget_by_skpd || {};
+    const topBSkpd = Object.entries(bSkpd).sort((a, b) => b[1] - a[1]).slice(0, 15);
+    new Chart(document.getElementById('chart-budget-skpd'), {
+        type: 'bar',
+        data: {
+            labels: topBSkpd.map(x => x[0]),
+            datasets: [{
+                label: T('Budget (Rp)'),
+                data: topBSkpd.map(x => x[1]),
+                backgroundColor: colors['primary-light'] || '#2c3950'
+            }]
+        },
+        options: { indexAxis: 'y' }
+    });
+
+    // 13. Timeline (Bar)
+    const timeline = data.timeline?.year_distribution || {};
+    new Chart(document.getElementById('chart-timeline'), {
+        type: 'bar',
+        data: {
+            labels: Object.keys(timeline),
+            datasets: [{
+                label: T('Activities Planned'),
+                data: Object.values(timeline),
+                backgroundColor: colors.teal
+            }]
+        }
+    });
+}
+
+function renderCrossCharts() {
+    // 14. Segmentation (Pie)
+    const segCounts = data.segmentation?.segment_counts || {};
+    new Chart(document.getElementById('chart-segmentation'), {
+        type: 'doughnut',
+        data: {
+            labels: Object.keys(segCounts),
+            datasets: [{
+                data: Object.values(segCounts),
+                backgroundColor: colors.palette,
+                borderWidth: 0
+            }]
+        },
+        options: { cutout: '50%', plugins: { legend: { position: 'right' } } }
+    });
+}
+
+
+// ─── SKPD Profiles Interactivity ───
+function initSkpdSelector() {
+    const skpds = data.skpd_profiles || {};
+    const selector = document.getElementById('skpd-selector');
+    const details = document.getElementById('skpd-details');
+    const emptyState = document.getElementById('skpd-empty');
+    const title = document.getElementById('skpd-title');
+
+    // Dynamic sticky header offset
+    const header = document.querySelector('header');
+    const filterRow = document.getElementById('skpd-filter-row');
+    if (header && filterRow) {
+        const obs = new ResizeObserver(entries => {
+            filterRow.style.top = entries[0].target.offsetHeight + 'px';
+        });
+        obs.observe(header);
+        filterRow.style.top = header.offsetHeight + 'px';
+    }
+
+    // Populate select options
+    selector.innerHTML = '<option value="">-- Select an SKPD --</option>';
+    const skpdNames = Object.keys(skpds).sort();
+    skpdNames.forEach(skpd => {
+        const opt = document.createElement('option');
+        opt.value = skpd;
+        opt.textContent = skpd;
+        selector.appendChild(opt);
+    });
+
+    // Selection event listener
+    selector.addEventListener('change', (e) => {
+        const val = e.target.value;
+        if (!val || !skpds[val]) {
+            details.style.display = 'none';
+            if (emptyState) emptyState.style.display = 'block';
+            if (title) title.textContent = T('Department (SKPD) Profiles');
+            return;
+        }
+
+        // Show details
+        details.style.display = 'block';
+        if (emptyState) emptyState.style.display = 'none';
+
+        // Update to dynamic title
+        if (title) title.textContent = val;
+
+        const profile = skpds[val];
+
+        // Update KPIs
+        document.getElementById('skpd-emp').textContent = formatNumber(profile.employee_count || 0);
+        document.getElementById('skpd-activities').textContent = formatNumber(profile.activity_count || 0);
+        document.getElementById('skpd-budget').textContent = formatCurrency(profile.total_budget || 0);
+
+        // Update Methods Table
+        const tbodyM = document.querySelector('#table-skpd-methods tbody');
+        tbodyM.innerHTML = '';
+        if (profile.top_methods) {
+            Object.entries(profile.top_methods).forEach(([m, count]) => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `<td>${m}</td><td class="text-right"><strong>${count}</strong></td>`;
+                tbodyM.appendChild(tr);
+            });
+        } else {
+            tbodyM.innerHTML = `<tr><td colspan="2" class="text-center text-muted">${T('No data available')}</td></tr>`;
+        }
+
+        // Update Topics Table
+        const tbodyT = document.querySelector('#table-skpd-topics tbody');
+        tbodyT.innerHTML = '';
+        if (profile.top_topics) {
+            Object.entries(profile.top_topics).forEach(([topic, count]) => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `<td>${topic}</td><td class="text-right"><strong>${count}</strong></td>`;
+                tbodyT.appendChild(tr);
+            });
+        } else {
+            tbodyT.innerHTML = `<tr><td colspan="2" class="text-center text-muted">${T('No data available')}</td></tr>`;
+        }
+    });
+
+    // Auto-select first item
+    if (skpdNames.length > 0) {
+        selector.value = skpdNames[0];
+        selector.dispatchEvent(new Event('change'));
+    }
+}
+
+</script>
+</body>
+
+</html>
