@@ -7,10 +7,10 @@ export const featuredProjects = [
     coverImage: "https://ik.imagekit.io/raihankalla/research_section_cover/bahasa-nusantara.png?updatedAt=1771319978903",
   },
   {
-    title: "Media Effects on the 2019 Election",
+    title: "Media Effects on Election",
     subtitle: "",
     type: "research",
-    url: "/media-election-2019",
+    url: "/media-effects-election",
     coverImage: "https://ik.imagekit.io/raihankalla/research_section_cover/media-election-2019.png",
   },
   {
