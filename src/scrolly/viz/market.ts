@@ -15,8 +15,29 @@ export default function renderMarket({ mountEl, panelEl, props }: MarketArgs) {
     const tooltip = tooltipTarget.append("div").attr("class", panelEl ? "d3-tooltip" : "d3-tooltip d3-tooltip-market");
 
     // Total Population
-    const popCircle = svg.append("circle").attr("cx", cx).attr("cy", cy).attr("r", 150).attr("fill", "#2C3E50").attr("opacity", 0.5);
-    svg.append("text").attr("x", cx).attr("y", cy - 100).attr("text-anchor", "middle").attr("fill", "white").style("pointer-events", "none").text("Internet Users (143M)");
+    const popCircle = svg.append("circle")
+        .attr("cx", cx)
+        .attr("cy", cy)
+        .attr("r", 0)
+        .attr("fill", "#2C3E50")
+        .attr("opacity", 0.5);
+
+    popCircle.transition().duration(1000).ease(d3.easeCubicOut).attr("r", 150);
+
+    const popText = svg.append("text")
+        .attr("x", cx)
+        .attr("y", cy - 110)
+        .attr("text-anchor", "middle")
+        .attr("fill", "white")
+        .style("font-family", "var(--font-serif)")
+        .style("font-size", "1.1rem")
+        .style("pointer-events", "none")
+        .attr("opacity", 0);
+
+    popText.transition().delay(400).duration(800).attr("opacity", 1);
+
+    popText.append("tspan").attr("x", cx).attr("dy", "0").text("Internet Users");
+    popText.append("tspan").attr("x", cx).attr("dy", "1.2em").style("font-size", "0.9rem").attr("opacity", 0.8).text("(143M)");
 
     popCircle.on("mouseover", function (this: SVGCircleElement, evt: any) {
         d3.select(this).attr("opacity", 0.7);
@@ -32,9 +53,41 @@ export default function renderMarket({ mountEl, panelEl, props }: MarketArgs) {
 
     // Search Users
     const searchG = svg.append("g").attr("transform", `translate(${cx}, ${cy + 30})`);
-    const searchCircle = searchG.append("circle").attr("r", 0).attr("fill", "#E67E22").attr("opacity", 0.8);
-    searchCircle.transition().duration(800).attr("r", 100);
-    searchG.append("text").attr("text-anchor", "middle").attr("dy", 5).attr("fill", "white").style("font-weight", "bold").style("pointer-events", "none").text("Search Engine Users (106M)");
+    const searchCircle = searchG.append("circle")
+        .attr("r", 0)
+        .attr("fill", "#E67E22")
+        .attr("opacity", 0.8);
+
+    searchCircle.transition().delay(300).duration(1000).ease(d3.easeElasticOut.amplitude(1.1).period(0.6)).attr("r", 100);
+
+    const searchLabel = searchG.append("text")
+        .attr("text-anchor", "middle")
+        .attr("dy", 0)
+        .attr("fill", "white")
+        .style("font-family", "var(--font-sans)")
+        .style("font-weight", "bold")
+        .style("font-size", "0.95rem")
+        .style("pointer-events", "none")
+        .attr("opacity", 0);
+
+    searchLabel.transition().delay(800).duration(600).attr("opacity", 1);
+
+    searchLabel.append("tspan")
+        .attr("x", 0)
+        .attr("dy", "-0.2em")
+        .text("Search Engine");
+
+    searchLabel.append("tspan")
+        .attr("x", 0)
+        .attr("dy", "1.1em")
+        .text("Users");
+
+    searchLabel.append("tspan")
+        .attr("x", 0)
+        .attr("dy", "1.2em")
+        .style("font-size", "0.8rem")
+        .style("font-weight", "normal")
+        .text("(106M)");
 
     searchCircle.on("mouseover", function (this: SVGCircleElement, evt: any) {
         d3.select(this).attr("opacity", 1);

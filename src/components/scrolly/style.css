@@ -573,6 +573,7 @@ body.light-theme .nav-theme-toggle .moon-icon {
   z-index: 10;
   display: grid;
   grid-template-columns: repeat(4, 1fr);
+  width: 100%;
   border-top: 1px solid var(--border);
   background: rgba(14, 20, 40, 0.72);
   backdrop-filter: blur(8px);
@@ -1269,9 +1270,16 @@ body.light-theme .nav-theme-toggle .moon-icon {
     order: 1;
   }
 
-  /* Nav: always show solid background on mobile so it's readable above viz.
-     Explicit height 48px so viz sticky top:48px lands exactly flush. */
+  /* Nav: scrolls away on mobile to yield space to sticky viz.
+     Hide dots navigation as it's replaced by mobile tabs. */
   #main-nav {
+    position: absolute !important;
+    background: transparent !important;
+    box-shadow: none;
+    padding: 16px;
+  }
+
+  .nav-controls-group {
     display: none !important;
   }
 
@@ -1303,10 +1311,11 @@ body.light-theme .nav-theme-toggle .moon-icon {
   #mobile-viz-topbar {
     display: flex;
     align-items: stretch;
-    border-bottom: 1px solid var(--border);
+    border-bottom: 2px solid var(--border);
     background: var(--paper-dark);
-    position: relative;
-    z-index: 2;
+    position: sticky;
+    top: 0;
+    z-index: 501;
   }
 
   #mobile-tab-bar {
@@ -1316,6 +1325,35 @@ body.light-theme .nav-theme-toggle .moon-icon {
     -webkit-overflow-scrolling: touch;
     scrollbar-width: none;
     min-width: 0;
+  }
+
+  #mobile-controls {
+    display: flex;
+    align-items: stretch;
+    border-left: 1px solid var(--border);
+  }
+
+  #mobile-controls .nav-theme-toggle {
+    width: 44px;
+    height: auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0.6;
+    background: transparent;
+    border: none;
+    border-right: 1px solid var(--border);
+    cursor: pointer;
+  }
+
+  #mobile-controls .nav-theme-toggle:hover {
+    opacity: 1;
+    color: var(--accent-blue);
+  }
+
+  #mobile-controls .nav-theme-toggle svg {
+    width: 18px;
+    height: 18px;
   }
 
   #mobile-tab-bar::-webkit-scrollbar {
@@ -1382,7 +1420,6 @@ body.light-theme .nav-theme-toggle .moon-icon {
     width: 44px;
     background: transparent;
     border: none;
-    border-left: 1px solid var(--border);
     cursor: pointer;
     display: flex;
     align-items: center;
@@ -1506,8 +1543,29 @@ body.light-theme .nav-theme-toggle .moon-icon {
   }
 
   /* Hero */
+  #hero {
+    height: auto !important;
+    min-height: 100dvh;
+    overflow: visible !important;
+    justify-content: flex-start;
+    padding-top: 80px;
+    /* Room for header/label */
+  }
+
   .hero-stats {
+    position: relative !important;
+    bottom: auto !important;
+    width: 100% !important;
     grid-template-columns: repeat(2, 1fr);
+  }
+
+  .hero-stat {
+    padding: 16px 8px;
+  }
+
+  .hero-stat:nth-child(2),
+  .hero-stat:nth-child(4) {
+    border-right: none;
   }
 
   .hero-title {
@@ -1515,9 +1573,9 @@ body.light-theme .nav-theme-toggle .moon-icon {
     margin-bottom: 16px;
   }
 
-  /* Move content up to avoid overlap with bottom stats */
+  /* Adjust padding so content is comfortable */
   .hero-content {
-    padding-bottom: 30vh;
+    padding-bottom: 60px !important;
   }
 
   .hero-teaser {
@@ -1555,6 +1613,19 @@ body.light-theme .nav-theme-toggle .moon-icon {
     grid-template-columns: repeat(2, 1fr);
   }
 
+  .hero-stat {
+    border-right: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .hero-stat:nth-child(2n) {
+    border-right: none;
+  }
+
+  .hero-stat:nth-child(n+3) {
+    border-bottom: none;
+  }
+
   .stat-num {
     font-size: 1.4rem;
   }
@@ -1565,7 +1636,7 @@ body.light-theme .nav-theme-toggle .moon-icon {
 
   .hero-content {
     /* Push content higher on small screens */
-    padding: 0 16px 35vh;
+    padding: 0 16px 60px !important;
   }
 
   #viz-panels-container {

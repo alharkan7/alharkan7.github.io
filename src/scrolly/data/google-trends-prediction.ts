@@ -6,7 +6,7 @@ export const config = {
         homeNavUrl: "/data"
     },
     hero: {
-        label: "Data Analysis",
+        label: "Conference Proceeding",
         titleHtml: 'Digital <span class="hero-accent">Crystal Ball?</span>',
         subtitleHtml: "Testing Google Trends as a Predictor for the 2019 Indonesian Presidential Election",
         authorsHtml: "Ali Al Harkan · Universitas Indonesia",
@@ -23,7 +23,7 @@ export const config = {
         {
             id: "context",
             navLabel: "Context",
-            mobileLabel: "Market Share",
+            mobileLabel: "Market",
             viz: {
                 key: "market",
                 title: "The Market of Attention",
@@ -99,7 +99,7 @@ export const config = {
         {
             id: "precision",
             navLabel: "Precision",
-            mobileLabel: "Precision plot",
+            mobileLabel: "Precision",
             viz: {
                 key: "precision",
                 title: "The Consistency Gap",
