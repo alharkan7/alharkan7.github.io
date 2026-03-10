@@ -46,7 +46,7 @@ Let's break down each of these components to see how they work together.
 
 ## Writing the Narrative in MDX
 
-The journey begins with the content. We use an MDX file (`src/posts/scrolly/media-effects-election.mdx`) as the entry point. The beauty of MDX is that it allows us to interweave standard Markdown with custom components.
+The journey begins with the content. We use an MDX file [`src/posts/scrolly/media-effects-election.mdx`](https://github.com/alharkan7/alharkan7.github.io/blob/main/src/posts/scrolly/media-effects-election.mdx) as the entry point. The beauty of MDX is that it allows us to interweave standard Markdown with custom components.
 
 At the very top, the frontmatter tells Astro which layout to use and provides an identifier for the data file:
 
@@ -74,7 +74,7 @@ The `id="context"` acts as a crucial anchor. When the reader scrolls down and th
 
 ## Isolating Data in TypeScript Configuration
 
-To preserve the readability of the MDX file, all the heavy lifting for the charts is extracted into a dedicated configuration file (`src/scrolly/data/media-effects-election.ts`).
+To preserve the readability of the MDX file, all the heavy lifting for the charts is extracted into a dedicated configuration file [`src/scrolly/data/media-effects-election.ts`](https://github.com/alharkan7/alharkan7.github.io/blob/main/src/scrolly/data/media-effects-election.ts).
 
 Because we provided the `configId` in the MDX frontmatter, Astro knows exactly which TypeScript file to import. This configuration object is the brain of the visualizations. It stores the hero metadata, the overall theme, and most importantly, an array of configuration options mapping to every `<ScrollySection>` ID found in the text:
 
