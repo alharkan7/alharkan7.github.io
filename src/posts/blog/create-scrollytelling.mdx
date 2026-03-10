@@ -153,6 +153,8 @@ This client-side orchestrator employs Intersection Observers alongside D3.js. It
 
 When a reader scrolls past a specific anchor, like `<ScrollySection id="finding1">`, the observer detects it. It then assigns an active class to the corresponding `div#viz-finding1` container, parses the embedded JSON data resting in the DOM, and instructs D3 to dynamically draw, animate, or update the chart on the screen.
 
+---
+
 Building a scrollytelling experience this way ensures scalability. Writers can focus entirely on the text in MDX, analysts can manage the numbers in isolated TypeScript files, and the underlying Astro orchestration engine smoothly connects the two worlds. Next time you need to present complex findings, a tailored narrative layout might just be the key to keeping your audience engaged. 
 
 I shared this architecture hoping it contributes to better science dissemination. As researchers, the data we collect is powerful, but it's the way we tell the story that truly makes an impact. 
