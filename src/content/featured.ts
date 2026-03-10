@@ -42,6 +42,13 @@ export const featuredProjects = [
     coverImage: "https://ik.imagekit.io/raihankalla/research_section_cover/pdrb-iklh.png",
   },
   {
+    title: "Google Trends' Election Prediction Power",
+    subtitle: "",
+    type: "analysis",
+    url: "/google-trends-prediction",
+    coverImage: "https://ik.imagekit.io/raihankalla/research_section_cover/google-trends-election.png",
+  },
+  {
     title: "Good News - Bibliometrics Analysis",
     subtitle: "",
     type: "analysis",

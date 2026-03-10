@@ -1,0 +1,79 @@
+---
+layout: ../../layouts/ScrollyLayout.astro
+configId: google-trends-prediction
+---
+
+import ScrollySection from '../../components/scrolly/ScrollySection.astro';
+
+<ScrollySection id="context">
+  <div class="section-label">Section 02</div>
+  ## Voters as Consumers
+  
+  Modern political campaigns treat candidates as "Brands" and voters as a "Market." To win, candidates need **Electoral Research**.
+  
+  With 143 million internet users in Indonesia—74% of whom use search engines—Google Trends captures the **"Curiosity"** of nearly 40% of the population. But curiosity doesn't always equal a vote.
+  
+  <div class="data-source-tag">Source: APJII Survey 2017</div>
+</ScrollySection>
+
+<ScrollySection id="methodology">
+  <div class="section-label">Section 03</div>
+  ## The Statistical Litmus Test
+  
+  To compare Google’s "Search Interest" (Small Data) with the KPU’s "Real Count" (Total Population), we used the **Predictive Accuracy (A)** measure by Martin, Traugott, and Kennedy.
+  
+  * **Accuracy:** Did Google predict the correct winner in a province?
+  * **Precision:** How close was the search ratio to the actual vote ratio?
+  
+  We analyzed "Topic Queries" (Broad Match) rather than "Search Terms" to capture the full spectrum of intent for both candidates across all 34 provinces.
+</ScrollySection>
+
+<ScrollySection id="maps">
+  <div class="section-label">Section 04</div>
+  ## The Geographical Mismatch
+  
+  At first glance, the maps look similar. But a deeper look reveals a contradiction.
+  
+  Google Trends showed **Candidate 02 (Prabowo)** dominating search interest in **20 provinces**. However, the Real Count showed **Candidate 01 (Jokowi)** winning in **21 provinces**. Search volume was leaning one way, while the actual votes were leaning the other.
+  
+  <div class="data-source-tag">Source: Google Trends & KPU 2019</div>
+</ScrollySection>
+
+<ScrollySection id="accuracy">
+  <div class="section-label">Finding 01</div>
+  ## A High Rate of Error
+  
+  The statistical value **'A'** should ideally be **0** (Perfect match).
+  
+  In reality, Google Trends only correctly predicted the winner in **13 out of 34 provinces**. This means the search-based model was wrong more than 60% of the time when applied to provincial outcomes.
+</ScrollySection>
+
+<ScrollySection id="precision">
+  <div class="section-label">Finding 02</div>
+  ## The Consistency Gap
+  
+  Precision measures reliability. Our analysis found that the 'A' values varied wildly—from **-0.029** (high precision in Jakarta) to **-0.955** (extremely low precision in Bali).
+  
+  Because the deviation was so inconsistent across the archipelago, Google Trends proved to be an **unreliable** tool for forecasting a national election in its current form.
+</ScrollySection>
+
+<ScrollySection id="sentiment">
+  <div class="section-label">Section 07</div>
+  ## Curiosity is not Support
+  
+  Why did the data fail? Google Trends measures **Volume**, not **Sentiment**.
+  
+  A voter might search for a candidate because they support them, or because they are looking for a scandal to criticize them. Without a way to distinguish between "Love-searching" and "Hate-searching," search volume remains a blunt instrument.
+</ScrollySection>
+
+<ScrollySection id="conclusion">
+  <div class="section-label">Section 08</div>
+  ## Potential for Evolution
+  
+  While it failed as a standalone predictor in 2019, Google Trends is not useless. It remains a powerful tool for measuring **Issue Salience**—what the public is thinking about *right now*.
+  
+  To become a true predictive tool, the platform needs:
+  1. **Sentiment Analysis** integration.
+  2. **User-Level Weighting** to prevent "Power Users" from skewing provincial data.
+  3. **Hybrid Modeling** combining search data with traditional survey metrics.
+</ScrollySection>

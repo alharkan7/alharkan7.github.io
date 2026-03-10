@@ -70,6 +70,13 @@ async function initViz(panelEl: HTMLElement) {
     matrix: () => import("./viz/matrix"),
     bars: () => import("./viz/bars"),
     map: () => import("./viz/map"),
+    market: () => import("./viz/market"),
+    equation: () => import("./viz/equation"),
+    dualmap: () => import("./viz/dualmap"),
+    accuracy: () => import("./viz/accuracy"),
+    precision: () => import("./viz/precision"),
+    sentiment: () => import("./viz/sentiment"),
+    upgrade: () => import("./viz/upgrade"),
   };
 
   const load = loaders[vizKey];
@@ -84,6 +91,13 @@ async function initViz(panelEl: HTMLElement) {
   if (vizKey === "matrix" && mount.svg) return render({ mountEl: mount.svg, props });
   if (vizKey === "bars" && mount.svg) return render({ mountEl: mount.svg, props });
   if (vizKey === "map" && mount.div) return render({ mountEl: mount.div, props });
+  if (vizKey === "market" && mount.svg) return render({ mountEl: mount.svg, panelEl, props });
+  if (vizKey === "equation" && mount.svg) return render({ mountEl: mount.svg, props });
+  if (vizKey === "dualmap" && mount.div) return render({ mountEl: mount.div, props });
+  if (vizKey === "accuracy" && mount.svg) return render({ mountEl: mount.svg, props });
+  if (vizKey === "precision" && mount.svg) return render({ mountEl: mount.svg, panelEl, props });
+  if (vizKey === "sentiment" && mount.svg) return render({ mountEl: mount.svg, panelEl, props });
+  if (vizKey === "upgrade" && mount.div) return render({ mountEl: mount.div, panelEl, props });
 }
 
 function switchViz(nextVizId: string) {
@@ -223,7 +237,7 @@ function initVizResize() {
   try {
     const saved = parseInt(localStorage.getItem(key) || "", 10);
     if (!isNaN(saved)) applyHeight(clamp(saved), false);
-  } catch (_) {}
+  } catch (_) { }
 
   handle.addEventListener("pointerdown", (e) => {
     dragging = true;
@@ -247,7 +261,7 @@ function initVizResize() {
     containerEl.style.transition = "";
     try {
       localStorage.setItem(key, String(containerEl.offsetHeight));
-    } catch (_) {}
+    } catch (_) { }
   }
 
   handle.addEventListener("pointerup", onDragEnd);

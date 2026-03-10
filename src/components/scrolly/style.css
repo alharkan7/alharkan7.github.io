@@ -269,7 +269,8 @@ body.light-theme #main-nav.scrolled {
   color: var(--scholarly-blue);
   opacity: 0.6;
   transition: opacity var(--transition-fast), transform var(--transition-fast);
-  font-size: 0.875rem; /* Match nav-logo size */
+  font-size: 0.875rem;
+  /* Match nav-logo size */
 }
 
 .nav-home-icon svg {
@@ -296,7 +297,8 @@ body.light-theme #main-nav.scrolled {
   justify-content: center;
   width: 1.35em;
   height: 1.35em;
-  font-size: 0.875rem; /* Match nav-home-icon proportion */
+  font-size: 0.875rem;
+  /* Match nav-home-icon proportion */
 }
 
 .nav-theme-toggle svg {
@@ -483,7 +485,7 @@ body.light-theme .nav-theme-toggle .moon-icon {
 }
 
 .light-theme .hero-accent {
-  background: linear-gradient(135deg, #1A5276, #C0392B);
+  background: linear-gradient(135deg, var(--accent-blue), var(--political-red));
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -1515,7 +1517,7 @@ body.light-theme .nav-theme-toggle .moon-icon {
 
   /* Move content up to avoid overlap with bottom stats */
   .hero-content {
-    padding-bottom: 25vh;
+    padding-bottom: 30vh;
   }
 
   .hero-teaser {
@@ -1563,11 +1565,41 @@ body.light-theme .nav-theme-toggle .moon-icon {
 
   .hero-content {
     /* Push content higher on small screens */
-    padding: 0 16px 20vh;
+    padding: 0 16px 35vh;
   }
 
   #viz-panels-container {
     height: 65vw;
     min-height: 220px;
   }
+}
+
+/* GOOGLE TRENDS OVERRIDES */
+body.page-google-trends-prediction {
+  background: radial-gradient(1200px 700px at 50% -10%, rgba(230, 126, 34, 0.14), transparent 60%), radial-gradient(900px 600px at 90% 10%, rgba(41, 128, 185, 0.12), transparent 55%), var(--paper) !important;
+}
+
+.page-google-trends-prediction .hero-bg {
+  background: radial-gradient(900px 560px at 15% 10%, rgba(230, 126, 34, 0.18), transparent 55%), radial-gradient(800px 520px at 85% 15%, rgba(41, 128, 185, 0.16), transparent 55%), var(--paper) !important;
+}
+
+.page-google-trends-prediction .hero-pattern {
+  background-image: linear-gradient(rgba(230, 126, 34, 0.22) 1px, transparent 1px), linear-gradient(90deg, rgba(41, 128, 185, 0.18) 1px, transparent 1px) !important;
+}
+
+body.page-google-trends-prediction.light-theme {
+  background: var(--paper) !important;
+}
+
+body.page-google-trends-prediction.light-theme .hero-bg {
+  background: radial-gradient(900px 560px at 15% 10%, rgba(230, 126, 34, 0.05), transparent 55%), radial-gradient(800px 520px at 85% 15%, rgba(41, 128, 185, 0.04), transparent 55%), var(--paper) !important;
+}
+
+body.page-google-trends-prediction.light-theme .hero-pattern {
+  background-image: linear-gradient(rgba(230, 126, 34, 0.06) 1px, transparent 1px), linear-gradient(90deg, rgba(41, 128, 185, 0.05) 1px, transparent 1px) !important;
+}
+
+/* Make section headers distinct for Google Trends */
+body.page-google-trends-prediction .scroll-section h2 {
+  color: var(--accent-blue) !important;
 }
