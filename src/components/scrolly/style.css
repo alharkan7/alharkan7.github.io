@@ -1270,16 +1270,7 @@ body.light-theme .nav-theme-toggle .moon-icon {
     order: 1;
   }
 
-  /* Nav: scrolls away on mobile to yield space to sticky viz.
-     Hide dots navigation as it's replaced by mobile tabs. */
   #main-nav {
-    position: absolute !important;
-    background: transparent !important;
-    box-shadow: none;
-    padding: 16px;
-  }
-
-  .nav-controls-group {
     display: none !important;
   }
 
