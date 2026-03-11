@@ -38,14 +38,16 @@ pnpm preview
 src/
 ├── components/          # Reusable UI components (Astro, React, Svelte)
 │   └── ProtectedRoute.astro  # Client-side auth wrapper for protected pages
-├── posts/     # MDX content organized by category
+├── posts/               # MDX content organized by category
 │   ├── blog/           # Main blog posts
 │   ├── misc/           # Miscellaneous posts
 │   ├── ptm/            # PTM category posts
+│   ├── scrolly/        # Scrollytelling stories
 │   ├── stories/        # Story posts
 │   └── uncategorized/  # Uncategorized content
 ├── layouts/            # Layout templates
 │   ├── BaseLayout.astro      # Main layout wrapper
+│   ├── ScrollyLayout.astro   # Scrollytelling layout engine
 │   └── RedirectLayout.astro  # Template for redirect pages
 ├── lib/                # Utilities and configurations
 │   ├── auth.js         # Client-side Firebase Auth utilities
@@ -54,6 +56,11 @@ src/
 ├── pages/              # Route components mirroring posts structure
 │   ├── api/           # API endpoints
 │   └── [categories]/   # Category index pages
+├── scrolly/            # Scrollytelling system
+│   ├── data/          # Visualization data configs (TypeScript)
+│   ├── viz/           # D3 visualization modules
+│   ├── scrolly-runtime.ts  # Scroll tracking engine
+│   └── README.md      # Scrolly system documentation
 ├── styles/             # Global CSS
 └── utils/              # Helper functions
 ```
@@ -66,6 +73,72 @@ The project uses three UI frameworks:
 - **Svelte**: For stateful components
 
 Components can be imported and used interchangeably within Astro pages.
+
+## ScrollyTelling System
+
+This is a custom-built, reusable scroll-driven storytelling framework. The architecture separates narrative content from technical visualization data.
+
+### Four-Layer Architecture
+
+| Layer | Purpose | Location |
+|-------|---------|----------|
+| **Narrative** | Story content in MDX | `src/posts/scrolly/*.mdx` |
+| **Configuration** | Visualization data and metadata | `src/scrolly/data/*.ts` |
+| **Layout** | Renders page, merges data with frontmatter | `src/layouts/ScrollyLayout.astro` |
+| **Engine** | Scroll tracking and viz switching | `src/scrolly/scrolly-runtime.ts` |
+
+### Creating a New Scrollytelling Story
+
+1. **Create data config** in `src/scrolly/data/my-story.ts`:
+   ```typescript
+   export const config = {
+     metadata: { title: "...", brand: "...", homeNavUrl: "/data" },
+     hero: { label: "...", titleHtml: "...", stats: [...] },
+     sections: [{ id: "intro", navLabel: "Intro", viz: { key: "timeline", props: {...} } }]
+   };
+   ```
+
+2. **Create MDX content** in `src/posts/scrolly/my-story.mdx`:
+   ```mdx
+   ---
+   layout: ../../layouts/ScrollyLayout.astro
+   configId: my-story
+   ---
+   import ScrollySection from '../../components/scrolly/ScrollySection.astro';
+   <ScrollySection id="intro">Content here</ScrollySection>
+   ```
+
+3. **Register viz types** in `src/scrolly/scrolly-runtime.ts` if adding new visualization types.
+
+### Visualization Modules
+
+Located in `src/scrolly/viz/`, the following D3-powered visualizations are available:
+- `scatter` - Scatter plots
+- `timeline` - Timeline visualizations
+- `map` / `dualmap` - Geographic maps
+- `bars` - Bar charts
+- `bubbles` - Bubble charts
+- `matrix` - Matrix visualizations
+- `sentiment` - Sentiment analysis displays
+- `sem` - SEM visualizations
+- `precision` / `accuracy` - Metric visualizations
+- `equation` - Mathematical equation displays
+- `market` - Market visualizations
+- `upgrade` - Upgrade displays
+
+### Theming
+
+Add `theme` to MDX frontmatter to override default colors:
+```yaml
+theme:
+  accent: "#4DE1FF"
+  paper: "#070A12"
+  paperDark: "#000000"
+  ink: "#FFFFFF"
+  secondary: "#06D6A0"
+```
+
+Frontmatter values override external config values. See `docs/scrollytelling.md` for complete documentation.
 
 ## Client-Side Authentication
 
@@ -126,6 +199,7 @@ Configured in `astro.config.mjs`:
 - Astro Icon (icon management)
 - Mermaid (diagrams)
 - TOCbot (table of contents)
+- D3.js (scrollytelling visualizations)
 
 ### Analytics
 - Vercel Analytics
@@ -137,6 +211,7 @@ Content Security Policy configured in `astro.config.mjs` for:
 - Firebase domains (`*.firebaseapp.com`, `*.firebase.com`)
 - Google APIs (`*.googleapis.com`)
 - Twitter embeds (`platform.twitter.com`)
+- D3.js (`d3js.org`)
 - Development server (`localhost:4321`)
 
 ## Redirect System
@@ -167,3 +242,4 @@ Required environment variables in `.env`:
 - No ESLint or Prettier configuration (uses Astro defaults)
 - No testing framework configured
 - TypeScript strict mode enabled
+- Path aliases configured: `@/*` maps to `src/*`
