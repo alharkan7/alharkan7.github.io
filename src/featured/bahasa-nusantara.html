@@ -4649,6 +4649,9 @@
     let dragStartPanY = 0;
     let dragMoved = false;
     let suppressClick = false;
+    let scrollVelocityY = 0;
+    let lastMoveY = 0;
+    let lastMoveT = 0;
 
     const treeNodes = [];
     const treeEdges = [];
@@ -4713,6 +4716,13 @@
         title: 'Pohon Kekerabatan Bahasa',
         caption: 'Keragaman bahasa di Indonesia ini mewakili 10% dari keseluruhan bahasa yang ada di dunia, menjadikan Indonesia sebagai negara dengan keragaman bahasa terbanyak kedua di dunia (setelah Papua Nugini).',
         apply: () => layoutTree()
+      },
+      {
+        key: 'list',
+        align: 'center',
+        title: 'Daftar Lengkap Bahasa',
+        caption: 'Berikut adalah daftar lengkap 718 bahasa Nusantara tersebut. Data ini menunjukkan kekayaan tak berwujud yang tersebar dari Sabang hingga Merauke, mencerminkan identitas unik dari setiap wilayah di Indonesia.',
+        apply: () => layoutList()
       }
     ];
     let nextHitBox = null;
@@ -5045,7 +5055,6 @@
 
     async function loadData() {
       try {
-        // Data inlined: fetch removed
         const list = INLINED_DATA;
         langList = Array.isArray(list) ? list : [];
 
@@ -5251,16 +5260,16 @@
       // But for now let's draw it with alpha.
 
       const fadeH = (captionY - yOffset) + (lines.length + 1) * lineH + 60;
-      // Use fixed height for gradient based on layout, ignore offset for the gradient box?
-      // Or move gradient with text?
-      // Let's move gradient with text.
 
-      const grad = ctx.createLinearGradient(0, yOffset, 0, fadeH + yOffset);
-      grad.addColorStop(0, `rgba(248, 250, 252, ${0.98 * opacity})`);
-      grad.addColorStop(0.7, `rgba(248, 250, 252, ${0.9 * opacity})`);
-      grad.addColorStop(1, `rgba(248, 250, 252, 0)`);
-      ctx.fillStyle = grad;
-      ctx.fillRect(0, 0, width, fadeH + Math.abs(yOffset) + 100); // Fill large enough area
+      // Only draw the background gradient for the CURRENT active scene to avoid double-darkening
+      if (scene === scenes[sceneIndex]) {
+        const grad = ctx.createLinearGradient(0, yOffset, 0, fadeH + yOffset);
+        grad.addColorStop(0, `rgba(248, 250, 252, ${0.98 * opacity})`);
+        grad.addColorStop(0.7, `rgba(248, 250, 252, ${0.9 * opacity})`);
+        grad.addColorStop(1, `rgba(248, 250, 252, 0)`);
+        ctx.fillStyle = grad;
+        ctx.fillRect(0, 0, width, fadeH + Math.abs(yOffset) + 100);
+      }
 
       // Text Rendering
       ctx.textBaseline = 'top';
@@ -5401,6 +5410,138 @@
       targetPanY = 0;
       focusNode = null;
 
+      for (const c of circles) c.delay = 0;
+
+      applyBarLayout(data, labelKey);
+    }
+
+    function layoutList() {
+      mode = 'list';
+      targetZoom = 1.0;
+      defaultZoom = 1.0;
+      labels = [];
+      panX = 0;
+      panY = 0;
+      targetPanX = 0;
+      targetPanY = 0;
+      focusNode = null;
+      barScrollable = false;
+
+      const s = uiScale();
+      const isMobile = width < 520;
+      const margin = Math.max(24, width * 0.08);
+      const rowHeight = isMobile ? 38 * s : 28 * s;
+      const startY = isMobile
+        ? (Math.max(200, height * 0.32) + rowHeight)
+        : (Math.max(220, height * 0.35) + rowHeight);
+
+      const startX = isMobile ? (width / 2 - 120 * s) : (width / 2 - 280 * s);
+
+      const colDots = startX;
+      const colName = startX + 35 * s;
+      const colProv = isMobile ? (startX + 35 * s) : (width / 2 - 40 * s);
+      const colArea = isMobile ? (startX + 35 * s) : (width / 2 + 130 * s);
+
+      circles.forEach((c, i) => {
+        const item = langList[i];
+        if (!item) {
+          c.tAlpha = 0;
+          c.tr = 0;
+          return;
+        }
+
+        c.tx = colDots;
+        c.ty = startY + i * rowHeight;
+        c.tr = clamp(4 * s, 3, 5);
+        c.color = COLOR_MAIN_1;
+        c.alpha = 0;
+        c.tAlpha = 1;
+        // Initial y for slide-up effect
+        c.y = c.ty + 10 * s;
+        c.delay = Math.floor(i * 2.0);
+        c.group = item.bahasa;
+
+        if (isMobile) {
+          // Name
+          labels.push({
+            x: colName,
+            y: c.ty - 6 * s,
+            targetY: c.ty - 6 * s,
+            text: ellipsize(item.bahasa, 40),
+            align: 'left',
+            font: `500 ${Math.round(13 * s)}px Outfit`,
+            fillStyle: COLOR_TEXT,
+            alpha: 0,
+            yOffset: 10 * s,
+            delay: Math.floor(i * 2.0)
+          });
+          // Prov & Area
+          labels.push({
+            x: colName,
+            y: c.ty + 8 * s,
+            targetY: c.ty + 8 * s,
+            text: ellipsize(`${item.provinsi}, ${item.wilayah}`, 60),
+            align: 'left',
+            font: `${Math.round(10 * s)}px Outfit`,
+            fillStyle: 'rgba(100, 116, 139, 0.8)',
+            alpha: 0,
+            yOffset: 10 * s,
+            delay: Math.floor(i * 2.0)
+          });
+        } else {
+          // Name
+          labels.push({
+            x: colName,
+            y: c.ty,
+            targetY: c.ty,
+            text: ellipsize(item.bahasa, 32),
+            align: 'left',
+            font: `500 ${Math.round(12 * s)}px Outfit`,
+            vAlign: 'middle',
+            fillStyle: COLOR_TEXT,
+            alpha: 0,
+            yOffset: 10 * s,
+            delay: Math.floor(i * 2.0)
+          });
+          // Prov
+          labels.push({
+            x: colProv,
+            y: c.ty,
+            targetY: c.ty,
+            text: ellipsize(item.provinsi, 30),
+            align: 'left',
+            font: `${Math.round(11 * s)}px Outfit`,
+            vAlign: 'middle',
+            fillStyle: 'rgba(71, 85, 105, 0.95)',
+            alpha: 0,
+            yOffset: 10 * s,
+            delay: Math.floor(i * 2.0)
+          });
+          // Area
+          labels.push({
+            x: colArea,
+            y: c.ty,
+            targetY: c.ty,
+            text: ellipsize(item.wilayah, 24),
+            align: 'left',
+            font: `${Math.round(11 * s)}px Outfit`,
+            vAlign: 'middle',
+            fillStyle: 'rgba(100, 116, 139, 0.7)',
+            alpha: 0,
+            yOffset: 10 * s,
+            delay: Math.floor(i * 2.0)
+          });
+        }
+      });
+
+      // Hide unused
+      for (let i = langList.length; i < circles.length; i++) {
+        circles[i].tAlpha = 0;
+        circles[i].tr = 0;
+      }
+    }
+
+    function applyBarLayout(data, labelKey) {
       const s = uiScale();
       const margin = clamp(Math.round(width * 0.06), 14, 60);
       const chartInnerWidth = width - margin * 2;
@@ -5434,16 +5575,22 @@
       const actualCols = packing.cols;
 
       barScrollable = virtualChartWidth > chartInnerWidth + 1;
-      barMinPanX = Math.min(0, chartInnerWidth - virtualChartWidth);
-      barMaxPanX = 0;
-      panX = clamp(panX, barMinPanX, barMaxPanX);
+      // Centered coordinate system: panX=0 is centered.
+      // Left edge is at width/2 - virtualChartWidth/2. 
+      // We want to be able to pan such that left edge is at margin:
+      // (width/2 - virtualChartWidth/2) + panX = margin  => panX = margin - width/2 + virtualChartWidth/2
+      barMaxPanX = barScrollable ? Math.max(0, margin - (width / 2 - virtualChartWidth / 2)) : 0;
+      barMinPanX = barScrollable ? Math.min(0, (width - margin) - (width / 2 + virtualChartWidth / 2)) : 0;
+
+      panX = 0; // Default to centered
       targetPanX = panX;
 
       let circleIndex = 0;
+      const chartStartX = width / 2 - virtualChartWidth / 2;
 
       data.forEach((item, i) => {
         const count = item.circle_count ?? item.jumlah_bahasa;
-        const centerX = margin + i * barWidth + effectiveBarWidth / 2;
+        const centerX = chartStartX + i * barWidth + effectiveBarWidth / 2;
         const groupLabel = item[labelKey];
         const candidates = (labelKey === 'wilayah' ? islandLangMap : provinceLangMap).get(groupLabel) ?? [];
 
@@ -5568,6 +5715,12 @@
       for (const c of circles) {
         c.tAlpha = 0;
         c.tr = 0;
+        c.delay = 0;
+        c.alpha = 0;
+        c.r = 0;
+        // Move to center so if they ever fly to a new scene, they come from center
+        c.x = width / 2;
+        c.y = height / 2;
       }
 
       treeNodes.length = 0;
@@ -5792,6 +5945,32 @@
         panY += (targetPanY - panY) * 0.12;
       }
 
+      // Handle list momentum scrolling
+      if (mode === 'list' && !isDragging) {
+        if (Math.abs(scrollVelocityY) > 0.1) {
+          targetPanY += scrollVelocityY;
+          scrollVelocityY *= 0.94; // Friction
+
+          // Boundaries for momentum
+          const isMobile = width < 520;
+          const s = uiScale();
+          const rowHeight = isMobile ? 38 * s : 28 * s;
+          const tStartY = isMobile
+            ? (Math.max(200, height * 0.32) + rowHeight)
+            : (Math.max(220, height * 0.35) + rowHeight);
+          const limit = -(langList.length * rowHeight - (height - tStartY) + 100);
+
+          if (targetPanY > 50) {
+            targetPanY = 50;
+            scrollVelocityY = 0;
+          } else if (targetPanY < limit) {
+            targetPanY = limit;
+            scrollVelocityY = 0;
+          }
+          panY = targetPanY;
+        }
+      }
+
       // Animate text
       textAnim.opacity += (1 - textAnim.opacity) * 0.08;
       textAnim.yOffset += (0 - textAnim.yOffset) * 0.08;
@@ -5824,6 +6003,9 @@
       ctx.translate(width / 2 + panX, height / 2 + panY);
       ctx.scale(globalZoom, globalZoom);
       ctx.translate(-width / 2, -height / 2);
+
+      // Always update ALL circles regardless of mode so their alpha/pos stay current
+      circles.forEach(c => c.update());
 
       if (mode === 'tree') {
         for (const n of treeNodes) n.update();
@@ -5864,11 +6046,8 @@
         drawStoryOverlayScreenSpace();
         ctx.restore();
       } else {
-        // Draw Circles
-        circles.forEach(c => {
-          c.update();
-          c.draw();
-        });
+        // Draw Circles - mode is not 'tree'
+        circles.forEach(c => c.draw());
 
         // Draw Labels
         ctx.fillStyle = COLOR_TEXT;
@@ -5877,15 +6056,32 @@
         ctx.textBaseline = 'top';
 
         labels.forEach(l => {
+          // Update alpha/delay for reveal effect
+          if (l.delay !== undefined) {
+            if (l.delay > 0) {
+              l.delay--;
+              return;
+            }
+            l.alpha = Math.min(1, l.alpha + 0.12);
+            l.yOffset = l.yOffset * 0.88;
+            l.y = l.targetY + l.yOffset;
+          }
+
+          // Simple culling
+          const sy = (l.y - height / 2) * globalZoom + height / 2 + panY;
+          if (sy < -60 || sy > height + 60) return;
+
           ctx.save();
+          if (l.alpha !== undefined) ctx.globalAlpha = l.alpha;
           ctx.translate(l.x, l.y);
           ctx.font = l.font ?? ctx.font;
           ctx.fillStyle = l.fillStyle ?? ctx.fillStyle;
+          ctx.textBaseline = l.vAlign ?? 'top';
           if (l.rotation) {
             ctx.rotate(l.rotation * Math.PI / 180);
             ctx.textAlign = 'right';
           } else {
-            ctx.textAlign = 'center';
+            ctx.textAlign = l.align ?? 'center';
           }
           ctx.fillText(l.text, 0, 0);
           ctx.restore();
@@ -6000,64 +6196,69 @@
         navStartX = e.clientX;
         navStartY = e.clientY;
         navStartT = performance.now();
+
+        dragStartX = e.clientX;
+        dragStartY = e.clientY;
+        dragStartPanX = panX;
+        dragStartPanY = panY;
+        isDragging = true;
+        dragMoved = false;
+        focusNode = null;
+      } else {
+        // Re-sync on additional pointers to prevent jumps
+        const pts = Array.from(pointers.values());
+        dragStartX = pts.reduce((sum, p) => sum + p.x, 0) / pts.length;
+        dragStartY = pts.reduce((sum, p) => sum + p.y, 0) / pts.length;
+        dragStartPanX = panX;
+        dragStartPanY = panY;
       }
 
       const extra = isCoarsePointer() ? 7 : 0;
       updateHoverAt(e.clientX, e.clientY, extra);
 
-      if (mode === 'tree') {
-        isDragging = true;
-        dragMoved = false;
-        dragStartX = e.clientX;
-        dragStartY = e.clientY;
-        dragStartPanX = panX;
-        dragStartPanY = panY;
-        focusNode = null;
-      } else if (mode === 'grid') {
-        isDragging = true;
-        dragMoved = false;
-        dragStartX = e.clientX;
-        dragStartY = e.clientY;
-        dragStartPanX = panX;
-        dragStartPanY = panY;
-        focusNode = null;
-      } else if (mode === 'bar') {
-        isDragging = true;
-        dragMoved = false;
-        dragStartX = e.clientX;
-        dragStartY = e.clientY;
-        dragStartPanX = panX;
-        dragStartPanY = panY;
-        focusNode = null;
+      if (mode === 'bar') {
         barIsDragging = true;
         barDragStartX = e.clientX;
         barDragStartPanX = panX;
-      } else if (isCoarsePointer()) {
-        // Only if NOT dragging
-        if (hoverClearTimer) window.clearTimeout(hoverClearTimer);
-        hoverClearTimer = window.setTimeout(() => {
-          hoveredCircle = null;
-        }, 2200);
       }
     });
 
     canvas.addEventListener('pointermove', (e) => {
-      if (!pointers.has(e.pointerId)) pointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
+      if (!pointers.has(e.pointerId)) return;
       pointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
 
       const extra = isCoarsePointer() ? 7 : 0;
 
-      if ((mode === 'tree' || mode === 'grid' || mode === 'bar') && pointers.size >= 2) {
+      if ((mode === 'tree' || mode === 'grid' || mode === 'bar' || mode === 'list') && pointers.size >= 2) {
         const pts = Array.from(pointers.values());
         const dx = pts[0].x - pts[1].x;
         const dy = pts[0].y - pts[1].y;
         const dist = Math.hypot(dx, dy);
+
+        // Centroid of the two fingers
+        const midX = (pts[0].x + pts[1].x) / 2;
+        const midY = (pts[0].y + pts[1].y) / 2;
+
         if (pinchStartDist == null) {
           pinchStartDist = dist || 1;
           pinchStartZoom = targetZoom;
+          // Reset drag start for smooth transition when one finger is released
+          dragStartX = midX;
+          dragStartY = midY;
+          dragStartPanX = panX;
+          dragStartPanY = panY;
         } else {
           const factor = (dist || 1) / pinchStartDist;
           targetZoom = clamp((pinchStartZoom || targetZoom) * factor, ZOOM_MIN, ZOOM_MAX);
+
+          // Also pan while pinching to follow the midpoint
+          const mdx = midX - dragStartX;
+          const mdy = midY - dragStartY;
+          panX = dragStartPanX + mdx;
+          panY = dragStartPanY + mdy;
+          targetPanX = panX;
+          targetPanY = panY;
+
           focusNode = null;
         }
         updateHoverAt(e.clientX, e.clientY, extra);
@@ -6067,31 +6268,28 @@
       pinchStartDist = null;
       pinchStartZoom = null;
 
-      if ((mode === 'tree' || mode === 'grid') && isDragging) {
+      if ((mode === 'tree' || mode === 'grid' || mode === 'list' || mode === 'bar') && isDragging) {
         const dx = e.clientX - dragStartX;
         const dy = e.clientY - dragStartY;
         if (!dragMoved && (dx * dx + dy * dy) > 16) dragMoved = true;
+
+        // For momentum calculation
+        const now = performance.now();
+        const dt = now - lastMoveT;
+        if (dt > 0) {
+          scrollVelocityY = (e.clientY - lastMoveY) / (dt / 16);
+        }
+        lastMoveY = e.clientY;
+        lastMoveT = now;
 
         // Direct manipulation of panX/panY
-        panX = dragStartPanX + dx;
-        panY = dragStartPanY + dy;
-
-        // IMPORTANT: Sync targetPanX to current panX so that when we release, 
-        // it doesn't try to tween back to an old target or focus point.
-        targetPanX = panX;
-        targetPanY = panY;
-
-        // Explicitly clear focusNode to stop the loop() from overriding our pan
-        focusNode = null;
-      }
-
-      if (mode === 'bar' && isDragging) {
-        const dx = e.clientX - dragStartX;
-        const dy = e.clientY - dragStartY;
-        if (!dragMoved && (dx * dx + dy * dy) > 16) dragMoved = true;
-        // Allow X panning
-        panX = dragStartPanX + dx;
-        panY = dragStartPanY + dy;
+        if (mode === 'list') {
+          panX = dragStartPanX + dx * 0.2;
+          panY = dragStartPanY + dy;
+        } else {
+          panX = dragStartPanX + dx;
+          panY = dragStartPanY + dy;
+        }
 
         targetPanX = panX;
         targetPanY = panY;
@@ -6119,52 +6317,85 @@
       }
 
       pointers.delete(e.pointerId);
-      if (pointers.size < 2) {
+
+      const wasDragging = isDragging;
+
+      if (pointers.size === 0) {
+        isDragging = false;
+        barIsDragging = false;
         pinchStartDist = null;
         pinchStartZoom = null;
-      }
-      if (mode === 'tree') {
-        isDragging = false;
-        suppressClick = dragMoved;
-        dragMoved = false;
-        if (!suppressClick) focusHoveredNode();
-        return;
+      } else {
+        // Re-sync anchor to the remaining finger
+        const pts = Array.from(pointers.values());
+        dragStartX = pts.reduce((sum, p) => sum + p.x, 0) / pts.length;
+        dragStartY = pts.reduce((sum, p) => sum + p.y, 0) / pts.length;
+        dragStartPanX = panX;
+        dragStartPanY = panY;
+        pinchStartDist = null; // Re-init pinch if another finger is added later
       }
 
-      if (mode === 'grid' || mode === 'bar') {
-        isDragging = false;
-        suppressClick = dragMoved;
-        dragMoved = false;
-        barIsDragging = false;
-        if (!suppressClick && hoveredCircle) {
-          focusCircle(hoveredCircle);
+      if (wasDragging && dragMoved && pointers.size === 0) {
+        if (isCoarsePointer()) {
+          const dt = performance.now() - navStartT;
+          const dx = e.clientX - navStartX;
+          const dy = e.clientY - navStartY;
+          const adx = Math.abs(dx);
+          const ady = Math.abs(dy);
+
+          // Fast swipe detection for scene change
+          if (dt < 420 && ady > 55 && ady > adx * 1.4) {
+            let allowSceneChange = true;
+            if (mode === 'list') {
+              // Only allow scene change swipe in list mode if they swipe fast at boundaries 
+              // to avoid conflict with normal scrolling
+              const atTop = targetPanY >= 40;
+              const atBottom = targetPanY <= -(langList.length * (width < 520 ? 38 : 28) * uiScale());
+              if (!atTop && dy > 0) allowSceneChange = false;
+              if (!atBottom && dy < 0) allowSceneChange = false;
+            }
+
+            if (allowSceneChange) {
+              if (dy < 0) applyScene(sceneIndex + 1);
+              else applyScene(sceneIndex - 1);
+              dragMoved = false;
+              return;
+            }
+          }
         }
-        return;
       }
 
-      if (!isCoarsePointer()) return;
-      if (mode === 'tree') return;
-      if (mode === 'bar' && barScrollable && Math.abs((e.clientX ?? 0) - navStartX) > Math.abs((e.clientY ?? 0) - navStartY)) return;
+      // Handle normal interaction end (clicks/focus)
+      if (!dragMoved) {
+        if (mode === 'tree') {
+          focusHoveredNode();
+        } else if (mode === 'grid' || mode === 'bar' || mode === 'list') {
+          if (hoveredCircle) focusCircle(hoveredCircle);
+        }
+      }
 
-      const dt = performance.now() - (navStartT || 0);
-      const dx = (e.clientX ?? 0) - navStartX;
-      const dy = (e.clientY ?? 0) - navStartY;
-      const adx = Math.abs(dx);
-      const ady = Math.abs(dy);
-      if (dt > 900) return;
-      if (ady < 52) return;
-      if (ady < adx * 1.25) return;
-
-      if (dy < 0) applyScene(sceneIndex + 1);
-      else applyScene(sceneIndex - 1);
+      dragMoved = false;
     }
 
     canvas.addEventListener('pointerup', endPointerInteraction);
     canvas.addEventListener('pointercancel', endPointerInteraction);
 
     window.addEventListener('wheel', (e) => {
-      // Allow zooming in all modes
       e.preventDefault();
+      if (mode === 'list') {
+        targetPanY -= e.deltaY;
+        // Simple boundary clamping
+        const isMobile = width < 520;
+        const s = uiScale();
+        const rowHeight = isMobile ? 38 * s : 28 * s;
+        const startY = isMobile
+          ? (Math.max(200, height * 0.32) + rowHeight)
+          : (Math.max(220, height * 0.35) + rowHeight);
+        const limit = -(langList.length * rowHeight - (height - startY) + 100);
+        targetPanY = clamp(targetPanY, limit, 50);
+        return;
+      }
+      // Allow zooming in other modes
       const factor = Math.exp((-e.deltaY) * 0.0015);
       targetZoom = clamp(targetZoom * factor, ZOOM_MIN, ZOOM_MAX);
       focusNode = null;
