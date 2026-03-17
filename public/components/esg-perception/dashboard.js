@@ -11,15 +11,15 @@ const setVal = (id, val) => {
 };
 
 if (newsData && newsData.metadata) {
-    setVal('news-total', newsData.metadata.total_articles || 0);
+    setVal('news-total', (newsData.metadata.total_articles || 0).toLocaleString());
 }
 if (newsData && newsData.content_metrics) {
     setVal('news-coverage', (newsData.content_metrics.total_content_filled_pct || 0).toFixed(1) + '%');
-    setVal('news-words', Math.round(newsData.content_metrics.avg_word_count || 0) + 'w');
+    setVal('news-words', Math.round(newsData.content_metrics.avg_word_count || 0).toLocaleString() + 'w');
 }
 
 if (xData && xData.metadata) {
-    setVal('x-total', xData.metadata.total_items || 0);
+    setVal('x-total', (xData.metadata.total_items || 0).toLocaleString());
 }
 if (xData && xData.engagement) {
     setVal('x-engagement', (xData.engagement.avg_likes || 0).toFixed(1));
@@ -394,7 +394,7 @@ function showTab(tabId, updateUrl = true) {
         'indepth': 2,
         'methodology': 3
     };
-    const btns = document.querySelectorAll('.tab-btn');
+    const btns = document.querySelectorAll('button.tab-btn');
     if (btns[tabBtnMap[tabId]]) {
         btns[tabBtnMap[tabId]].classList.add('active');
     }

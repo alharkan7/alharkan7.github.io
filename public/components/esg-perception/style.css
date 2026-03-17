@@ -76,12 +76,25 @@ h1 {
     display: inline-block;
 }
 
-/* Academic Tabs */
+/* Academic Tabs - Sticky Navigation */
 .tabs {
     display: flex;
     justify-content: center;
     gap: 2rem;
-    margin-top: 2rem;
+    position: sticky;
+    top: 0;
+    background-color: var(--bg-paper);
+    z-index: 1000;
+    padding: 1.5rem 0;
+    margin-bottom: 3rem;
+    border-bottom: 1px solid transparent;
+    transition: all 0.3s ease;
+}
+
+/* Add a subtle border when sticking (optional but recommended) */
+.tabs.active-sticky {
+    border-bottom-color: var(--border-subtle);
+    box-shadow: var(--shadow-soft);
 }
 
 .tab-btn {

@@ -49,6 +49,13 @@ export const featuredProjects = [
     coverImage: "https://ik.imagekit.io/raihankalla/research_section_cover/google-trends-election.png",
   },
   {
+    title: "ESG Perception Analysis",
+    subtitle: "",
+    type: "research",
+    url: "/esg-perception",
+    coverImage: "https://ik.imagekit.io/raihankalla/research_section_cover/esg-perception.png",
+  },
+  {
     title: "Good News - Bibliometrics Analysis",
     subtitle: "",
     type: "analysis",
