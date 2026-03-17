@@ -9,7 +9,7 @@
         href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Lora:ital,wght@0,400;0,600;0,700;1,400&display=swap"
         rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <link rel="stylesheet" href="/components/esg-perception/style.css">
+    <link rel="stylesheet" href="components/esg-perception/style.css">
 </head>
 
 <body>
@@ -95,407 +95,403 @@
 
             <!-- News Explorer Table (Combined) -->
             <div class="card" style="margin-top: 1.5rem;">
-                <div class="card-header" style="margin-bottom: 2rem;">
-                    <div
-                        style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
-                        <h2 class="card-title" style="margin-bottom: 0;">Latest ESG News Matches</h2>
-                        <div class="match-toggles" style="display: flex; gap: 1rem;">
-                            <div class="filter-group">
-                                <label>Company Match</label>
-                                <select id="filter-company-match" onchange="applyFilters()">
-                                    <option value="true" selected>True</option>
-                                    <option value="false">False</option>
-                                    <option value="all">All</option>
-                                </select>
-                            </div>
-                            <div class="filter-group">
-                                <label>Perception Match</label>
-                                <select id="filter-perception-match" onchange="applyFilters()">
-                                    <option value="true" selected>True</option>
-                                    <option value="false">False</option>
-                                    <option value="all">All</option>
-                                </select>
-                            </div>
+                <div class="card-header flex-header">
+                    <h2 class="card-title" style="margin-bottom: 0;">Latest ESG News Matches</h2>
+                    <div class="match-toggles filter-row">
+                        <div class="filter-group">
+                            <label>Company Match</label>
+                            <select id="filter-company-match" onchange="applyFilters()">
+                                <option value="true" selected>True</option>
+                                <option value="false">False</option>
+                                <option value="all">All</option>
+                            </select>
+                        </div>
+                        <div class="filter-group">
+                            <label>Perception Match</label>
+                            <select id="filter-perception-match" onchange="applyFilters()">
+                                <option value="true" selected>True</option>
+                                <option value="false">False</option>
+                                <option value="all">All</option>
+                            </select>
                         </div>
                     </div>
-                    <p class="card-subtitle">Showing <span id="filtered-count">1,243</span> articles for verification
-                    </p>
                 </div>
+                <p class="card-subtitle">Showing <span id="filtered-count">1,243</span> articles for verification
+                </p>
+            </div>
 
-                <div class="filter-bar">
-                    <div class="filter-group">
-                        <label>Search</label>
-                        <input type="text" id="news-search" placeholder="Search news titles..."
-                            oninput="applyFilters()">
-                    </div>
-                    <div class="filter-group">
-                        <label>Company</label>
-                        <select id="filter-company" onchange="applyFilters()">
-                            <option value="all">All Companies</option>
-                        </select>
-                    </div>
-                    <div class="filter-group">
-                        <label>Month-Year</label>
-                        <select id="filter-month" onchange="applyFilters()">
-                            <option value="all">All Time</option>
-                        </select>
-                    </div>
-                    <div class="filter-group">
-                        <label>Source</label>
-                        <select id="filter-source" onchange="applyFilters()">
-                            <option value="all">All Sources</option>
-                        </select>
-                    </div>
-                    <div class="filter-group">
-                        <label>Sort By</label>
-                        <select id="filter-sort" onchange="applyFilters()">
-                            <option value="newest">Newest First</option>
-                            <option value="oldest">Oldest First</option>
-                        </select>
-                    </div>
+            <div class="filter-bar">
+                <div class="filter-group">
+                    <label>Search</label>
+                    <input type="text" id="news-search" placeholder="Search news titles..." oninput="applyFilters()">
                 </div>
+                <div class="filter-group">
+                    <label>Company</label>
+                    <select id="filter-company" onchange="applyFilters()">
+                        <option value="all">All Companies</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label>Month-Year</label>
+                    <select id="filter-month" onchange="applyFilters()">
+                        <option value="all">All Time</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label>Source</label>
+                    <select id="filter-source" onchange="applyFilters()">
+                        <option value="all">All Sources</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label>Sort By</label>
+                    <select id="filter-sort" onchange="applyFilters()">
+                        <option value="newest">Newest First</option>
+                        <option value="oldest">Oldest First</option>
+                    </select>
+                </div>
+            </div>
 
-                <div class="table-container">
-                    <table id="news-table">
-                        <thead>
-                            <tr>
-                                <th>Date</th>
-                                <th>Company</th>
-                                <th>Title</th>
-                                <th>Source</th>
-                            </tr>
-                        </thead>
-                        <tbody id="news-table-body">
-                            <!-- Populated via JS -->
-                        </tbody>
-                    </table>
-                </div>
-                <div class="pagination" id="news-pagination">
-                    <!-- Populated via JS -->
-                </div>
+            <div class="table-container">
+                <table id="news-table">
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Company</th>
+                            <th>Title</th>
+                            <th>Source</th>
+                        </tr>
+                    </thead>
+                    <tbody id="news-table-body">
+                        <!-- Populated via JS -->
+                    </tbody>
+                </table>
+            </div>
+            <div class="pagination" id="news-pagination">
+                <!-- Populated via JS -->
+            </div>
+        </div>
+    </div>
+
+    <!-- SOCIAL TAB -->
+    <div id="social-tab" class="tab-content" style="display:none;">
+        <!-- Social Buzz Content -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-label">Total Mentions</div>
+                <div class="stat-value" id="x-total">0</div>
+                <div class="stat-desc">Aggregate frequency of company-related tags and keywords across social
+                    channels.</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Engagement Rate</div>
+                <div class="stat-value" id="x-engagement">0</div>
+                <div class="stat-desc">The average intensity of public reaction, measured by likes and shares per
+                    post.</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Viral Reach</div>
+                <div class="stat-value" id="x-reach">0</div>
+                <div class="stat-desc">Estimated narrative propagation based on retweet velocity and follower
+                    amplification.</div>
             </div>
         </div>
 
-        <!-- SOCIAL TAB -->
-        <div id="social-tab" class="tab-content" style="display:none;">
-            <!-- Social Buzz Content -->
-            <div class="stats-grid">
-                <div class="stat-card">
-                    <div class="stat-label">Total Mentions</div>
-                    <div class="stat-value" id="x-total">0</div>
-                    <div class="stat-desc">Aggregate frequency of company-related tags and keywords across social
-                        channels.</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-label">Engagement Rate</div>
-                    <div class="stat-value" id="x-engagement">0</div>
-                    <div class="stat-desc">The average intensity of public reaction, measured by likes and shares per
-                        post.</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-label">Viral Reach</div>
-                    <div class="stat-value" id="x-reach">0</div>
-                    <div class="stat-desc">Estimated narrative propagation based on retweet velocity and follower
-                        amplification.</div>
-                </div>
-            </div>
-
-            <div class="charts-row" style="grid-template-columns: 1fr; margin-bottom: 2rem;">
-                <div class="chart-card limited-height">
-                    <div class="chart-title">Social Mentions by Company</div>
-                    <canvas id="xCompanyChart"></canvas>
-                    <p class="chart-caption">
-                        <strong>Overview:</strong> Public discourse volume on X/Twitter.<br>
-                        <strong>Interpretation:</strong> PT Adaro leads public buzz, specifically related to CSR
-                        programs (beasiswa) and community environmental concerns.
-                    </p>
-                </div>
-            </div>
-
-            <div class="charts-row" style="grid-template-columns: 1fr; margin-bottom: 2rem;">
-                <div class="chart-card limited-height">
-                    <div class="chart-title">Social Volume Trend (Monthly)</div>
-                    <canvas id="xTrendChart"></canvas>
-                    <p class="chart-caption">
-                        <strong>Overview:</strong> Temporal distribution of public mentions and engagement spikes.<br>
-                        <strong>Interpretation:</strong> Periodic surges in sentiment often correlate with quarterly
-                        sustainability reports or external environmental incidents.
-                    </p>
-                </div>
-            </div>
-
-            <div class="charts-row" style="grid-template-columns: 1fr;">
-                <div class="chart-card limited-height">
-                    <div class="chart-title">Top Narrative Drivers (Users)</div>
-                    <canvas id="xUserChart"></canvas>
-                    <p class="chart-caption">
-                        <strong>Overview:</strong> Influential accounts or bots driving the narrative.<br>
-                        <strong>Interpretation:</strong> Presence of automated accounts and news aggregators indicates
-                        that the narrative is partially managed rather than purely organic.
-                    </p>
-                </div>
-            </div>
-
-            <!-- Social Media Explorer -->
-            <div class="card" style="margin-top: 2rem;">
-                <div class="card-header" style="flex-direction: column; align-items: flex-start; gap: 0.5rem;">
-                    <h2 class="card-title">Social Corpus Explorer</h2>
-                    <p class="card-subtitle">Showing <span id="x-filtered-count">0</span> social posts for public
-                        sentiment analysis</p>
-                </div>
-
-                <div class="filter-bar">
-                    <div class="filter-group">
-                        <label>Search</label>
-                        <input type="text" id="x-search" placeholder="Search tweet content..."
-                            oninput="applyXFilters()">
-                    </div>
-                    <div class="filter-group">
-                        <label>Company</label>
-                        <select id="filter-x-company" onchange="applyXFilters()">
-                            <option value="all">All Companies</option>
-                        </select>
-                    </div>
-                    <div class="filter-group">
-                        <label>Sort By</label>
-                        <select id="filter-x-sort" onchange="applyXFilters()">
-                            <option value="newest">Newest First</option>
-                            <option value="oldest">Oldest First</option>
-                            <option value="engagement">Highest Engagement</option>
-                        </select>
-                    </div>
-                </div>
-
-                <div class="table-container">
-                    <table id="x-table">
-                        <thead>
-                            <tr>
-                                <th style="width: 120px;">Date</th>
-                                <th style="width: 120px;">User</th>
-                                <th>Content</th>
-                                <th style="width: 150px;">Company</th>
-                                <th style="width: 80px;">Stats</th>
-                            </tr>
-                        </thead>
-                        <tbody id="x-table-body">
-                            <!-- Populated via JS -->
-                        </tbody>
-                    </table>
-                </div>
-                <div class="pagination" id="x-pagination">
-                    <!-- Populated via JS -->
-                </div>
-            </div>
-        </div>
-
-        <!-- IN-DEPTH TAB -->
-        <div id="indepth-tab" class="tab-content" style="display:none;">
-            <!-- In Depth Content -->
-            <div class="stats-grid">
-                <div class="stat-card">
-                    <div class="stat-label">Dominant Pillar</div>
-                    <div class="stat-value" style="color: var(--pillar-g);">Governance</div>
-                    <div class="stat-desc">The primary ESG category detected across the analyzed official news dataset.
-                    </div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-label">Pillar Confidence</div>
-                    <div class="stat-value">91%</div>
-                    <div class="stat-desc">The average probability score assigned by the classification models to all
-                        matches.</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-label">Model Engine</div>
-                    <div class="stat-value" style="font-size: 1.5rem; padding-top: 0.5rem;">mDeBERTa + IndoBERT</div>
-                    <div class="stat-desc">State-of-the-art transformer models used for pillar and sentiment detection.
-                    </div>
-                </div>
-            </div>
-
-            <div class="charts-row" style="grid-template-columns: 2fr 1fr; margin-bottom: 2rem;">
-                <div class="chart-card limited-height">
-                    <div class="chart-title">ESG Pillar Breakdown by Source</div>
-                    <canvas id="pillarComparisonChart"></canvas>
-                    <p class="chart-caption">
-                        <strong>Overview:</strong> Distribution of E, S, and G themes across News vs. Social data.<br>
-                        <strong>Interpretation:</strong> News is more focused on <strong>Governance (G)</strong> (legal
-                        compliance), while Social Media is heavily weighted towards <strong>Environmental (E)</strong>
-                        and <strong>Social (S)</strong> grievances.
-                    </p>
-                </div>
-                <div class="chart-card limited-height">
-                    <div class="chart-title">Environmental vs. Social Focus</div>
-                    <canvas id="pillarRadarChart"></canvas>
-                    <p class="chart-caption">
-                        <strong>Overview:</strong> Relative intensity of primary ESG research themes.<br>
-                        <strong>Interpretation:</strong> Environmental concerns currently outweigh Social or Governance
-                        topics in terms of linguistic intensity and community engagement.
-                    </p>
-                </div>
-            </div>
-
-            <div class="section-header">
-                <h3>ESG Pillar Analysis</h3>
-                <span>Comparative Pillar Distribution</span>
-            </div>
-
-            <div class="charts-row" style="grid-template-columns: 1fr; margin-bottom: 2rem;">
-                <div class="chart-card">
-                    <div class="chart-title">News ESG Crisis Hotspots (E, S, G Split)</div>
-                    <div style="height: 400px;">
-                        <canvas id="newsCompanyPillarChart"></canvas>
-                    </div>
-                    <p class="chart-caption">
-                        <strong>Overview:</strong> ESG risk composition per company in official news.<br>
-                        <strong>Interpretation:</strong> Official narratives often highlight Governance (G) legal risks.
-                    </p>
-                </div>
-            </div>
-
-            <div class="charts-row" style="grid-template-columns: 1fr; margin-bottom: 2rem;">
-                <div class="chart-card">
-                    <div class="chart-title">Social ESG Crisis Hotspots (E, S, G Split)</div>
-                    <div style="height: 400px;">
-                        <canvas id="socialCompanyPillarChart"></canvas>
-                    </div>
-                    <p class="chart-caption">
-                        <strong>Overview:</strong> ESG risk composition per company in social media buzz.<br>
-                        <strong>Interpretation:</strong> Public grievances are typically weighted towards Environmental
-                        (E) and Social (S) issues.
-                    </p>
-                </div>
-            </div>
-
-            <div class="section-header">
-                <h3>Sentiment Distribution</h3>
-                <span>Sentiment Polarity Analysis</span>
-            </div>
-
-            <div class="charts-row" style="grid-template-columns: 1fr; margin-bottom: 2rem;">
-                <div class="chart-card">
-                    <div class="chart-title">News Sentiment by Company (ESG Context)</div>
-                    <div style="height: 400px;">
-                        <canvas id="newsSentimentChart"></canvas>
-                    </div>
-                    <p class="chart-caption">
-                        <strong>Overview:</strong> Positivity vs Negativity ratios for official news articles.<br>
-                        <strong>Interpretation:</strong> Most ESG news currently shows a <strong>Positive</strong> or
-                        <strong>Neutral</strong> tone, often reflecting official company statements.
-                    </p>
-                </div>
-            </div>
-
-            <div class="charts-row" style="grid-template-columns: 1fr; margin-bottom: 2rem;">
-                <div class="chart-card">
-                    <div class="chart-title">Social Sentiment by Company (Public Buzz)</div>
-                    <div style="height: 400px;">
-                        <canvas id="socialSentimentChart"></canvas>
-                    </div>
-                    <p class="chart-caption">
-                        <strong>Overview:</strong> Positivity vs Negativity ratios for social media mentions.<br>
-                        <strong>Interpretation:</strong> Public buzz often highlights environmental and social
-                        grievances not captured in official news.
-                    </p>
-                </div>
-            </div>
-        </div>
-
-        <!-- METHODOLOGY TAB -->
-        <div id="methodology-tab" class="tab-content" style="display:none;">
-            <div class="card-header"
-                style="text-align: center; border-bottom: 1px solid var(--border-subtle); padding-bottom: 2rem; margin-bottom: 3rem;">
-                <h2 class="card-title">Research Methodology</h2>
-                <p class="card-subtitle">Technical pipeline for ESG Perception classification & synthesis</p>
-            </div>
-
-            <div class="method-flow">
-                <!-- Step 1 -->
-                <div class="method-step">
-                    <div class="method-icon">1</div>
-                    <div class="method-card">
-                        <h3>Data Collection</h3>
-                        <p>Multi-source ingestion engine targeting Indonesian mining giants across official and public
-                            channels. Scripts automate the retrieval of high-fidelity content while handling rate limits
-                            and site-specific paginations.</p>
-                        <div class="method-tags">
-                            <span class="method-tag">Python</span>
-                            <span class="method-tag">BeautifulSoup</span>
-                            <span class="method-tag">X API</span>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Step 2 -->
-                <div class="method-step">
-                    <div class="method-icon">2</div>
-                    <div class="method-card">
-                        <h3>Preprocessing & Normalization</h3>
-                        <p>Cleansing raw datasets by removing duplicates, normalizing Indonesian date formats (e.g.,
-                            "Februari" to ISO), and stripping HTML noise to prepare clean text for semantic processing.
-                        </p>
-                        <div class="method-tags">
-                            <span class="method-tag">Pandas</span>
-                            <span class="method-tag">Regex</span>
-                            <span class="method-tag">NLP Cleaning</span>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Step 3 -->
-                <div class="method-step">
-                    <div class="method-icon">3</div>
-                    <div class="method-card">
-                        <h3>Dual-Stage Matching</h3>
-                        <p>High-precision filtering logic ensuring every record specifically mentions a target <span
-                                class="tech-highlight">Company</span> and contains relevant <span
-                                class="tech-highlight">Perception Keywords</span> (Lingkungan, Korupsi, CSR, etc.).</p>
-                        <div class="method-tags">
-                            <span class="method-tag">Entity Recognition</span>
-                            <span class="method-tag">Keyword Dictionary</span>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Step 4 -->
-                <div class="method-step">
-                    <div class="method-icon">4</div>
-                    <div class="method-card">
-                        <h3>AI Analytical Insight</h3>
-                        <p>Deployment of transformer models to extract latent meaning. We classify articles into <span
-                                class="tech-highlight">E, S, G pillars</span> and detect public <span
-                                class="tech-highlight">Sentiment</span> with high confidence scores.</p>
-                        <div class="method-tags">
-                            <span class="method-tag">mDeBERTa-v3</span>
-                            <span class="method-tag">IndoBERT</span>
-                            <span class="method-tag">PyTorch</span>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Step 5 -->
-                <div class="method-step">
-                    <div class="method-icon">5</div>
-                    <div class="method-card">
-                        <h3>Synthesis & Visualization</h3>
-                        <p>Aggregating processed insights into the interactive dashboard. Real-time filtering and chart
-                            rendering allow stakeholders to audit specific metrics down to the raw article level.</p>
-                        <div class="method-tags">
-                            <span class="method-tag">Chart.js</span>
-                            <span class="method-tag">JSON Assets</span>
-                            <span class="method-tag">Verification UI</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div style="margin: 3rem 0; padding: 2rem; border-top: 1px solid var(--border-subtle); text-align: center;">
-                <p style="font-size: 0.875rem; color: var(--text-secondary); font-style: italic;">
-                    This methodology ensures analytical purity by requiring dual-stage verification (jointly matched)
-                    for all corpus entries, maintaining a <strong>91% average model confidence</strong> across the
-                    dataset.
+        <div class="charts-row charts-row-full">
+            <div class="chart-card limited-height">
+                <div class="chart-title">Social Mentions by Company</div>
+                <canvas id="xCompanyChart"></canvas>
+                <p class="chart-caption">
+                    <strong>Overview:</strong> Public discourse volume on X/Twitter.<br>
+                    <strong>Interpretation:</strong> PT Adaro leads public buzz, specifically related to CSR
+                    programs (beasiswa) and community environmental concerns.
                 </p>
             </div>
         </div>
+
+        <div class="charts-row charts-row-full">
+            <div class="chart-card limited-height">
+                <div class="chart-title">Social Volume Trend (Monthly)</div>
+                <canvas id="xTrendChart"></canvas>
+                <p class="chart-caption">
+                    <strong>Overview:</strong> Temporal distribution of public mentions and engagement spikes.<br>
+                    <strong>Interpretation:</strong> Periodic surges in sentiment often correlate with quarterly
+                    sustainability reports or external environmental incidents.
+                </p>
+            </div>
+        </div>
+
+        <div class="charts-row charts-row-full">
+            <div class="chart-card limited-height">
+                <div class="chart-title">Top Narrative Drivers (Users)</div>
+                <canvas id="xUserChart"></canvas>
+                <p class="chart-caption">
+                    <strong>Overview:</strong> Influential accounts or bots driving the narrative.<br>
+                    <strong>Interpretation:</strong> Presence of automated accounts and news aggregators indicates
+                    that the narrative is partially managed rather than purely organic.
+                </p>
+            </div>
+        </div>
+
+        <!-- Social Media Explorer -->
+        <div class="card" style="margin-top: 2rem;">
+            <div class="card-header flex-header">
+                <h2 class="card-title">Social Corpus Explorer</h2>
+                <p class="card-subtitle">Showing <span id="x-filtered-count">0</span> social posts for public
+                    sentiment analysis</p>
+            </div>
+
+            <div class="filter-bar">
+                <div class="filter-group">
+                    <label>Search</label>
+                    <input type="text" id="x-search" placeholder="Search tweet content..." oninput="applyXFilters()">
+                </div>
+                <div class="filter-group">
+                    <label>Company</label>
+                    <select id="filter-x-company" onchange="applyXFilters()">
+                        <option value="all">All Companies</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label>Sort By</label>
+                    <select id="filter-x-sort" onchange="applyXFilters()">
+                        <option value="newest">Newest First</option>
+                        <option value="oldest">Oldest First</option>
+                        <option value="engagement">Highest Engagement</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="table-container">
+                <table id="x-table">
+                    <thead>
+                        <tr>
+                            <th style="width: 120px;">Date</th>
+                            <th style="width: 120px;">User</th>
+                            <th>Content</th>
+                            <th style="width: 150px;">Company</th>
+                            <th style="width: 80px;">Stats</th>
+                        </tr>
+                    </thead>
+                    <tbody id="x-table-body">
+                        <!-- Populated via JS -->
+                    </tbody>
+                </table>
+            </div>
+            <div class="pagination" id="x-pagination">
+                <!-- Populated via JS -->
+            </div>
+        </div>
+    </div>
+
+    <!-- IN-DEPTH TAB -->
+    <div id="indepth-tab" class="tab-content" style="display:none;">
+        <!-- In Depth Content -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-label">Dominant Pillar</div>
+                <div class="stat-value" style="color: var(--pillar-g);">Governance</div>
+                <div class="stat-desc">The primary ESG category detected across the analyzed official news dataset.
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Pillar Confidence</div>
+                <div class="stat-value">91%</div>
+                <div class="stat-desc">The average probability score assigned by the classification models to all
+                    matches.</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Model Engine</div>
+                <div class="stat-value" style="font-size: 1.5rem; padding-top: 0.5rem;">mDeBERTa + IndoBERT</div>
+                <div class="stat-desc">State-of-the-art transformer models used for pillar and sentiment detection.
+                </div>
+            </div>
+        </div>
+
+        <div class="charts-row charts-row-2-1">
+            <div class="chart-card limited-height">
+                <div class="chart-title">ESG Pillar Breakdown by Source</div>
+                <canvas id="pillarComparisonChart"></canvas>
+                <p class="chart-caption">
+                    <strong>Overview:</strong> Distribution of E, S, and G themes across News vs. Social data.<br>
+                    <strong>Interpretation:</strong> News is more focused on <strong>Governance (G)</strong> (legal
+                    compliance), while Social Media is heavily weighted towards <strong>Environmental (E)</strong>
+                    and <strong>Social (S)</strong> grievances.
+                </p>
+            </div>
+            <div class="chart-card limited-height">
+                <div class="chart-title">Environmental vs. Social Focus</div>
+                <canvas id="pillarRadarChart"></canvas>
+                <p class="chart-caption">
+                    <strong>Overview:</strong> Relative intensity of primary ESG research themes.<br>
+                    <strong>Interpretation:</strong> Environmental concerns currently outweigh Social or Governance
+                    topics in terms of linguistic intensity and community engagement.
+                </p>
+            </div>
+        </div>
+
+        <div class="section-header">
+            <h3>ESG Pillar Analysis</h3>
+            <span>Comparative Pillar Distribution</span>
+        </div>
+
+        <div class="charts-row charts-row-full">
+            <div class="chart-card">
+                <div class="chart-title">News ESG Crisis Hotspots (E, S, G Split)</div>
+                <div style="height: 400px;">
+                    <canvas id="newsCompanyPillarChart"></canvas>
+                </div>
+                <p class="chart-caption">
+                    <strong>Overview:</strong> ESG risk composition per company in official news.<br>
+                    <strong>Interpretation:</strong> Official narratives often highlight Governance (G) legal risks.
+                </p>
+            </div>
+        </div>
+
+        <div class="charts-row charts-row-full">
+            <div class="chart-card">
+                <div class="chart-title">Social ESG Crisis Hotspots (E, S, G Split)</div>
+                <div style="height: 400px;">
+                    <canvas id="socialCompanyPillarChart"></canvas>
+                </div>
+                <p class="chart-caption">
+                    <strong>Overview:</strong> ESG risk composition per company in social media buzz.<br>
+                    <strong>Interpretation:</strong> Public grievances are typically weighted towards Environmental
+                    (E) and Social (S) issues.
+                </p>
+            </div>
+        </div>
+
+        <div class="section-header">
+            <h3>Sentiment Distribution</h3>
+            <span>Sentiment Polarity Analysis</span>
+        </div>
+
+        <div class="charts-row charts-row-full">
+            <div class="chart-card">
+                <div class="chart-title">News Sentiment by Company (ESG Context)</div>
+                <div style="height: 400px;">
+                    <canvas id="newsSentimentChart"></canvas>
+                </div>
+                <p class="chart-caption">
+                    <strong>Overview:</strong> Positivity vs Negativity ratios for official news articles.<br>
+                    <strong>Interpretation:</strong> Most ESG news currently shows a <strong>Positive</strong> or
+                    <strong>Neutral</strong> tone, often reflecting official company statements.
+                </p>
+            </div>
+        </div>
+
+        <div class="charts-row charts-row-full">
+            <div class="chart-card">
+                <div class="chart-title">Social Sentiment by Company (Public Buzz)</div>
+                <div style="height: 400px;">
+                    <canvas id="socialSentimentChart"></canvas>
+                </div>
+                <p class="chart-caption">
+                    <strong>Overview:</strong> Positivity vs Negativity ratios for social media mentions.<br>
+                    <strong>Interpretation:</strong> Public buzz often highlights environmental and social
+                    grievances not captured in official news.
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- METHODOLOGY TAB -->
+    <div id="methodology-tab" class="tab-content" style="display:none;">
+        <div class="card-header"
+            style="text-align: center; border-bottom: 1px solid var(--border-subtle); padding-bottom: 2rem; margin-bottom: 3rem;">
+            <h2 class="card-title">Research Methodology</h2>
+            <p class="card-subtitle">Technical pipeline for ESG Perception classification & synthesis</p>
+        </div>
+
+        <div class="method-flow">
+            <!-- Step 1 -->
+            <div class="method-step">
+                <div class="method-icon">1</div>
+                <div class="method-card">
+                    <h3>Data Collection</h3>
+                    <p>Multi-source ingestion engine targeting Indonesian mining giants across official and public
+                        channels. Scripts automate the retrieval of high-fidelity content while handling rate limits
+                        and site-specific paginations.</p>
+                    <div class="method-tags">
+                        <span class="method-tag">Python</span>
+                        <span class="method-tag">BeautifulSoup</span>
+                        <span class="method-tag">X API</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Step 2 -->
+            <div class="method-step">
+                <div class="method-icon">2</div>
+                <div class="method-card">
+                    <h3>Preprocessing & Normalization</h3>
+                    <p>Cleansing raw datasets by removing duplicates, normalizing Indonesian date formats (e.g.,
+                        "Februari" to ISO), and stripping HTML noise to prepare clean text for semantic processing.
+                    </p>
+                    <div class="method-tags">
+                        <span class="method-tag">Pandas</span>
+                        <span class="method-tag">Regex</span>
+                        <span class="method-tag">NLP Cleaning</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Step 3 -->
+            <div class="method-step">
+                <div class="method-icon">3</div>
+                <div class="method-card">
+                    <h3>Dual-Stage Matching</h3>
+                    <p>High-precision filtering logic ensuring every record specifically mentions a target <span
+                            class="tech-highlight">Company</span> and contains relevant <span
+                            class="tech-highlight">Perception Keywords</span> (Lingkungan, Korupsi, CSR, etc.).</p>
+                    <div class="method-tags">
+                        <span class="method-tag">Entity Recognition</span>
+                        <span class="method-tag">Keyword Dictionary</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Step 4 -->
+            <div class="method-step">
+                <div class="method-icon">4</div>
+                <div class="method-card">
+                    <h3>AI Analytical Insight</h3>
+                    <p>Deployment of transformer models to extract latent meaning. We classify articles into <span
+                            class="tech-highlight">E, S, G pillars</span> and detect public <span
+                            class="tech-highlight">Sentiment</span> with high confidence scores.</p>
+                    <div class="method-tags">
+                        <span class="method-tag">mDeBERTa-v3</span>
+                        <span class="method-tag">IndoBERT</span>
+                        <span class="method-tag">PyTorch</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Step 5 -->
+            <div class="method-step">
+                <div class="method-icon">5</div>
+                <div class="method-card">
+                    <h3>Synthesis & Visualization</h3>
+                    <p>Aggregating processed insights into the interactive dashboard. Real-time filtering and chart
+                        rendering allow stakeholders to audit specific metrics down to the raw article level.</p>
+                    <div class="method-tags">
+                        <span class="method-tag">Chart.js</span>
+                        <span class="method-tag">JSON Assets</span>
+                        <span class="method-tag">Verification UI</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div style="margin: 3rem 0; padding: 2rem; border-top: 1px solid var(--border-subtle); text-align: center;">
+            <p style="font-size: 0.875rem; color: var(--text-secondary); font-style: italic;">
+                This methodology ensures analytical purity by requiring dual-stage verification (jointly matched)
+                for all corpus entries, maintaining a <strong>91% average model confidence</strong> across the
+                dataset.
+            </p>
+        </div>
+    </div>
     </div>
     <footer>
         <div class="footer-grid">
@@ -529,8 +525,8 @@
         </div>
     </footer>
 
-    <script src="/components/esg-perception/data.js"></script>
-    <script src="/components/esg-perception/dashboard.js"></script>
+    <script src="components/esg-perception/data.js"></script>
+    <script src="components/esg-perception/dashboard.js"></script>
 </body>
 
 </html>
