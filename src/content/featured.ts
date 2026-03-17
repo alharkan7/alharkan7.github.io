@@ -21,11 +21,11 @@ export const featuredProjects = [
     coverImage: "https://ik.imagekit.io/raihankalla/research_section_cover/goodnews-garden.png",
   },
   {
-    title: "Jakarta Labor Market Analysis (19K+ Job Postings)",
+    title: "Jakarta Job Market Analysis (19K+ Vacancies)",
     subtitle: "",
     type: "analysis",
     url: "/labor-market-analysis",
-    coverImage: "https://ik.imagekit.io/raihankalla/research_section_cover/job-market-analysis.png",
+    coverImage: "https://ik.imagekit.io/raihankalla/research_section_cover/job-market-analysis-2.png",
   },
   {
     title: "National Budget Progression",
@@ -53,7 +53,7 @@ export const featuredProjects = [
     subtitle: "",
     type: "analysis",
     url: "/goodnews-bibliometrics",
-    coverImage: "https://ik.imagekit.io/raihankalla/research_section_cover/goodnews-bibliometrics.png",
+    coverImage: "https://ik.imagekit.io/raihankalla/research_section_cover/goodnews-bibliometrics-2.png",
   },
   {
     title: "TurnBackHoax Analysis of 2025: Narrative 3D Network",
