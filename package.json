@@ -52,6 +52,9 @@
       "form-data": "^4.0.4",
       "glob": "^10.5.0",
       "brace-expansion": "^2.0.2"
+    },
+    "patchedDependencies": {
+      "astro@5.16.6": "patches/astro@5.16.6.patch"
     }
   }
 }

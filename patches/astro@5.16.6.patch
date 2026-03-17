@@ -1,0 +1,13 @@
+diff --git a/dist/vite-plugin-astro/index.js b/dist/vite-plugin-astro/index.js
+index 09715dfaa63450494706a9713da026d0d8020177..b2a265d5e9053405be727b0c089edd604a417559 100644
+--- a/dist/vite-plugin-astro/index.js
++++ b/dist/vite-plugin-astro/index.js
+@@ -228,7 +228,7 @@ File: ${id}`
+ function appendSourceMap(content, map) {
+   if (!map) return content;
+   return `${content}
+-//# sourceMappingURL=data:application/json;charset=utf-8;base64,${Buffer.from(
++//# ${"sourceMappingURL"}=data:application/json;charset=utf-8;base64,${Buffer.from(
+     map
+   ).toString("base64")}`;
+ }
