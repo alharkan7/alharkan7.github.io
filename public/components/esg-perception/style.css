@@ -46,7 +46,7 @@ body {
 header {
     border-bottom: 2px solid var(--border-strong);
     padding-bottom: 2rem;
-    margin-bottom: 3rem;
+    margin-bottom: 1rem;
     text-align: center;
 }
 
@@ -80,13 +80,14 @@ h1 {
 .tabs {
     display: flex;
     justify-content: center;
+    align-items: center;
     gap: 2rem;
     position: sticky;
     top: 0;
     background-color: var(--bg-paper);
     z-index: 1000;
-    padding: 1.5rem 0;
-    margin-bottom: 3rem;
+    padding: 0.75rem 0;
+    margin-bottom: 2rem;
     border-bottom: 1px solid transparent;
     transition: all 0.3s ease;
 }
@@ -591,11 +592,12 @@ footer {
         gap: 1.5rem;
         overflow-x: auto;
         justify-content: flex-start;
-        padding: 0 1.5rem 1rem;
-        margin: 2rem -1.5rem 0;
+        padding: 0.75rem 1.5rem;
+        margin: 0 -1.5rem 2rem;
         width: calc(100% + 3rem);
         -webkit-overflow-scrolling: touch;
         border-bottom: 1px solid var(--border-subtle);
+        background-color: var(--bg-paper);
     }
 
     .tabs::-webkit-scrollbar {
