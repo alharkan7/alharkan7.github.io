@@ -1,0 +1,842 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IDR Currency Exchange Tracker</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400..800;1,400..800&family=Lora:ital,wght@0,400..700;1,400..700&display=swap"
+        rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-zoom"></script>
+    <style>
+        html {
+            box-sizing: border-box;
+            height: 100%;
+        }
+
+        *,
+        *:before,
+        *:after {
+            box-sizing: inherit;
+        }
+
+        :root {
+            /* Light Theme (New Default) */
+            --bg-color: #fdfdfd;
+            --surface-color: #ffffff;
+            --primary-color: #004a99;
+            --secondary-color: #1a7f37;
+            --text-main: #1a1a1a;
+            --text-dim: #4a4a4a;
+            --border-color: #e1e4e8;
+            --grid-color: rgba(200, 200, 200, 0.4);
+            --chip-bg-unselected: #f3f4f6;
+            --chip-text-unselected: #4a4a4a;
+            --font-serif: 'EB Garamond', serif;
+            --font-body: 'Lora', serif;
+        }
+
+        [data-theme="dark"] {
+            /* Dark Theme Override */
+            --bg-color: #0d1117;
+            --surface-color: #161b22;
+            --primary-color: #58a6ff;
+            --secondary-color: #3fb950;
+            --text-main: #c9d1d9;
+            --text-dim: #8b949e;
+            --border-color: #30363d;
+            --grid-color: rgba(48, 54, 61, 0.2);
+            --chip-bg-unselected: #21262d;
+            --chip-text-unselected: #8b949e;
+        }
+
+        .mobile-only {
+            display: none;
+        }
+
+        body {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            /* Prevents global scrollbars */
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            font-family: var(--font-body);
+            display: flex;
+            flex-direction: column;
+            transition: background-color 0.4s, color 0.4s;
+            -webkit-font-smoothing: optimizeLegibility;
+            line-height: 1.3;
+        }
+
+        .header {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--border-color);
+            padding: 10px 20px;
+            flex-shrink: 0;
+            box-sizing: border-box;
+        }
+
+        .theme-toggle {
+            background: transparent;
+            border: 1px solid var(--border-color);
+            color: var(--text-main);
+            padding: 6px 14px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transition: all 0.2s;
+            font-family: var(--font-body);
+        }
+
+        .theme-toggle:hover {
+            background: rgba(128, 128, 128, 0.05);
+            border-color: var(--text-main);
+        }
+
+        .theme-toggle svg {
+            width: 14px;
+            height: 14px;
+            fill: currentColor;
+        }
+
+        #moon-icon {
+            display: block;
+        }
+
+        #sun-icon {
+            display: none;
+        }
+
+        [data-theme="dark"] #moon-icon {
+            display: none;
+        }
+
+        [data-theme="dark"] #sun-icon {
+            display: block;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            background: var(--surface-color);
+            padding: 0 20px 10px;
+            display: flex;
+            flex-direction: column;
+            flex: 1 1 0;
+            /* Forces it to fill space without pushing boundaries */
+            min-height: 0;
+            overflow: hidden;
+        }
+
+        h1 {
+            font-family: var(--font-serif);
+            font-size: 1.6rem;
+            font-weight: 400;
+            margin: 0;
+            color: var(--text-main);
+            letter-spacing: -0.01em;
+            font-style: italic;
+        }
+
+        .controls {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin: 5px 0 10px;
+            padding: 10px 15px;
+            background: rgba(128, 128, 128, 0.02);
+            border: 1px solid var(--border-color);
+            flex-shrink: 0;
+        }
+
+        .control-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        label {
+            font-family: var(--font-serif);
+            font-size: 1.1rem;
+            color: var(--text-main);
+            font-weight: 500;
+            text-align: center;
+            font-style: italic;
+        }
+
+        .currency-row {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 16px;
+            padding: 10px;
+        }
+
+        .currency-row::-webkit-scrollbar {
+            height: 3px;
+        }
+
+        .currency-row::-webkit-scrollbar-thumb {
+            background: var(--border-color);
+        }
+
+
+        .range-container {
+            position: relative;
+            height: 20px;
+            margin: 5px 0;
+        }
+
+        .slider-track {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 100%;
+            height: 1px;
+            background: var(--border-color);
+            z-index: 1;
+        }
+
+        input[type="range"] {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 100%;
+            appearance: none;
+            background: none;
+            pointer-events: none;
+            z-index: 2;
+            margin: 0;
+        }
+
+        input[type="range"]::-webkit-slider-thumb {
+            appearance: none;
+            pointer-events: auto;
+            width: 14px;
+            height: 14px;
+            background: var(--text-main);
+            border-radius: 0;
+            cursor: pointer;
+            border: 1px solid var(--surface-color);
+        }
+
+        .range-labels {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.85rem;
+            color: var(--text-dim);
+            font-family: var(--font-serif);
+            font-style: italic;
+        }
+
+        .chart-wrapper {
+            position: relative;
+            flex: 1;
+            /* Smoothly takes remaining space */
+            width: 100%;
+            min-height: 0;
+            /* Allows shrinking below content size to prevent overflow */
+            cursor: crosshair;
+        }
+
+        .chart-wrapper canvas {
+            position: absolute !important;
+            top: 0;
+            left: 0;
+            width: 100% !important;
+            height: 100% !important;
+        }
+
+        .chart-hint {
+            font-size: 0.7rem;
+            color: var(--text-dim);
+            text-align: center;
+            margin-top: 5px;
+            font-family: var(--font-serif);
+            font-style: italic;
+            border-top: 1px solid var(--border-color);
+            padding: 5px 0;
+            flex-shrink: 0;
+        }
+
+        .timeline-column {
+            width: 100%;
+        }
+
+        .currency-dropdown-container {
+            width: 100%;
+            position: relative;
+        }
+
+        #currency-dropdown-btn {
+            display: none;
+        }
+
+
+        #loading {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 1.2rem;
+            color: var(--text-main);
+            font-family: var(--font-serif);
+            font-style: italic;
+        }
+
+        .legend-indicator {
+            width: 10px;
+            height: 10px;
+            display: inline-block;
+            border: 2px solid currentColor;
+            border-radius: 50%;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        /* Custom Legend Styling */
+        .custom-legend {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-bottom: 5px;
+            padding: 2px 0;
+            min-height: 25px;
+            transition: all 0.3s ease;
+            flex-shrink: 0;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-family: var(--font-serif);
+            font-size: 1rem;
+            color: var(--text-main);
+            font-style: italic;
+            cursor: pointer;
+            padding: 4px 8px;
+            border-radius: 4px;
+            transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+            opacity: 1;
+            transform: scale(1);
+            white-space: nowrap;
+        }
+
+        .legend-item:hover {
+            background: rgba(128, 128, 128, 0.05);
+            transform: translateY(-1px);
+        }
+
+        .legend-item.inactive {
+            opacity: 0.25;
+            filter: grayscale(0.8);
+        }
+
+        .legend-item.inactive:hover {
+            opacity: 0.5;
+            filter: grayscale(0.4);
+        }
+
+        @keyframes legendPop {
+            0% {
+                opacity: 0;
+                transform: scale(0.5) translateY(10px);
+            }
+
+            100% {
+                opacity: 1;
+                transform: scale(1) translateY(0);
+            }
+        }
+
+        .legend-circle {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            border: 2.5px solid;
+            background: transparent;
+            flex-shrink: 0;
+        }
+
+        /* Mobile Adjustments */
+        @media (max-width: 600px) {
+            body {
+                padding: 10px;
+            }
+
+            h1 {
+                font-size: 1.4rem;
+            }
+
+            .controls {
+                flex-direction: row;
+                align-items: center;
+                gap: 10px;
+                padding: 10px;
+                margin: 0 0 10px 0;
+            }
+
+            .timeline-column {
+                width: 80%;
+            }
+
+            .currency-dropdown-container {
+                width: 20%;
+                display: flex;
+                justify-content: flex-end;
+            }
+
+            #currency-dropdown-btn {
+                display: block;
+                width: 100%;
+                padding: 8px 5px;
+                background: var(--surface-color);
+                border: 1px solid var(--border-color);
+                color: var(--text-main);
+                font-family: var(--font-serif);
+                font-style: normal;
+                font-size: 1.2rem;
+                font-weight: bold;
+                cursor: pointer;
+                border-radius: 4px;
+                text-align: center;
+                transition: background 0.2s;
+            }
+
+            .custom-legend {
+                display: none;
+                position: absolute;
+                top: calc(100% + 8px);
+                right: 0;
+                background: var(--surface-color);
+                border: 1px solid var(--border-color);
+                padding: 12px;
+                width: max-content;
+                flex-direction: column;
+                align-items: flex-start;
+                box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+                z-index: 100;
+                gap: 12px;
+                border-radius: 6px;
+            }
+
+            .custom-legend.show-dropdown {
+                display: flex !important;
+            }
+
+            .chart-hint {
+                font-size: 0.7rem;
+            }
+
+            .control-group label {
+                font-size: 0.75rem;
+                text-align: center;
+            }
+
+            .range-labels {
+                display: none;
+            }
+
+            /* Hide 'Period: ' prefix to save space */
+            .control-group label span#range-text::before {
+                content: "";
+            }
+
+            .desktop-only {
+                display: none;
+            }
+
+            .mobile-only {
+                display: inline;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div id="loading">Retrieving market indices...</div>
+
+    <div class="header">
+        <h1>
+            <span class="desktop-only">Market Indices: Indonesian Rupiah</span>
+            <span class="mobile-only">IDR Market Index</span>
+        </h1>
+        <button class="theme-toggle" id="theme-toggle">
+            <svg id="moon-icon" viewBox="0 0 24 24">
+                <path
+                    d="M12.1,22c-4.8,0-9-3.3-10-8c-1.1-5.1,2.1-10.1,7.2-11.2c0.5-0.1,1.1-0.1,1.6-0.1c0.4,0,0.7,0.3,0.8,0.7 c0.1,0.4-0.1,0.8-0.5,1c-1.8,1.2-2.9,3.3-2.9,5.5c0,3.7,3,6.8,6.8,6.8c2.2,0,4.3-1.1,5.5-2.9c0.2-0.4,0.7-0.6,1.1-0.5 c0.4,0.1,0.7,0.4,0.7,0.8c0,0.5,0,1.1-0.1,1.6C22.2,18.9,17.2,22.1,12.1,22z" />
+            </svg>
+            <svg id="sun-icon" viewBox="0 0 24 24">
+                <path
+                    d="M12,18c-3.3,0-6-2.7-6-6s2.7-6,6-6s6,2.7,6,6S15.3,18,12,18z M12,8c-2.2,0-4,1.8-4,4s1.8,4,4,4s4-1.8,4-4S14.2,8,12,8z M12,4c-0.6,0-1-0.4-1-1V1c0-0.6,0.4-1,1-1s1,0.4,1,1v2C13,3.6,12.6,4,12,4z M12,24c-0.6,0-1-0.4-1-1v-2c0-0.6,0.4-1,1-1s1,0.4,1,1v2 C13,23.6,12.6,24,12,24z M5.6,6.7c-0.3,0-0.5-0.1-0.7-0.3L3.5,4.9c-0.4-0.4-0.4-1,0-1.4s1-0.4,1.4,0l1.4,1.4c0.4,0.4,0.4,1,0,1.4 C6.2,6.6,5.9,6.7,5.6,6.7z M19.1,20.1c-0.3,0-0.5-0.1-0.7-0.3l-1.4-1.4c-0.4-0.4-0.4-1,0-1.4s1-0.4,1.4,0l1.4,1.4c0.4,0.4,0.4,1,0,1.4 C19.6,20,19.3,20.1,19.1,20.1z M3,13H1c-0.6,0-1-0.4-1-1s0.4-1,1-1h2c0.6,0,1,0.4,1,1S3.6,13,3,13z M23,13h-2c-0.6,0-1-0.4-1-1 s0.4-1,1-1h2c0.6,0,1,0.4,1,1S23.6,13,23,13z M5.6,20.1c-0.3,0-0.5-0.1-0.7-0.3l-1.4-1.4c-0.4-0.4-0.4-1,0-1.4s1-0.4,1.4,0l1.4,1.4 c0.4,0.4,0.4,1,0,1.4C6.2,20,5.9,20.1,5.6,20.1z M19.1,6.7c-0.3,0-0.5-0.1-0.7-0.3c-0.4-0.4-0.4-1,0-1.4l1.4-1.4c0.4-0.4,1-0.4,1.4,0 s0.4,1,0,1.4l-1.4,1.4C19.6,6.6,19.3,6.7,19.1,6.7z" />
+            </svg>
+            <!-- <span id="theme-text">Light Mode</span> -->
+        </button>
+    </div>
+
+    <div class="container" style="display: none;" id="main-container">
+        <div class="controls">
+            <div class="control-group timeline-column">
+                <label>Period: <span id="range-text" style="color: var(--text-main); font-weight: 600;"></span></label>
+                <div class="range-container">
+                    <div class="slider-track" id="slider-track"></div>
+                    <input type="range" id="range-start" step="1">
+                    <input type="range" id="range-end" step="1">
+                </div>
+                <div class="range-labels">
+                    <span id="min-label"></span>
+                    <span id="max-label"></span>
+                </div>
+            </div>
+
+            <div class="currency-dropdown-container">
+                <button id="currency-dropdown-btn">☰</button>
+                <div id="custom-legend" class="custom-legend"></div>
+            </div>
+        </div>
+
+        <div class="chart-wrapper">
+            <canvas id="currencyChart"></canvas>
+        </div>
+        <div class="chart-hint">Scroll to magnify timeline • Drag to navigate • Pinch for mobile adjustment</div>
+    </div>
+
+    <script>
+        const MONTHS = {
+            'Januari': 0, 'Februari': 1, 'Maret': 2, 'April': 3, 'Mei': 4, 'Juni': 5,
+            'Juli': 6, 'Agustus': 7, 'September': 8, 'Oktober': 9, 'November': 10, 'Desember': 11
+        };
+        const MONTH_ABBR = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+        const CURRENCIES = [
+            { code: 'USD', color: '#58a6ff' }, { code: 'JPY', color: '#ff7b72' },
+            { code: 'GBP', color: '#79c0ff' }, { code: 'CHF', color: '#d2a8ff' },
+            { code: 'SGD', color: '#ffa657' }, { code: 'MYR', color: '#3fb950' },
+            { code: 'HKD', color: '#a5d6ff' }, { code: 'AUD', color: '#7ee787' },
+            { code: 'CAD', color: '#f2cc60' }
+        ];
+
+        let allData = [];
+        let chartInstance = null;
+        let isUpdatingFromZoom = false;
+        let activeCurrencies = new Set(['USD']);
+
+        // Theme Logic
+        const themeToggle = document.getElementById('theme-toggle');
+        const html = document.documentElement;
+
+        themeToggle.addEventListener('click', () => {
+            const currentTheme = html.getAttribute('data-theme') || 'light';
+            const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+            setTheme(newTheme);
+        });
+
+        function setTheme(theme) {
+            html.setAttribute('data-theme', theme);
+            document.getElementById('theme-text').innerText = theme === 'dark' ? 'Dark Mode' : 'Light Mode';
+            if (chartInstance) {
+                updateChartTheme();
+            }
+        }
+
+        function updateChartTheme() {
+            const currentTheme = html.getAttribute('data-theme') || 'light';
+            const isLight = currentTheme === 'light';
+            const textColor = isLight ? '#1a1a1a' : '#c9d1d9';
+            const gridColor = isLight ? 'rgba(200, 200, 200, 0.4)' : 'rgba(48, 54, 61, 0.2)';
+
+            chartInstance.options.scales.x.ticks.color = textColor;
+            chartInstance.options.scales.y.ticks.color = textColor;
+            chartInstance.options.scales.x.grid.color = gridColor;
+            chartInstance.options.scales.y.grid.color = gridColor;
+            chartInstance.options.plugins.legend.labels.color = textColor;
+
+            chartInstance.options.plugins.tooltip.backgroundColor = isLight ? '#ffffff' : '#161b22';
+            chartInstance.options.plugins.tooltip.bodyColor = isLight ? '#1a1a1a' : '#c9d1d9';
+            chartInstance.options.plugins.tooltip.borderColor = isLight ? '#e1e4e8' : '#30363d';
+
+            chartInstance.update();
+        }
+
+        async function fetchData() {
+            try {
+                const response = await fetch('/components/idr-exchange/IDR_exchange_value.csv');
+                const csvText = await response.text();
+                processCSV(csvText);
+                setupUI();
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('main-container').style.display = 'flex';
+                initChart();
+                updateCustomLegend(); // Initial legend visually update without triggering a redundant chart reload
+            } catch (error) {
+                console.error('Error loading data:', error);
+                document.getElementById('loading').innerText = 'Data connection lost.';
+            }
+        }
+
+        function processCSV(csvText) {
+            const lines = csvText.trim().split('\n');
+            const headers = lines[0].split(',');
+            const data = lines.slice(1).map(line => {
+                const parts = []; let current = ''; let inQuotes = false;
+                for (let i = 0; i < line.length; i++) {
+                    const char = line[i];
+                    if (char === '"') inQuotes = !inQuotes;
+                    else if (char === ',' && !inQuotes) { parts.push(current.trim()); current = ''; }
+                    else current += char;
+                }
+                parts.push(current.trim());
+                if (parts.length < headers.length) return null;
+                const entry = { year: parseInt(parts[0]), monthName: parts[1] || 'Annual' };
+                entry.monthIdx = MONTHS[entry.monthName] !== undefined ? MONTHS[entry.monthName] : 11;
+                entry.displayDate = entry.monthName === 'Annual' ? `${entry.year}` : `${MONTH_ABBR[entry.monthIdx]} ${entry.year}`;
+                for (let i = 2; i < headers.length; i++) {
+                    const val = parts[i]?.replace(/,/g, '');
+                    entry[headers[i]] = val ? parseFloat(val) : null;
+                }
+                entry.dateObj = new Date(entry.year, entry.monthIdx, 1);
+                return entry;
+            }).filter(d => d !== null);
+            allData = data.sort((a, b) => a.dateObj - b.dateObj);
+        }
+
+        function updateTrack() {
+            const rStart = document.getElementById('range-start');
+            const rEnd = document.getElementById('range-end');
+            const total = allData.length - 1;
+            const p1 = (rStart.value / total) * 100;
+            const p2 = (rEnd.value / total) * 100;
+            document.getElementById('slider-track').style.background =
+                `linear-gradient(to right, var(--border-color) ${p1}%, var(--text-main) ${p1}%, var(--text-main) ${p2}%, var(--border-color) ${p2}%)`;
+            document.getElementById('range-text').innerText = `${allData[rStart.value].displayDate} — ${allData[rEnd.value].displayDate}`;
+        }
+
+        function setupUI() {
+            initCustomLegend();
+
+            const currencyBtn = document.getElementById('currency-dropdown-btn');
+            const legendContainerElem = document.getElementById('custom-legend');
+            currencyBtn.addEventListener('click', (e) => {
+                legendContainerElem.classList.toggle('show-dropdown');
+                e.stopPropagation();
+            });
+            document.addEventListener('click', (e) => {
+                if (!legendContainerElem.contains(e.target) && e.target !== currencyBtn) {
+                    legendContainerElem.classList.remove('show-dropdown');
+                }
+            });
+
+            const rStart = document.getElementById('range-start');
+            const rEnd = document.getElementById('range-end');
+            rStart.min = rEnd.min = 0;
+            rStart.max = rEnd.max = allData.length - 1;
+            rStart.value = 0; rEnd.value = allData.length - 1;
+            document.getElementById('min-label').innerText = allData[0].displayDate;
+            document.getElementById('max-label').innerText = allData[allData.length - 1].displayDate;
+
+            const onInput = (e) => {
+                if (parseInt(rStart.value) > parseInt(rEnd.value)) {
+                    if (e.target.id === 'range-start') rStart.value = rEnd.value;
+                    else rEnd.value = rStart.value;
+                }
+                updateTrack();
+                if (chartInstance && !isUpdatingFromZoom) {
+                    chartInstance.options.scales.x.min = parseInt(rStart.value);
+                    chartInstance.options.scales.x.max = parseInt(rEnd.value);
+                    chartInstance.update('none');
+                }
+            };
+            rStart.addEventListener('input', onInput);
+            rEnd.addEventListener('input', onInput);
+            updateTrack();
+        }
+
+        function initChart() {
+            const ctx = document.getElementById('currencyChart').getContext('2d');
+            const selected = CURRENCIES.filter(c => activeCurrencies.has(c.code));
+            const currentTheme = html.getAttribute('data-theme') || 'light';
+            const isLight = currentTheme === 'light';
+
+            chartInstance = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: allData.map(d => d.displayDate),
+                    datasets: selected.map(curr => ({
+                        label: curr.code, data: allData.map(d => d[curr.code]),
+                        borderColor: curr.color, backgroundColor: curr.color + '05',
+                        borderWidth: 1.5, pointRadius: 0, pointHoverRadius: 4, fill: true, tension: 0.1
+                    }))
+                },
+                options: {
+                    responsive: true, maintainAspectRatio: false,
+                    interaction: { intersect: false, mode: 'index' },
+                    onHover: (event, elements) => {
+                        const chart = event.chart;
+                        if (!chart) return;
+                        const mouseOnPoint = chart.getElementsAtEventForMode(event, 'nearest', { intersect: true }, true).length > 0;
+                        const newMode = mouseOnPoint ? 'nearest' : 'index';
+                        const newIntersect = mouseOnPoint;
+
+                        if (chart.options.interaction.mode !== newMode) {
+                            chart.options.interaction.mode = newMode;
+                            chart.options.interaction.intersect = newIntersect;
+                            chart.update('none');
+                        }
+                    },
+                    scales: {
+                        x: {
+                            min: 0, max: allData.length - 1,
+                            grid: { color: isLight ? 'rgba(200, 200, 200, 0.4)' : 'rgba(48, 54, 61, 0.2)', drawBorder: false },
+                            ticks: { color: isLight ? '#1a1a1a' : '#c9d1d9', autoSkip: true, maxTicksLimit: 10, font: { family: 'EB Garamond', size: 14, style: 'italic' } }
+                        },
+                        y: {
+                            grid: { color: isLight ? 'rgba(200, 200, 200, 0.4)' : 'rgba(48, 54, 61, 0.2)', drawBorder: false },
+                            ticks: {
+                                color: isLight ? '#1a1a1a' : '#c9d1d9',
+                                font: { family: 'Lora', size: 12 },
+                                callback: v => (window.innerWidth <= 600 && Math.abs(v) >= 1000) ? (v / 1000) + 'K' : v.toLocaleString()
+                            }
+                        }
+                    },
+                    animations: {
+                        x: {
+                            type: 'number',
+                            easing: 'linear',
+                            duration: 5,
+                            from: NaN,
+                            delay(ctx) {
+                                if (ctx.type !== 'data' || ctx.xStarted) return 0;
+                                ctx.xStarted = true;
+                                return ctx.index * 5;
+                            }
+                        },
+                        y: {
+                            type: 'number',
+                            easing: 'linear',
+                            duration: 5,
+                            from(ctx) {
+                                if (ctx.index === 0) return ctx.chart.scales.y.getPixelForValue(ctx.dataset.data[ctx.index]);
+                                return ctx.chart.scales.y.getPixelForValue(ctx.dataset.data[ctx.index - 1]);
+                            },
+                            delay(ctx) {
+                                if (ctx.type !== 'data' || ctx.yStarted) return 0;
+                                ctx.yStarted = true;
+                                return ctx.index * 5;
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        tooltip: {
+                            backgroundColor: isLight ? '#ffffff' : '#161b22',
+                            titleColor: '#58a6ff',
+                            bodyColor: isLight ? '#1a1a1a' : '#c9d1d9',
+                            borderColor: isLight ? '#e1e4e8' : '#30363d',
+                            borderWidth: 1,
+                            titleFont: { family: 'EB Garamond', size: 16 },
+                            bodyFont: { family: 'Lora', size: 13 },
+                            boxPadding: 6,
+                            callbacks: { label: ctx => ` ${ctx.dataset.label}: ${ctx.parsed.y.toLocaleString('en-US')} IDR` }
+                        },
+                        zoom: {
+                            zoom: { wheel: { enabled: true }, pinch: { enabled: true }, mode: 'x', onZoom: syncSlider },
+                            pan: { enabled: true, mode: 'x', onPan: syncSlider }
+                        }
+                    }
+                }
+            });
+        }
+
+        function syncSlider({ chart }) {
+            isUpdatingFromZoom = true;
+            const min = Math.max(0, Math.floor(chart.scales.x.min));
+            const max = Math.min(allData.length - 1, Math.ceil(chart.scales.x.max));
+            document.getElementById('range-start').value = min;
+            document.getElementById('range-end').value = max;
+            updateTrack();
+            isUpdatingFromZoom = false;
+        }
+
+        function updateChartDatasets() {
+            if (!chartInstance) return;
+            const selectedCodes = Array.from(activeCurrencies);
+
+            // Update Chart.js datasets
+            chartInstance.data.datasets = selectedCodes.map(code => {
+                const curr = CURRENCIES.find(c => c.code === code);
+                const existing = chartInstance.data.datasets.find(ds => ds.label === code);
+                if (existing) return existing;
+                return {
+                    label: curr.code, data: allData.map(d => d[curr.code]),
+                    borderColor: curr.color, backgroundColor: curr.color + '05',
+                    borderWidth: 1.5, pointRadius: 0, pointHoverRadius: 4, fill: true, tension: 0.1
+                };
+            });
+            chartInstance.update();
+
+            // Update Legend Visuals
+            updateCustomLegend();
+        }
+
+        function initCustomLegend() {
+            const legendContainer = document.getElementById('custom-legend');
+            legendContainer.innerHTML = '';
+
+            CURRENCIES.forEach(curr => {
+                const item = document.createElement('div');
+                item.className = 'legend-item';
+                item.id = `legend-${curr.code}`;
+                item.innerHTML = `
+                    <div class="legend-circle" style="border-color: ${curr.color}"></div>
+                    <span>${curr.code}</span>
+                `;
+
+                item.addEventListener('click', () => {
+                    if (activeCurrencies.has(curr.code)) {
+                        activeCurrencies.delete(curr.code);
+                    } else {
+                        activeCurrencies.add(curr.code);
+                    }
+                    updateChartDatasets();
+                });
+
+                legendContainer.appendChild(item);
+            });
+            updateCustomLegend();
+        }
+
+        function updateCustomLegend() {
+            CURRENCIES.forEach(curr => {
+                const item = document.getElementById(`legend-${curr.code}`);
+                if (activeCurrencies.has(curr.code)) {
+                    item.classList.remove('inactive');
+                } else {
+                    item.classList.add('inactive');
+                }
+            });
+        }
+
+        fetchData();
+    </script>
+</body>
+
+</html>

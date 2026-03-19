@@ -56,6 +56,13 @@ export const featuredProjects = [
     coverImage: "https://ik.imagekit.io/raihankalla/research_section_cover/esg-perception.png",
   },
   {
+    title: "IDR Exchange Trend",
+    subtitle: "",
+    type: "visualization",
+    url: "/idr-exchange",
+    coverImage: "https://ik.imagekit.io/raihankalla/research_section_cover/idr-exchange.png",
+  },
+  {
     title: "Good News - Bibliometrics Analysis",
     subtitle: "",
     type: "analysis",
