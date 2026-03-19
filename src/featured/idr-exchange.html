@@ -87,6 +87,31 @@
             box-sizing: border-box;
         }
 
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .home-link {
+            color: var(--text-main);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+            transition: opacity 0.2s;
+        }
+
+        .home-link:hover {
+            opacity: 0.7;
+        }
+
+        .home-icon {
+            width: 20px;
+            height: 20px;
+            fill: currentColor;
+        }
+
         .theme-toggle {
             background: transparent;
             border: 1px solid var(--border-color);
@@ -475,10 +500,17 @@
     <div id="loading">Retrieving market indices...</div>
 
     <div class="header">
-        <h1>
-            <span class="desktop-only">Market Indices: Indonesian Rupiah</span>
-            <span class="mobile-only">IDR Market Index</span>
-        </h1>
+        <div class="header-left">
+            <a href="/data" class="home-link" aria-label="Home">
+                <svg viewBox="0 0 24 24" class="home-icon">
+                    <path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/>
+                </svg>
+            </a>
+            <h1>
+                <span class="desktop-only">Market Indices: Indonesian Rupiah</span>
+                <span class="mobile-only">IDR Market Index</span>
+            </h1>
+        </div>
         <button class="theme-toggle" id="theme-toggle">
             <svg id="moon-icon" viewBox="0 0 24 24">
                 <path
