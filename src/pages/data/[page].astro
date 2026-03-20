@@ -18,15 +18,19 @@ export async function getStaticPaths() {
         projects: featuredProjects.slice(startIndex, startIndex + projectsPerPage),
         currentPage: page,
         totalPages,
+        allProjects: featuredProjects, // Pass all for client-side search
       },
     };
   });
 }
 
-const { projects, currentPage, totalPages } = Astro.props;
+const { projects, currentPage, totalPages, allProjects } = Astro.props;
 const title = "Research Posts";
 const description = "I scrape, analyze or visualize data in my spare time. Here's the list of special pages showcasing the results that don't fit the blog formatting.";
-const permalink = `${Astro.site?.href}data`;
+const permalink = `${Astro.site?.href}data/${currentPage}`;
+
+// Extract unique types for filtering
+const types = [...new Set(allProjects.map((p) => p.type).filter(Boolean))].sort();
 ---
 
 <BaseLayout
@@ -38,9 +42,50 @@ const permalink = `${Astro.site?.href}data`;
   <div class="container">
     <header class="page-header">
       <h1>{title}</h1>
+      <p class="description">{description}</p>
+
+      <div class="filter-controls">
+        <div class="search-wrapper">
+          <input
+            type="text"
+            id="project-search"
+            placeholder="Search all projects..."
+            aria-label="Search projects"
+          />
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="20"
+            height="20"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            class="search-icon"
+          >
+            <circle cx="11" cy="11" r="8"></circle>
+            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+          </svg>
+        </div>
+
+        <div class="type-filter-wrapper">
+          <select id="type-filter" aria-label="Filter by type">
+            <option value="all">All Types</option>
+            {types.map((type) => (
+              <option value={type}>{type.charAt(0).toUpperCase() + type.slice(1)}</option>
+            ))}
+          </select>
+        </div>
+      </div>
     </header>
 
-    <div class="data-grid">
+    <div id="no-results" class="no-results" style="display: none;">
+      <p>No projects found matching your criteria.</p>
+    </div>
+
+    <!-- Initial Paginated Grid (Shown by default) -->
+    <div class="data-grid" id="paginated-grid">
       {projects.map((project) => (
         <a
           href={project.url}
@@ -65,7 +110,10 @@ const permalink = `${Astro.site?.href}data`;
       ))}
     </div>
 
-    <div class="pagination">
+    <!-- Filtered Results Grid (Hidden by default, populated by JS) -->
+    <div class="data-grid" id="filtered-grid" style="display: none;"></div>
+
+    <div class="pagination" id="pagination-controls">
       <a
         href={currentPage === 2 ? "/data" : `/data/${currentPage - 1}`}
         class="prev-button">← Prev</a
@@ -80,10 +128,76 @@ const permalink = `${Astro.site?.href}data`;
     </div>
   </div>
 
-  <style>
+  <script define:vars={{ allProjects }}>
+    const searchInput = document.getElementById('project-search');
+    const typeFilter = document.getElementById('type-filter');
+    const paginatedGrid = document.getElementById('paginated-grid');
+    const filteredGrid = document.getElementById('filtered-grid');
+    const noResults = document.getElementById('no-results');
+    const paginationControls = document.getElementById('pagination-controls');
+
+    function filterProjects() {
+      const searchTerm = searchInput.value.toLowerCase().trim();
+      const selectedType = typeFilter.value;
+      const isFiltering = searchTerm !== '' || selectedType !== 'all';
+
+      if (!isFiltering) {
+        paginatedGrid.style.display = 'grid';
+        filteredGrid.style.display = 'none';
+        noResults.style.display = 'none';
+        if (paginationControls) paginationControls.style.display = 'flex';
+        return;
+      }
+
+      paginatedGrid.style.display = 'none';
+      if (paginationControls) paginationControls.style.display = 'none';
+      
+      const filtered = allProjects.filter(project => {
+        const matchesSearch = project.title.toLowerCase().includes(searchTerm) || 
+                             (project.subtitle || '').toLowerCase().includes(searchTerm);
+        const matchesType = selectedType === 'all' || project.type === selectedType;
+        return matchesSearch && matchesType;
+      });
+
+      if (filtered.length === 0) {
+        filteredGrid.style.display = 'none';
+        noResults.style.display = 'block';
+      } else {
+        filteredGrid.style.display = 'grid';
+        noResults.style.display = 'none';
+        
+        filteredGrid.innerHTML = filtered.map(project => `
+          <a
+            href="${project.url}"
+            class="data-card"
+            target="${project.url.startsWith("http") ? "_blank" : "_self"}"
+            rel="${project.url.startsWith("http") ? "noopener noreferrer" : ""}"
+          >
+            <div class="card-image-wrapper">
+              <img
+                src="${project.coverImage}"
+                alt="${project.title}"
+                loading="lazy"
+                class="card-image"
+              />
+              ${project.type ? `<span class="card-type">${project.type}</span>` : ''}
+            </div>
+            <div class="card-content">
+              <h3 class="card-title">${project.title}</h3>
+              ${project.subtitle ? `<p class="card-subtitle">${project.subtitle}</p>` : ''}
+            </div>
+          </a>
+        `).join('');
+      }
+    }
+
+    searchInput?.addEventListener('input', filterProjects);
+    typeFilter?.addEventListener('change', filterProjects);
+  </script>
+
+  <style is:global>
     .page-header {
       margin-bottom: 3rem;
-      /* max-width: 800px; */
     }
 
     h1 {
@@ -97,13 +211,93 @@ const permalink = `${Astro.site?.href}data`;
       font-size: 1.1rem;
       color: var(--text-secondary);
       line-height: 1.6;
-      /* max-width: 600px; */
+    }
+
+    .filter-controls {
+      display: flex;
+      gap: 1rem;
+      flex-wrap: wrap;
+      align-items: center;
+      margin-top: 2rem;
+    }
+
+    .search-wrapper {
+      position: relative;
+      flex: 1;
+      min-width: 250px;
+    }
+
+    .search-icon {
+      position: absolute;
+      left: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--text-secondary);
+      pointer-events: none;
+      opacity: 0.6;
+    }
+
+    #project-search {
+      width: 100%;
+      padding: 0.75rem 1rem 0.75rem 2.5rem;
+      border-radius: 8px;
+      border: 1px solid var(--border-color);
+      background: var(--background-elevated, rgba(0, 0, 0, 0.03));
+      color: var(--text-primary);
+      font-family: inherit;
+      font-size: 1rem;
+      transition: all 0.2s ease;
+    }
+
+    #project-search:focus {
+      outline: none;
+      border-color: var(--primary-color);
+      background: var(--background-body);
+      box-shadow: 0 0 0 3px rgba(var(--primary-color-rgb, 0, 112, 243), 0.1);
+    }
+
+    .type-filter-wrapper {
+      min-width: 150px;
+    }
+
+    #type-filter {
+      width: 100%;
+      padding: 0.75rem 1rem;
+      border-radius: 8px;
+      border: 1px solid var(--border-color);
+      background: var(--background-elevated, rgba(0, 0, 0, 0.03));
+      color: var(--text-primary);
+      font-family: inherit;
+      font-size: 1rem;
+      cursor: pointer;
+      appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 12px center;
+      padding-right: 2.5rem;
+      transition: all 0.2s ease;
+    }
+
+    #type-filter:focus {
+      outline: none;
+      border-color: var(--primary-color);
+      background-color: var(--background-body);
     }
 
     .data-grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
       gap: 2rem 1.5rem;
+      margin-bottom: 4rem;
+    }
+
+    .no-results {
+      text-align: center;
+      padding: 4rem 2rem;
+      color: var(--text-secondary);
+      font-size: 1.1rem;
+      border: 2px dashed var(--border-color);
+      border-radius: 12px;
       margin-bottom: 4rem;
     }
 
@@ -144,10 +338,6 @@ const permalink = `${Astro.site?.href}data`;
       transition: transform 0.3s ease;
     }
 
-    .data-card:hover .card-image {
-      transform: scale(1.05);
-    }
-
     .card-type {
       position: absolute;
       bottom: 0;
@@ -164,11 +354,6 @@ const permalink = `${Astro.site?.href}data`;
       z-index: 1;
       pointer-events: none;
       backdrop-filter: blur(4px);
-    }
-
-    .card-content {
-      display: flex;
-      flex-direction: column;
     }
 
     .card-title {
@@ -197,9 +382,9 @@ const permalink = `${Astro.site?.href}data`;
         grid-template-columns: 1fr;
         gap: 1.75rem 1rem;
       }
-
-      h1 {
-        font-size: 2rem;
+      .filter-controls {
+        flex-direction: column;
+        align-items: stretch;
       }
     }
 
@@ -219,12 +404,6 @@ const permalink = `${Astro.site?.href}data`;
       font-weight: 700;
       text-decoration: none;
       box-shadow: inset 0 -0.12em 0 var(--primary-color);
-      -webkit-transition:
-        box-shadow 0.2s ease-in-out,
-        color 0.2s ease-in-out;
-      transition:
-        box-shadow 0.2s ease-in-out,
-        color 0.2s ease-in-out;
     }
 
     .prev-button:hover,
@@ -236,10 +415,6 @@ const permalink = `${Astro.site?.href}data`;
 
     .next-button {
       margin-left: auto;
-    }
-
-    .prev-button {
-      margin-right: auto;
     }
   </style>
 </BaseLayout>
