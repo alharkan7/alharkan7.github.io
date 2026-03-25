@@ -38,6 +38,8 @@ const { current = "" } = Astro.props;
   .theme-toggle-container {
     display: flex;
     align-items: center;
+    gap: 0.25rem;
+    flex-shrink: 0;
     font-family: var(--font-family-sans);
     font-weight: 700;
     text-transform: uppercase;
@@ -119,6 +121,7 @@ const { current = "" } = Astro.props;
     .theme-toggle-container {
       position: sticky; /* Keep theme toggle visible */
       right: 0;
+      gap: 0;
       padding-left: 0;
       margin-left: auto;
       justify-content: flex-end;
@@ -127,7 +130,7 @@ const { current = "" } = Astro.props;
     }
 
     .search-icon-link {
-      padding: 6px; /* Slightly smaller padding on mobile */
+      padding: 4px;
     }
 
     .search-icon {
