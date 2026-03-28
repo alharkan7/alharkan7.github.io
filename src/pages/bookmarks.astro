@@ -2,6 +2,7 @@
 import BaseLayout from "../layouts/BaseLayout.astro";
 // import bookmarksDataUntyped from "../../scripts/os-bookmarks/chrome_bookmarks.json" assert { type: "json" };
 import { createClient } from "@supabase/supabase-js";
+import { Search } from "lucide-react";
 import fs from "fs";
 import path from "path";
 import BookmarkNodeComponent from "../components/BookmarkNode.astro"; // Import the new component
@@ -437,10 +438,36 @@ rootsToRender.forEach((root: ComponentBookmarkFolder) => {
     current="bookmarks"
 >
     <div class="container">
-        <h1>My {totalUrlCount} Bookmarks</h1>
+        <h1>
+            My <span id="bookmarks-heading-count">{totalUrlCount}</span> Bookmarks
+        </h1>
         <p>On AI Research, Business, Software, and Digital Media</p>
         <hr />
-        <div>
+
+        <div
+            class="bookmarks-search-toolbar group bookmarks-search-field relative my-4 w-full min-w-0"
+            role="search"
+            aria-label="Search bookmarks"
+        >
+            <span
+                class="pointer-events-none absolute left-2.5 top-1/2 z-[1] -translate-y-1/2 text-[color:var(--text-secondary)] transition-colors group-focus-within:text-[color:var(--primary-color)] [&_svg]:block"
+                aria-hidden="true"
+            >
+                <Search size={18} strokeWidth={2} />
+            </span>
+            <input
+                type="search"
+                id="bookmarks-search"
+                name="bookmarks-search"
+                class="w-full rounded border border-gray-300 bg-[var(--background-body)] py-1.5 pl-9 pr-2 text-sm text-[var(--text-main)] outline-none transition-[border-color,box-shadow] focus:border-[color:var(--primary-color)] dark:border-gray-600"
+                placeholder="Search title or URL…"
+                aria-label="Search bookmarks by title or URL"
+                autocomplete="off"
+                spellcheck="false"
+            />
+        </div>
+
+        <div id="bookmark-list-root" data-total-url-count={totalUrlCount}>
             {
                 rootsToRender.map(
                     (
@@ -495,46 +522,8 @@ rootsToRender.forEach((root: ComponentBookmarkFolder) => {
 </BaseLayout>
 
 <script>
-    // Select the container holding the top-level bookmark folders
-    const bookmarkContainer = document.querySelector(".container > div");
-
-    if (bookmarkContainer) {
-        bookmarkContainer.addEventListener(
-            "toggle",
-            (event) => {
-                const target = event.target as HTMLElement; // Cast to HTMLElement first
-
-                // Check if the event target is a <details> element and if it was opened
-                // AND ensure the target is a DIRECT CHILD of the container
-                if (
-                    target &&
-                    target.tagName === "DETAILS" &&
-                    target.parentElement === bookmarkContainer &&
-                    (target as HTMLDetailsElement).open
-                ) {
-                    // Cast target specifically to HTMLDetailsElement for accessing .open
-                    const openedDetails = target as HTMLDetailsElement;
-
-                    // Get all direct children <details> elements within the container
-                    // Cast the NodeListOf<Element> to HTMLDetailsElement[]
-                    const allDetails = Array.from(
-                        bookmarkContainer.querySelectorAll<HTMLDetailsElement>(
-                            ":scope > details",
-                        ),
-                    );
-
-                    // Close all other <details> elements
-                    allDetails.forEach((details) => {
-                        // Now 'details' is correctly typed as HTMLDetailsElement
-                        if (details !== openedDetails) {
-                            details.open = false;
-                        }
-                    });
-                }
-            },
-            true,
-        ); // Use capture phase to potentially handle nested toggles if needed later
-    }
+    import { initBookmarksPage } from "../utils/bookmarks-page-client";
+    initBookmarksPage();
 </script>
 
 <style>
@@ -544,10 +533,18 @@ rootsToRender.forEach((root: ComponentBookmarkFolder) => {
         /* You could use padding-top/padding-bottom instead if needed */
     }
 
-    /* Add margin to the div containing the bookmark list */
-    .container > div {
-        margin-block-start: 3em; /* Margin above the list */
-        margin-block-end: 3em; /* Margin below the list */
+    /* Bookmark list container */
+    #bookmark-list-root {
+        margin-block-start: 1.5em;
+        margin-block-end: 3em;
+    }
+
+    :global(#bookmark-list-root .bookmark-search-hidden) {
+        display: none !important;
+    }
+
+    :global(#bookmark-list-root details.bookmark-folder.bookmark-folder-search-hidden) {
+        display: none !important;
     }
 
     /* Style the last paragraph as a footnote */

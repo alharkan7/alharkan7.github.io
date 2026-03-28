@@ -1,6 +1,7 @@
 ---
 import BaseLayout from "../layouts/BaseLayout.astro";
 import { createClient } from "@supabase/supabase-js";
+import { Search } from "lucide-react";
 import fs from "fs";
 import path from "path";
 
@@ -241,71 +242,106 @@ if (!validLimits.includes(initialLimit)) {
             </div>
         )}
 
-        <!-- Filter Controls (Render based on build-time data) -->
+        <!-- Filter Controls: column on small screens; one nowrap row from md up -->
         <div
-            class="filter-controls flex flex-row flex-wrap justify-center gap-x-4 gap-y-2 my-4 sm:justify-center sm:items-center"
+            class="filter-controls my-4 flex min-w-0 flex-col gap-2 md:flex-row md:flex-nowrap md:items-center md:gap-x-2 md:overflow-x-auto md:overflow-y-visible md:pb-0.5 lg:gap-x-3 [scrollbar-width:thin]"
         >
-            <div class="flex items-center gap-x-2 justify-between">
-                <select
-                    id="year-select"
-                    class="border rounded px-2 py-1 text-sm bg-[var(--background-body)] text-[var(--text-main)] border-gray-300 dark:border-gray-600 w-full"
-                    disabled={uniqueYears.length === 0}
-                >
-                    <option value="all">All Years</option>
-                    {
-                        uniqueYears.map((year) => (
-                            <option value={year}>{year}</option>
-                        ))
-                    }
-                </select>
-            </div>
-            <div class="flex items-center gap-x-2 justify-between">
-                <select
-                    id="channel-select"
-                    class="border rounded px-2 py-1 text-sm bg-[var(--background-body)] text-[var(--text-main)] border-gray-300 dark:border-gray-600 w-full"
-                     disabled={uniqueChannels.length === 0}
-                >
-                    <option value="all">All Channels</option>
-                    {
-                        uniqueChannels.map((channel) => {
-                            const maxLen = 15;
-                            const displayTitle =
-                                channel.title.length > maxLen
-                                    ? channel.title.substring(0, maxLen) + "…"
-                                    : channel.title;
-                            return (
-                                <option
-                                    value={channel.id}
-                                    title={channel.title}
-                                >
-                                    {displayTitle}
-                                </option>
-                            );
-                        })
-                    }
-                </select>
-            </div>
-            <!-- Remove Filter Button (hidden by default) -->
-            <button
-                id="remove-filters-button"
-                class="hidden text-sm hover:underline focus:outline-none flex justify-start items-center"
-                disabled
+            <div
+                class="group videos-search-field relative w-full min-w-0 shrink md:min-w-0 md:max-w-sm md:flex-1 lg:max-w-md"
             >
-                <p class="text-sm text-[var(--primary-color)]">Clear Filters</p>
-            </button>
-
-            {/* Items per page selector */}
-            <div class="pagination-limit flex items-center">
-                <select
-                    id="limit-select"
-                    class="border rounded px-2 py-1 text-sm bg-[var(--background-body)]"
-                    disabled={totalItems === 0}
+                <span
+                    class="pointer-events-none absolute left-2.5 top-1/2 z-[1] -translate-y-1/2 text-[color:var(--text-secondary)] transition-colors group-focus-within:text-[color:var(--primary-color)] [&_svg]:block"
+                    aria-hidden="true"
                 >
-                    {validLimits.map((l) => (
-                       <option value={l} selected={l === initialLimit}>{l}</option>
-                    ))}
-                </select>
-                <p class="ml-2 text-sm whitespace-nowrap">per Page</p>
+                    <Search size={18} strokeWidth={2} />
+                </span>
+                <input
+                    type="search"
+                    id="videos-search"
+                    name="videos-search"
+                    class="w-full rounded border border-gray-300 bg-[var(--background-body)] py-1.5 pl-9 pr-2 text-sm text-[var(--text-main)] outline-none transition-[border-color,box-shadow] focus:border-[color:var(--primary-color)] dark:border-gray-600"
+                    placeholder="Search title or channel…"
+                    aria-label="Search by title or channel"
+                    autocomplete="off"
+                    spellcheck="false"
+                    disabled={totalItems === 0}
+                />
+            </div>
+
+            <div
+                class="flex min-w-0 w-full flex-nowrap items-center gap-1.5 overflow-x-auto pb-0.5 [scrollbar-width:thin] md:w-auto md:shrink-0 md:justify-end md:gap-2 md:overflow-visible md:pb-0"
+            >
+                <div class="flex min-w-0 flex-[1_1_0%] items-center md:w-24 md:flex-none">
+                    <select
+                        id="year-select"
+                        class="w-full min-w-0 max-w-full rounded border border-gray-300 bg-[var(--background-body)] px-1.5 py-1.5 text-xs text-[var(--text-main)] dark:border-gray-600 md:px-2 md:text-sm"
+                        disabled={uniqueYears.length === 0}
+                    >
+                        <option value="all">All Years</option>
+                        {
+                            uniqueYears.map((year) => (
+                                <option value={year}>{year}</option>
+                            ))
+                        }
+                    </select>
+                </div>
+                <div class="flex min-w-0 flex-[1_1_0%] items-center md:w-36 md:flex-none lg:w-40">
+                    <select
+                        id="channel-select"
+                        class="w-full min-w-0 max-w-full rounded border border-gray-300 bg-[var(--background-body)] px-1.5 py-1.5 text-xs text-[var(--text-main)] dark:border-gray-600 md:px-2 md:text-sm"
+                        disabled={uniqueChannels.length === 0}
+                    >
+                        <option value="all">All Channels</option>
+                        {
+                            uniqueChannels.map((channel) => {
+                                const maxLen = 15;
+                                const displayTitle =
+                                    channel.title.length > maxLen
+                                        ? channel.title.substring(0, maxLen) +
+                                          "…"
+                                        : channel.title;
+                                return (
+                                    <option
+                                        value={channel.id}
+                                        title={channel.title}
+                                    >
+                                        {displayTitle}
+                                    </option>
+                                );
+                            })
+                        }
+                    </select>
+                </div>
+                <button
+                    id="remove-filters-button"
+                    type="button"
+                    class="hidden inline-flex shrink-0 items-center justify-center text-xs hover:underline focus:outline-none md:text-sm"
+                    disabled
+                >
+                    <span class="whitespace-nowrap text-[var(--primary-color)]"
+                        >Clear</span
+                    >
+                    <span class="hidden text-[var(--primary-color)] md:inline"
+                        >&nbsp;Filters</span
+                    >
+                </button>
+
+                <div class="pagination-limit flex shrink-0 items-center">
+                    <select
+                        id="limit-select"
+                        class="rounded border border-gray-300 bg-[var(--background-body)] px-1.5 py-1.5 text-xs text-[var(--text-main)] dark:border-gray-600 md:px-2 md:text-sm"
+                        disabled={totalItems === 0}
+                    >
+                        {validLimits.map((l) => (
+                            <option value={l} selected={l === initialLimit}>
+                                {l}
+                            </option>
+                        ))}
+                    </select>
+                    <p class="ml-1 whitespace-nowrap text-xs text-[var(--text-main)] md:ml-2 md:text-sm">
+                        per Page
+                    </p>
+                </div>
             </div>
         </div>
 
@@ -394,6 +430,7 @@ if (!validLimits.includes(initialLimit)) {
     const removeFiltersButton = document.getElementById("remove-filters-button");
     const loadingIndicator = document.getElementById("loading-indicator");
     const errorMessageElement = document.getElementById("error-message"); // Added error message display
+    const videosSearchInput = document.getElementById("videos-search");
 
     // State variables
     let allVideos = allVideosData; // Use data passed from Astro frontmatter
@@ -404,6 +441,9 @@ if (!validLimits.includes(initialLimit)) {
     let totalPages = 1;
     let selectedYear = "all";
     let selectedChannelId = "all";
+    /** Lowercase substring match against title + channel name (debounced from input) */
+    let videoSearchQuery = "";
+    let videoSearchDebounce = null;
     let isInitialLoad = true; // Track if this is initial page load
     
     // Keep track of build-time filters for validation/initial state
@@ -488,6 +528,7 @@ if (!validLimits.includes(initialLimit)) {
             if (yearSelect) yearSelect.disabled = true;
             if (channelSelect) channelSelect.disabled = true;
             if (removeFiltersButton) removeFiltersButton.disabled = true;
+            if (videosSearchInput) videosSearchInput.disabled = true;
             
             // Make sure loading indicator is visible
             if (gridContainer && loadingIndicator) {
@@ -514,6 +555,7 @@ if (!validLimits.includes(initialLimit)) {
         if (limitSelect) limitSelect.disabled = false;
         if (yearSelect) yearSelect.disabled = false;
         if (channelSelect) channelSelect.disabled = false;
+        if (videosSearchInput) videosSearchInput.disabled = false;
 
         // --- Update Dropdown Options BASED on current state ---
         try {
@@ -537,6 +579,16 @@ if (!validLimits.includes(initialLimit)) {
                 filteredVideos = filteredVideos.filter(
                     (video) => video?.video_owner_channel_id === selectedChannelId
                 );
+            }
+            const q = (videoSearchQuery || "").trim().toLowerCase();
+            if (q) {
+                filteredVideos = filteredVideos.filter((video) => {
+                    const title = (video?.title ?? "").toLowerCase();
+                    const channel = (
+                        video?.video_owner_channel_title ?? ""
+                    ).toLowerCase();
+                    return title.includes(q) || channel.includes(q);
+                });
             }
         } catch (error) {
             console.error("Error filtering videos:", error);
@@ -616,9 +668,17 @@ if (!validLimits.includes(initialLimit)) {
                 gridContainer.innerHTML = `<div class="col-span-full text-center py-10 text-red-600">Error rendering videos. Please try refreshing the page.</div>`;
             }
         } else {
+            const hasActiveFilters =
+                selectedYear !== "all" ||
+                selectedChannelId !== "all" ||
+                !!(videoSearchQuery || "").trim();
             gridContainer.innerHTML = `
                 <div class="col-span-full text-center py-10">
-                    <p class="text-lg text-[color:var(--text-secondary)]">No videos match your filters.<br>${selectedYear !== 'all' || selectedChannelId !== 'all' ? 'Try adjusting or clearing filters.' : ''}</p>
+                    <p class="text-lg text-[color:var(--text-secondary)]">No videos match your filters.<br>${
+                        hasActiveFilters
+                            ? "Try adjusting or clearing filters."
+                            : ""
+                    }</p>
                 </div>`;
         }
 
@@ -652,7 +712,10 @@ if (!validLimits.includes(initialLimit)) {
 
         // --- Show/Hide Remove Filters Button ---
         if (removeFiltersButton) {
-            const filtersActive = selectedYear !== "all" || selectedChannelId !== "all";
+            const filtersActive =
+                selectedYear !== "all" ||
+                selectedChannelId !== "all" ||
+                !!(videoSearchQuery || "").trim();
             removeFiltersButton.classList.toggle("hidden", !filtersActive);
             removeFiltersButton.disabled = !filtersActive; // Also disable if not active
         }
@@ -744,6 +807,7 @@ if (!validLimits.includes(initialLimit)) {
             if (yearSelect) yearSelect.disabled = true;
             if (channelSelect) channelSelect.disabled = true;
             if (removeFiltersButton) removeFiltersButton.disabled = true;
+            if (videosSearchInput) videosSearchInput.disabled = true;
             if (prevButton) { prevButton.classList.add("disabled"); prevButton.setAttribute("aria-disabled", "true");}
             if (nextButton) { nextButton.classList.add("disabled"); nextButton.setAttribute("aria-disabled", "true");}
             if (pageSelect) pageSelect.disabled = true;
@@ -872,6 +936,8 @@ if (!validLimits.includes(initialLimit)) {
             event.preventDefault();
             selectedYear = "all";
             selectedChannelId = "all";
+            videoSearchQuery = "";
+            if (videosSearchInput) videosSearchInput.value = "";
             currentPage = 1;
             updateUrl(false); // Use pushState for user interaction
             renderPage();
@@ -893,6 +959,20 @@ if (!validLimits.includes(initialLimit)) {
             }
         };
         replaceListener(pageSelect, "change", handlePageSelectChange);
+
+        // Search (title + channel name), debounced
+        if (videosSearchInput) {
+            const handleSearchInput = () => {
+                if (videoSearchDebounce) clearTimeout(videoSearchDebounce);
+                videoSearchDebounce = setTimeout(() => {
+                    videoSearchQuery = videosSearchInput.value || "";
+                    currentPage = 1;
+                    updateUrl(false);
+                    renderPage();
+                }, 200);
+            };
+            replaceListener(videosSearchInput, "input", handleSearchInput);
+        }
 
         // Handle browser back/forward buttons
         if (!window._popstateHandledVideos) {

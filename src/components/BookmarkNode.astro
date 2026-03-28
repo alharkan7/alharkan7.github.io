@@ -78,7 +78,10 @@ if (node.type === "folder") {
         <span>
           {node.name}
           {childrenCount > 0 && (
-            <span class="folder-count"> ({childrenCount})</span>
+            <span class="folder-count" data-total-count={childrenCount}>
+              {" "}
+              ({childrenCount})
+            </span>
           )}
         </span>
         <span class="chevron-icon closed">
