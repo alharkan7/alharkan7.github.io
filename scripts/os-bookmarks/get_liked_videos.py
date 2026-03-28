@@ -219,6 +219,140 @@ def get_github_stars(username, token):
             raise
     return all_repos
 
+def get_github_star_lists_by_repo_id(username, token):
+    """
+    Build a map of REST repo id (GitHub databaseId) -> Star List names for that user.
+
+    The REST API for starred repos does not include GitHub "Stars lists" membership.
+    That data is only available via the GraphQL API (UserList / Repository).
+
+    Returns:
+        dict[int, list[str]] on success (may be empty if the user has no lists).
+        None if GraphQL failed (auth, scope, or API errors) so callers can preserve DB values.
+    """
+    if not token or not username:
+        print(
+            "Info: Skipping GitHub Star Lists GraphQL (GITHUB_TOKEN or GITHUB_USER missing).",
+            file=sys.stderr,
+        )
+        return None
+
+    headers = {
+        "Authorization": f"Bearer {token}",
+        "Content-Type": "application/json",
+    }
+    endpoint = "https://api.github.com/graphql"
+    repo_to_lists = {}
+
+    lists_query = """
+    query ($login: String!, $after: String) {
+      user(login: $login) {
+        lists(first: 50, after: $after) {
+          pageInfo {
+            hasNextPage
+            endCursor
+          }
+          nodes {
+            id
+            name
+          }
+        }
+      }
+    }
+    """
+
+    items_query = """
+    query ($id: ID!, $after: String) {
+      node(id: $id) {
+        ... on UserList {
+          items(first: 100, after: $after) {
+            pageInfo {
+              hasNextPage
+              endCursor
+            }
+            nodes {
+              ... on Repository {
+                databaseId
+              }
+            }
+          }
+        }
+      }
+    }
+    """
+
+    lists_after = None
+    try:
+        while True:
+            r = requests.post(
+                endpoint,
+                json={"query": lists_query, "variables": {"login": username, "after": lists_after}},
+                headers=headers,
+                timeout=90,
+            )
+            r.raise_for_status()
+            payload = r.json()
+            if payload.get("errors"):
+                print(
+                    f"GitHub GraphQL (lists) errors: {payload['errors']}",
+                    file=sys.stderr,
+                )
+                return None
+            user_data = (payload.get("data") or {}).get("user")
+            if not user_data:
+                print("GitHub GraphQL: user not found or lists unavailable.", file=sys.stderr)
+                return None
+            conn = user_data.get("lists") or {}
+            for node in conn.get("nodes") or []:
+                list_id = node.get("id")
+                list_name = node.get("name")
+                if not list_id or not list_name:
+                    continue
+                items_after = None
+                while True:
+                    r2 = requests.post(
+                        endpoint,
+                        json={
+                            "query": items_query,
+                            "variables": {"id": list_id, "after": items_after},
+                        },
+                        headers=headers,
+                        timeout=90,
+                    )
+                    r2.raise_for_status()
+                    payload2 = r2.json()
+                    if payload2.get("errors"):
+                        print(
+                            f"GitHub GraphQL (list items) errors: {payload2['errors']}",
+                            file=sys.stderr,
+                        )
+                        return None
+                    node_data = (payload2.get("data") or {}).get("node") or {}
+                    items_conn = node_data.get("items") or {}
+                    for item in items_conn.get("nodes") or []:
+                        rid = item.get("databaseId")
+                        if rid is None:
+                            continue
+                        rid = int(rid)
+                        repo_to_lists.setdefault(rid, set()).add(list_name)
+                    pinfo = items_conn.get("pageInfo") or {}
+                    if pinfo.get("hasNextPage") and pinfo.get("endCursor"):
+                        items_after = pinfo["endCursor"]
+                    else:
+                        break
+
+            lp = conn.get("pageInfo") or {}
+            if lp.get("hasNextPage") and lp.get("endCursor"):
+                lists_after = lp["endCursor"]
+            else:
+                break
+    except requests.exceptions.RequestException as e:
+        print(f"GitHub GraphQL request failed: {e}", file=sys.stderr)
+        return None
+
+    # sorted stable output for DB / diffs
+    return {k: sorted(v) for k, v in repo_to_lists.items()}
+
 if __name__ == "__main__":
     if not HAS_PSYCOPG2:
         print("Error: psycopg2 module not found. Please install it (e.g., pip install psycopg2-binary) to run this script.", file=sys.stderr)
@@ -346,30 +480,47 @@ if __name__ == "__main__":
                 print(f"Found {len(all_starred_repos_from_api)} starred repositories from API.")
                 current_github_repo_ids_from_api = {repo['id'] for repo in all_starred_repos_from_api if repo.get('id')}
 
+                print("Fetching GitHub Star Lists (GraphQL)...")
+                star_lists_by_repo = get_github_star_lists_by_repo_id(github_user, github_token)
+                if star_lists_by_repo is not None:
+                    n = len(star_lists_by_repo)
+                    print(f"Star Lists: mapped {n} repositories to at least one list.")
+                else:
+                    print(
+                        "Star Lists: GraphQL fetch failed or skipped; existing star_list_names preserved on update.",
+                        file=sys.stderr,
+                    )
+
                 if all_starred_repos_from_api:
                     repo_data_tuples = []
                     for repo in all_starred_repos_from_api:
                         if not repo.get('id'):
                             print(f"Skipping repository due to missing ID: {repo.get('full_name')}", file=sys.stderr)
                             continue
+                        rid = repo.get("id")
+                        list_names = None
+                        if star_lists_by_repo is not None:
+                            list_names = star_lists_by_repo.get(rid, [])
                         repo_data_tuples.append((
-                            repo.get("id"), repo.get("full_name"), repo.get("html_url"),
+                            rid, repo.get("full_name"), repo.get("html_url"),
                             repo.get("description"), repo.get("language"), repo.get("stargazers_count"),
                             repo.get("forks_count"), repo.get("pushed_at"), repo.get("owner", {}).get("login"),
-                            repo.get("owner", {}).get("avatar_url"), repo.get("starred_at")
+                            repo.get("owner", {}).get("avatar_url"), repo.get("starred_at"),
+                            list_names,
                         ))
                     if repo_data_tuples:
                         sql_github_upsert = """
                             INSERT INTO github_stars (repo_id, full_name, html_url, description, language,
                                                     stargazers_count, forks_count, pushed_at, owner_login,
-                                                    owner_avatar_url, starred_at)
+                                                    owner_avatar_url, starred_at, star_list_names)
                             VALUES %s
                             ON CONFLICT (repo_id) DO UPDATE SET
                                 full_name = EXCLUDED.full_name, html_url = EXCLUDED.html_url,
                                 description = EXCLUDED.description, language = EXCLUDED.language,
                                 stargazers_count = EXCLUDED.stargazers_count, forks_count = EXCLUDED.forks_count,
                                 pushed_at = EXCLUDED.pushed_at, owner_login = EXCLUDED.owner_login,
-                                owner_avatar_url = EXCLUDED.owner_avatar_url, starred_at = EXCLUDED.starred_at
+                                owner_avatar_url = EXCLUDED.owner_avatar_url, starred_at = EXCLUDED.starred_at,
+                                star_list_names = COALESCE(EXCLUDED.star_list_names, github_stars.star_list_names)
                             RETURNING (xmax = 0);
                         """
                         results = execute_values(cur, sql_github_upsert, repo_data_tuples, fetch=True)

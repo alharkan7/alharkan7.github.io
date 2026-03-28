@@ -27,7 +27,8 @@ CREATE TABLE github_stars (
     owner_login TEXT,
     owner_avatar_url TEXT,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
-    starred_at TIMESTAMP WITH TIME ZONE
+    starred_at TIMESTAMP WITH TIME ZONE,
+    star_list_names TEXT[]
 );
 
 -- Table: chrome_bookmarks
