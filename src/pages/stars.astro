@@ -2,7 +2,7 @@
 import BaseLayout from "../layouts/BaseLayout.astro";
 import { createClient } from "@supabase/supabase-js";
 // Import Lucide icons
-import { Code, Star, GitFork, ChevronDown, ChevronUp } from "lucide-react";
+import { Code, Star, GitFork, Search } from "lucide-react";
 
 // Define the TypeScript interface for a single starred repository item
 interface GitHubOwner {
@@ -23,6 +23,7 @@ interface GitHubRepo {
     stargazers_count: number | null;
     forks_count: number | null;
     pushed_at: string | null; // Add pushed_at
+    star_list_names: string[] | null;
     // Remove topics, visibility, etc.
 }
 
@@ -39,6 +40,7 @@ interface SupabaseGitHubStar {
     owner_login: string | undefined;
     owner_avatar_url: string | undefined;
     starred_at: string | null; // Add starred_at
+    star_list_names: string[] | null;
 }
 
 // Initialize Supabase client
@@ -74,7 +76,7 @@ async function getStarredRepos(): Promise<GitHubRepo[]> {
         const { data, error, count } = await supabase
             .from("github_stars")
             .select(
-                "repo_id, full_name, html_url, description, language, stargazers_count, forks_count, pushed_at, owner_login, owner_avatar_url, starred_at",
+                "repo_id, full_name, html_url, description, language, stargazers_count, forks_count, pushed_at, owner_login, owner_avatar_url, starred_at, star_list_names",
                 { count: "exact" }, // Request exact count
             )
             .order("starred_at", { ascending: false })
@@ -130,11 +132,18 @@ async function getStarredRepos(): Promise<GitHubRepo[]> {
               stargazers_count: repo.stargazers_count,
               forks_count: repo.forks_count,
               pushed_at: repo.pushed_at,
+              star_list_names: repo.star_list_names ?? null,
           }))
         : [];
 }
 
 const starredRepos = await getStarredRepos();
+
+const categoryOptions = Array.from(
+    new Set(
+        starredRepos.flatMap((r) => r.star_list_names ?? []).filter(Boolean),
+    ),
+).sort((a, b) => a.localeCompare(b));
 
 // Determine the last update date from the database
 let lastUpdateDate = "Unknown";
@@ -187,6 +196,39 @@ const totalStars = starredRepos.length;
         <p>{description}</p>
         <hr />
 
+        {
+            starredRepos.length > 0 && (
+                <div class="stars-toolbar" role="search" aria-label="Filter starred repositories">
+                    <div class="stars-toolbar-field stars-search-wrap">
+                        <span class="stars-search-icon" aria-hidden="true">
+                            <Search size={18} strokeWidth={2} />
+                        </span>
+                        <input
+                            type="search"
+                            id="stars-search"
+                            class="stars-input stars-input--with-icon"
+                            placeholder="Search title or description…"
+                            aria-label="Search by title or description"
+                            autocomplete="off"
+                            spellcheck="false"
+                        />
+                    </div>
+                    <div class="stars-toolbar-field">
+                        <select
+                            id="stars-category"
+                            class="stars-select"
+                            aria-label="Filter by category"
+                        >
+                            <option value="">All categories</option>
+                            {categoryOptions.map((name) => (
+                                <option value={name}>{name}</option>
+                            ))}
+                        </select>
+                    </div>
+                </div>
+            )
+        }
+
         <div class="repo-grid">
             {
                 starredRepos.map((repo) => {
@@ -195,12 +237,19 @@ const totalStars = starredRepos.length;
                         ? `var(--color-${repo.language.toLowerCase().replace(/[^a-z0-9]/g, "-")}, #ccc)`
                         : "var(--color-unknown, #ccc)"; // Fallback for unknown language
 
+                    const lists = repo.star_list_names ?? [];
+                    const searchBlob = `${repo.full_name ?? ""} ${repo.description ?? ""}`
+                        .toLowerCase()
+                        .trim();
+
                     return (
                         <a
                             href={repo.html_url}
                             target="_blank"
                             rel="noopener noreferrer"
                             class="repo-card"
+                            data-search-text={searchBlob}
+                            data-list-names={JSON.stringify(lists)}
                         >
                             <div class="repo-card-header">
                                 <img
@@ -214,6 +263,15 @@ const totalStars = starredRepos.length;
                                     {repo.full_name}
                                 </span>
                             </div>
+                            {
+                                lists.length > 0 && (
+                                    <div class="repo-categories" aria-label="Star list categories">
+                                        {lists.map((name) => (
+                                            <span class="repo-category-tag">{name}</span>
+                                        ))}
+                                    </div>
+                                )
+                            }
                             <div class="repo-description-container">
                                 <p
                                     class="repo-description"
@@ -301,6 +359,85 @@ const totalStars = starredRepos.length;
     .container > p:first-of-type {
         /* Target the description paragraph */
         margin-block-end: 1.5em;
+    }
+
+    .stars-toolbar {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 1rem 1.5rem;
+        margin-block: 1.25rem 0.5rem;
+    }
+
+    .stars-toolbar-field {
+        min-width: min(100%, 220px);
+        flex: 1 1 200px;
+    }
+
+    .stars-search-wrap {
+        position: relative;
+        display: block;
+    }
+
+    .stars-search-icon {
+        position: absolute;
+        left: 0.65rem;
+        top: 50%;
+        transform: translateY(-50%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--text-secondary);
+        pointer-events: none;
+    }
+
+    .stars-search-icon :global(svg) {
+        display: block;
+    }
+
+    .stars-input,
+    .stars-select {
+        width: 100%;
+        padding: 0.5rem 0.65rem;
+        font-size: 0.95rem;
+        font-family: var(--font-family-sans);
+        color: var(--text-main);
+        background-color: var(--background-body);
+        border: 1px solid var(--border-color);
+        border-radius: 6px;
+        outline: none;
+        transition: border-color 0.15s ease;
+    }
+
+    .stars-input--with-icon {
+        padding-left: 2.35rem;
+    }
+
+    .stars-input:focus,
+    .stars-select:focus {
+        border-color: var(--primary-color);
+    }
+
+    .stars-search-wrap:focus-within .stars-search-icon {
+        color: var(--primary-color);
+    }
+
+    .repo-categories {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.35rem;
+        margin: 0.35rem 0 0.5rem;
+    }
+
+    .repo-category-tag {
+        font-size: 0.72rem;
+        font-weight: 600;
+        line-height: 1.2;
+        padding: 0.2rem 0.45rem;
+        border-radius: 4px;
+        background: color-mix(in srgb, var(--primary-color) 18%, transparent);
+        color: var(--text-main);
+        border: 1px solid color-mix(in srgb, var(--primary-color) 35%, var(--border-color));
     }
 
     .repo-grid {
@@ -534,10 +671,35 @@ const totalStars = starredRepos.length;
         }
     }
 
+    function parseCardListNames(card: Element): string[] {
+        try {
+            return JSON.parse(card.getAttribute("data-list-names") || "[]");
+        } catch {
+            return [];
+        }
+    }
+
+    function cardMatchesFilters(
+        card: Element,
+        query: string,
+        category: string,
+    ): boolean {
+        if (query) {
+            const haystack = (
+                card.getAttribute("data-search-text") || ""
+            ).toLowerCase();
+            if (!haystack.includes(query)) return false;
+        }
+        if (category) {
+            const lists = parseCardListNames(card);
+            if (!lists.includes(category)) return false;
+        }
+        return true;
+    }
+
     function initializePagination() {
         console.log("Initializing stars pagination...");
 
-        // Query DOM elements
         const repoGrid = document.querySelector(".repo-grid");
         const prevButton = document.getElementById(
             "prev-button",
@@ -552,8 +714,13 @@ const totalStars = starredRepos.length;
         const paginationControls = document.querySelector(
             ".pagination-controls",
         ) as HTMLElement | null;
+        const searchInput = document.getElementById(
+            "stars-search",
+        ) as HTMLInputElement | null;
+        const categorySelect = document.getElementById(
+            "stars-category",
+        ) as HTMLSelectElement | null;
 
-        // Check if elements exist
         if (
             !repoGrid ||
             !prevButton ||
@@ -565,61 +732,68 @@ const totalStars = starredRepos.length;
             console.error(
                 "Pagination elements missing. Aborting initialization.",
             );
-            // Hide controls if they partially exist but others are missing
             if (paginationControls) paginationControls.style.display = "none";
             return;
         }
 
-        // --- State Calculation ---
         const itemsPerPage = 30;
-        // Get all repo cards directly from the grid container
         const allRepos = Array.from(repoGrid.children).filter((el) =>
             el.classList.contains("repo-card"),
         );
-        const totalItems = allRepos.length;
-        const totalPages = Math.ceil(totalItems / itemsPerPage) || 1; // Ensure at least 1 page
 
-        // --- Read Current Page from URL ---
         const urlParams = new URLSearchParams(window.location.search);
         let currentPage = parseInt(urlParams.get("page") || "1", 10);
-        // Clamp page number to valid range
-        currentPage = Math.max(1, Math.min(currentPage, totalPages));
 
-        console.log(
-            `Stars State: currentPage=${currentPage}, totalPages=${totalPages}, totalItems=${totalItems}`,
-        );
+        let searchDebounce: ReturnType<typeof setTimeout> | null = null;
 
-        // --- Update Display Function ---
+        function getFilterQuery(): string {
+            return (searchInput?.value || "").trim().toLowerCase();
+        }
+
+        function getFilterCategory(): string {
+            return categorySelect?.value || "";
+        }
+
+        function getFilteredRepos(): Element[] {
+            const q = getFilterQuery();
+            const cat = getFilterCategory();
+            return allRepos.filter((c) => cardMatchesFilters(c, q, cat));
+        }
+
         function updatePageDisplay() {
-            // Re-check core elements in case something went wrong
             if (!paginationControls || !pageSelect || !pageTotalSpan) return;
 
-            if (totalItems === 0) {
-                console.log("No repo items found, hiding pagination.");
+            const filtered = getFilteredRepos();
+            const totalItems = filtered.length;
+            const totalPages = Math.ceil(totalItems / itemsPerPage) || 1;
+
+            currentPage = Math.max(1, Math.min(currentPage, totalPages));
+
+            console.log(
+                `Stars State: currentPage=${currentPage}, totalPages=${totalPages}, filteredItems=${totalItems}`,
+            );
+
+            if (allRepos.length === 0) {
                 paginationControls.style.display = "none";
                 return;
             }
-            paginationControls.style.display = "flex"; // Ensure controls are visible
+            paginationControls.style.display = "flex";
 
             const startIndex = (currentPage - 1) * itemsPerPage;
             const endIndex = startIndex + itemsPerPage;
+            const pageSlice = filtered.slice(startIndex, endIndex);
+            const showSet = new Set(pageSlice);
+            const filteredSet = new Set(filtered);
 
-            // Hide all repo cards initially
-            allRepos.forEach(
-                (repo) => ((repo as HTMLElement).style.display = "none"),
-            );
+            allRepos.forEach((repo) => {
+                const el = repo as HTMLElement;
+                if (!filteredSet.has(repo)) {
+                    el.style.display = "none";
+                    return;
+                }
+                el.style.display = showSet.has(repo) ? "flex" : "none";
+            });
 
-            // Show only the cards for the current page
-            const reposToShow = allRepos.slice(startIndex, endIndex);
-            reposToShow.forEach(
-                (repo) => ((repo as HTMLElement).style.display = "flex"),
-            ); // Use flex based on .repo-card style
-
-            console.log(
-                `Displaying repos ${startIndex + 1} to ${Math.min(endIndex, totalItems)}`,
-            );
-
-            // --- Update Controls State ---
             prevButton.setAttribute("aria-disabled", String(currentPage === 1));
             prevButton.classList.toggle("disabled", currentPage === 1);
             nextButton.setAttribute(
@@ -628,45 +802,36 @@ const totalStars = starredRepos.length;
             );
             nextButton.classList.toggle("disabled", currentPage === totalPages);
 
-            // Update page select dropdown
-            // Check if update is needed (different total pages or selected value)
             if (
                 pageSelect.options.length !== totalPages ||
                 parseInt(pageSelect.value, 10) !== currentPage
             ) {
-                console.log("Rebuilding page select dropdown");
-                pageSelect.innerHTML = ""; // Clear existing options
+                pageSelect.innerHTML = "";
                 for (let i = 1; i <= totalPages; i++) {
                     const option = document.createElement("option");
                     option.value = String(i);
                     option.textContent = String(i);
-                    if (i === currentPage) {
-                        option.selected = true;
-                    }
+                    if (i === currentPage) option.selected = true;
                     pageSelect.appendChild(option);
                 }
             } else {
-                // Ensure the value is correct even if options weren't rebuilt
                 pageSelect.value = String(currentPage);
             }
             pageSelect.disabled = totalPages <= 1;
 
-            // Update "of X" text
             pageTotalSpan.innerHTML = `of&nbsp;&nbsp;&nbsp;${totalPages}`;
+
+            initializeDescriptionToggles();
         }
 
-        // --- URL Update Function (uses pushState) ---
         function updateUrl() {
             const url = new URL(window.location.href);
             url.searchParams.set("page", currentPage.toString());
-            // Only push state if the URL actually changes
             if (url.toString() !== window.location.href) {
                 history.pushState({ page: currentPage }, "", url.toString());
-                console.log(`Pushed history state: ${url.toString()}`);
             }
         }
 
-        // --- Event Handlers ---
         function handlePrevClick(event: MouseEvent) {
             event.preventDefault();
             if (currentPage > 1) {
@@ -678,7 +843,9 @@ const totalStars = starredRepos.length;
 
         function handleNextClick(event: MouseEvent) {
             event.preventDefault();
-            if (currentPage < totalPages) {
+            const tp =
+                Math.ceil(getFilteredRepos().length / itemsPerPage) || 1;
+            if (currentPage < tp) {
                 currentPage++;
                 updateUrl();
                 updatePageDisplay();
@@ -687,17 +854,30 @@ const totalStars = starredRepos.length;
 
         function handlePageSelectChange(event: Event) {
             const target = event.target as HTMLSelectElement;
+            const tp = Math.ceil(getFilteredRepos().length / itemsPerPage) || 1;
             const newPage = parseInt(target.value, 10);
-            // Check if the value is a valid number and within range
-            if (!isNaN(newPage) && newPage >= 1 && newPage <= totalPages) {
+            if (!isNaN(newPage) && newPage >= 1 && newPage <= tp) {
                 currentPage = newPage;
                 updateUrl();
                 updatePageDisplay();
             }
         }
 
-        // --- Attach Event Listeners ---
-        // Remove potentially existing listeners first to be safe, although reload makes it less critical
+        function handleCategoryChange() {
+            currentPage = 1;
+            updateUrl();
+            updatePageDisplay();
+        }
+
+        function handleSearchInput() {
+            if (searchDebounce) clearTimeout(searchDebounce);
+            searchDebounce = setTimeout(() => {
+                currentPage = 1;
+                updateUrl();
+                updatePageDisplay();
+            }, 200);
+        }
+
         prevButton.removeEventListener(
             "click",
             handlePrevClick as EventListener,
@@ -713,25 +893,24 @@ const totalStars = starredRepos.length;
         pageSelect.removeEventListener("change", handlePageSelectChange);
         pageSelect.addEventListener("change", handlePageSelectChange);
 
-        // --- Initial Setup ---
-        updatePageDisplay(); // Render the correct page view first
+        if (searchInput) {
+            searchInput.removeEventListener("input", handleSearchInput);
+            searchInput.addEventListener("input", handleSearchInput);
+        }
+        if (categorySelect) {
+            categorySelect.removeEventListener("change", handleCategoryChange);
+            categorySelect.addEventListener("change", handleCategoryChange);
+        }
 
-        // Set initial URL using replaceState to match the potentially clamped currentPage
+        updatePageDisplay();
+
         const initialUrl = new URL(window.location.href);
         initialUrl.searchParams.set("page", currentPage.toString());
         if (initialUrl.toString() !== window.location.href) {
-            // Only replace if the URL needs adjustment
             history.replaceState(
                 { page: currentPage },
                 "",
                 initialUrl.toString(),
-            );
-            console.log(
-                `Initial URL set (replaceState): ${initialUrl.toString()}`,
-            );
-        } else {
-            console.log(
-                `Initial URL (${initialUrl.toString()}) already correct.`,
             );
         }
     } // End initializePagination
@@ -835,7 +1014,6 @@ const totalStars = starredRepos.length;
                 "Astro:page-load event fired on /stars, initializing...",
             );
             initializePagination();
-            initializeDescriptionToggles(); // <-- Call the new function here
         } else {
             console.log("Astro:page-load event fired, but not on /stars page.");
         }
