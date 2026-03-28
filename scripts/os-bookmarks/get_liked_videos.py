@@ -232,7 +232,7 @@ def get_github_star_lists_by_repo_id(username, token):
     """
     if not token or not username:
         print(
-            "Info: Skipping GitHub Star Lists GraphQL (GITHUB_TOKEN or GITHUB_USER missing).",
+            "Info: Skipping GitHub Star Lists GraphQL (GH_TOKEN or GH_USER missing).",
             file=sys.stderr,
         )
         return None
@@ -466,14 +466,14 @@ if __name__ == "__main__":
         # --- GitHub Stars ---
         all_starred_repos_from_api = []
         current_github_repo_ids_from_api = set()
-        github_user = os.environ.get("GITHUB_USER")
-        github_token = os.environ.get("GITHUB_TOKEN")
+        github_user = os.environ.get("GH_USER")
+        github_token = os.environ.get("GH_TOKEN")
 
         if not github_user:
-            print("\nError: GITHUB_USER environment variable not set. Skipping GitHub sync.", file=sys.stderr)
+            print("\nError: GH_USER environment variable not set. Skipping GitHub sync.", file=sys.stderr)
         else:
             if not github_token: # Token is optional, but print warning
-                print("\nWarning: GITHUB_TOKEN environment variable not set. API calls may be rate-limited or fail for private data.", file=sys.stderr)
+                print("\nWarning: GH_TOKEN environment variable not set. API calls may be rate-limited or fail for private data.", file=sys.stderr)
             try:
                 print("\nFetching GitHub starred repositories...")
                 all_starred_repos_from_api = get_github_stars(github_user, github_token)
@@ -536,7 +536,7 @@ if __name__ == "__main__":
                     else:
                         print("No valid GitHub repository data to upsert after filtering.")
 
-                # Deletion logic for GitHub (runs if GITHUB_USER is set)
+                # Deletion logic for GitHub (runs if GH_USER is set)
                 cur.execute("SELECT repo_id FROM github_stars")
                 db_github_repo_ids = {row[0] for row in cur.fetchall()}
                 github_ids_to_delete = db_github_repo_ids - current_github_repo_ids_from_api
