@@ -25,6 +25,7 @@ let state = {
     zoomTransform: d3.zoomIdentity, // Add zoom state
     isPlaying: false,
     playTimer: null,
+    areaFocusMode: false,
     introPlayed: {
         "main-view": false,
         "mixed-view": false,
@@ -698,6 +699,7 @@ function renderTreemapChart(selection, year, tmWidth = width, tmHeight = height)
         .attr("fill", d => color(d.data.name))
         .style("opacity", d => (state.highlightedKey && state.highlightedKey !== d.data.name) ? 0.3 : 1)
         .on("mouseover", function (event, d) {
+            if (state.highlightedKey && state.highlightedKey !== d.data.name) return;
             d3.select(this).attr("stroke", "white").attr("stroke-width", 2);
             const pct = (d.data.value / row.total) * 100;
             showTooltip(event, `${year} — ${d.data.name}`,
@@ -1018,14 +1020,32 @@ function renderAreaChart() {
     const compKey = state.selectedComponent;
     const isAll = compKey === 'All';
 
+    // Update toggle visibility and meta text
+    const toggleContainer = document.getElementById("area-focus-container");
+    const metaEL = document.getElementById("area-meta");
+    if (toggleContainer) {
+        toggleContainer.style.display = isAll ? "none" : "flex";
+    }
+    if (metaEL) {
+        if (isAll) {
+            metaEL.textContent = "Area: Total vs Selected";
+        } else {
+            metaEL.textContent = state.areaFocusMode ? "Area: Actual Value" : "Area: Total vs Selected";
+        }
+    }
+
     const xBase = d3.scaleLinear()
         .domain(d3.extent(data, d => d.year))
         .range([0, width]);
 
     const x = state.zoomTransform.rescaleX(xBase);
 
+    let yMax = d3.max(data, d => d.total);
+    if (!isAll && state.areaFocusMode) {
+        yMax = d3.max(data, d => d[compKey]);
+    }
     const y = d3.scaleLinear()
-        .domain([0, d3.max(data, d => d.total) * 1.1])
+        .domain([0, yMax * 1.1])
         .range([height, 0]);
 
     // Axes
@@ -1073,7 +1093,7 @@ function renderAreaChart() {
         .datum(data)
         .attr("fill", "#E2E8F0")
         .attr("d", areaTotal)
-        .attr("opacity", 0.6);
+        .attr("opacity", (!isAll && state.areaFocusMode) ? 0 : 0.6);
 
     if (isAll) {
         // Full Stacked Area - in fgContent
@@ -1341,10 +1361,13 @@ function toggleCategory(key) {
 
 // ... existing mouse handlers ...
 function handleMouseOver(event, d) {
+    const parentData = this.parentNode ? d3.select(this.parentNode).datum() : null;
+    const category = d.key || (d.data && d.data.name) || (parentData ? parentData.key : null);
+    if (state.highlightedKey && state.highlightedKey !== category) return;
+
     d3.select(this).style("opacity", 0.9).attr("stroke", "white").attr("stroke-width", 1);
 
     // New data structure support
-    const category = d.key || d3.select(this.parentNode).datum().key;
     const val = (d.y1 !== undefined) ? (d.y1 - d.y0) : (d[1] - d[0]);
     const year = d.data.year;
     const total = d.data.total;
@@ -1357,11 +1380,21 @@ function handleMouseOver(event, d) {
 }
 
 function handleMouseMove(event, d) {
+    const parentData = this.parentNode ? d3.select(this.parentNode).datum() : null;
+    const category = d.key || (d.data && d.data.name) || (parentData ? parentData.key : null);
+    if (state.highlightedKey && state.highlightedKey !== category) return;
     positionTooltip(event);
 }
 
 function handleMouseOut(event, d) {
-    d3.select(this).style("opacity", 1).attr("stroke", "none");
+    const parentData = this.parentNode ? d3.select(this.parentNode).datum() : null;
+    const category = d.key || (d.data && d.data.name) || (parentData ? parentData.key : null);
+    
+    if (state.highlightedKey && state.highlightedKey !== category) {
+        d3.select(this).style("opacity", 0.3).attr("stroke", "none");
+    } else {
+        d3.select(this).style("opacity", 1).attr("stroke", "none");
+    }
     hideTooltip();
 }
 
@@ -1424,6 +1457,15 @@ function setupControls() {
     const playBtn = document.getElementById('play-year-btn');
     if (playBtn) {
         playBtn.addEventListener('click', togglePlay);
+    }
+
+    // Area Focus Toggle Logic
+    const areaFocusToggle = document.getElementById('area-focus-toggle');
+    if (areaFocusToggle) {
+        areaFocusToggle.addEventListener('change', (e) => {
+            state.areaFocusMode = e.target.checked;
+            renderActiveTab();
+        });
     }
 
     // Mobile Toggles
