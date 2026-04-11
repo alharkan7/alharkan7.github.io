@@ -85,6 +85,7 @@ const types = [...new Set(allProjects.map((p) => p.type).filter(Boolean))].sort(
           </div>
           <div class="card-content">
             <h3 class="card-title">{project.title}</h3>
+            {project.date && <time class="card-date">{new Date(project.date).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })}</time>}
             {project.subtitle && <p class="card-subtitle">{project.subtitle}</p>}
           </div>
         </a>
@@ -161,6 +162,7 @@ const types = [...new Set(allProjects.map((p) => p.type).filter(Boolean))].sort(
             </div>
             <div class="card-content">
               <h3 class="card-title">${project.title}</h3>
+              ${project.date ? `<time class="card-date">${new Date(project.date).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })}</time>` : ''}
               ${project.subtitle ? `<p class="card-subtitle">${project.subtitle}</p>` : ''}
             </div>
           </a>
@@ -260,6 +262,15 @@ const types = [...new Set(allProjects.map((p) => p.type).filter(Boolean))].sort(
 
     .card-subtitle {
       font-family: var(--font-family-sans); font-weight: 400; color: var(--text-secondary); font-size: 0.95rem; line-height: 1.5; margin: 0; margin-top: 0.5rem;
+    }
+
+    .card-date {
+      display: block;
+      font-family: var(--font-family-sans);
+      font-size: 0.8rem;
+      color: var(--text-secondary);
+      opacity: 0.7;
+      margin-top: 0.25rem;
     }
 
     @media (max-width: 600px) {

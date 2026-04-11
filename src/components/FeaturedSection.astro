@@ -3,6 +3,7 @@ export interface FeaturedItem {
   title: string;
   subtitle: string;
   type?: string;
+  date?: string;
   url: string;
   coverImage: string;
 }
@@ -130,6 +131,15 @@ const { sectionTitle, sectionSubtitle, items } = Astro.props;
     margin-top: 0.5rem;
   }
 
+  .featured-item-date {
+    display: block;
+    font-family: var(--font-family-sans);
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+    opacity: 0.7;
+    margin-top: 0.25rem;
+  }
+
   @media screen and (max-width: 520px) {
     .featured-section {
       margin: 2rem 0;
@@ -176,6 +186,7 @@ const { sectionTitle, sectionSubtitle, items } = Astro.props;
           </div>
           <div class="featured-content">
             <h3 class="featured-item-title">{item.title}</h3>
+            {item.date && <time class="featured-item-date">{new Date(item.date).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })}</time>}
             {item.subtitle && <p class="featured-item-subtitle">{item.subtitle}</p>}
           </div>
         </a>
