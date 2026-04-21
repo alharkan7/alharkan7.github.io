@@ -29,3 +29,7 @@ token.pickle
 
 # Deno (unused - project uses pnpm)
 deno.lock
+
+# Twitter data
+x_bookmarks.json
+x_likes.js

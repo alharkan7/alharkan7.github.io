@@ -15,7 +15,10 @@ export async function getStaticPaths() {
     return {
       params: { page: String(page) },
       props: {
-        projects: featuredProjects.slice(startIndex, startIndex + projectsPerPage),
+        projects: featuredProjects.slice(
+          startIndex,
+          startIndex + projectsPerPage,
+        ),
         currentPage: page,
         totalPages,
         allProjects: featuredProjects, // Pass all for client-side search
@@ -26,11 +29,14 @@ export async function getStaticPaths() {
 
 const { projects, currentPage, totalPages, allProjects } = Astro.props;
 const title = "Research Posts";
-const description = "I scrape, analyze or visualize data in my spare time. Here's the list of special pages showcasing the results that don't fit the blog formatting.";
+const description =
+  "This is a list of special pages showcasing the results that don't fit the blog formatting.";
 const permalink = `${Astro.site?.href}data/${currentPage}`;
 
 // Extract unique types for filtering
-const types = [...new Set(allProjects.map((p) => p.type).filter(Boolean))].sort();
+const types = [
+  ...new Set(allProjects.map((p) => p.type).filter(Boolean)),
+].sort();
 ---
 
 <BaseLayout
@@ -72,9 +78,13 @@ const types = [...new Set(allProjects.map((p) => p.type).filter(Boolean))].sort(
         <div class="type-filter-wrapper">
           <select id="type-filter" aria-label="Filter by type">
             <option value="all">All Types</option>
-            {types.map((type) => (
-              <option value={type}>{type.charAt(0).toUpperCase() + type.slice(1)}</option>
-            ))}
+            {
+              types.map((type) => (
+                <option value={type}>
+                  {type.charAt(0).toUpperCase() + type.slice(1)}
+                </option>
+              ))
+            }
           </select>
         </div>
       </div>
@@ -86,29 +96,41 @@ const types = [...new Set(allProjects.map((p) => p.type).filter(Boolean))].sort(
 
     <!-- Initial Paginated Grid (Shown by default) -->
     <div class="data-grid" id="paginated-grid">
-      {projects.map((project) => (
-        <a
-          href={project.url}
-          class="data-card"
-          target={project.url.startsWith("http") ? "_blank" : "_self"}
-          rel={project.url.startsWith("http") ? "noopener noreferrer" : ""}
-        >
-          <div class="card-image-wrapper">
-            <img
-              src={project.coverImage}
-              alt={project.title}
-              loading="lazy"
-              class="card-image"
-            />
-            {project.type && <span class="card-type">{project.type}</span>}
-          </div>
-          <div class="card-content">
-            <h3 class="card-title">{project.title}</h3>
-            {project.date && <time class="card-date">{new Date(project.date).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })}</time>}
-            {project.subtitle && <p class="card-subtitle">{project.subtitle}</p>}
-          </div>
-        </a>
-      ))}
+      {
+        projects.map((project) => (
+          <a
+            href={project.url}
+            class="data-card"
+            target={project.url.startsWith("http") ? "_blank" : "_self"}
+            rel={project.url.startsWith("http") ? "noopener noreferrer" : ""}
+          >
+            <div class="card-image-wrapper">
+              <img
+                src={project.coverImage}
+                alt={project.title}
+                loading="lazy"
+                class="card-image"
+              />
+              {project.type && <span class="card-type">{project.type}</span>}
+            </div>
+            <div class="card-content">
+              <h3 class="card-title">{project.title}</h3>
+              {project.date && (
+                <time class="card-date">
+                  {new Date(project.date).toLocaleDateString("en-GB", {
+                    day: "2-digit",
+                    month: "short",
+                    year: "numeric",
+                  })}
+                </time>
+              )}
+              {project.subtitle && (
+                <p class="card-subtitle">{project.subtitle}</p>
+              )}
+            </div>
+          </a>
+        ))
+      }
     </div>
 
     <!-- Filtered Results Grid (Hidden by default, populated by JS) -->
@@ -130,44 +152,48 @@ const types = [...new Set(allProjects.map((p) => p.type).filter(Boolean))].sort(
   </div>
 
   <script define:vars={{ allProjects }}>
-    const searchInput = document.getElementById('project-search');
-    const typeFilter = document.getElementById('type-filter');
-    const paginatedGrid = document.getElementById('paginated-grid');
-    const filteredGrid = document.getElementById('filtered-grid');
-    const noResults = document.getElementById('no-results');
-    const paginationControls = document.getElementById('pagination-controls');
+    const searchInput = document.getElementById("project-search");
+    const typeFilter = document.getElementById("type-filter");
+    const paginatedGrid = document.getElementById("paginated-grid");
+    const filteredGrid = document.getElementById("filtered-grid");
+    const noResults = document.getElementById("no-results");
+    const paginationControls = document.getElementById("pagination-controls");
 
     function filterProjects() {
       const searchTerm = searchInput.value.toLowerCase().trim();
       const selectedType = typeFilter.value;
-      const isFiltering = searchTerm !== '' || selectedType !== 'all';
+      const isFiltering = searchTerm !== "" || selectedType !== "all";
 
       if (!isFiltering) {
-        paginatedGrid.style.display = 'grid';
-        filteredGrid.style.display = 'none';
-        noResults.style.display = 'none';
-        if (paginationControls) paginationControls.style.display = 'flex';
+        paginatedGrid.style.display = "grid";
+        filteredGrid.style.display = "none";
+        noResults.style.display = "none";
+        if (paginationControls) paginationControls.style.display = "flex";
         return;
       }
 
-      paginatedGrid.style.display = 'none';
-      if (paginationControls) paginationControls.style.display = 'none';
-      
-      const filtered = allProjects.filter(project => {
-        const matchesSearch = project.title.toLowerCase().includes(searchTerm) || 
-                             (project.subtitle || '').toLowerCase().includes(searchTerm);
-        const matchesType = selectedType === 'all' || project.type === selectedType;
+      paginatedGrid.style.display = "none";
+      if (paginationControls) paginationControls.style.display = "none";
+
+      const filtered = allProjects.filter((project) => {
+        const matchesSearch =
+          project.title.toLowerCase().includes(searchTerm) ||
+          (project.subtitle || "").toLowerCase().includes(searchTerm);
+        const matchesType =
+          selectedType === "all" || project.type === selectedType;
         return matchesSearch && matchesType;
       });
 
       if (filtered.length === 0) {
-        filteredGrid.style.display = 'none';
-        noResults.style.display = 'block';
+        filteredGrid.style.display = "none";
+        noResults.style.display = "block";
       } else {
-        filteredGrid.style.display = 'grid';
-        noResults.style.display = 'none';
-        
-        filteredGrid.innerHTML = filtered.map(project => `
+        filteredGrid.style.display = "grid";
+        noResults.style.display = "none";
+
+        filteredGrid.innerHTML = filtered
+          .map(
+            (project) => `
           <a
             href="${project.url}"
             class="data-card"
@@ -181,20 +207,22 @@ const types = [...new Set(allProjects.map((p) => p.type).filter(Boolean))].sort(
                 loading="lazy"
                 class="card-image"
               />
-              ${project.type ? `<span class="card-type">${project.type}</span>` : ''}
+              ${project.type ? `<span class="card-type">${project.type}</span>` : ""}
             </div>
             <div class="card-content">
               <h3 class="card-title">${project.title}</h3>
-              ${project.date ? `<time class="card-date">${new Date(project.date).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })}</time>` : ''}
-              ${project.subtitle ? `<p class="card-subtitle">${project.subtitle}</p>` : ''}
+              ${project.date ? `<time class="card-date">${new Date(project.date).toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric" })}</time>` : ""}
+              ${project.subtitle ? `<p class="card-subtitle">${project.subtitle}</p>` : ""}
             </div>
           </a>
-        `).join('');
+        `,
+          )
+          .join("");
       }
     }
 
-    searchInput?.addEventListener('input', filterProjects);
-    typeFilter?.addEventListener('change', filterProjects);
+    searchInput?.addEventListener("input", filterProjects);
+    typeFilter?.addEventListener("change", filterProjects);
   </script>
 
   <style is:global>

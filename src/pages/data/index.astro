@@ -8,10 +8,13 @@ const initialProjects = featuredProjects.slice(0, projectsPerPage);
 const allProjects = featuredProjects;
 
 const title = "Research Pages";
-const description = "I scrape, analyze or visualize data in my spare time. Here's the list of special pages showcasing the results that don't fit the blog formatting.";
+const description =
+  "This is a list of special pages showcasing the results that don't fit the blog formatting.";
 const permalink = Astro.site?.href ? `${Astro.site.href}data` : "/data";
 
-const types = [...new Set(allProjects.map((p) => p.type).filter(Boolean))].sort();
+const types = [
+  ...new Set(allProjects.map((p) => p.type).filter(Boolean)),
+].sort();
 ---
 
 <BaseLayout
@@ -53,9 +56,13 @@ const types = [...new Set(allProjects.map((p) => p.type).filter(Boolean))].sort(
         <div class="type-filter-wrapper">
           <select id="type-filter" aria-label="Filter by type">
             <option value="all">All Types</option>
-            {types.map((type) => (
-              <option value={type}>{type.charAt(0).toUpperCase() + type.slice(1)}</option>
-            ))}
+            {
+              types.map((type) => (
+                <option value={type}>
+                  {type.charAt(0).toUpperCase() + type.slice(1)}
+                </option>
+              ))
+            }
           </select>
         </div>
       </div>
@@ -67,29 +74,41 @@ const types = [...new Set(allProjects.map((p) => p.type).filter(Boolean))].sort(
 
     <!-- Initial Paginated Grid -->
     <div class="data-grid" id="paginated-grid">
-      {initialProjects.map((project) => (
-        <a
-          href={project.url}
-          class="data-card"
-          target={project.url.startsWith("http") ? "_blank" : "_self"}
-          rel={project.url.startsWith("http") ? "noopener noreferrer" : ""}
-        >
-          <div class="card-image-wrapper">
-            <img
-              src={project.coverImage}
-              alt={project.title}
-              loading="lazy"
-              class="card-image"
-            />
-            {project.type && <span class="card-type">{project.type}</span>}
-          </div>
-          <div class="card-content">
-            <h3 class="card-title">{project.title}</h3>
-            {project.date && <time class="card-date">{new Date(project.date).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })}</time>}
-            {project.subtitle && <p class="card-subtitle">{project.subtitle}</p>}
-          </div>
-        </a>
-      ))}
+      {
+        initialProjects.map((project) => (
+          <a
+            href={project.url}
+            class="data-card"
+            target={project.url.startsWith("http") ? "_blank" : "_self"}
+            rel={project.url.startsWith("http") ? "noopener noreferrer" : ""}
+          >
+            <div class="card-image-wrapper">
+              <img
+                src={project.coverImage}
+                alt={project.title}
+                loading="lazy"
+                class="card-image"
+              />
+              {project.type && <span class="card-type">{project.type}</span>}
+            </div>
+            <div class="card-content">
+              <h3 class="card-title">{project.title}</h3>
+              {project.date && (
+                <time class="card-date">
+                  {new Date(project.date).toLocaleDateString("en-GB", {
+                    day: "2-digit",
+                    month: "short",
+                    year: "numeric",
+                  })}
+                </time>
+              )}
+              {project.subtitle && (
+                <p class="card-subtitle">{project.subtitle}</p>
+              )}
+            </div>
+          </a>
+        ))
+      }
     </div>
 
     <!-- Filtered Results Grid (Populated by JS) -->
@@ -107,44 +126,48 @@ const types = [...new Set(allProjects.map((p) => p.type).filter(Boolean))].sort(
   </div>
 
   <script define:vars={{ allProjects }}>
-    const searchInput = document.getElementById('project-search');
-    const typeFilter = document.getElementById('type-filter');
-    const paginatedGrid = document.getElementById('paginated-grid');
-    const filteredGrid = document.getElementById('filtered-grid');
-    const noResults = document.getElementById('no-results');
-    const paginationControls = document.getElementById('pagination-controls');
+    const searchInput = document.getElementById("project-search");
+    const typeFilter = document.getElementById("type-filter");
+    const paginatedGrid = document.getElementById("paginated-grid");
+    const filteredGrid = document.getElementById("filtered-grid");
+    const noResults = document.getElementById("no-results");
+    const paginationControls = document.getElementById("pagination-controls");
 
     function filterProjects() {
       const searchTerm = searchInput.value.toLowerCase().trim();
       const selectedType = typeFilter.value;
-      const isFiltering = searchTerm !== '' || selectedType !== 'all';
+      const isFiltering = searchTerm !== "" || selectedType !== "all";
 
       if (!isFiltering) {
-        paginatedGrid.style.display = 'grid';
-        filteredGrid.style.display = 'none';
-        noResults.style.display = 'none';
-        if (paginationControls) paginationControls.style.display = 'flex';
+        paginatedGrid.style.display = "grid";
+        filteredGrid.style.display = "none";
+        noResults.style.display = "none";
+        if (paginationControls) paginationControls.style.display = "flex";
         return;
       }
 
-      paginatedGrid.style.display = 'none';
-      if (paginationControls) paginationControls.style.display = 'none';
-      
-      const filtered = allProjects.filter(project => {
-        const matchesSearch = project.title.toLowerCase().includes(searchTerm) || 
-                             (project.subtitle || '').toLowerCase().includes(searchTerm);
-        const matchesType = selectedType === 'all' || project.type === selectedType;
+      paginatedGrid.style.display = "none";
+      if (paginationControls) paginationControls.style.display = "none";
+
+      const filtered = allProjects.filter((project) => {
+        const matchesSearch =
+          project.title.toLowerCase().includes(searchTerm) ||
+          (project.subtitle || "").toLowerCase().includes(searchTerm);
+        const matchesType =
+          selectedType === "all" || project.type === selectedType;
         return matchesSearch && matchesType;
       });
 
       if (filtered.length === 0) {
-        filteredGrid.style.display = 'none';
-        noResults.style.display = 'block';
+        filteredGrid.style.display = "none";
+        noResults.style.display = "block";
       } else {
-        filteredGrid.style.display = 'grid';
-        noResults.style.display = 'none';
-        
-        filteredGrid.innerHTML = filtered.map(project => `
+        filteredGrid.style.display = "grid";
+        noResults.style.display = "none";
+
+        filteredGrid.innerHTML = filtered
+          .map(
+            (project) => `
           <a
             href="${project.url}"
             class="data-card"
@@ -158,20 +181,22 @@ const types = [...new Set(allProjects.map((p) => p.type).filter(Boolean))].sort(
                 loading="lazy"
                 class="card-image"
               />
-              ${project.type ? `<span class="card-type">${project.type}</span>` : ''}
+              ${project.type ? `<span class="card-type">${project.type}</span>` : ""}
             </div>
             <div class="card-content">
               <h3 class="card-title">${project.title}</h3>
-              ${project.date ? `<time class="card-date">${new Date(project.date).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })}</time>` : ''}
-              ${project.subtitle ? `<p class="card-subtitle">${project.subtitle}</p>` : ''}
+              ${project.date ? `<time class="card-date">${new Date(project.date).toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric" })}</time>` : ""}
+              ${project.subtitle ? `<p class="card-subtitle">${project.subtitle}</p>` : ""}
             </div>
           </a>
-        `).join('');
+        `,
+          )
+          .join("");
       }
     }
 
-    searchInput?.addEventListener('input', filterProjects);
-    typeFilter?.addEventListener('change', filterProjects);
+    searchInput?.addEventListener("input", filterProjects);
+    typeFilter?.addEventListener("change", filterProjects);
   </script>
 
   <style is:global>
@@ -193,23 +218,46 @@ const types = [...new Set(allProjects.map((p) => p.type).filter(Boolean))].sort(
     }
 
     .filter-controls {
-      display: flex; gap: 1rem; flex-wrap: wrap; align-items: center; margin-top: 2rem;
+      display: flex;
+      gap: 1rem;
+      flex-wrap: wrap;
+      align-items: center;
+      margin-top: 2rem;
     }
 
     .search-wrapper {
-      position: relative; flex: 1; min-width: 250px;
+      position: relative;
+      flex: 1;
+      min-width: 250px;
     }
 
     .data-search-icon {
-      position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: var(--text-secondary); pointer-events: none; opacity: 0.6;
+      position: absolute;
+      left: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--text-secondary);
+      pointer-events: none;
+      opacity: 0.6;
     }
 
     #project-search {
-      width: 100%; padding: 0.75rem 1rem 0.75rem 2.5rem; border-radius: 8px; border: 1px solid var(--border-color); background: var(--background-elevated, rgba(0, 0, 0, 0.03)); color: var(--text-primary); font-family: inherit; font-size: 1rem; transition: all 0.2s ease;
+      width: 100%;
+      padding: 0.75rem 1rem 0.75rem 2.5rem;
+      border-radius: 8px;
+      border: 1px solid var(--border-color);
+      background: var(--background-elevated, rgba(0, 0, 0, 0.03));
+      color: var(--text-primary);
+      font-family: inherit;
+      font-size: 1rem;
+      transition: all 0.2s ease;
     }
 
     #project-search:focus {
-      outline: none; border-color: var(--primary-color); background: var(--background-body); box-shadow: 0 0 0 3px rgba(var(--primary-color-rgb, 0, 112, 243), 0.1);
+      outline: none;
+      border-color: var(--primary-color);
+      background: var(--background-body);
+      box-shadow: 0 0 0 3px rgba(var(--primary-color-rgb, 0, 112, 243), 0.1);
     }
 
     .type-filter-wrapper {
@@ -217,23 +265,55 @@ const types = [...new Set(allProjects.map((p) => p.type).filter(Boolean))].sort(
     }
 
     #type-filter {
-      width: 100%; padding: 0.75rem 1rem; border-radius: 8px; border: 1px solid var(--border-color); background: var(--background-elevated, rgba(0, 0, 0, 0.03)); color: var(--text-primary); font-family: inherit; font-size: 1rem; cursor: pointer; appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 12px center; padding-right: 2.5rem; transition: all 0.2s ease;
+      width: 100%;
+      padding: 0.75rem 1rem;
+      border-radius: 8px;
+      border: 1px solid var(--border-color);
+      background: var(--background-elevated, rgba(0, 0, 0, 0.03));
+      color: var(--text-primary);
+      font-family: inherit;
+      font-size: 1rem;
+      cursor: pointer;
+      appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 12px center;
+      padding-right: 2.5rem;
+      transition: all 0.2s ease;
     }
 
     #type-filter:focus {
-      outline: none; border-color: var(--primary-color); background-color: var(--background-body);
+      outline: none;
+      border-color: var(--primary-color);
+      background-color: var(--background-body);
     }
 
     .data-grid {
-      display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 2rem 1.5rem; margin-bottom: 4rem;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 2rem 1.5rem;
+      margin-bottom: 4rem;
     }
 
     .no-results {
-      text-align: center; padding: 4rem 2rem; color: var(--text-secondary); font-size: 1.1rem; border: 2px dashed var(--border-color); border-radius: 12px; margin-bottom: 4rem;
+      text-align: center;
+      padding: 4rem 2rem;
+      color: var(--text-secondary);
+      font-size: 1.1rem;
+      border: 2px dashed var(--border-color);
+      border-radius: 12px;
+      margin-bottom: 4rem;
     }
 
     .data-card {
-      display: flex; flex-direction: column; text-decoration: none; color: inherit; transition: all 0.2s ease; border-radius: 8px; overflow: hidden; height: 100%;
+      display: flex;
+      flex-direction: column;
+      text-decoration: none;
+      color: inherit;
+      transition: all 0.2s ease;
+      border-radius: 8px;
+      overflow: hidden;
+      height: 100%;
     }
 
     .data-card:hover {
@@ -245,23 +325,60 @@ const types = [...new Set(allProjects.map((p) => p.type).filter(Boolean))].sort(
     }
 
     .card-image-wrapper {
-      width: 100%; aspect-ratio: 16 / 9; background-color: var(--background-elevated, rgba(0, 0, 0, 0.05)); border-radius: 8px; overflow: hidden; margin-bottom: 0.5rem; border: 1px solid var(--border-color); position: relative;
+      width: 100%;
+      aspect-ratio: 16 / 9;
+      background-color: var(--background-elevated, rgba(0, 0, 0, 0.05));
+      border-radius: 8px;
+      overflow: hidden;
+      margin-bottom: 0.5rem;
+      border: 1px solid var(--border-color);
+      position: relative;
     }
 
     .card-image {
-      width: 100%; height: 100%; object-fit: cover; transition: transform 0.3s ease;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 0.3s ease;
     }
 
     .card-type {
-      position: absolute; bottom: 0; left: 0; background-color: var(--background-elevated, rgba(255, 255, 255, 0.9)); color: var(--primary-color); font-family: var(--font-family-sans); font-weight: 700; font-size: 0.65rem; padding: 0.25rem 0.6rem; text-transform: capitalize; letter-spacing: 0.05em; border-radius: 0 8px 0 8px; z-index: 1; pointer-events: none; backdrop-filter: blur(4px);
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      background-color: var(--background-elevated, rgba(255, 255, 255, 0.9));
+      color: var(--primary-color);
+      font-family: var(--font-family-sans);
+      font-weight: 700;
+      font-size: 0.65rem;
+      padding: 0.25rem 0.6rem;
+      text-transform: capitalize;
+      letter-spacing: 0.05em;
+      border-radius: 0 8px 0 8px;
+      z-index: 1;
+      pointer-events: none;
+      backdrop-filter: blur(4px);
     }
 
     .card-title {
-      font-family: var(--font-family-serif); font-weight: 600; font-size: 1.1rem; color: var(--text-primary); transition: color 0.2s ease; margin-top: 0.25rem; margin-bottom: 0; line-height: 1.5;
+      font-family: var(--font-family-serif);
+      font-weight: 600;
+      font-size: 1.1rem;
+      color: var(--text-primary);
+      transition: color 0.2s ease;
+      margin-top: 0.25rem;
+      margin-bottom: 0;
+      line-height: 1.5;
     }
 
     .card-subtitle {
-      font-family: var(--font-family-sans); font-weight: 400; color: var(--text-secondary); font-size: 0.95rem; line-height: 1.5; margin: 0; margin-top: 0.5rem;
+      font-family: var(--font-family-sans);
+      font-weight: 400;
+      color: var(--text-secondary);
+      font-size: 0.95rem;
+      line-height: 1.5;
+      margin: 0;
+      margin-top: 0.5rem;
     }
 
     .card-date {
@@ -274,20 +391,38 @@ const types = [...new Set(allProjects.map((p) => p.type).filter(Boolean))].sort(
     }
 
     @media (max-width: 600px) {
-      .data-grid { grid-template-columns: 1fr; gap: 1.75rem 1rem; }
-      .filter-controls { flex-direction: column; align-items: stretch; }
+      .data-grid {
+        grid-template-columns: 1fr;
+        gap: 1.75rem 1rem;
+      }
+      .filter-controls {
+        flex-direction: column;
+        align-items: stretch;
+      }
     }
 
     .pagination {
-      display: flex; justify-content: space-between; align-items: center; padding: 1rem 0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1rem 0;
     }
 
     .next-button {
-      color: var(--text-secondary); transition: all 0.2s ease; font-family: var(--font-family-sans); font-size: 1.2em; font-weight: 700; text-decoration: none; box-shadow: inset 0 -0.12em 0 var(--primary-color); margin-left: auto;
+      color: var(--text-secondary);
+      transition: all 0.2s ease;
+      font-family: var(--font-family-sans);
+      font-size: 1.2em;
+      font-weight: 700;
+      text-decoration: none;
+      box-shadow: inset 0 -0.12em 0 var(--primary-color);
+      margin-left: auto;
     }
 
     .next-button:hover {
-      color: var(--primary-color); box-shadow: inset 0 -1.5em 0 var(--primary-color); color: #fff;
+      color: var(--primary-color);
+      box-shadow: inset 0 -1.5em 0 var(--primary-color);
+      color: #fff;
     }
   </style>
 </BaseLayout>
