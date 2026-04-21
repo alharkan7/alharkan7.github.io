@@ -2,6 +2,7 @@
 dist/
 .output/
 .astro/
+.claude/
 
 # dependencies
 node_modules/
@@ -33,3 +34,5 @@ deno.lock
 # Twitter data
 x_bookmarks.json
 x_likes.js
+
+tokens.json

@@ -1,4 +1,4 @@
-name: Update Videos and Stars JSON
+name: Update Curated Database
 
 on:
   schedule:
@@ -7,7 +7,7 @@ on:
   workflow_dispatch: # Allows manual triggering from the Actions tab
 
 jobs:
-  update-json:
+  update-db:
     runs-on: ubuntu-latest
     permissions:
         contents: write # Allow workflow to commit to the repo
@@ -42,7 +42,18 @@ jobs:
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
           SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
           VERCEL_DEPLOY_HOOK_URL: ${{ secrets.VERCEL_DEPLOY_HOOK_URL }} # Add your Vercel deploy hook secret here
-        run: python scripts/os-bookmarks/get_liked_videos.py # Adjust path if needed
+          X_CLIENT_ID: ${{ secrets.X_CLIENT_ID }}
+          X_CLIENT_SECRET: ${{ secrets.X_CLIENT_SECRET }}
+          X_REFRESH_TOKEN: ${{ secrets.X_REFRESH_TOKEN }}
+        run: python scripts/os-bookmarks/curated_db_update.py # Adjust path if needed
+
+      - name: Save refreshed token back to GitHub Secrets
+        env:
+          GH_TOKEN: ${{ secrets.ACTIONS_PAT }} # Needs repo access
+        run: |
+          if [ -f .new_x_refresh_token ]; then
+            gh secret set X_REFRESH_TOKEN --body "$(cat .new_x_refresh_token)"
+          fi
 
       # Data is stored in Supabase database, not in JSON files
       # The Python script handles Supabase updates and Vercel deployment trigger

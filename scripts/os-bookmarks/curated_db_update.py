@@ -2,6 +2,7 @@ import os
 import pickle
 import json
 import requests
+import base64
 # Conditional import for dotenv
 try:
     from dotenv import load_dotenv
@@ -12,7 +13,7 @@ from pathlib import Path
 # Conditional import for psycopg2
 try:
     import psycopg2
-    from psycopg2.extras import execute_values
+    from psycopg2.extras import execute_values, Json
     HAS_PSYCOPG2 = True
 except ModuleNotFoundError:
     HAS_PSYCOPG2 = False
@@ -48,6 +49,11 @@ DB_NAME = os.getenv("SUPABASE_DB_NAME", "postgres")
 DB_USER = os.getenv("SUPABASE_DB_USER", "postgres")
 DB_PASSWORD = os.getenv("SUPABASE_DB_PASSWORD")
 DB_PORT = os.getenv("SUPABASE_DB_PORT", "5432")
+
+X_CLIENT_ID = os.getenv("X_CLIENT_ID")
+X_CLIENT_SECRET = os.getenv("X_CLIENT_SECRET")
+X_REFRESH_TOKEN = os.getenv("X_REFRESH_TOKEN")
+X_TOKEN_URL = "https://api.x.com/2/oauth2/token"
 
 def trigger_vercel_deploy(hook_url):
     if not hook_url:
@@ -353,6 +359,123 @@ def get_github_star_lists_by_repo_id(username, token):
     # sorted stable output for DB / diffs
     return {k: sorted(v) for k, v in repo_to_lists.items()}
 
+def refresh_x_token():
+    if not X_CLIENT_ID or not X_CLIENT_SECRET or not X_REFRESH_TOKEN:
+         print("Error: X_CLIENT_ID, X_CLIENT_SECRET, or X_REFRESH_TOKEN not found in env.", file=sys.stderr)
+         return None
+
+    print("Refreshing X access token...")
+    auth = base64.b64encode(f"{X_CLIENT_ID}:{X_CLIENT_SECRET}".encode("utf-8")).decode("utf-8")
+    headers = {
+        "Content-Type": "application/x-www-form-urlencoded",
+        "Authorization": f"Basic {auth}"
+    }
+    data = {
+        "refresh_token": X_REFRESH_TOKEN,
+        "grant_type": "refresh_token",
+        "client_id": X_CLIENT_ID
+    }
+    
+    resp = requests.post(X_TOKEN_URL, headers=headers, data=data)
+    if resp.status_code == 200:
+        new_token_data = resp.json()
+        new_refresh = new_token_data.get("refresh_token")
+        if new_refresh:
+            try:
+                # Save just the raw refresh token string so github workflow can update it without quoting issues
+                with open(".new_x_refresh_token", "w") as f:
+                    f.write(new_refresh)
+            except Exception as e:
+                print(f"Warning: Could not save new refresh token to file: {e}")
+        return new_token_data.get("access_token")
+    else:
+        print(f"Error refreshing X token: {resp.text}", file=sys.stderr)
+        return None
+
+def fetch_latest_x_tweets(url, access_token, max_results=50):
+    headers = {"Authorization": f"Bearer {access_token}"}
+    params = {
+        "max_results": max_results,
+        "tweet.fields": "created_at,text,public_metrics,entities",
+        "expansions": "author_id",
+        "user.fields": "name,username"
+    }
+    resp = requests.get(url, headers=headers, params=params)
+    if resp.status_code == 200:
+        return resp.json().get("data", [])
+    else:
+        print(f"Error fetching X data: {resp.text}", file=sys.stderr)
+        return []
+
+def update_x_tweets_to_db(cur, new_tweets, is_bookmark=False, is_like=False):
+    if not new_tweets:
+        return 0, 0
+    
+    tuples = []
+    for tweet in new_tweets:
+        tweet_id = str(tweet.get("id"))
+        author_id = tweet.get("author_id", "")
+        if not author_id and "author" in tweet:
+            author_id = tweet["author"].get("id", "")
+        text = tweet.get("text", "")
+        created_at = tweet.get("created_at") or tweet.get("timestamp")
+        edit_history = tweet.get("edit_history_tweet_ids", [])
+        
+        metrics = tweet.get("public_metrics", {})
+        retweet_count = metrics.get("retweet_count", 0)
+        reply_count = metrics.get("reply_count", 0)
+        like_count = metrics.get("like_count", 0)
+        quote_count = metrics.get("quote_count", 0)
+        bookmark_count = metrics.get("bookmark_count", 0)
+        impression_count = metrics.get("impression_count", 0)
+        
+        article = tweet.get("article", {})
+        article_title = article.get("title")
+        
+        entities = tweet.get("entities", {})
+        
+        tuples.append((
+            tweet_id, is_bookmark, is_like, author_id, text, created_at,
+            edit_history if isinstance(edit_history, list) else [edit_history],
+            retweet_count, reply_count, like_count, quote_count, bookmark_count,
+            impression_count, article_title, Json(entities)
+        ))
+        
+    query = """
+        INSERT INTO x_tweets (
+            id, is_bookmark, is_like, author_id, text, created_at, edit_history_tweet_ids,
+            retweet_count, reply_count, like_count, quote_count, bookmark_count, impression_count,
+            article_title, entities
+        ) VALUES %s
+        ON CONFLICT (id) DO UPDATE SET
+            is_bookmark = x_tweets.is_bookmark OR EXCLUDED.is_bookmark,
+            is_like = x_tweets.is_like OR EXCLUDED.is_like,
+            author_id = EXCLUDED.author_id,
+            text = EXCLUDED.text,
+            created_at = EXCLUDED.created_at,
+            edit_history_tweet_ids = EXCLUDED.edit_history_tweet_ids,
+            retweet_count = EXCLUDED.retweet_count,
+            reply_count = EXCLUDED.reply_count,
+            like_count = EXCLUDED.like_count,
+            quote_count = EXCLUDED.quote_count,
+            bookmark_count = EXCLUDED.bookmark_count,
+            impression_count = EXCLUDED.impression_count,
+            article_title = EXCLUDED.article_title,
+            entities = EXCLUDED.entities
+        RETURNING (xmax = 0);
+    """
+    results = execute_values(cur, query, tuples, fetch=True)
+    
+    synced = 0
+    updated = 0
+    for res in results:
+        if res[0]:
+            synced += 1
+        else:
+            updated += 1
+            
+    return synced, updated
+
 if __name__ == "__main__":
     if not HAS_PSYCOPG2:
         print("Error: psycopg2 module not found. Please install it (e.g., pip install psycopg2-binary) to run this script.", file=sys.stderr)
@@ -369,6 +492,10 @@ if __name__ == "__main__":
     github_synced_count = 0
     github_updated_count = 0
     github_deleted_count = 0
+    x_bookmarks_synced = 0
+    x_bookmarks_updated = 0
+    x_likes_synced = 0
+    x_likes_updated = 0
 
     try:
         print(f"Attempting to connect to database {DB_NAME} on {DB_HOST}:{DB_PORT}...")
@@ -561,6 +688,40 @@ if __name__ == "__main__":
             except Exception as e_gh:
                 print(f"An error occurred during GitHub stars processing: {e_gh}", file=sys.stderr)
                 if conn: conn.rollback() # General rollback for other exceptions in GitHub block
+
+        # --- X (Twitter) Bookmarks & Likes ---
+        try:
+            print("\nFetching X (Twitter) interactions...")
+            if not X_REFRESH_TOKEN:
+                print("Info: X_REFRESH_TOKEN not set in environment. Skipping X sync.", file=sys.stderr)
+            else:
+                access_token = refresh_x_token()
+                
+                if access_token:
+                    # Get user ID
+                    me_resp = requests.get("https://api.x.com/2/users/me", headers={"Authorization": f"Bearer {access_token}"})
+                    if me_resp.status_code == 200:
+                        x_user_id = me_resp.json()["data"]["id"]
+                        
+                        # Sync Bookmarks
+                        print("Fetching X Bookmarks...")
+                        bookmarks = fetch_latest_x_tweets(f"https://api.x.com/2/users/{x_user_id}/bookmarks", access_token, max_results=50)
+                        x_bookmarks_synced, x_bookmarks_updated = update_x_tweets_to_db(cur, bookmarks, is_bookmark=True, is_like=False)
+                        print(f"X Bookmarks upsert complete. Added: {x_bookmarks_synced}, Updated: {x_bookmarks_updated}.")
+                        
+                        # Sync Likes
+                        print("Fetching X Likes...")
+                        likes = fetch_latest_x_tweets(f"https://api.x.com/2/users/{x_user_id}/liked_tweets", access_token, max_results=50)
+                        x_likes_synced, x_likes_updated = update_x_tweets_to_db(cur, likes, is_bookmark=False, is_like=True)
+                        print(f"X Likes upsert complete. Added: {x_likes_synced}, Updated: {x_likes_updated}.")
+                        
+                        conn.commit()
+                    else:
+                        print(f"Error fetching X user info: {me_resp.text}", file=sys.stderr)
+        except Exception as e_x:
+            print(f"An error occurred during X (Twitter) processing: {e_x}", file=sys.stderr)
+            if conn: conn.rollback()
+
     except psycopg2.Error as e_db:
         print(f"Database connection or operational error: {e_db}", file=sys.stderr)
         if conn: conn.rollback()
@@ -574,11 +735,14 @@ if __name__ == "__main__":
         print("\n--- Sync Summary ---")
         print(f"YouTube Liked Videos: {youtube_synced_count} added, {youtube_updated_count} updated, {youtube_deleted_count} deleted.")
         print(f"GitHub Starred Repos: {github_synced_count} added, {github_updated_count} updated, {github_deleted_count} deleted.")
+        print(f"X Bookmarks: {x_bookmarks_synced} added, {x_bookmarks_updated} updated.")
+        print(f"X Likes: {x_likes_synced} added, {x_likes_updated} updated.")
 
         # Trigger Vercel build if any changes were made
         changes_made = any([
             youtube_synced_count > 0, youtube_updated_count > 0, youtube_deleted_count > 0,
-            github_synced_count > 0, github_updated_count > 0, github_deleted_count > 0
+            github_synced_count > 0, github_updated_count > 0, github_deleted_count > 0,
+            x_bookmarks_synced > 0, x_bookmarks_updated > 0, x_likes_synced > 0, x_likes_updated > 0
         ])
 
         if changes_made:

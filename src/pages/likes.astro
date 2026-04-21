@@ -48,13 +48,29 @@ async function getLikedTweets(): Promise<Tweet[]> {
         }
     }
 
-    return allData.map((tweet) => ({
-        id: tweet.id,
-        text: tweet.text || "",
-        created_at: tweet.created_at,
-        is_like: tweet.is_like || false,
-        is_bookmark: tweet.is_bookmark || false,
-    }));
+    return allData
+        .filter((tweet) => {
+            const text = tweet.text || "";
+            return !text.includes(
+                "unable to view this Post because this account owner limits who can view their Posts",
+            );
+        })
+        .sort((a, b) => {
+            try {
+                const idA = BigInt(a.id);
+                const idB = BigInt(b.id);
+                return idA < idB ? 1 : idA > idB ? -1 : 0;
+            } catch {
+                return 0;
+            }
+        })
+        .map((tweet) => ({
+            id: tweet.id,
+            text: tweet.text || "",
+            created_at: tweet.created_at,
+            is_like: tweet.is_like || false,
+            is_bookmark: tweet.is_bookmark || false,
+        }));
 }
 
 const likedTweets = await getLikedTweets();
@@ -69,18 +85,7 @@ if (likedTweets.length > 0) {
     });
 }
 
-function formatDate(dateString: string | null): string {
-    if (!dateString) return "N/A";
-    try {
-        return new Date(dateString).toLocaleDateString("en-US", {
-            year: "numeric",
-            month: "short",
-            day: "numeric",
-        });
-    } catch (e) {
-        return "Invalid Date";
-    }
-}
+// Date format unused as the database insertion date shouldn't reflect original tweet date.
 
 // Formatting text to visually differentiate URLs without breaking <a> tag bounds
 function colorizeUrls(text: string): string {
@@ -94,7 +99,7 @@ function colorizeUrls(text: string): string {
 const title = "Liked Tweets";
 const description = "A curated list of liked posts from X (Twitter).";
 const permalink = Astro.site?.href ? `${Astro.site.href}likes` : "/likes";
-const initialBookmarkCount = likedTweets.filter(t => t.is_bookmark).length;
+const initialBookmarkCount = likedTweets.filter((t) => t.is_bookmark).length;
 ---
 
 <BaseLayout
@@ -104,7 +109,10 @@ const initialBookmarkCount = likedTweets.filter(t => t.is_bookmark).length;
     current="likes"
 >
     <div class="container">
-        <h1 id="page-title">My <span id="title-count">{initialBookmarkCount}</span> <span id="title-text">Bookmarked Tweets</span></h1>
+        <h1 id="page-title">
+            My <span id="title-count">{initialBookmarkCount}</span>
+            <span id="title-text">Bookmarked Tweets</span>
+        </h1>
         <p>{description}</p>
         <hr />
 
@@ -202,12 +210,6 @@ const initialBookmarkCount = likedTweets.filter(t => t.is_bookmark).length;
                                     class="tweet-text"
                                     set:html={colorizeUrls(tweet.text)}
                                 />
-                            </div>
-
-                            <div class="tweet-meta">
-                                <span class="tweet-date">
-                                    {formatDate(tweet.created_at)}
-                                </span>
                             </div>
                         </a>
                     );
@@ -486,21 +488,6 @@ const initialBookmarkCount = likedTweets.filter(t => t.is_bookmark).length;
         color: var(--primary-color);
     }
 
-    .tweet-meta {
-        display: flex;
-        align-items: center;
-        font-size: 0.85em;
-        color: var(--text-secondary);
-        margin-top: auto;
-        padding-top: 0.5rem;
-    }
-
-    .tweet-date {
-        font-weight: 500;
-        font-size: 0.85em;
-        color: var(--text-secondary);
-    }
-
     .footnote {
         font-size: 0.85em;
         color: var(--text-secondary);
@@ -727,8 +714,12 @@ const initialBookmarkCount = likedTweets.filter(t => t.is_bookmark).length;
             if (titleCountSpan && titleTextSpan) {
                 titleCountSpan.textContent = String(totalItems);
 
-                const bmActive = document.getElementById("filter-bookmarks")?.classList.contains("active");
-                const lkActive = document.getElementById("filter-likes")?.classList.contains("active");
+                const bmActive = document
+                    .getElementById("filter-bookmarks")
+                    ?.classList.contains("active");
+                const lkActive = document
+                    .getElementById("filter-likes")
+                    ?.classList.contains("active");
 
                 if (bmActive && !lkActive) {
                     titleTextSpan.textContent = "Bookmarked Tweets";
