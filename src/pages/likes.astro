@@ -1,0 +1,961 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import { createClient } from "@supabase/supabase-js";
+import { Heart, Search, Bookmark, Twitter } from "lucide-react";
+
+interface Tweet {
+    id: string;
+    text: string;
+    created_at: string;
+    is_like: boolean;
+    is_bookmark: boolean;
+}
+
+const supabaseUrl = import.meta.env.SUPABASE_URL || "SUPABASE_URL";
+const supabaseAnonKey =
+    import.meta.env.SUPABASE_ANON_KEY || "SUPABASE_ANON_KEY";
+
+const supabase = createClient(supabaseUrl, supabaseAnonKey);
+
+async function getLikedTweets(): Promise<Tweet[]> {
+    const CHUNK_SIZE = 1000;
+    let allData: any[] = [];
+    let offset = 0;
+    let keepFetching = true;
+
+    while (keepFetching) {
+        const { data, error } = await supabase
+            .from("x_tweets")
+            .select("id, text, created_at, is_like, is_bookmark")
+            .or("is_like.eq.true,is_bookmark.eq.true")
+            .order("created_at", { ascending: false })
+            .range(offset, offset + CHUNK_SIZE - 1);
+
+        if (error) {
+            console.error("Error fetching liked tweets:", error);
+            break;
+        }
+
+        if (data && data.length > 0) {
+            allData = allData.concat(data);
+            if (data.length < CHUNK_SIZE) {
+                keepFetching = false;
+            } else {
+                offset += CHUNK_SIZE;
+            }
+        } else {
+            keepFetching = false;
+        }
+    }
+
+    return allData.map((tweet) => ({
+        id: tweet.id,
+        text: tweet.text || "",
+        created_at: tweet.created_at,
+        is_like: tweet.is_like || false,
+        is_bookmark: tweet.is_bookmark || false,
+    }));
+}
+
+const likedTweets = await getLikedTweets();
+
+let lastUpdateDate = "Unknown";
+if (likedTweets.length > 0) {
+    const latestDate = new Date(likedTweets[0].created_at);
+    lastUpdateDate = latestDate.toLocaleDateString("en-GB", {
+        year: "numeric",
+        month: "short",
+        day: "numeric",
+    });
+}
+
+function formatDate(dateString: string | null): string {
+    if (!dateString) return "N/A";
+    try {
+        return new Date(dateString).toLocaleDateString("en-US", {
+            year: "numeric",
+            month: "short",
+            day: "numeric",
+        });
+    } catch (e) {
+        return "Invalid Date";
+    }
+}
+
+// Formatting text to visually differentiate URLs without breaking <a> tag bounds
+function colorizeUrls(text: string): string {
+    if (!text) return "";
+    return text.replace(
+        /(https?:\/\/[^\s]+)/g,
+        '<span class="tweet-url-text">$1</span>',
+    );
+}
+
+const title = "Liked Tweets";
+const description = "A curated list of liked posts from X (Twitter).";
+const permalink = Astro.site?.href ? `${Astro.site.href}likes` : "/likes";
+const initialBookmarkCount = likedTweets.filter(t => t.is_bookmark).length;
+---
+
+<BaseLayout
+    title={title}
+    description={description}
+    permalink={permalink ?? "/"}
+    current="likes"
+>
+    <div class="container">
+        <h1 id="page-title">My <span id="title-count">{initialBookmarkCount}</span> <span id="title-text">Bookmarked Tweets</span></h1>
+        <p>{description}</p>
+        <hr />
+
+        {
+            likedTweets.length > 0 && (
+                <div
+                    class="likes-toolbar"
+                    role="search"
+                    aria-label="Filter liked tweets"
+                >
+                    <div class="likes-toolbar-field likes-search-wrap">
+                        <span class="likes-search-icon" aria-hidden="true">
+                            <Search size={18} strokeWidth={2} />
+                        </span>
+                        <input
+                            type="search"
+                            id="likes-search"
+                            class="likes-input likes-input--with-icon"
+                            placeholder="Search tweet text…"
+                            aria-label="Search by tweet text"
+                            autocomplete="off"
+                            spellcheck="false"
+                        />
+                    </div>
+                    <div class="likes-filter-toggles">
+                        <button
+                            type="button"
+                            id="filter-bookmarks"
+                            class="filter-toggle"
+                            aria-pressed="true"
+                        >
+                            <Bookmark size={16} />
+                            <span class="filter-text">Bookmarks</span>
+                        </button>
+                        <button
+                            type="button"
+                            id="filter-likes"
+                            class="filter-toggle"
+                            aria-pressed="false"
+                        >
+                            <Heart size={16} />
+                            <span class="filter-text">Likes</span>
+                        </button>
+                    </div>
+                </div>
+            )
+        }
+
+        <div class="tweet-grid">
+            {
+                likedTweets.map((tweet) => {
+                    const searchBlob = (tweet.text ?? "").toLowerCase().trim();
+                    const viewUrl = `https://x.com/i/web/status/${tweet.id}`;
+
+                    return (
+                        <a
+                            href={viewUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            class="tweet-card"
+                            data-search-text={searchBlob}
+                            data-is-bookmark={String(tweet.is_bookmark)}
+                            data-is-like={String(tweet.is_like)}
+                        >
+                            <div class="tweet-card-header">
+                                <span
+                                    class="twitter-icon-wrap"
+                                    aria-hidden="true"
+                                >
+                                    <Twitter
+                                        size={18}
+                                        className="twitter-bird"
+                                    />
+                                </span>
+                                <span class="tweet-status-icons">
+                                    {tweet.is_like && (
+                                        <Heart
+                                            size={16}
+                                            aria-hidden="true"
+                                            className="heart-icon"
+                                        />
+                                    )}
+                                    {tweet.is_bookmark && (
+                                        <Bookmark
+                                            size={16}
+                                            aria-hidden="true"
+                                            className="bookmark-icon"
+                                        />
+                                    )}
+                                </span>
+                            </div>
+
+                            <div class="tweet-content-container">
+                                <p
+                                    class="tweet-text"
+                                    set:html={colorizeUrls(tweet.text)}
+                                />
+                            </div>
+
+                            <div class="tweet-meta">
+                                <span class="tweet-date">
+                                    {formatDate(tweet.created_at)}
+                                </span>
+                            </div>
+                        </a>
+                    );
+                })
+            }
+        </div>
+
+        <!-- Pagination Controls -->
+        {
+            likedTweets.length > 0 && (
+                <div class="pagination-controls">
+                    <a
+                        id="prev-button"
+                        href="#"
+                        class="nav-button disabled"
+                        aria-disabled="true"
+                    >
+                        Prev
+                    </a>
+                    <div class="page-select-container">
+                        <span class="mr-1">Page</span>
+                        <select
+                            id="page-select"
+                            class="page-select"
+                            disabled
+                            aria-label="Select page number"
+                        >
+                            <option value="1">1</option>
+                        </select>
+                        <span id="page-total-span">of ?</span>
+                    </div>
+                    <a
+                        id="next-button"
+                        href="#"
+                        class="nav-button disabled"
+                        aria-disabled="true"
+                    >
+                        Next
+                    </a>
+                </div>
+            )
+        }
+
+        <hr class="mt-8" />
+
+        <p class="footnote text-sm">
+            This list is automatically updated daily (latest: {lastUpdateDate}).
+        </p>
+    </div>
+</BaseLayout>
+
+<style>
+    .container h1 {
+        margin-block-start: 1em;
+        margin-block-end: 0.5em;
+    }
+    .container > p:first-of-type {
+        margin-block-end: 1.5em;
+    }
+
+    .likes-toolbar {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 1rem 1.5rem;
+        margin-block: 1.25rem 0.5rem;
+    }
+
+    .likes-toolbar-field {
+        min-width: min(100%, 300px);
+        flex: 1 1 300px;
+    }
+
+    .likes-search-wrap {
+        position: relative;
+        display: block;
+    }
+
+    .likes-filter-toggles {
+        display: flex;
+        gap: 0.5rem;
+        margin-left: auto;
+    }
+
+    .filter-toggle {
+        display: flex;
+        align-items: center;
+        gap: 0.35rem;
+        padding: 0.4rem 0.75rem;
+        border: 1px solid var(--border-color);
+        border-radius: 6px;
+        background-color: var(--background-body);
+        color: var(--text-secondary);
+        font-family: var(--font-family-sans);
+        font-size: 0.9em;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.2s ease;
+    }
+
+    .filter-toggle:hover {
+        border-color: var(--primary-color);
+        color: var(--primary-color);
+    }
+
+    .filter-toggle.active {
+        background-color: color-mix(
+            in srgb,
+            var(--primary-color) 15%,
+            transparent
+        );
+        border-color: var(--primary-color);
+        color: var(--primary-color);
+    }
+
+    #filter-likes:hover {
+        border-color: #f91880;
+        color: #f91880;
+    }
+
+    #filter-likes.active {
+        background-color: color-mix(in srgb, #f91880 15%, transparent);
+        border-color: #f91880;
+        color: #f91880;
+    }
+
+    .filter-toggle svg {
+        fill: transparent;
+        transition: fill 0.2s ease;
+    }
+
+    .filter-toggle.active svg {
+        fill: currentColor;
+    }
+
+    @media (max-width: 480px) {
+        .filter-text {
+            display: none;
+        }
+        .filter-toggle {
+            padding: 0.4rem 0.6rem;
+        }
+    }
+
+    .likes-search-icon {
+        position: absolute;
+        left: 0.65rem;
+        top: 50%;
+        transform: translateY(-50%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--text-secondary);
+        pointer-events: none;
+    }
+
+    .likes-search-icon :global(svg) {
+        display: block;
+    }
+
+    .likes-input {
+        width: 100%;
+        padding: 0.5rem 0.65rem;
+        font-size: 0.95rem;
+        font-family: var(--font-family-sans);
+        color: var(--text-main);
+        background-color: var(--background-body);
+        border: 1px solid var(--border-color);
+        border-radius: 6px;
+        outline: none;
+        transition: border-color 0.15s ease;
+    }
+
+    .likes-input--with-icon {
+        padding-left: 2.35rem;
+    }
+
+    .likes-input:focus {
+        border-color: var(--primary-color);
+    }
+
+    .likes-search-wrap:focus-within .likes-search-icon {
+        color: var(--primary-color);
+    }
+
+    .tweet-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+        gap: 1.5rem;
+        margin-block: 2em;
+    }
+
+    .tweet-card {
+        display: flex;
+        flex-direction: column;
+        border: 1px solid var(--border-color);
+        border-radius: 8px;
+        padding: 1.25rem;
+        text-decoration: none;
+        color: inherit;
+        background-color: var(--background-alt);
+        transition:
+            transform 0.2s ease-in-out,
+            box-shadow 0.2s ease-in-out;
+        height: 100%;
+    }
+
+    .tweet-card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        border-color: var(--primary-color);
+    }
+
+    .tweet-card-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 0.5rem;
+        margin-bottom: 0.75rem;
+    }
+
+    .twitter-bird {
+        color: var(--text-secondary);
+        transition:
+            color 0.2s ease,
+            fill 0.2s ease;
+    }
+
+    .tweet-card:hover .twitter-bird {
+        color: var(--primary-color);
+        fill: var(--primary-color);
+    }
+
+    .tweet-status-icons {
+        display: flex;
+        align-items: center;
+        gap: 0.35rem;
+    }
+
+    .heart-icon {
+        color: #f91880;
+        fill: transparent;
+        transition: fill 0.2s ease;
+    }
+
+    .bookmark-icon {
+        color: var(--primary-color);
+        fill: transparent;
+        transition: fill 0.2s ease;
+    }
+
+    .tweet-card:hover .heart-icon {
+        fill: #f91880;
+    }
+
+    .tweet-card:hover .bookmark-icon {
+        fill: var(--primary-color);
+    }
+
+    .tweet-content-container {
+        flex-grow: 1;
+        margin-bottom: 1rem;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .tweet-text {
+        font-size: 0.95em;
+        line-height: 1.5;
+        white-space: pre-wrap;
+        word-break: break-word;
+        margin: 0;
+    }
+
+    :global(.tweet-url-text) {
+        color: var(--primary-color);
+    }
+
+    .tweet-meta {
+        display: flex;
+        align-items: center;
+        font-size: 0.85em;
+        color: var(--text-secondary);
+        margin-top: auto;
+        padding-top: 0.5rem;
+    }
+
+    .tweet-date {
+        font-weight: 500;
+        font-size: 0.85em;
+        color: var(--text-secondary);
+    }
+
+    .footnote {
+        font-size: 0.85em;
+        color: var(--text-secondary);
+        margin-top: 2em;
+        text-align: left;
+    }
+
+    /* Pagination Styles */
+    .pagination-controls {
+        display: flex;
+        flex-direction: row;
+        flex-wrap: nowrap;
+        justify-content: center;
+        align-items: center;
+        gap: 1rem;
+        margin: 2em 0;
+        font-family: var(--font-family-sans);
+    }
+
+    .nav-button {
+        color: var(--text-secondary);
+        font-size: 0.9em;
+        font-weight: bold;
+        text-decoration: none;
+        transition: all 0.2s ease-in-out;
+        box-shadow: inset 0 -0.12em 0 var(--primary-color);
+        padding: 0.2em 0.1em;
+    }
+
+    .nav-button:hover {
+        box-shadow: inset 0 -1.5em 0 var(--primary-color);
+        color: #fff;
+    }
+
+    .nav-button.disabled,
+    .nav-button[aria-disabled="true"] {
+        opacity: 0.5;
+        cursor: not-allowed;
+        pointer-events: none;
+        box-shadow: inset 0 -0.12em 0 var(--text-secondary);
+    }
+
+    .nav-button.disabled:hover,
+    .nav-button[aria-disabled="true"]:hover {
+        color: var(--text-secondary);
+        box-shadow: inset 0 -0.12em 0 var(--text-secondary);
+    }
+
+    .page-select-container {
+        display: flex;
+        align-items: center;
+        font-size: 0.9em;
+        white-space: nowrap;
+    }
+
+    .page-select {
+        padding: 0.25rem;
+        font-size: 0.9em;
+        background-color: var(--background-body);
+        color: var(--text-main);
+        border: none;
+        outline: none;
+        border-radius: 4px;
+        text-align: center;
+        margin: 0;
+    }
+
+    .page-select:disabled {
+        opacity: 0.7;
+        cursor: not-allowed;
+    }
+
+    #page-total-span {
+        margin-left: 0.5em;
+    }
+</style>
+
+<style is:global>
+    #page-select::-webkit-scrollbar {
+        width: 5px;
+    }
+    #page-select::-webkit-scrollbar-track {
+        background: transparent;
+    }
+    #page-select::-webkit-scrollbar-thumb {
+        background-color: var(--text-secondary);
+        border-radius: 10px;
+        border: none;
+    }
+    #page-select {
+        scrollbar-width: thin;
+        scrollbar-color: var(--text-secondary) transparent;
+    }
+</style>
+
+<script>
+    declare global {
+        interface Window {
+            _popstateHandledLikes?: boolean;
+        }
+    }
+
+    function cardMatchesFilters(card: Element, query: string): boolean {
+        if (query) {
+            const haystack = (
+                card.getAttribute("data-search-text") || ""
+            ).toLowerCase();
+            if (!haystack.includes(query)) return false;
+        }
+
+        const showBookmarks = document
+            .getElementById("filter-bookmarks")
+            ?.classList.contains("active");
+        const showLikes = document
+            .getElementById("filter-likes")
+            ?.classList.contains("active");
+
+        const isBookmark = card.getAttribute("data-is-bookmark") === "true";
+        const isLike = card.getAttribute("data-is-like") === "true";
+
+        if (showBookmarks && isBookmark) return true;
+        if (showLikes && isLike) return true;
+        if (showBookmarks || showLikes) return false;
+
+        return true;
+    }
+
+    function initializePagination() {
+        console.log("Initializing likes pagination...");
+
+        const tweetGrid = document.querySelector(".tweet-grid");
+        const prevButton = document.getElementById(
+            "prev-button",
+        ) as HTMLAnchorElement;
+        const nextButton = document.getElementById(
+            "next-button",
+        ) as HTMLAnchorElement;
+        const pageSelect = document.getElementById(
+            "page-select",
+        ) as HTMLSelectElement;
+        const pageTotalSpan = document.getElementById("page-total-span");
+        const paginationControls = document.querySelector(
+            ".pagination-controls",
+        ) as HTMLElement | null;
+        const searchInput = document.getElementById(
+            "likes-search",
+        ) as HTMLInputElement | null;
+
+        if (
+            !tweetGrid ||
+            !prevButton ||
+            !nextButton ||
+            !pageSelect ||
+            !pageTotalSpan ||
+            !paginationControls
+        ) {
+            console.error(
+                "Pagination elements missing. Aborting initialization.",
+            );
+            if (paginationControls) paginationControls.style.display = "none";
+            return;
+        }
+
+        const itemsPerPage = 30;
+        const allTweets = Array.from(tweetGrid.children).filter((el) =>
+            el.classList.contains("tweet-card"),
+        );
+
+        const urlParams = new URLSearchParams(window.location.search);
+        let currentPage = parseInt(urlParams.get("page") || "1", 10);
+
+        const filterBookmarksBtn = document.getElementById("filter-bookmarks");
+        const filterLikesBtn = document.getElementById("filter-likes");
+
+        const hasBookmarksParam = urlParams.has("bookmarks");
+        const hasLikesParam = urlParams.has("likes");
+
+        if (hasBookmarksParam || hasLikesParam) {
+            if (filterBookmarksBtn)
+                filterBookmarksBtn.classList.toggle(
+                    "active",
+                    urlParams.get("bookmarks") === "true",
+                );
+            if (filterLikesBtn)
+                filterLikesBtn.classList.toggle(
+                    "active",
+                    urlParams.get("likes") === "true",
+                );
+        } else {
+            if (filterBookmarksBtn)
+                filterBookmarksBtn.classList.toggle("active", true);
+            if (filterLikesBtn)
+                filterLikesBtn.classList.toggle("active", false);
+        }
+
+        const initialSearch = urlParams.get("search");
+        if (initialSearch && searchInput) {
+            searchInput.value = initialSearch;
+        }
+
+        let searchDebounce: ReturnType<typeof setTimeout> | null = null;
+
+        function getFilterQuery(): string {
+            return (searchInput?.value || "").trim().toLowerCase();
+        }
+
+        function getFilteredTweets(): Element[] {
+            const q = getFilterQuery();
+            return allTweets.filter((c) => cardMatchesFilters(c, q));
+        }
+
+        function updatePageDisplay() {
+            if (!paginationControls || !pageSelect || !pageTotalSpan) return;
+
+            const filtered = getFilteredTweets();
+            const totalItems = filtered.length;
+            const totalPages = Math.ceil(totalItems / itemsPerPage) || 1;
+
+            currentPage = Math.max(1, Math.min(currentPage, totalPages));
+
+            const titleCountSpan = document.getElementById("title-count");
+            const titleTextSpan = document.getElementById("title-text");
+
+            if (titleCountSpan && titleTextSpan) {
+                titleCountSpan.textContent = String(totalItems);
+
+                const bmActive = document.getElementById("filter-bookmarks")?.classList.contains("active");
+                const lkActive = document.getElementById("filter-likes")?.classList.contains("active");
+
+                if (bmActive && !lkActive) {
+                    titleTextSpan.textContent = "Bookmarked Tweets";
+                } else if (!bmActive && lkActive) {
+                    titleTextSpan.textContent = "Liked Tweets";
+                } else if (bmActive && lkActive) {
+                    titleTextSpan.textContent = "Bookmarked & Liked Tweets";
+                } else {
+                    titleTextSpan.textContent = "Saved Tweets";
+                }
+            }
+
+            if (allTweets.length === 0) {
+                paginationControls.style.display = "none";
+                return;
+            }
+            paginationControls.style.display = "flex";
+
+            const startIndex = (currentPage - 1) * itemsPerPage;
+            const endIndex = startIndex + itemsPerPage;
+            const pageSlice = filtered.slice(startIndex, endIndex);
+            const showSet = new Set(pageSlice);
+            const filteredSet = new Set(filtered);
+
+            allTweets.forEach((tweet) => {
+                const el = tweet as HTMLElement;
+                if (!filteredSet.has(tweet)) {
+                    el.style.display = "none";
+                    return;
+                }
+                el.style.display = showSet.has(tweet) ? "flex" : "none";
+            });
+
+            prevButton.setAttribute("aria-disabled", String(currentPage === 1));
+            prevButton.classList.toggle("disabled", currentPage === 1);
+            nextButton.setAttribute(
+                "aria-disabled",
+                String(currentPage === totalPages),
+            );
+            nextButton.classList.toggle("disabled", currentPage === totalPages);
+
+            if (
+                pageSelect.options.length !== totalPages ||
+                parseInt(pageSelect.value, 10) !== currentPage
+            ) {
+                pageSelect.innerHTML = "";
+                for (let i = 1; i <= totalPages; i++) {
+                    const option = document.createElement("option");
+                    option.value = String(i);
+                    option.textContent = String(i);
+                    if (i === currentPage) option.selected = true;
+                    pageSelect.appendChild(option);
+                }
+            } else {
+                pageSelect.value = String(currentPage);
+            }
+            pageSelect.disabled = totalPages <= 1;
+
+            pageTotalSpan.innerHTML = `of&nbsp;&nbsp;&nbsp;${totalPages}`;
+        }
+
+        function updateUrl() {
+            const url = new URL(window.location.href);
+            url.searchParams.set("page", currentPage.toString());
+
+            const query = getFilterQuery();
+            if (query) {
+                url.searchParams.set("search", query);
+            } else {
+                url.searchParams.delete("search");
+            }
+
+            const filterBookmarksBtn =
+                document.getElementById("filter-bookmarks");
+            const filterLikesBtn = document.getElementById("filter-likes");
+            if (filterBookmarksBtn && filterLikesBtn) {
+                const bmActive =
+                    filterBookmarksBtn.classList.contains("active");
+                const lkActive = filterLikesBtn.classList.contains("active");
+                if (bmActive !== true || lkActive !== false) {
+                    url.searchParams.set("bookmarks", String(bmActive));
+                    url.searchParams.set("likes", String(lkActive));
+                } else {
+                    url.searchParams.delete("bookmarks");
+                    url.searchParams.delete("likes");
+                }
+            }
+
+            if (url.toString() !== window.location.href) {
+                history.pushState({ page: currentPage }, "", url.toString());
+            }
+        }
+
+        function handleFilterToggle(event: Event) {
+            const btn = event.currentTarget as HTMLElement;
+            btn.classList.toggle("active");
+            btn.setAttribute(
+                "aria-pressed",
+                String(btn.classList.contains("active")),
+            );
+
+            currentPage = 1;
+            updateUrl();
+            updatePageDisplay();
+        }
+
+        function handlePrevClick(event: MouseEvent) {
+            event.preventDefault();
+            if (currentPage > 1) {
+                currentPage--;
+                updateUrl();
+                updatePageDisplay();
+            }
+        }
+
+        function handleNextClick(event: MouseEvent) {
+            event.preventDefault();
+            const tp =
+                Math.ceil(getFilteredTweets().length / itemsPerPage) || 1;
+            if (currentPage < tp) {
+                currentPage++;
+                updateUrl();
+                updatePageDisplay();
+            }
+        }
+
+        function handlePageSelectChange(event: Event) {
+            const target = event.target as HTMLSelectElement;
+            const tp =
+                Math.ceil(getFilteredTweets().length / itemsPerPage) || 1;
+            const newPage = parseInt(target.value, 10);
+            if (!isNaN(newPage) && newPage >= 1 && newPage <= tp) {
+                currentPage = newPage;
+                updateUrl();
+                updatePageDisplay();
+            }
+        }
+
+        function handleSearchInput() {
+            if (searchDebounce) clearTimeout(searchDebounce);
+            searchDebounce = setTimeout(() => {
+                currentPage = 1;
+                updateUrl();
+                updatePageDisplay();
+            }, 200);
+        }
+
+        prevButton.removeEventListener(
+            "click",
+            handlePrevClick as EventListener,
+        );
+        prevButton.addEventListener("click", handlePrevClick as EventListener);
+
+        nextButton.removeEventListener(
+            "click",
+            handleNextClick as EventListener,
+        );
+        nextButton.addEventListener("click", handleNextClick as EventListener);
+
+        pageSelect.removeEventListener("change", handlePageSelectChange);
+        pageSelect.addEventListener("change", handlePageSelectChange);
+
+        if (searchInput) {
+            searchInput.removeEventListener("input", handleSearchInput);
+            searchInput.addEventListener("input", handleSearchInput);
+        }
+
+        if (filterBookmarksBtn) {
+            filterBookmarksBtn.removeEventListener("click", handleFilterToggle);
+            filterBookmarksBtn.addEventListener("click", handleFilterToggle);
+        }
+        if (filterLikesBtn) {
+            filterLikesBtn.removeEventListener("click", handleFilterToggle);
+            filterLikesBtn.addEventListener("click", handleFilterToggle);
+        }
+
+        updatePageDisplay();
+
+        const initialUrl = new URL(window.location.href);
+        initialUrl.searchParams.set("page", currentPage.toString());
+
+        const initialQ = getFilterQuery();
+        if (initialQ) {
+            initialUrl.searchParams.set("search", initialQ);
+        } else {
+            initialUrl.searchParams.delete("search");
+        }
+
+        if (filterBookmarksBtn && filterLikesBtn) {
+            const bmActive = filterBookmarksBtn.classList.contains("active");
+            const lkActive = filterLikesBtn.classList.contains("active");
+            if (bmActive !== true || lkActive !== false) {
+                initialUrl.searchParams.set("bookmarks", String(bmActive));
+                initialUrl.searchParams.set("likes", String(lkActive));
+            } else {
+                initialUrl.searchParams.delete("bookmarks");
+                initialUrl.searchParams.delete("likes");
+            }
+        }
+
+        if (initialUrl.toString() !== window.location.href) {
+            history.replaceState(
+                { page: currentPage },
+                "",
+                initialUrl.toString(),
+            );
+        }
+    }
+
+    document.addEventListener("astro:page-load", () => {
+        if (
+            window.location.pathname === "/likes" ||
+            window.location.pathname === "/likes/"
+        ) {
+            initializePagination();
+        }
+    });
+
+    if (!window._popstateHandledLikes) {
+        window.addEventListener("popstate", () => {
+            if (
+                window.location.pathname === "/likes" ||
+                window.location.pathname === "/likes/"
+            ) {
+                window.location.reload();
+            }
+        });
+        window._popstateHandledLikes = true;
+    }
+</script>

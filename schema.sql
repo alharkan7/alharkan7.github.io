@@ -46,4 +46,25 @@ CREATE TABLE chrome_bookmarks (
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
 
+-- Table: x_tweets
+DROP TABLE IF EXISTS x_tweets;
+CREATE TABLE x_tweets (
+    id TEXT PRIMARY KEY,
+    is_bookmark BOOLEAN DEFAULT FALSE,
+    is_like BOOLEAN DEFAULT FALSE,
+    author_id TEXT,
+    text TEXT,
+    created_at TIMESTAMP WITH TIME ZONE,
+    edit_history_tweet_ids TEXT[],
+    retweet_count INTEGER DEFAULT 0,
+    reply_count INTEGER DEFAULT 0,
+    like_count INTEGER DEFAULT 0,
+    quote_count INTEGER DEFAULT 0,
+    bookmark_count INTEGER DEFAULT 0,
+    impression_count INTEGER DEFAULT 0,
+    article_title TEXT,
+    entities JSONB,
+    synced_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+);
+
 PRAGMA foreign_keys=ON; 
