@@ -6,8 +6,8 @@ import requests
 from urllib.parse import urlencode, urlparse, parse_qs
 
 # Your keys from .env
-X_CLIENT_ID = os.getenv("X_CLIENT_ID", "VXJfVHhfWjhkNVRPZl80S2VPdEE6MTpjaQ")
-X_CLIENT_SECRET = os.getenv("X_CLIENT_SECRET", "VfvdqZQnU1tHMDuwlRElNZROnbZpNLHwnNrU0rFNTqp8q9E5Ha")
+X_CLIENT_ID = os.getenv("X_CLIENT_ID", "")
+X_CLIENT_SECRET = os.getenv("X_CLIENT_SECRET", "")
 
 # Twitter requires a valid redirect URI that matches what is in your Developer Portal!
 # If you used a Streamlit app before, it might have been http://localhost:8501 or similar.
