@@ -1,7 +1,7 @@
 ---
 import BaseLayout from "../layouts/BaseLayout.astro";
 import { createClient } from "@supabase/supabase-js";
-import { Heart, Search, Bookmark, Twitter } from "lucide-react";
+import { Heart, Search, Bookmark, Twitter, MessageCircle, Repeat } from "lucide-react";
 
 interface Tweet {
     id: string;
@@ -9,6 +9,9 @@ interface Tweet {
     created_at: string;
     is_like: boolean;
     is_bookmark: boolean;
+    reply_count: number;
+    like_count: number;
+    retweet_count: number;
 }
 
 const supabaseUrl = import.meta.env.SUPABASE_URL || "SUPABASE_URL";
@@ -26,7 +29,7 @@ async function getLikedTweets(): Promise<Tweet[]> {
     while (keepFetching) {
         const { data, error } = await supabase
             .from("x_tweets")
-            .select("id, text, created_at, is_like, is_bookmark")
+            .select("id, text, created_at, is_like, is_bookmark, reply_count, like_count, retweet_count")
             .or("is_like.eq.true,is_bookmark.eq.true")
             .order("created_at", { ascending: false })
             .range(offset, offset + CHUNK_SIZE - 1);
@@ -70,6 +73,9 @@ async function getLikedTweets(): Promise<Tweet[]> {
             created_at: tweet.created_at,
             is_like: tweet.is_like || false,
             is_bookmark: tweet.is_bookmark || false,
+            reply_count: tweet.reply_count || 0,
+            like_count: tweet.like_count || 0,
+            retweet_count: tweet.retweet_count || 0,
         }));
 }
 
@@ -211,6 +217,29 @@ const initialBookmarkCount = likedTweets.filter((t) => t.is_bookmark).length;
                                     set:html={colorizeUrls(tweet.text)}
                                 />
                             </div>
+
+                            {(tweet.reply_count > 0 || tweet.retweet_count > 0 || tweet.like_count > 0) && (
+                                <div class="tweet-stats">
+                                    {tweet.reply_count > 0 && (
+                                        <div class="tweet-stat" title={`${tweet.reply_count} Replies`}>
+                                            <MessageCircle size={14} aria-hidden="true" />
+                                            <span>{tweet.reply_count}</span>
+                                        </div>
+                                    )}
+                                    {tweet.retweet_count > 0 && (
+                                        <div class="tweet-stat" title={`${tweet.retweet_count} Retweets`}>
+                                            <Repeat size={14} aria-hidden="true" />
+                                            <span>{tweet.retweet_count}</span>
+                                        </div>
+                                    )}
+                                    {tweet.like_count > 0 && (
+                                        <div class="tweet-stat" title={`${tweet.like_count} Likes`}>
+                                            <Heart size={14} aria-hidden="true" />
+                                            <span>{tweet.like_count}</span>
+                                        </div>
+                                    )}
+                                </div>
+                            )}
                         </a>
                     );
                 })
@@ -490,6 +519,23 @@ const initialBookmarkCount = likedTweets.filter((t) => t.is_bookmark).length;
 
     :global(.tweet-url-text) {
         color: var(--primary-color);
+    }
+
+    .tweet-stats {
+        display: flex;
+        align-items: center;
+        gap: 1.25rem;
+        margin-top: auto;
+        padding-top: 0.75rem;
+        border-top: 1px solid var(--border-color);
+        color: var(--text-secondary);
+        font-size: 0.85em;
+    }
+
+    .tweet-stat {
+        display: flex;
+        align-items: center;
+        gap: 0.35rem;
     }
 
     .footnote {
