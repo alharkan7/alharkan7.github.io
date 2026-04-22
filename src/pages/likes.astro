@@ -272,15 +272,15 @@ const initialBookmarkCount = likedTweets.filter((t) => t.is_bookmark).length;
 
     .likes-toolbar {
         display: flex;
-        flex-wrap: wrap;
+        flex-wrap: nowrap;
         align-items: center;
-        gap: 1rem 1.5rem;
+        gap: 1rem;
         margin-block: 1.25rem 0.5rem;
     }
 
     .likes-toolbar-field {
-        min-width: min(100%, 300px);
-        flex: 1 1 300px;
+        min-width: 0;
+        flex: 1;
     }
 
     .likes-search-wrap {
@@ -292,6 +292,7 @@ const initialBookmarkCount = likedTweets.filter((t) => t.is_bookmark).length;
         display: flex;
         gap: 0.5rem;
         margin-left: auto;
+        flex-shrink: 0;
     }
 
     .filter-toggle {
