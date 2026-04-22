@@ -1,7 +1,7 @@
 ---
 import BaseLayout from "../layouts/BaseLayout.astro";
 import { createClient } from "@supabase/supabase-js";
-import { Heart, Search, Bookmark, Twitter } from "lucide-react";
+import { Heart, Search, Bookmark, Twitter, Repeat } from "lucide-react";
 
 interface Tweet {
     id: string;
@@ -9,6 +9,7 @@ interface Tweet {
     created_at: string;
     is_like: boolean;
     is_bookmark: boolean;
+    is_retweet: boolean;
 }
 
 const supabaseUrl = import.meta.env.SUPABASE_URL || "SUPABASE_URL";
@@ -17,7 +18,7 @@ const supabaseAnonKey =
 
 const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
-async function getLikedTweets(): Promise<Tweet[]> {
+async function getSavedTweets(): Promise<Tweet[]> {
     const CHUNK_SIZE = 1000;
     let allData: any[] = [];
     let offset = 0;
@@ -26,8 +27,8 @@ async function getLikedTweets(): Promise<Tweet[]> {
     while (keepFetching) {
         const { data, error } = await supabase
             .from("x_tweets")
-            .select("id, text, created_at, is_like, is_bookmark")
-            .or("is_like.eq.true,is_bookmark.eq.true")
+            .select("id, text, created_at, is_like, is_bookmark, is_retweet")
+            .or("is_like.eq.true,is_bookmark.eq.true,is_retweet.eq.true")
             .order("created_at", { ascending: false })
             .range(offset, offset + CHUNK_SIZE - 1);
 
@@ -70,14 +71,15 @@ async function getLikedTweets(): Promise<Tweet[]> {
             created_at: tweet.created_at,
             is_like: tweet.is_like || false,
             is_bookmark: tweet.is_bookmark || false,
+            is_retweet: tweet.is_retweet || false,
         }));
 }
 
-const likedTweets = await getLikedTweets();
+const savedTweets = await getSavedTweets();
 
 let lastUpdateDate = "Unknown";
-if (likedTweets.length > 0) {
-    const latestDate = new Date(likedTweets[0].created_at);
+if (savedTweets.length > 0) {
+    const latestDate = new Date(savedTweets[0].created_at);
     lastUpdateDate = latestDate.toLocaleDateString("en-GB", {
         year: "numeric",
         month: "short",
@@ -96,53 +98,54 @@ function colorizeUrls(text: string): string {
     );
 }
 
-const title = "Liked Tweets";
-const description = "A curated list of liked posts from X (Twitter).";
-const permalink = Astro.site?.href ? `${Astro.site.href}likes` : "/likes";
-const initialBookmarkCount = likedTweets.filter((t) => t.is_bookmark).length;
+const title = "Saved Tweets";
+const description =
+    "A curated list of liked, bookmarked, and retweeted posts from Twitter.";
+const permalink = Astro.site?.href ? `${Astro.site.href}tweets` : "/tweets";
+const initialRetweetCount = savedTweets.filter((t) => t.is_retweet).length;
 ---
 
 <BaseLayout
     title={title}
     description={description}
     permalink={permalink ?? "/"}
-    current="likes"
+    current="tweets"
 >
     <div class="container">
         <h1 id="page-title">
-            My <span id="title-count">{initialBookmarkCount}</span>
-            <span id="title-text">Bookmarked Tweets</span>
+            My <span id="title-count">{initialRetweetCount}</span>
+            <span id="title-text">Retweets</span>
         </h1>
         <p>{description}</p>
         <hr />
 
         {
-            likedTweets.length > 0 && (
+            savedTweets.length > 0 && (
                 <div
-                    class="likes-toolbar"
+                    class="tweets-toolbar"
                     role="search"
-                    aria-label="Filter liked tweets"
+                    aria-label="Filter saved tweets"
                 >
-                    <div class="likes-toolbar-field likes-search-wrap">
-                        <span class="likes-search-icon" aria-hidden="true">
+                    <div class="tweets-toolbar-field tweets-search-wrap">
+                        <span class="tweets-search-icon" aria-hidden="true">
                             <Search size={18} strokeWidth={2} />
                         </span>
                         <input
                             type="search"
-                            id="likes-search"
-                            class="likes-input likes-input--with-icon"
+                            id="tweets-search"
+                            class="tweets-input tweets-input--with-icon"
                             placeholder="Search tweet text…"
                             aria-label="Search by tweet text"
                             autocomplete="off"
                             spellcheck="false"
                         />
                     </div>
-                    <div class="likes-filter-toggles">
+                    <div class="tweets-filter-toggles">
                         <button
                             type="button"
                             id="filter-bookmarks"
                             class="filter-toggle"
-                            aria-pressed="true"
+                            aria-pressed="false"
                         >
                             <Bookmark size={16} />
                             <span class="filter-text">Bookmarks</span>
@@ -156,6 +159,15 @@ const initialBookmarkCount = likedTweets.filter((t) => t.is_bookmark).length;
                             <Heart size={16} />
                             <span class="filter-text">Likes</span>
                         </button>
+                        <button
+                            type="button"
+                            id="filter-retweets"
+                            class="filter-toggle"
+                            aria-pressed="true"
+                        >
+                            <Repeat size={16} />
+                            <span class="filter-text">Retweets</span>
+                        </button>
                     </div>
                 </div>
             )
@@ -163,63 +175,97 @@ const initialBookmarkCount = likedTweets.filter((t) => t.is_bookmark).length;
 
         <div class="tweet-grid">
             {
-                likedTweets.map((tweet) => {
-                    const searchBlob = (tweet.text ?? "").toLowerCase().trim();
-                    const viewUrl = `https://x.com/i/web/status/${tweet.id}`;
+                (() => {
+                    let retweetCount = 0;
+                    return savedTweets.map((tweet) => {
+                        let displayText = tweet.text ?? "";
+                        let retweetUser = "";
+                        const rtMatch = displayText.match(/^RT\s+@([A-Za-z0-9_]+):\s*/i);
+                        if (rtMatch) {
+                            retweetUser = rtMatch[1];
+                            displayText = displayText.replace(rtMatch[0], "");
+                        }
 
-                    return (
-                        <a
-                            href={viewUrl}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            class="tweet-card"
-                            data-search-text={searchBlob}
-                            data-is-bookmark={String(tweet.is_bookmark)}
-                            data-is-like={String(tweet.is_like)}
-                        >
-                            <div class="tweet-card-header">
-                                <span
-                                    class="twitter-icon-wrap"
-                                    aria-hidden="true"
-                                >
-                                    <Twitter
-                                        size={18}
-                                        className="twitter-bird"
+                        const searchBlob = displayText
+                            .toLowerCase()
+                            .trim();
+                        const viewUrl = `https://x.com/i/web/status/${tweet.id}`;
+
+                        const isDefaultVisible =
+                            tweet.is_retweet && retweetCount < 30;
+                        if (tweet.is_retweet) retweetCount++;
+
+                        return (
+                            <a
+                                href={viewUrl}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                class="tweet-card"
+                                data-search-text={searchBlob}
+                                data-is-bookmark={String(tweet.is_bookmark)}
+                                data-is-like={String(tweet.is_like)}
+                                data-is-retweet={String(tweet.is_retweet)}
+                                style={
+                                    isDefaultVisible
+                                        ? "display: flex;"
+                                        : "display: none;"
+                                }
+                            >
+                                <div class="tweet-card-header">
+                                    <span
+                                        class="twitter-icon-wrap"
+                                        aria-hidden="true"
+                                        style="display: flex; align-items: center; gap: 0.4rem;"
+                                    >
+                                        <Twitter
+                                            size={18}
+                                            className="twitter-bird"
+                                        />
+                                        {retweetUser && (
+                                            <span class="retweet-user">@{retweetUser}</span>
+                                        )}
+                                    </span>
+                                    <span class="tweet-status-icons">
+                                        {tweet.is_like && (
+                                            <Heart
+                                                size={16}
+                                                aria-hidden="true"
+                                                className="heart-icon"
+                                            />
+                                        )}
+                                        {tweet.is_bookmark && (
+                                            <Bookmark
+                                                size={16}
+                                                aria-hidden="true"
+                                                className="bookmark-icon"
+                                            />
+                                        )}
+                                        {tweet.is_retweet && (
+                                            <Repeat
+                                                size={16}
+                                                aria-hidden="true"
+                                                className="retweet-icon"
+                                            />
+                                        )}
+                                    </span>
+                                </div>
+
+                                <div class="tweet-content-container">
+                                    <p
+                                        class="tweet-text"
+                                        set:html={colorizeUrls(displayText)}
                                     />
-                                </span>
-                                <span class="tweet-status-icons">
-                                    {tweet.is_like && (
-                                        <Heart
-                                            size={16}
-                                            aria-hidden="true"
-                                            className="heart-icon"
-                                        />
-                                    )}
-                                    {tweet.is_bookmark && (
-                                        <Bookmark
-                                            size={16}
-                                            aria-hidden="true"
-                                            className="bookmark-icon"
-                                        />
-                                    )}
-                                </span>
-                            </div>
-
-                            <div class="tweet-content-container">
-                                <p
-                                    class="tweet-text"
-                                    set:html={colorizeUrls(tweet.text)}
-                                />
-                            </div>
-                        </a>
-                    );
-                })
+                                </div>
+                            </a>
+                        );
+                    });
+                })()
             }
         </div>
 
         <!-- Pagination Controls -->
         {
-            likedTweets.length > 0 && (
+            savedTweets.length > 0 && (
                 <div class="pagination-controls">
                     <a
                         id="prev-button"
@@ -270,7 +316,7 @@ const initialBookmarkCount = likedTweets.filter((t) => t.is_bookmark).length;
         margin-block-end: 1.5em;
     }
 
-    .likes-toolbar {
+    .tweets-toolbar {
         display: flex;
         flex-wrap: nowrap;
         align-items: stretch;
@@ -278,19 +324,19 @@ const initialBookmarkCount = likedTweets.filter((t) => t.is_bookmark).length;
         margin-block: 1.25rem 0.5rem;
     }
 
-    .likes-toolbar-field {
+    .tweets-toolbar-field {
         min-width: 0;
         flex: 1;
         display: flex;
     }
 
-    .likes-search-wrap {
+    .tweets-search-wrap {
         position: relative;
         display: flex;
         flex: 1;
     }
 
-    .likes-filter-toggles {
+    .tweets-filter-toggles {
         display: flex;
         gap: 0.5rem;
         margin-left: auto;
@@ -340,6 +386,17 @@ const initialBookmarkCount = likedTweets.filter((t) => t.is_bookmark).length;
         color: #f91880;
     }
 
+    #filter-retweets:hover {
+        border-color: #00ba7c;
+        color: #00ba7c;
+    }
+
+    #filter-retweets.active {
+        background-color: color-mix(in srgb, #00ba7c 15%, transparent);
+        border-color: #00ba7c;
+        color: #00ba7c;
+    }
+
     .filter-toggle svg {
         fill: transparent;
         transition: fill 0.2s ease;
@@ -358,7 +415,7 @@ const initialBookmarkCount = likedTweets.filter((t) => t.is_bookmark).length;
         }
     }
 
-    .likes-search-icon {
+    .tweets-search-icon {
         position: absolute;
         left: 0.65rem;
         top: 50%;
@@ -370,11 +427,11 @@ const initialBookmarkCount = likedTweets.filter((t) => t.is_bookmark).length;
         pointer-events: none;
     }
 
-    .likes-search-icon :global(svg) {
+    .tweets-search-icon :global(svg) {
         display: block;
     }
 
-    .likes-input {
+    .tweets-input {
         width: 100%;
         padding: 0.5rem 0.65rem;
         font-size: 0.95rem;
@@ -387,15 +444,15 @@ const initialBookmarkCount = likedTweets.filter((t) => t.is_bookmark).length;
         transition: border-color 0.15s ease;
     }
 
-    .likes-input--with-icon {
+    .tweets-input--with-icon {
         padding-left: 2.35rem;
     }
 
-    .likes-input:focus {
+    .tweets-input:focus {
         border-color: var(--primary-color);
     }
 
-    .likes-search-wrap:focus-within .likes-search-icon {
+    .tweets-search-wrap:focus-within .tweets-search-icon {
         color: var(--primary-color);
     }
 
@@ -447,6 +504,17 @@ const initialBookmarkCount = likedTweets.filter((t) => t.is_bookmark).length;
         fill: var(--primary-color);
     }
 
+    .retweet-user {
+        font-size: 0.9em;
+        font-weight: 500;
+        color: var(--text-secondary);
+        transition: color 0.2s ease;
+    }
+
+    .tweet-card:hover .retweet-user {
+        color: var(--primary-color);
+    }
+
     .tweet-status-icons {
         display: flex;
         align-items: center;
@@ -463,6 +531,10 @@ const initialBookmarkCount = likedTweets.filter((t) => t.is_bookmark).length;
         color: var(--primary-color);
         fill: transparent;
         transition: fill 0.2s ease;
+    }
+
+    .retweet-icon {
+        color: #00ba7c;
     }
 
     .tweet-card:hover .heart-icon {
@@ -590,7 +662,7 @@ const initialBookmarkCount = likedTweets.filter((t) => t.is_bookmark).length;
 <script>
     declare global {
         interface Window {
-            _popstateHandledLikes?: boolean;
+            _popstateHandledTweets?: boolean;
         }
     }
 
@@ -608,19 +680,24 @@ const initialBookmarkCount = likedTweets.filter((t) => t.is_bookmark).length;
         const showLikes = document
             .getElementById("filter-likes")
             ?.classList.contains("active");
+        const showRetweets = document
+            .getElementById("filter-retweets")
+            ?.classList.contains("active");
 
         const isBookmark = card.getAttribute("data-is-bookmark") === "true";
         const isLike = card.getAttribute("data-is-like") === "true";
+        const isRetweet = card.getAttribute("data-is-retweet") === "true";
 
         if (showBookmarks && isBookmark) return true;
         if (showLikes && isLike) return true;
-        if (showBookmarks || showLikes) return false;
+        if (showRetweets && isRetweet) return true;
+        if (showBookmarks || showLikes || showRetweets) return false;
 
         return true;
     }
 
     function initializePagination() {
-        console.log("Initializing likes pagination...");
+        console.log("Initializing tweets pagination...");
 
         const tweetGrid = document.querySelector(".tweet-grid");
         const prevButton = document.getElementById(
@@ -637,7 +714,7 @@ const initialBookmarkCount = likedTweets.filter((t) => t.is_bookmark).length;
             ".pagination-controls",
         ) as HTMLElement | null;
         const searchInput = document.getElementById(
-            "likes-search",
+            "tweets-search",
         ) as HTMLInputElement | null;
 
         if (
@@ -665,11 +742,13 @@ const initialBookmarkCount = likedTweets.filter((t) => t.is_bookmark).length;
 
         const filterBookmarksBtn = document.getElementById("filter-bookmarks");
         const filterLikesBtn = document.getElementById("filter-likes");
+        const filterRetweetsBtn = document.getElementById("filter-retweets");
 
         const hasBookmarksParam = urlParams.has("bookmarks");
         const hasLikesParam = urlParams.has("likes");
+        const hasRetweetsParam = urlParams.has("retweets");
 
-        if (hasBookmarksParam || hasLikesParam) {
+        if (hasBookmarksParam || hasLikesParam || hasRetweetsParam) {
             if (filterBookmarksBtn)
                 filterBookmarksBtn.classList.toggle(
                     "active",
@@ -680,11 +759,18 @@ const initialBookmarkCount = likedTweets.filter((t) => t.is_bookmark).length;
                     "active",
                     urlParams.get("likes") === "true",
                 );
+            if (filterRetweetsBtn)
+                filterRetweetsBtn.classList.toggle(
+                    "active",
+                    urlParams.get("retweets") === "true",
+                );
         } else {
             if (filterBookmarksBtn)
-                filterBookmarksBtn.classList.toggle("active", true);
+                filterBookmarksBtn.classList.toggle("active", false);
             if (filterLikesBtn)
                 filterLikesBtn.classList.toggle("active", false);
+            if (filterRetweetsBtn)
+                filterRetweetsBtn.classList.toggle("active", true);
         }
 
         const initialSearch = urlParams.get("search");
@@ -724,13 +810,17 @@ const initialBookmarkCount = likedTweets.filter((t) => t.is_bookmark).length;
                 const lkActive = document
                     .getElementById("filter-likes")
                     ?.classList.contains("active");
+                const rtActive = document
+                    .getElementById("filter-retweets")
+                    ?.classList.contains("active");
 
-                if (bmActive && !lkActive) {
-                    titleTextSpan.textContent = "Bookmarked Tweets";
-                } else if (!bmActive && lkActive) {
-                    titleTextSpan.textContent = "Liked Tweets";
-                } else if (bmActive && lkActive) {
-                    titleTextSpan.textContent = "Bookmarked & Liked Tweets";
+                const activeNames = [];
+                if (bmActive) activeNames.push("Bookmarks");
+                if (lkActive) activeNames.push("Likes");
+                if (rtActive) activeNames.push("Retweets");
+
+                if (activeNames.length === 1 || activeNames.length === 2) {
+                    titleTextSpan.textContent = activeNames.join(" & ");
                 } else {
                     titleTextSpan.textContent = "Saved Tweets";
                 }
@@ -799,16 +889,27 @@ const initialBookmarkCount = likedTweets.filter((t) => t.is_bookmark).length;
             const filterBookmarksBtn =
                 document.getElementById("filter-bookmarks");
             const filterLikesBtn = document.getElementById("filter-likes");
-            if (filterBookmarksBtn && filterLikesBtn) {
+            const filterRetweetsBtn =
+                document.getElementById("filter-retweets");
+
+            if (filterBookmarksBtn && filterLikesBtn && filterRetweetsBtn) {
                 const bmActive =
                     filterBookmarksBtn.classList.contains("active");
                 const lkActive = filterLikesBtn.classList.contains("active");
-                if (bmActive !== true || lkActive !== false) {
+                const rtActive = filterRetweetsBtn.classList.contains("active");
+
+                if (
+                    bmActive !== true ||
+                    lkActive !== false ||
+                    rtActive !== false
+                ) {
                     url.searchParams.set("bookmarks", String(bmActive));
                     url.searchParams.set("likes", String(lkActive));
+                    url.searchParams.set("retweets", String(rtActive));
                 } else {
                     url.searchParams.delete("bookmarks");
                     url.searchParams.delete("likes");
+                    url.searchParams.delete("retweets");
                 }
             }
 
@@ -899,6 +1000,10 @@ const initialBookmarkCount = likedTweets.filter((t) => t.is_bookmark).length;
             filterLikesBtn.removeEventListener("click", handleFilterToggle);
             filterLikesBtn.addEventListener("click", handleFilterToggle);
         }
+        if (filterRetweetsBtn) {
+            filterRetweetsBtn.removeEventListener("click", handleFilterToggle);
+            filterRetweetsBtn.addEventListener("click", handleFilterToggle);
+        }
 
         updatePageDisplay();
 
@@ -912,15 +1017,19 @@ const initialBookmarkCount = likedTweets.filter((t) => t.is_bookmark).length;
             initialUrl.searchParams.delete("search");
         }
 
-        if (filterBookmarksBtn && filterLikesBtn) {
+        if (filterBookmarksBtn && filterLikesBtn && filterRetweetsBtn) {
             const bmActive = filterBookmarksBtn.classList.contains("active");
             const lkActive = filterLikesBtn.classList.contains("active");
-            if (bmActive !== true || lkActive !== false) {
+            const rtActive = filterRetweetsBtn.classList.contains("active");
+
+            if (bmActive !== true || lkActive !== false || rtActive !== false) {
                 initialUrl.searchParams.set("bookmarks", String(bmActive));
                 initialUrl.searchParams.set("likes", String(lkActive));
+                initialUrl.searchParams.set("retweets", String(rtActive));
             } else {
                 initialUrl.searchParams.delete("bookmarks");
                 initialUrl.searchParams.delete("likes");
+                initialUrl.searchParams.delete("retweets");
             }
         }
 
@@ -935,22 +1044,22 @@ const initialBookmarkCount = likedTweets.filter((t) => t.is_bookmark).length;
 
     document.addEventListener("astro:page-load", () => {
         if (
-            window.location.pathname === "/likes" ||
-            window.location.pathname === "/likes/"
+            window.location.pathname === "/tweets" ||
+            window.location.pathname === "/tweets/"
         ) {
             initializePagination();
         }
     });
 
-    if (!window._popstateHandledLikes) {
+    if (!window._popstateHandledTweets) {
         window.addEventListener("popstate", () => {
             if (
-                window.location.pathname === "/likes" ||
-                window.location.pathname === "/likes/"
+                window.location.pathname === "/tweets" ||
+                window.location.pathname === "/tweets/"
             ) {
                 window.location.reload();
             }
         });
-        window._popstateHandledLikes = true;
+        window._popstateHandledTweets = true;
     }
 </script>

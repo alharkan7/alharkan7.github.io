@@ -216,8 +216,8 @@ const { current = "" } = Astro.props;
         class={current === "bookmarks" ||
         current === "videos" ||
         current === "stars" ||
+        current === "threads" ||
         current === "tweets" ||
-        current === "likes" ||
         current === "readings"
           ? "selected"
           : ""}
@@ -231,8 +231,8 @@ const { current = "" } = Astro.props;
         <a href="/bookmarks">Bookmarks</a>
         <a href="/stars">Repos</a>
         <a href="/readings">Readings</a>
+        <a href="/threads">Threads</a>
         <a href="/tweets">Tweets</a>
-        <a href="/likes">Likes</a>
       </div>
     </div>
 

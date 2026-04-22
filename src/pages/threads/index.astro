@@ -2,28 +2,11 @@
 import BaseLayout from "../../layouts/BaseLayout.astro";
 import { tweetEmbeds } from "../../content/tweet-shorts.ts";
 
-export const prerender = true;
+const tweetsPerPage = 5;
+const currentPage = 1;
+const totalPages = Math.ceil(tweetEmbeds.length / tweetsPerPage);
+const tweets = tweetEmbeds.slice(0, tweetsPerPage);
 
-export async function getStaticPaths() {
-  const tweetsPerPage = 5;
-  const totalPages = Math.ceil(tweetEmbeds.length / tweetsPerPage);
-
-  // Generate paths for pages 2 onwards (page 1 is handled by index.astro)
-  return Array.from({ length: totalPages - 1 }, (_, i) => {
-    const page = i + 2; // Start from page 2
-    const startIndex = (page - 1) * tweetsPerPage;
-    return {
-      params: { page: String(page) },
-      props: {
-        tweets: tweetEmbeds.slice(startIndex, startIndex + tweetsPerPage),
-        currentPage: page,
-        totalPages,
-      },
-    };
-  });
-}
-
-const { tweets, currentPage, totalPages } = Astro.props;
 const title = "Short Threads";
 const description = "Collection of Short Threads by Al Harkan";
 const permalink = `${Astro?.site?.href}short`;
@@ -41,7 +24,7 @@ const permalink = `${Astro?.site?.href}short`;
     <p>
       <b
         >Go to my <a
-          href="https://x.com/alhrkn"
+          href="https://x.com/alhrkn/highlights"
           target="_blank"
           rel="noopener noreferrer">Highlights</a
         > for more updated list.</b
@@ -54,14 +37,10 @@ const permalink = `${Astro?.site?.href}short`;
     </div>
 
     <div class="pagination">
-      <a
-        href={currentPage === 2 ? "/tweets" : `/tweets/${currentPage - 1}`}
-        class="prev-button">← Prev</a
-      >
       <!-- <span class="page-info">Page {currentPage} of {totalPages}</span> -->
       {
-        currentPage < totalPages && (
-          <a href={`/tweets/${currentPage + 1}`} class="next-button">
+        totalPages > 1 && (
+          <a href="/threads/2" class="next-button">
             Next →
           </a>
         )
@@ -105,7 +84,7 @@ const permalink = `${Astro?.site?.href}short`;
     color: var(--text-secondary);
     transition: all 0.2s ease;
     font-family: var(--font-family-sans);
-    font-size: 1.8em;
+    font-size: 1.2em;
     font-weight: 700;
     text-decoration: none;
     box-shadow: inset 0 -0.12em 0 var(--primary-color);

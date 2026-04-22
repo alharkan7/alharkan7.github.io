@@ -52,9 +52,10 @@ CREATE TABLE x_tweets (
     id TEXT PRIMARY KEY,
     is_bookmark BOOLEAN DEFAULT FALSE,
     is_like BOOLEAN DEFAULT FALSE,
-    author_id TEXT,
+    is_retweet BOOLEAN DEFAULT FALSE,
+    author_id TEXT NOT NULL,
     text TEXT,
-    created_at TIMESTAMP WITH TIME ZONE,
+    created_at TIMESTAMP WITH TIME ZONE NOT NULL,
     edit_history_tweet_ids TEXT[],
     retweet_count INTEGER DEFAULT 0,
     reply_count INTEGER DEFAULT 0,
@@ -63,8 +64,9 @@ CREATE TABLE x_tweets (
     bookmark_count INTEGER DEFAULT 0,
     impression_count INTEGER DEFAULT 0,
     article_title TEXT,
-    entities JSONB,
-    synced_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+    entities JSONB DEFAULT '{}',
+    synced_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT valid_type CHECK (is_bookmark = TRUE OR is_like = TRUE OR is_retweet = TRUE)
 );
 
 PRAGMA foreign_keys=ON; 
