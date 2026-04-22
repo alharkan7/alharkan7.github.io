@@ -103,6 +103,13 @@ const description =
     "A curated list of liked, bookmarked, and retweeted posts from Twitter.";
 const permalink = Astro.site?.href ? `${Astro.site.href}tweets` : "/tweets";
 const initialRetweetCount = savedTweets.filter((t) => t.is_retweet).length;
+
+// Prepare items for structured data (limit to first 100)
+const structuredDataItems = savedTweets.slice(0, 100).map((tweet) => ({
+  name: tweet.text.substring(0, 100) + (tweet.text.length > 100 ? "..." : ""),
+  url: `https://twitter.com/i/web/status/${tweet.id}`,
+}));
+
 ---
 
 <BaseLayout
@@ -110,6 +117,8 @@ const initialRetweetCount = savedTweets.filter((t) => t.is_retweet).length;
     description={description}
     permalink={permalink ?? "/"}
     current="tweets"
+    type="collection"
+    items={structuredDataItems}
 >
     <div class="container">
         <h1 id="page-title">

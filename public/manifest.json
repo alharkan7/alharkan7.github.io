@@ -11,7 +11,7 @@
   "orientation": "portrait-primary",
   "icons": [
     {
-      "src": "/assets/social.png",
+      "src": "/assets/og-image.png",
       "sizes": "1200x630",
       "type": "image/png",
       "purpose": "any"

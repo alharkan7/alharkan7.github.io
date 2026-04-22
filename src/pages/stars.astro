@@ -183,6 +183,13 @@ const title = "Starred Repos";
 const description = "A curated list of starred GitHub repositories.";
 const permalink = Astro.site?.href ? `${Astro.site.href}stars` : "/stars";
 const totalStars = starredRepos.length;
+
+// Prepare items for structured data (limit to first 100)
+const structuredDataItems = starredRepos.slice(0, 100).map((repo) => ({
+  name: repo.full_name || repo.html_url?.split("/").slice(-2).join("/"),
+  url: repo.html_url,
+  description: repo.description || undefined,
+}));
 ---
 
 <BaseLayout
@@ -190,6 +197,8 @@ const totalStars = starredRepos.length;
     description={description}
     permalink={permalink ?? "/"}
     current="stars"
+    type="collection"
+    items={structuredDataItems}
 >
     <div class="container">
         <h1>My {totalStars} Starred Repositories</h1>

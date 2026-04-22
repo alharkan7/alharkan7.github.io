@@ -222,6 +222,12 @@ if (!validLimits.includes(initialLimit)) {
 }
 // --- End Initial State ---
 
+// Prepare items for structured data (limit to first 100)
+const structuredDataItems = allVideosData.slice(0, 100).map((video) => ({
+  name: video.title,
+  url: video.url,
+}));
+
 ---
 
 <BaseLayout
@@ -229,6 +235,8 @@ if (!validLimits.includes(initialLimit)) {
     description={description}
     permalink={permalink ?? "/"}
     current="videos"
+    type="collection"
+    items={structuredDataItems}
 >
     <div class="container">
         <h1 class="!mb-4">My Entire YouTube History in {totalItems > 0 ? `${totalItems} ` : ''} Videos</h1>

@@ -429,6 +429,11 @@ rootsToRender.forEach((root: ComponentBookmarkFolder) => {
 // --- End URL Counting Logic ---
 
 // Remove the old renderBookmarkNode function
+// Prepare items for structured data (use category names)
+const structuredDataItems = allowedFolderNames.map((folderName) => ({
+  name: folderName,
+}));
+
 ---
 
 <BaseLayout
@@ -436,6 +441,8 @@ rootsToRender.forEach((root: ComponentBookmarkFolder) => {
     description={description}
     permalink={permalink ?? "/"}
     current="bookmarks"
+    type="collection"
+    items={structuredDataItems}
 >
     <div class="container">
         <h1>

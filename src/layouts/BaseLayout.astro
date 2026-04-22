@@ -11,8 +11,10 @@ export interface Props {
   permalink: string;
   current?: string;
   image?: string;
-  type?: "website" | "article";
+  subtitle?: string;
+  type?: "website" | "article" | "collection";
   publishDate?: string;
+  items?: Array<{ name: string; url?: string; description?: string }>;
 }
 const {
   title,
@@ -20,8 +22,10 @@ const {
   permalink,
   current,
   image,
+  subtitle,
   type = "website",
   publishDate,
+  items,
 } = Astro.props;
 ---
 
@@ -32,8 +36,10 @@ const {
       description={description}
       permalink={permalink}
       image={image}
+      subtitle={subtitle}
       type={type}
       publishDate={publishDate}
+      items={items}
     />
   </head>
   <body>
