@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Social Image Export - Al Harkan's Blog</title>
+  <style>
+    body { margin: 0; display: flex; justify-content: center; align-items: center; min-height: 100vh; background: #f0f0f0; }
+    .container { text-align: center; }
+    canvas { box-shadow: 0 4px 20px rgba(0,0,0,0.15); max-width: 100%; height: auto; }
+    button { margin-top: 20px; padding: 12px 24px; font-size: 16px; background: #0d9488; color: white; border: none; border-radius: 8px; cursor: pointer; }
+    button:hover { background: #0b8488; }
+    p { color: #52525b; font-family: system-ui, sans-serif; margin-bottom: 20px; max-width: 600px; margin-left: auto; margin-right: auto; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <p>Right-click the image and "Save Image As" to download the PNG (1200x630), or use the button below.</p>
+    <canvas id="canvas"></canvas>
+    <br>
+    <button onclick="downloadPNG()">Download PNG</button>
+  </div>
+
+  <script>
+    const canvas = document.getElementById('canvas');
+    const ctx = canvas.getContext('2d');
+    canvas.width = 1200;
+    canvas.height = 630;
+
+    // Background gradient
+    const bgGradient = ctx.createLinearGradient(0, 0, 1200, 630);
+    bgGradient.addColorStop(0, '#ffffff');
+    bgGradient.addColorStop(1, '#f8fafc');
+    ctx.fillStyle = bgGradient;
+    ctx.fillRect(0, 0, 1200, 630);
+
+    // Node pattern (subtle grid)
+    ctx.fillStyle = 'rgba(13, 148, 136, 0.15)';
+    for (let x = 30; x < 1200; x += 60) {
+      for (let y = 30; y < 630; y += 60) {
+        ctx.beginPath();
+        ctx.arc(x, y, 1.5, 0, Math.PI * 2);
+        ctx.fill();
+      }
+    }
+    ctx.strokeStyle = 'rgba(13, 148, 136, 0.06)';
+    ctx.lineWidth = 1;
+    for (let x = 30; x < 1200; x += 60) {
+      ctx.beginPath();
+      ctx.moveTo(x, 0);
+      ctx.lineTo(x, 630);
+      ctx.stroke();
+    }
+    for (let y = 30; y < 630; y += 60) {
+      ctx.beginPath();
+      ctx.moveTo(0, y);
+      ctx.lineTo(1200, y);
+      ctx.stroke();
+    }
+
+    // Bottom triangles
+    ctx.fillStyle = 'rgba(13, 148, 136, 0.08)';
+    ctx.beginPath();
+    ctx.moveTo(0, 630);
+    ctx.lineTo(200, 630);
+    ctx.lineTo(0, 480);
+    ctx.fill();
+
+    ctx.fillStyle = 'rgba(13, 148, 136, 0.06)';
+    ctx.beginPath();
+    ctx.moveTo(1200, 630);
+    ctx.lineTo(1000, 630);
+    ctx.lineTo(1200, 450);
+    ctx.fill();
+
+    ctx.fillStyle = 'rgba(13, 148, 136, 0.04)';
+    ctx.beginPath();
+    ctx.moveTo(1200, 630);
+    ctx.lineTo(900, 630);
+    ctx.lineTo(1200, 380);
+    ctx.fill();
+
+    // Hexagon outline (top right)
+    ctx.strokeStyle = 'rgba(13, 148, 136, 0.12)';
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    const hexX = 1090, hexY = 146, hexR = 46;
+    for (let i = 0; i < 6; i++) {
+      const angle = (i * 60 - 30) * Math.PI / 180;
+      const x = hexX + hexR * Math.cos(angle);
+      const y = hexY + hexR * Math.sin(angle);
+      i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+    }
+    ctx.closePath();
+    ctx.stroke();
+
+    // Top left geometric cluster
+    ctx.fillStyle = 'rgba(13, 148, 136, 0.15)';
+    ctx.fillRect(80, 80, 24, 24);
+    ctx.fillStyle = 'rgba(13, 148, 136, 0.105)';
+    ctx.fillRect(112, 88, 16, 16);
+    ctx.fillRect(88, 112, 16, 16);
+
+    // Personal blog label
+    ctx.fillStyle = 'rgba(13, 148, 136, 0.8)';
+    ctx.font = '600 12px Arial, sans-serif';
+    ctx.fillText('PERSONAL BLOG', 80, 205);
+
+    // Title - single line, no overlap
+    ctx.fillStyle = '#18181b';
+    ctx.font = '700 64px Arial, sans-serif';
+    ctx.fillText("Al Harkan's Blog", 80, 280);
+
+    // Decorative underline
+    ctx.fillStyle = '#0d9488';
+    ctx.fillRect(80, 305, 60, 4);
+
+    // Subtitle
+    ctx.fillStyle = '#52525b';
+    ctx.font = '400 26px Arial, sans-serif';
+    ctx.fillText('On Media, Technology, and Everything in Between', 80, 350);
+
+    // URL badge
+    ctx.fillStyle = 'rgba(13, 148, 136, 0.1)';
+    ctx.beginPath();
+    ctx.roundRect(950, 538, 200, 44, 22);
+    ctx.fill();
+    ctx.strokeStyle = 'rgba(13, 148, 136, 0.3)';
+    ctx.lineWidth = 1.5;
+    ctx.stroke();
+    ctx.fillStyle = '#0d9488';
+    ctx.font = '600 16px Arial, sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillText('raihankalla.id', 1050, 566);
+    ctx.textAlign = 'left';
+
+    // Small accent dot
+    ctx.fillStyle = 'rgba(13, 148, 136, 0.4)';
+    ctx.beginPath();
+    ctx.arc(920, 582, 4, 0, Math.PI * 2);
+    ctx.fill();
+
+    function downloadPNG() {
+      const link = document.createElement('a');
+      link.download = 'social.png';
+      link.href = canvas.toDataURL('image/png');
+      link.click();
+    }
+  </script>
+</body>
+</html>
