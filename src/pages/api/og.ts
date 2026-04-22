@@ -44,12 +44,12 @@ export const GET: APIRoute = async ({ url }) => {
             width: "100%",
             display: "flex",
             flexDirection: "column",
-            backgroundColor: "#ffffff",
+            backgroundColor: "#F5F1E8",
             position: "relative",
             fontFamily: "Noto Sans",
           },
           children: [
-            // Background dots
+            // Background dots (monochrome)
             {
               type: "div",
               props: {
@@ -57,102 +57,37 @@ export const GET: APIRoute = async ({ url }) => {
                   position: "absolute",
                   inset: 0,
                   display: "flex",
-                  backgroundImage: "radial-gradient(#cbd5e1 1px, transparent 1px)",
+                  backgroundImage: "radial-gradient(#a8a29e 1px, transparent 1px)",
                   backgroundSize: "24px 24px",
                 },
               },
             },
-            // Bottom left triangle
+            // Main content (vertically centered, slightly higher)
             {
               type: "div",
               props: {
                 style: {
                   position: "absolute",
-                  bottom: 0,
+                  top: "35%",
                   left: 0,
-                  width: "200px",
-                  height: "150px",
-                  display: "flex",
-                  background: "linear-gradient(135deg, #0d9488 0%, #14b8a6 100%)",
-                  opacity: 0.08,
-                  clipPath: "polygon(0 100%, 100% 100%, 0 0)",
-                },
-              },
-            },
-            // Bottom right triangle
-            {
-              type: "div",
-              props: {
-                style: {
-                  position: "absolute",
-                  bottom: 0,
                   right: 0,
-                  width: "300px",
-                  height: "250px",
-                  display: "flex",
-                  background: "linear-gradient(135deg, #0d9488 0%, #14b8a6 100%)",
-                  opacity: 0.04,
-                  clipPath: "polygon(100% 100%, 0 100%, 100% 0)",
-                },
-              },
-            },
-            // Top left geometric cluster
-            {
-              type: "div",
-              props: {
-                style: {
-                  position: "absolute",
-                  top: "80px",
-                  left: "80px",
-                  display: "flex",
-                  gap: "8px",
-                  alignItems: "flex-start",
-                },
-                children: [
-                  { type: "div", props: { style: { width: "24px", height: "24px", background: "#0d9488", opacity: 0.15 } } },
-                  { type: "div", props: { style: { width: "16px", height: "16px", background: "#0d9488", opacity: 0.105, marginTop: "8px" } } },
-                  { type: "div", props: { style: { width: "16px", height: "16px", background: "#0d9488", opacity: 0.105, marginLeft: "-8px" } } },
-                ],
-              },
-            },
-            // Main content
-            {
-              type: "div",
-              props: {
-                style: {
-                  position: "absolute",
-                  top: 0,
-                  left: 0,
                   display: "flex",
                   flexDirection: "column",
-                  alignItems: "flex-start",
-                  padding: "80px",
-                  paddingTop: subtitle ? "40px" : "60px",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  padding: "0 80px",
                 },
                 children: [
                   {
                     type: "div",
                     props: {
                       style: {
-                        fontSize: "12px",
-                        fontWeight: 600,
-                        letterSpacing: "3px",
-                        color: "#0d9488",
-                        opacity: 0.8,
-                        marginBottom: "10px",
-                      },
-                      children: "PERSONAL BLOG",
-                    },
-                  },
-                  {
-                    type: "div",
-                    props: {
-                      style: {
-                        fontSize: "64px",
+                        fontSize: "56px",
                         fontWeight: 700,
-                        color: "#18181b",
+                        color: "#1c1917",
                         lineHeight: 1.1,
                         maxWidth: "900px",
+                        textAlign: "center",
                       },
                       children: title,
                     },
@@ -163,11 +98,12 @@ export const GET: APIRoute = async ({ url }) => {
                           type: "div",
                           props: {
                             style: {
-                              fontSize: "26px",
+                              fontSize: "24px",
                               fontWeight: 400,
-                              color: "#52525b",
+                              color: "#57534e",
                               marginTop: "16px",
                               maxWidth: "800px",
+                              textAlign: "center",
                             },
                             children: subtitle,
                           },
@@ -177,13 +113,13 @@ export const GET: APIRoute = async ({ url }) => {
                   {
                     type: "div",
                     props: {
-                      style: { width: "60px", height: "4px", background: "#0d9488", marginTop: "20px" },
+                      style: { width: "60px", height: "3px", background: "#78716c", marginTop: "24px" },
                     },
                   },
                 ],
               },
             },
-            // URL badge
+            // URL badge (monochrome, bottom right)
             {
               type: "div",
               props: {
@@ -199,7 +135,7 @@ export const GET: APIRoute = async ({ url }) => {
                   {
                     type: "div",
                     props: {
-                      style: { width: "8px", height: "8px", background: "#0d9488", opacity: 0.4, borderRadius: "50%" },
+                      style: { width: "8px", height: "8px", background: "#78716c", opacity: 0.6, borderRadius: "50%" },
                     },
                   },
                   {
@@ -207,15 +143,15 @@ export const GET: APIRoute = async ({ url }) => {
                     props: {
                       style: {
                         padding: "12px 24px",
-                        background: "rgba(13, 148, 136, 0.1)",
+                        background: "rgba(120, 113, 108, 0.15)",
                         borderRadius: "22px",
-                        border: "1px solid #0d9488",
+                        border: "1px solid #78716c",
                         display: "flex",
                       },
                       children: {
                         type: "span",
                         props: {
-                          style: { fontSize: "16px", fontWeight: 600, color: "#0d9488" },
+                          style: { fontSize: "16px", fontWeight: 600, color: "#44403c" },
                           children: "raihankalla.id",
                         },
                       },
