@@ -272,33 +272,37 @@ const initialBookmarkCount = likedTweets.filter((t) => t.is_bookmark).length;
 
     .likes-toolbar {
         display: flex;
-        flex-wrap: wrap;
-        align-items: center;
-        gap: 1rem 1.5rem;
+        flex-wrap: nowrap;
+        align-items: stretch;
+        gap: 1rem;
         margin-block: 1.25rem 0.5rem;
     }
 
     .likes-toolbar-field {
-        min-width: min(100%, 300px);
-        flex: 1 1 300px;
+        min-width: 0;
+        flex: 1;
+        display: flex;
     }
 
     .likes-search-wrap {
         position: relative;
-        display: block;
+        display: flex;
+        flex: 1;
     }
 
     .likes-filter-toggles {
         display: flex;
         gap: 0.5rem;
         margin-left: auto;
+        flex-shrink: 0;
+        align-items: stretch;
     }
 
     .filter-toggle {
         display: flex;
         align-items: center;
         gap: 0.35rem;
-        padding: 0.4rem 0.75rem;
+        padding: 0 0.75rem;
         border: 1px solid var(--border-color);
         border-radius: 6px;
         background-color: var(--background-body);
