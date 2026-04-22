@@ -1,18 +1,19 @@
 import { defineConfig } from 'astro/config'
 import svelte from '@astrojs/svelte'
 import mdx from '@astrojs/mdx'
-import sitemap from '@astrojs/sitemap'
 import remarkGfm from 'remark-gfm'
 import remarkSmartypants from 'remark-smartypants'
 import rehypeExternalLinks from 'rehype-external-links'
 import react from "@astrojs/react"
 import icon from "astro-icon"
+import vercel from "@astrojs/vercel"
 
 import tailwind from '@astrojs/tailwind';
 
 export default defineConfig({
   site: 'https://raihankalla.id',
-  output: 'static',
+  output: 'server',
+  adapter: vercel(),
   security: {
     directives: {
       'script-src': [
@@ -49,7 +50,7 @@ export default defineConfig({
       'cross-origin-resource-policy': ['cross-origin']
     }
   },
-  integrations: [sitemap(), svelte(), mdx(
+  integrations: [svelte(), mdx(
     //   {
     //   remarkPlugins: [remarkGfm, remarkSmartypants],
     //   rehypePlugins: [

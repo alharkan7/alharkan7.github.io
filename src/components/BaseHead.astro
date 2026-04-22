@@ -8,8 +8,10 @@ export interface Props {
   description: string;
   permalink: string;
   image?: string;
-  type?: "website" | "article";
+  subtitle?: string;
+  type?: "website" | "article" | "collection";
   publishDate?: string;
+  items?: Array<{ name: string; url?: string; description?: string }>;
 }
 
 const {
@@ -17,16 +19,31 @@ const {
   description,
   permalink,
   image,
+  subtitle,
   type = "website",
   publishDate,
+  items,
 } = Astro.props;
 
 // Ensure the permalink is absolute
-const canonicalURL = new URL(permalink, Astro.site).href;
-// Use provided image or fallback to default social image
+// Use current request URL to handle both www and non-www
+const currentSite = Astro.url?.origin || Astro.site?.href || "https://raihankalla.id";
+const canonicalURL = new URL(permalink, currentSite).href;
+
+// Helper to encode text for URL
+const encodeText = (text: string) => encodeURIComponent(text).substring(0, 100);
+
+// Use provided image or generate dynamic OG image via API
+// Use current request origin to avoid redirect issues
 const socialImageURL = image
-  ? new URL(image, Astro.site).href
-  : new URL("assets/social.png", Astro.site).href;
+  ? new URL(image, currentSite).href
+  : new URL(
+      `/api/og?title=${encodeText(title)}${subtitle ? `&subtitle=${encodeText(subtitle)}` : ""}`,
+      currentSite
+    ).href;
+
+// Logo URL
+const logoURL = new URL("/assets/logo.png", currentSite).href;
 ---
 
 <!-- Global Metadata -->
@@ -59,8 +76,10 @@ const socialImageURL = image
 <meta property="og:image:alt" content={description} />
 <meta property="og:image:width" content="1200" />
 <meta property="og:image:height" content="630" />
+<meta property="og:image:secure_url" content={socialImageURL} />
 <meta property="og:site_name" content="Al Harkan's Blog" />
 <meta property="og:locale" content="en_US" />
+<meta property="og:logo" content={logoURL} />
 {
   publishDate && (
     <meta
@@ -99,13 +118,41 @@ const socialImageURL = image
       "url": "https://raihankalla.id",
       "logo": {
         "@type": "ImageObject",
-        "url": "https://raihankalla.id/assets/social.png"
+        "url": "https://raihankalla.id/assets/logo.png"
       }
     },
     "mainEntityOfPage": {
       "@type": "WebPage",
       "@id": canonicalURL
     }
+  })} type="application/ld+json" />
+) : type === "collection" ? (
+  <script set:html={JSON.stringify({
+    "@context": "https://schema.org",
+    "@type": "CollectionPage",
+    "name": title,
+    "description": description,
+    "url": canonicalURL,
+    "author": {
+      "@type": "Person",
+      "name": "Al Harkan",
+      "url": "https://raihankalla.id"
+    },
+    ...(items && items.length > 0 ? {
+      "mainEntity": {
+        "@type": "ItemList",
+        "itemListElement": items.slice(0, 100).map((item, index) => ({
+          "@type": "ListItem",
+          "position": index + 1,
+          "item": {
+            "@type": item.url ? "Thing" : "Thing",
+            "name": item.name,
+            ...(item.url && { "url": item.url.startsWith("http") ? item.url : `https://raihankalla.id${item.url}` }),
+            ...(item.description && { "description": item.description })
+          }
+        }))
+      }
+    } : {})
   })} type="application/ld+json" />
 ) : (
   <script set:html={JSON.stringify({

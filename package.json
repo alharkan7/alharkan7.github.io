@@ -21,6 +21,7 @@
     "@astrojs/svelte": "^7.2.4",
     "@astrojs/tailwind": "^6.0.2",
     "@astrojs/vercel": "^9.0.2",
+    "@fontsource/noto-sans": "^5.2.10",
     "@iconify-json/heroicons": "^1.2.3",
     "@iconify-json/lucide": "^1.2.82",
     "@iconify-json/simple-icons": "^1.2.63",
@@ -37,6 +38,7 @@
     "rehype-external-links": "^3.0.0",
     "remark-gfm": "^4.0.0",
     "remark-smartypants": "^3.0.2",
+    "satori": "^0.26.0",
     "tailwindcss": "^3.4.19",
     "tocbot": "^4.36.4"
   },
