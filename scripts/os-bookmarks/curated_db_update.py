@@ -31,6 +31,7 @@ SCRIPT_DIR = Path(__file__).resolve().parent
 if HAS_DOTENV:
     dotenv_path_script_dir = SCRIPT_DIR / '.env'
     dotenv_path_cwd = Path.cwd() / '.env'
+    dotenv_path_root = SCRIPT_DIR.parent.parent / '.env'
 
     if dotenv_path_script_dir.exists():
         load_dotenv(dotenv_path=dotenv_path_script_dir)
@@ -38,8 +39,11 @@ if HAS_DOTENV:
     elif dotenv_path_cwd.exists():
         load_dotenv(dotenv_path=dotenv_path_cwd)
         print(f"Loaded .env file from {dotenv_path_cwd}")
+    elif dotenv_path_root.exists():
+        load_dotenv(dotenv_path=dotenv_path_root)
+        print(f"Loaded .env file from {dotenv_path_root}")
     else:
-        print("Info: .env file not found in script directory or current working directory. Relying on shell environment variables for all configurations.", file=sys.stderr)
+        print("Info: .env file not found. Relying on shell environment variables.", file=sys.stderr)
 else:
     print("Warning: python-dotenv module not found. Relying solely on shell/system-set environment variables.", file=sys.stderr)
 
@@ -359,6 +363,32 @@ def get_github_star_lists_by_repo_id(username, token):
     # sorted stable output for DB / diffs
     return {k: sorted(v) for k, v in repo_to_lists.items()}
 
+def update_env_file(key, value):
+    """Updates or adds a key-value pair in the root .env file."""
+    dotenv_path = SCRIPT_DIR.parent.parent / '.env'
+    if not dotenv_path.exists():
+        return
+    
+    lines = []
+    found = False
+    with open(dotenv_path, "r") as f:
+        lines = f.readlines()
+    
+    new_lines = []
+    for line in lines:
+        if line.strip().startswith(f"{key}="):
+            new_lines.append(f"{key}={value}\n")
+            found = True
+        else:
+            new_lines.append(line)
+    
+    if not found:
+        new_lines.append(f"{key}={value}\n")
+        
+    with open(dotenv_path, "w") as f:
+        f.writelines(new_lines)
+    print(f"Updated {key} in {dotenv_path}")
+
 def refresh_x_token():
     if not X_CLIENT_ID or not X_CLIENT_SECRET or not X_REFRESH_TOKEN:
          print("Error: X_CLIENT_ID, X_CLIENT_SECRET, or X_REFRESH_TOKEN not found in env.", file=sys.stderr)
@@ -382,21 +412,24 @@ def refresh_x_token():
         new_refresh = new_token_data.get("refresh_token")
         if new_refresh:
             try:
-                # Save just the raw refresh token string so github workflow can update it without quoting issues
+                # 1. Save for GitHub Actions
                 with open(".new_x_refresh_token", "w") as f:
                     f.write(new_refresh)
+                
+                # 2. Save for Local Persistence (update .env file)
+                update_env_file("X_REFRESH_TOKEN", new_refresh)
             except Exception as e:
-                print(f"Warning: Could not save new refresh token to file: {e}")
+                print(f"Warning: Could not save new refresh token: {e}")
         return new_token_data.get("access_token")
     else:
         print(f"Error refreshing X token: {resp.text}", file=sys.stderr)
         return None
 
-def fetch_latest_x_tweets(url, access_token, max_results=50):
+def fetch_latest_x_timeline(url, access_token, max_results=50):
     headers = {"Authorization": f"Bearer {access_token}"}
     params = {
         "max_results": max_results,
-        "tweet.fields": "created_at,text,public_metrics,entities",
+        "tweet.fields": "created_at,text,public_metrics,entities,referenced_tweets",
         "expansions": "author_id",
         "user.fields": "name,username"
     }
@@ -404,19 +437,29 @@ def fetch_latest_x_tweets(url, access_token, max_results=50):
     if resp.status_code == 200:
         return resp.json().get("data", [])
     else:
-        print(f"Error fetching X data: {resp.text}", file=sys.stderr)
+        print(f"Error fetching X timeline: {resp.text}", file=sys.stderr)
         return []
 
-def update_x_tweets_to_db(cur, new_tweets, is_bookmark=False, is_like=False):
+def update_x_tweets_to_db(cur, new_tweets, is_bookmark=False, is_like=False, is_retweet=False):
     if not new_tweets:
         return 0, 0
     
     tuples = []
     for tweet in new_tweets:
         tweet_id = str(tweet.get("id"))
+        
+        # Extract author_id
+        # For retweets, we prefer the original author's ID if possible (matching import-retweets.js logic)
         author_id = tweet.get("author_id", "")
+        if is_retweet:
+            entities = tweet.get("entities", {})
+            mentions = entities.get("user_mentions", [])
+            if mentions:
+                author_id = str(mentions[0].get("id") or mentions[0].get("id_str") or author_id)
+        
         if not author_id and "author" in tweet:
             author_id = tweet["author"].get("id", "")
+            
         text = tweet.get("text", "")
         created_at = tweet.get("created_at") or tweet.get("timestamp")
         edit_history = tweet.get("edit_history_tweet_ids", [])
@@ -435,7 +478,7 @@ def update_x_tweets_to_db(cur, new_tweets, is_bookmark=False, is_like=False):
         entities = tweet.get("entities", {})
         
         tuples.append((
-            tweet_id, is_bookmark, is_like, author_id, text, created_at,
+            tweet_id, is_bookmark, is_like, is_retweet, author_id, text, created_at,
             edit_history if isinstance(edit_history, list) else [edit_history],
             retweet_count, reply_count, like_count, quote_count, bookmark_count,
             impression_count, article_title, Json(entities)
@@ -443,13 +486,14 @@ def update_x_tweets_to_db(cur, new_tweets, is_bookmark=False, is_like=False):
         
     query = """
         INSERT INTO x_tweets (
-            id, is_bookmark, is_like, author_id, text, created_at, edit_history_tweet_ids,
+            id, is_bookmark, is_like, is_retweet, author_id, text, created_at, edit_history_tweet_ids,
             retweet_count, reply_count, like_count, quote_count, bookmark_count, impression_count,
             article_title, entities
         ) VALUES %s
         ON CONFLICT (id) DO UPDATE SET
             is_bookmark = x_tweets.is_bookmark OR EXCLUDED.is_bookmark,
             is_like = x_tweets.is_like OR EXCLUDED.is_like,
+            is_retweet = x_tweets.is_retweet OR EXCLUDED.is_retweet,
             author_id = EXCLUDED.author_id,
             text = EXCLUDED.text,
             created_at = EXCLUDED.created_at,
@@ -496,6 +540,8 @@ if __name__ == "__main__":
     x_bookmarks_updated = 0
     x_likes_synced = 0
     x_likes_updated = 0
+    x_retweets_synced = 0
+    x_retweets_updated = 0
 
     try:
         print(f"Attempting to connect to database {DB_NAME} on {DB_HOST}:{DB_PORT}...")
@@ -705,15 +751,22 @@ if __name__ == "__main__":
                         
                         # Sync Bookmarks
                         print("Fetching X Bookmarks...")
-                        bookmarks = fetch_latest_x_tweets(f"https://api.x.com/2/users/{x_user_id}/bookmarks", access_token, max_results=50)
-                        x_bookmarks_synced, x_bookmarks_updated = update_x_tweets_to_db(cur, bookmarks, is_bookmark=True, is_like=False)
+                        bookmarks = fetch_latest_x_timeline(f"https://api.x.com/2/users/{x_user_id}/bookmarks", access_token, max_results=50)
+                        x_bookmarks_synced, x_bookmarks_updated = update_x_tweets_to_db(cur, bookmarks, is_bookmark=True, is_like=False, is_retweet=False)
                         print(f"X Bookmarks upsert complete. Added: {x_bookmarks_synced}, Updated: {x_bookmarks_updated}.")
                         
                         # Sync Likes
                         print("Fetching X Likes...")
-                        likes = fetch_latest_x_tweets(f"https://api.x.com/2/users/{x_user_id}/liked_tweets", access_token, max_results=50)
-                        x_likes_synced, x_likes_updated = update_x_tweets_to_db(cur, likes, is_bookmark=False, is_like=True)
+                        likes = fetch_latest_x_timeline(f"https://api.x.com/2/users/{x_user_id}/liked_tweets", access_token, max_results=50)
+                        x_likes_synced, x_likes_updated = update_x_tweets_to_db(cur, likes, is_bookmark=False, is_like=True, is_retweet=False)
                         print(f"X Likes upsert complete. Added: {x_likes_synced}, Updated: {x_likes_updated}.")
+                        
+                        # Sync Retweets
+                        print("Fetching X Retweets from timeline...")
+                        timeline = fetch_latest_x_timeline(f"https://api.x.com/2/users/{x_user_id}/tweets", access_token, max_results=50)
+                        retweets = [t for t in timeline if "referenced_tweets" in t and any(r["type"] == "retweeted" for r in t["referenced_tweets"])]
+                        x_retweets_synced, x_retweets_updated = update_x_tweets_to_db(cur, retweets, is_bookmark=False, is_like=False, is_retweet=True)
+                        print(f"X Retweets upsert complete. Added: {x_retweets_synced}, Updated: {x_retweets_updated}.")
                         
                         conn.commit()
                     else:
@@ -737,12 +790,14 @@ if __name__ == "__main__":
         print(f"GitHub Starred Repos: {github_synced_count} added, {github_updated_count} updated, {github_deleted_count} deleted.")
         print(f"X Bookmarks: {x_bookmarks_synced} added, {x_bookmarks_updated} updated.")
         print(f"X Likes: {x_likes_synced} added, {x_likes_updated} updated.")
+        print(f"X Retweets: {x_retweets_synced} added, {x_retweets_updated} updated.")
 
         # Trigger Vercel build if any changes were made
         changes_made = any([
             youtube_synced_count > 0, youtube_updated_count > 0, youtube_deleted_count > 0,
             github_synced_count > 0, github_updated_count > 0, github_deleted_count > 0,
-            x_bookmarks_synced > 0, x_bookmarks_updated > 0, x_likes_synced > 0, x_likes_updated > 0
+            x_bookmarks_synced > 0, x_bookmarks_updated > 0, x_likes_synced > 0, x_likes_updated > 0,
+            x_retweets_synced > 0, x_retweets_updated > 0
         ])
 
         if changes_made:
