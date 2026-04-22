@@ -1,0 +1,20 @@
+{
+  "name": "Al Harkan's Blog",
+  "short_name": "Al Harkan",
+  "description": "Personal blog about data, media studies, and technology",
+  "start_url": "/",
+  "display": "website",
+  "background_color": "#ffffff",
+  "theme_color": "#ff6b6b",
+  "lang": "en",
+  "dir": "ltr",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/assets/social.png",
+      "sizes": "1200x630",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ]
+}

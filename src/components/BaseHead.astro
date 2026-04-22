@@ -33,6 +33,9 @@ const socialImageURL = image
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width" />
 <link rel="icon" type="image/x-icon" href="/favicon.ico" />
+<link rel="manifest" href="/manifest.json" />
+<meta name="theme-color" content="#ff6b6b" />
+<link rel="alternate" type="application/rss+xml" title="Al Harkan's Blog" href="/rss.xml" />
 <link rel="canonical" href={canonicalURL} />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -73,6 +76,51 @@ const socialImageURL = image
 <meta property="twitter:title" content={title} />
 <meta property="twitter:description" content={description} />
 <meta property="twitter:image" content={socialImageURL} />
+
+<!-- Structured Data / JSON-LD -->
+{type === "article" && publishDate ? (
+  <script set:html={JSON.stringify({
+    "@context": "https://schema.org",
+    "@type": "BlogPosting",
+    "headline": title,
+    "description": description,
+    "image": socialImageURL,
+    "datePublished": new Date(publishDate).toISOString(),
+    "dateModified": new Date(publishDate).toISOString(),
+    "url": canonicalURL,
+    "author": {
+      "@type": "Person",
+      "name": "Al Harkan",
+      "url": "https://raihankalla.id"
+    },
+    "publisher": {
+      "@type": "Organization",
+      "name": "Al Harkan's Blog",
+      "url": "https://raihankalla.id",
+      "logo": {
+        "@type": "ImageObject",
+        "url": "https://raihankalla.id/assets/social.png"
+      }
+    },
+    "mainEntityOfPage": {
+      "@type": "WebPage",
+      "@id": canonicalURL
+    }
+  })} type="application/ld+json" />
+) : (
+  <script set:html={JSON.stringify({
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    "name": "Al Harkan's Blog",
+    "url": "https://raihankalla.id",
+    "description": "Personal blog about data, media studies, and technology",
+    "publisher": {
+      "@type": "Person",
+      "name": "Al Harkan",
+      "url": "https://raihankalla.id"
+    }
+  })} type="application/ld+json" />
+)}
 
 <ViewTransitions />
 
