@@ -22,6 +22,7 @@
     "@astrojs/tailwind": "^6.0.2",
     "@astrojs/vercel": "^9.0.2",
     "@fontsource/noto-sans": "^5.2.10",
+    "@fontsource/playfair-display": "^5.2.8",
     "@iconify-json/heroicons": "^1.2.3",
     "@iconify-json/lucide": "^1.2.82",
     "@iconify-json/simple-icons": "^1.2.63",

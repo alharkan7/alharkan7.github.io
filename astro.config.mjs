@@ -7,11 +7,20 @@ import rehypeExternalLinks from 'rehype-external-links'
 import react from "@astrojs/react"
 import icon from "astro-icon"
 import vercel from "@astrojs/vercel"
+import sitemap from '@astrojs/sitemap'
 
 import tailwind from '@astrojs/tailwind';
 
 export default defineConfig({
-  site: 'https://raihankalla.id',
+  vite: {
+    server: {
+      allowedHosts: ['.trycloudflare.com', 'localhost'],
+    },
+  },
+  server: {
+    host: true,
+  },
+  site: 'https://www.raihankalla.id',
   output: 'server',
   adapter: vercel(),
   security: {
@@ -65,7 +74,7 @@ export default defineConfig({
     //     theme: 'nord',
     //   },
     // }
-  ), react(), tailwind(), icon({
+  ), react(), tailwind(), sitemap(), icon({
     include: {
       lucide: ['*'],
       'simple-icons': ['*']

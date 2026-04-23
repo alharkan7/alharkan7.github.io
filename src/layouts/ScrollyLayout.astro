@@ -71,9 +71,17 @@ const styleString = Object.entries(themeOverrides)
 // Generate dynamic OG image URL
 // Use current request origin to handle both www and non-www
 const currentSite = Astro.url?.origin || Astro.site?.href || "https://raihankalla.id";
-const encodeText = (text: string) => encodeURIComponent(text).substring(0, 100);
+const canonicalURL = Astro.url?.href || "";
+const encodeText = (text: string) => encodeURIComponent(text);
+
+// Resolve OG subtitle: fall back to description (same logic as BaseHead)
+const rawSubtitle = page.metadata.description || "";
+const ogSubtitle = rawSubtitle.length > 75
+  ? rawSubtitle.substring(0, 75).replace(/\s+\S*$/, "") + "..."
+  : rawSubtitle;
+
 const ogImageUrl = new URL(
-  `/api/og?title=${encodeText(page.metadata.title)}`,
+  `/api/og?title=${encodeText(page.metadata.title)}&subtitle=${encodeText(ogSubtitle)}`,
   currentSite
 ).href;
 ---
@@ -83,11 +91,14 @@ const ogImageUrl = new URL(
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/assets/logo.png" />
     <title>{page.metadata.title}</title>
     <meta name="description" content={page.metadata.description} />
 
     <!-- Open Graph / Facebook -->
+    <link rel="canonical" href={canonicalURL} />
     <meta property="og:type" content="website" />
+    <meta property="og:url" content={canonicalURL} />
     <meta property="og:title" content={page.metadata.title} />
     <meta property="og:description" content={page.metadata.description} />
     <meta property="og:image" content={ogImageUrl} />
@@ -96,15 +107,15 @@ const ogImageUrl = new URL(
     <meta property="og:image:height" content="630" />
     <meta property="og:image:secure_url" content={ogImageUrl} />
     <meta property="og:site_name" content="Al Harkan's Blog" />
-    <meta property="og:url" content={Astro.url?.href || ""} />
     <meta property="og:locale" content="en_US" />
     <meta property="og:logo" content={new URL("/assets/logo.png", Astro.site).href} />
 
     <!-- Twitter -->
-    <meta property="twitter:card" content="summary_large_image" />
-    <meta property="twitter:title" content={page.metadata.title} />
-    <meta property="twitter:description" content={page.metadata.description} />
-    <meta property="twitter:image" content={ogImageUrl} />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:url" content={canonicalURL} />
+    <meta name="twitter:title" content={page.metadata.title} />
+    <meta name="twitter:description" content={page.metadata.description} />
+    <meta name="twitter:image" content={ogImageUrl} />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link

@@ -46,6 +46,9 @@ importers:
       '@fontsource/noto-sans':
         specifier: ^5.2.10
         version: 5.2.10
+      '@fontsource/playfair-display':
+        specifier: ^5.2.8
+        version: 5.2.8
       '@iconify-json/heroicons':
         specifier: ^1.2.3
         version: 1.2.3
@@ -716,6 +719,9 @@ packages:
 
   '@fontsource/noto-sans@5.2.10':
     resolution: {integrity: sha512-J58RVfS/C0Z2VBF+PoU260Tx8cdRGYuS+e3yQe4hYaIYDl0sEVn5CzlLo5zVRvQD0HaIUTV8AZMfqR7rtdEpqQ==}
+
+  '@fontsource/playfair-display@5.2.8':
+    resolution: {integrity: sha512-fUEhib70SszNhQVsGbUMSsWJhr7Je0rdeuZdtGpDNu0GKF1xJM8QhpI/y0pckU25GcChXm9TLOmeZupkvvZo2g==}
 
   '@google-cloud/firestore@7.11.6':
     resolution: {integrity: sha512-EW/O8ktzwLfyWBOsNuhRoMi8lrC3clHM5LVFhGvO1HCsLozCOOXRAlHrYBoE6HL42Sc8yYMuCb2XqcnJ4OOEpw==}
@@ -4997,6 +5003,8 @@ snapshots:
   '@firebase/webchannel-wrapper@1.0.5': {}
 
   '@fontsource/noto-sans@5.2.10': {}
+
+  '@fontsource/playfair-display@5.2.8': {}
 
   '@google-cloud/firestore@7.11.6':
     dependencies:

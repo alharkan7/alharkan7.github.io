@@ -184,6 +184,7 @@ if (type === "post") {
   <BaseLayout
     title={title}
     description={description}
+    subtitle={description ? (description.length > 75 ? description.substring(0, 75).replace(/\s+\S*$/, '') + '...' : description) : undefined}
     permalink={permalink}
     current={category}
     type="article"

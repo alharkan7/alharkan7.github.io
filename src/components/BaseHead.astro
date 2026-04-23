@@ -31,14 +31,23 @@ const currentSite = Astro.url?.origin || Astro.site?.href || "https://raihankall
 const canonicalURL = new URL(permalink, currentSite).href;
 
 // Helper to encode text for URL
-const encodeText = (text: string) => encodeURIComponent(text).substring(0, 100);
+const encodeText = (text: string) => encodeURIComponent(text);
+
+// Strip the site name suffix from the title specifically for the OG image
+const ogTitle = title.replace(" - Al Harkan", "");
+
+// Resolve the OG subtitle: use explicit subtitle prop, or fall back to description
+const rawSubtitle = subtitle || description || "";
+const ogSubtitle = rawSubtitle.length > 75
+  ? rawSubtitle.substring(0, 75).replace(/\s+\S*$/, "") + "..."
+  : rawSubtitle;
 
 // Use provided image or generate dynamic OG image via API
 // Use current request origin to avoid redirect issues
 const socialImageURL = image
   ? new URL(image, currentSite).href
   : new URL(
-      `/api/og?title=${encodeText(title)}${subtitle ? `&subtitle=${encodeText(subtitle)}` : ""}`,
+      `/api/og?title=${encodeText(ogTitle)}&subtitle=${encodeText(ogSubtitle)}`,
       currentSite
     ).href;
 
@@ -50,6 +59,7 @@ const logoURL = new URL("/assets/logo.png", currentSite).href;
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width" />
 <link rel="icon" type="image/x-icon" href="/favicon.ico" />
+<link rel="apple-touch-icon" sizes="180x180" href="/assets/logo.png" />
 <link rel="manifest" href="/manifest.json" />
 <meta name="theme-color" content="#ff6b6b" />
 <link rel="alternate" type="application/rss+xml" title="Al Harkan's Blog" href="/rss.xml" />
@@ -90,11 +100,11 @@ const logoURL = new URL("/assets/logo.png", currentSite).href;
 }
 
 <!-- Twitter -->
-<meta property="twitter:card" content="summary_large_image" />
-<meta property="twitter:url" content={canonicalURL} />
-<meta property="twitter:title" content={title} />
-<meta property="twitter:description" content={description} />
-<meta property="twitter:image" content={socialImageURL} />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:url" content={canonicalURL} />
+<meta name="twitter:title" content={title} />
+<meta name="twitter:description" content={description} />
+<meta name="twitter:image" content={socialImageURL} />
 
 <!-- Structured Data / JSON-LD -->
 {type === "article" && publishDate ? (

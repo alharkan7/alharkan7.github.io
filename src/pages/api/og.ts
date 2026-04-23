@@ -11,28 +11,32 @@ export const GET: APIRoute = async ({ url }) => {
     const subtitle = searchParams.get("subtitle") || "";
 
     // Try multiple possible paths for the font file
-    let fontData;
-    const fontFileName = "noto-sans-latin-700-normal.woff";
-    const possiblePaths = [
-      // Vercel serverless function bundle path
-      resolve(process.cwd(), "node_modules/.pnpm/@fontsource+noto-sans@5.2.10/node_modules/@fontsource/noto-sans/files/", fontFileName),
-      // Standard node_modules path
-      resolve(process.cwd(), "node_modules/@fontsource/noto-sans/files/", fontFileName),
-      // Fallback for different pnpm store structures
-      resolve(fileURLToPath(new URL(".", import.meta.url)), "../../../../node_modules/.pnpm/@fontsource+noto-sans@5.2.10/node_modules/@fontsource/noto-sans/files/", fontFileName),
-    ];
+    const loadFont = async (fileName: string) => {
+      const possiblePaths = [
+        // Vercel serverless function bundle path
+        resolve(process.cwd(), "node_modules/.pnpm/@fontsource+playfair-display@5.2.8/node_modules/@fontsource/playfair-display/files/", fileName),
+        // Standard node_modules path
+        resolve(process.cwd(), "node_modules/@fontsource/playfair-display/files/", fileName),
+        // Fallback for different pnpm store structures
+        // @ts-ignore
+        resolve(fileURLToPath(new URL(".", import.meta.url)), "../../../../node_modules/.pnpm/@fontsource+playfair-display@5.2.8/node_modules/@fontsource/playfair-display/files/", fileName),
+      ];
 
-    for (const path of possiblePaths) {
-      try {
-        fontData = await readFile(path);
-        break;
-      } catch {
-        // Try next path
+      for (const path of possiblePaths) {
+        try {
+          return await readFile(path);
+        } catch {
+          // Try next path
+        }
       }
-    }
+      return null;
+    };
 
-    if (!fontData) {
-      throw new Error("Could not load font file");
+    const fontDataBold = await loadFont("playfair-display-latin-700-normal.woff");
+    const fontDataRegular = await loadFont("playfair-display-latin-400-normal.woff");
+
+    if (!fontDataBold || !fontDataRegular) {
+      throw new Error("Could not load font files");
     }
 
     const svg = await satori(
@@ -44,9 +48,9 @@ export const GET: APIRoute = async ({ url }) => {
             width: "100%",
             display: "flex",
             flexDirection: "column",
-            backgroundColor: "#F5F1E8",
+            backgroundColor: "#FCFBF9",
             position: "relative",
-            fontFamily: "Noto Sans",
+            fontFamily: "Playfair Display",
           },
           children: [
             // Background dots (monochrome)
@@ -57,85 +61,87 @@ export const GET: APIRoute = async ({ url }) => {
                   position: "absolute",
                   inset: 0,
                   display: "flex",
-                  backgroundImage: "radial-gradient(#a8a29e 1px, transparent 1px)",
+                  backgroundImage: "radial-gradient(#e7e5e4 1px, transparent 1px)",
                   backgroundSize: "24px 24px",
                 },
               },
             },
-            // Main content (vertically centered, slightly higher)
+            // Main content (vertically centered, aligned left)
             {
               type: "div",
               props: {
                 style: {
                   position: "absolute",
-                  top: "35%",
-                  left: 0,
-                  right: 0,
+                  top: 0,
+                  bottom: 0,
+                  left: "80px",
+                  right: "80px",
                   display: "flex",
                   flexDirection: "column",
-                  alignItems: "center",
+                  alignItems: "flex-start",
                   justifyContent: "center",
-                  padding: "0 80px",
                 },
                 children: [
                   {
                     type: "div",
                     props: {
                       style: {
-                        fontSize: "56px",
+                        fontSize: "64px",
                         fontWeight: 700,
                         color: "#1c1917",
                         lineHeight: 1.1,
                         maxWidth: "900px",
-                        textAlign: "center",
+                        textAlign: "left",
                       },
                       children: title,
                     },
                   },
                   ...(subtitle
                     ? [
-                        {
-                          type: "div",
-                          props: {
-                            style: {
-                              fontSize: "24px",
-                              fontWeight: 400,
-                              color: "#57534e",
-                              marginTop: "16px",
-                              maxWidth: "800px",
-                              textAlign: "center",
-                            },
-                            children: subtitle,
+                      {
+                        type: "div",
+                        props: {
+                          style: {
+                            fontSize: "28px",
+                            fontWeight: 400,
+                            color: "#57534e",
+                            marginTop: "24px",
+                            maxWidth: "800px",
+                            textAlign: "left",
                           },
+                          children: subtitle,
                         },
-                      ]
+                      },
+                    ]
                     : []),
                   {
                     type: "div",
                     props: {
-                      style: { width: "60px", height: "3px", background: "#78716c", marginTop: "24px" },
+                      style: { width: "60px", height: "3px", background: "#78716c", marginTop: "32px" },
                     },
                   },
                 ],
               },
             },
-            // URL badge (monochrome, bottom right)
+            // Footer row (Blog name on left, URL badge on right)
             {
               type: "div",
               props: {
                 style: {
                   position: "absolute",
                   bottom: "60px",
+                  left: "80px",
                   right: "60px",
                   display: "flex",
+                  justifyContent: "space-between",
                   alignItems: "center",
-                  gap: "12px",
                 },
                 children: [
                   {
                     type: "div",
                     props: {
-                      style: { width: "8px", height: "8px", background: "#78716c", opacity: 0.6, borderRadius: "50%" },
+                      style: { fontSize: "20px", fontWeight: 700, color: "#57534e", display: "flex", alignItems: "center" },
+                      children: "Al Harkan's Blog",
                     },
                   },
                   {
@@ -143,7 +149,6 @@ export const GET: APIRoute = async ({ url }) => {
                     props: {
                       style: {
                         padding: "12px 24px",
-                        background: "rgba(120, 113, 108, 0.15)",
                         borderRadius: "22px",
                         border: "1px solid #78716c",
                         display: "flex",
@@ -151,7 +156,7 @@ export const GET: APIRoute = async ({ url }) => {
                       children: {
                         type: "span",
                         props: {
-                          style: { fontSize: "16px", fontWeight: 600, color: "#44403c" },
+                          style: { fontSize: "16px", fontWeight: 700, color: "#44403c" },
                           children: "raihankalla.id",
                         },
                       },
@@ -162,15 +167,21 @@ export const GET: APIRoute = async ({ url }) => {
             },
           ],
         },
-      },
+      } as any,
       {
         width: 1200,
         height: 630,
         fonts: [
           {
-            name: "Noto Sans",
-            data: fontData,
+            name: "Playfair Display",
+            data: fontDataBold,
             weight: 700,
+            style: "normal",
+          },
+          {
+            name: "Playfair Display",
+            data: fontDataRegular,
+            weight: 400,
             style: "normal",
           },
         ],
