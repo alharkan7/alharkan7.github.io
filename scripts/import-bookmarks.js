@@ -59,7 +59,10 @@ async function importBookmarks() {
 
   for (let i = 0; i < records.length; i += batchSize) {
     const batch = records.slice(i, i + batchSize);
-    const { data, error } = await supabase.from('x_tweets').insert(batch).select();
+    const { data, error } = await supabase
+      .from('x_tweets')
+      .upsert(batch, { onConflict: 'id', ignoreDuplicates: false })
+      .select();
 
     if (error) {
       console.error(`Batch ${Math.floor(i / batchSize)} error:`, error.message);
