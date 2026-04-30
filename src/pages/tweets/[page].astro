@@ -1,0 +1,29 @@
+---
+export const prerender = false;
+
+import { resolveTweetsPage } from "../../lib/tweets-query";
+import TweetsPage from "../../components/tweets/TweetsPage.astro";
+
+const raw = Astro.params.page ?? "";
+if (raw === "1") {
+  return Astro.redirect(`/tweets${Astro.url.search}`, 308);
+}
+
+const n = parseInt(raw, 10);
+if (isNaN(n) || n < 1) {
+  return Astro.redirect(`/tweets${Astro.url.search}`);
+}
+
+const resolved = await resolveTweetsPage(Astro.url, Astro.site, n);
+if ("redirectTo" in resolved) return Astro.redirect(resolved.redirectTo);
+
+const searchRaw = Astro.url.searchParams.get("search") ?? "";
+if (!searchRaw) {
+  Astro.response.headers.set(
+    "Cache-Control",
+    "s-maxage=300, stale-while-revalidate=3600",
+  );
+}
+---
+
+<TweetsPage view={resolved.view} />

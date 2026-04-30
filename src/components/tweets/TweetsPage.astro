@@ -1,0 +1,663 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import TweetIcons from "../../components/tweets/TweetIcons.astro";
+import type { TweetsViewModel } from "../../lib/tweets-query";
+
+interface Props {
+  view: TweetsViewModel;
+}
+
+const v = Astro.props.view;
+
+function colorizeUrls(text: string): string {
+  if (!text) return "";
+  return text.replace(
+    /(https?:\/\/[^\s]+)/g,
+    '<span class="tweet-url-text">$1</span>',
+  );
+}
+
+const title = "Saved Tweets";
+const description =
+  "A curated list of liked, bookmarked, and retweeted posts from Twitter.";
+---
+
+<BaseLayout
+  title={title}
+  description={description}
+  permalink={v.permalink ?? "/tweets"}
+  current="tweets"
+  type="collection"
+  items={v.structuredDataItems}
+>
+  <TweetIcons />
+  <div class="container">
+    <h1 id="page-title">
+      My <span id="title-count">{v.totalCount}</span>
+      <span id="title-text">{v.headingLabel}</span>
+    </h1>
+    <p>{description}</p>
+    <hr />
+
+    {
+      v.loadError && (
+        <p class="tweet-error" role="alert">
+          <b>Could not load tweets.</b> {v.loadError}
+        </p>
+      )
+    }
+
+    {
+      !v.loadError && v.totalCount > 0 && (
+        <div
+          class="tweets-toolbar"
+          role="search"
+          aria-label="Filter saved tweets"
+        >
+          <form class="tweets-toolbar-form" method="get" action="/tweets">
+            {
+              v.filterNonDefault && (
+                <>
+                  <input
+                    type="hidden"
+                    name="bookmarks"
+                    value={String(v.filters.showBookmarks)}
+                  />
+                  <input
+                    type="hidden"
+                    name="likes"
+                    value={String(v.filters.showLikes)}
+                  />
+                  <input
+                    type="hidden"
+                    name="retweets"
+                    value={String(v.filters.showRetweets)}
+                  />
+                </>
+              )
+            }
+            <div class="tweets-toolbar-field tweets-search-wrap">
+              <div class="tweets-search-inner">
+                <span class="tweets-search-icon" aria-hidden="true">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="18"
+                    height="18"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  >
+                    <circle cx="11" cy="11" r="8"></circle>
+                    <path d="m21 21-4.35-4.35"></path>
+                  </svg>
+                </span>
+                <input
+                  type="search"
+                  name="search"
+                  class="tweets-input tweets-input--with-icon"
+                  placeholder="Search tweet text…"
+                  aria-label="Search by tweet text"
+                  autocomplete="off"
+                  spellcheck="false"
+                  value={v.searchRaw}
+                />
+              </div>
+              <button type="submit" class="tweets-search-submit">
+                Search
+              </button>
+            </div>
+          </form>
+          <div class="tweets-filter-toggles">
+            <a
+              href={v.hrefBookmarks}
+              class:list={[
+                "filter-toggle",
+                { active: v.filters.showBookmarks },
+              ]}
+            >
+              <svg
+                class="filter-ic icon-stroke"
+                width="16"
+                height="16"
+                aria-hidden="true"
+              >
+                <use href="#tweet-ic-bookmark"></use>
+              </svg>
+              <span class="filter-text">Bookmarks</span>
+            </a>
+            <a
+              href={v.hrefLikes}
+              class:list={["filter-toggle", { active: v.filters.showLikes }]}
+            >
+              <svg
+                class="filter-ic heart-solid heart-ic"
+                width="16"
+                height="16"
+                aria-hidden="true"
+              >
+                <use href="#tweet-ic-heart"></use>
+              </svg>
+              <span class="filter-text">Likes</span>
+            </a>
+            <a
+              href={v.hrefRetweets}
+              class:list={[
+                "filter-toggle",
+                { active: v.filters.showRetweets },
+              ]}
+            >
+              <svg
+                class="filter-ic icon-stroke retweet-ic"
+                width="16"
+                height="16"
+                aria-hidden="true"
+              >
+                <use href="#tweet-ic-repeat"></use>
+              </svg>
+              <span class="filter-text">Retweets</span>
+            </a>
+          </div>
+        </div>
+      )
+    }
+
+    <div class="tweet-grid">
+      {
+        !v.loadError &&
+          v.rows.map((tweet) => {
+            let displayText = tweet.text ?? "";
+            let retweetUser = "";
+            const rtMatch = displayText.match(/^RT\s+@([A-Za-z0-9_]+):\s*/i);
+            if (rtMatch) {
+              retweetUser = rtMatch[1];
+              displayText = displayText.replace(rtMatch[0], "");
+            }
+
+            const viewUrl = `https://x.com/i/web/status/${tweet.id}`;
+
+            return (
+              <a
+                href={viewUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                class="tweet-card"
+                style="display: flex;"
+              >
+                <div class="tweet-card-header">
+                  <span
+                    class="twitter-icon-wrap"
+                    aria-hidden="true"
+                    style="display: flex; align-items: center; gap: 0.4rem;"
+                  >
+                    <svg
+                      class="twitter-bird"
+                      width="18"
+                      height="18"
+                      aria-hidden="true"
+                    >
+                      <use href="#tweet-ic-bird" />
+                    </svg>
+                    {retweetUser && (
+                      <span class="retweet-user">@{retweetUser}</span>
+                    )}
+                  </span>
+                  <span class="tweet-status-icons">
+                    {tweet.is_like && (
+                      <svg
+                        class="heart-icon card-ic heart-solid"
+                        width="16"
+                        height="16"
+                        aria-hidden="true"
+                      >
+                        <use href="#tweet-ic-heart" />
+                      </svg>
+                    )}
+                    {tweet.is_bookmark && (
+                      <svg
+                        class="bookmark-icon card-ic"
+                        width="16"
+                        height="16"
+                        aria-hidden="true"
+                      >
+                        <use href="#tweet-ic-bookmark" />
+                      </svg>
+                    )}
+                    {tweet.is_retweet && (
+                      <svg
+                        class="retweet-icon card-ic"
+                        width="16"
+                        height="16"
+                        aria-hidden="true"
+                      >
+                        <use href="#tweet-ic-repeat" />
+                      </svg>
+                    )}
+                  </span>
+                </div>
+
+                <div class="tweet-content-container">
+                  <p
+                    class="tweet-text"
+                    set:html={colorizeUrls(displayText)}
+                  />
+                </div>
+              </a>
+            );
+          })
+      }
+    </div>
+
+    {
+      !v.loadError && v.totalCount === 0 && (
+        <p class="tweet-empty">No tweets match these filters or search.</p>
+      )
+    }
+
+    {
+      !v.loadError && v.totalCount > 0 && v.totalPages > 1 && (
+        <nav class="pagination-controls" aria-label="Tweet pages">
+          {v.hrefPrev ? (
+            <a href={v.hrefPrev} class="nav-button">
+              Prev
+            </a>
+          ) : (
+            <span class="nav-button disabled" aria-disabled="true">
+              Prev
+            </span>
+          )}
+          <div class="page-select-container">
+            <span class="mr-1">Page</span>
+            <strong>{v.currentPage}</strong>
+            <span class="mx-1">of</span>
+            <strong>{v.totalPages}</strong>
+          </div>
+          {v.hrefNext ? (
+            <a href={v.hrefNext} class="nav-button">
+              Next
+            </a>
+          ) : (
+            <span class="nav-button disabled" aria-disabled="true">
+              Next
+            </span>
+          )}
+        </nav>
+      )
+    }
+
+    <hr class="mt-8" />
+
+    <p class="footnote text-sm">
+      This list is automatically updated daily (latest: {v.lastUpdateDate}).
+    </p>
+  </div>
+</BaseLayout>
+
+<style>
+  .tweet-error {
+    color: #b91c1c;
+    margin: 1rem 0;
+  }
+
+  .tweet-empty {
+    color: var(--text-secondary);
+    margin: 2rem 0;
+  }
+
+  .container h1 {
+    margin-block-start: 1em;
+    margin-block-end: 0.5em;
+  }
+  .container > p:first-of-type {
+    margin-block-end: 1.5em;
+  }
+
+  .tweets-toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: stretch;
+    gap: 1rem;
+    margin-block: 1.25rem 0.5rem;
+  }
+
+  .tweets-toolbar-form {
+    display: flex;
+    flex: 1;
+    min-width: 200px;
+  }
+
+  .tweets-toolbar-field {
+    min-width: 0;
+    flex: 1;
+    display: flex;
+    align-items: stretch;
+    gap: 0.5rem;
+  }
+
+  .tweets-search-inner {
+    position: relative;
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    align-items: stretch;
+  }
+
+  .tweets-search-wrap {
+    position: relative;
+    display: flex;
+    flex: 1;
+    gap: 0.5rem;
+    align-items: center;
+  }
+
+  .tweets-search-submit {
+    flex-shrink: 0;
+    padding: 0.5rem 0.85rem;
+    font-size: 0.9em;
+    font-weight: 600;
+    font-family: var(--font-family-sans);
+    color: var(--background-body);
+    background-color: var(--primary-color);
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: opacity 0.15s ease;
+  }
+
+  .tweets-search-submit:hover {
+    opacity: 0.9;
+  }
+
+  .tweets-filter-toggles {
+    display: flex;
+    gap: 0.5rem;
+    margin-left: auto;
+    flex-shrink: 0;
+    align-items: stretch;
+  }
+
+  .filter-toggle {
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+    padding: 0 0.75rem;
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    background-color: var(--background-body);
+    color: var(--text-secondary);
+    font-family: var(--font-family-sans);
+    font-size: 0.9em;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-decoration: none;
+  }
+
+  .filter-toggle:hover {
+    border-color: var(--primary-color);
+    color: var(--primary-color);
+  }
+
+  .filter-toggle.active {
+    background-color: color-mix(
+      in srgb,
+      var(--primary-color) 15%,
+      transparent
+    );
+    border-color: var(--primary-color);
+    color: var(--primary-color);
+  }
+
+  .filter-ic {
+    flex-shrink: 0;
+  }
+
+  .filter-ic.heart-solid {
+    stroke: none;
+  }
+
+  .heart-solid {
+    fill: currentColor;
+    stroke: none;
+  }
+
+  .heart-ic {
+    color: #f91880;
+  }
+
+  .filter-toggle.active svg.icon-stroke {
+    fill: none;
+  }
+
+  a.filter-toggle:has(.heart-ic):hover {
+    border-color: #f91880;
+    color: #f91880;
+  }
+
+  a.filter-toggle:has(.heart-ic).active {
+    background-color: color-mix(in srgb, #f91880 15%, transparent);
+    border-color: #f91880;
+    color: #f91880;
+  }
+
+  a.filter-toggle:has(.retweet-ic):hover {
+    border-color: #00ba7c;
+    color: #00ba7c;
+  }
+
+  a.filter-toggle:has(.retweet-ic).active {
+    background-color: color-mix(in srgb, #00ba7c 15%, transparent);
+    border-color: #00ba7c;
+    color: #00ba7c;
+  }
+
+  @media (max-width: 480px) {
+    .filter-text {
+      display: none;
+    }
+    .filter-toggle {
+      padding: 0.4rem 0.6rem;
+    }
+  }
+
+  .tweets-search-icon {
+    position: absolute;
+    left: 0.65rem;
+    top: 50%;
+    transform: translateY(-50%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-secondary);
+    pointer-events: none;
+  }
+
+  .tweets-search-icon :global(svg) {
+    display: block;
+  }
+
+  .tweets-input {
+    min-width: 0;
+    width: 100%;
+    padding: 0.5rem 0.65rem;
+    font-size: 0.95rem;
+    font-family: var(--font-family-sans);
+    color: var(--text-main);
+    background-color: var(--background-body);
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    outline: none;
+    transition: border-color 0.15s ease;
+  }
+
+  .tweets-input--with-icon {
+    padding-left: 2.35rem;
+  }
+
+  .tweets-input:focus {
+    border-color: var(--primary-color);
+  }
+
+  .tweets-search-inner:focus-within .tweets-search-icon {
+    color: var(--primary-color);
+  }
+
+  .tweet-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 1.5rem;
+    margin-block: 2em;
+  }
+
+  .tweet-card {
+    display: flex;
+    flex-direction: column;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 1.25rem;
+    text-decoration: none;
+    color: inherit;
+    background-color: var(--background-alt);
+    transition:
+      transform 0.2s ease-in-out,
+      box-shadow 0.2s ease-in-out;
+    height: 100%;
+  }
+
+  .tweet-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    border-color: var(--primary-color);
+  }
+
+  .tweet-card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+    margin-bottom: 0.75rem;
+  }
+
+  .twitter-bird {
+    color: var(--text-secondary);
+    transition:
+      color 0.2s ease,
+      fill 0.2s ease;
+  }
+
+  .tweet-card:hover .twitter-bird {
+    color: var(--primary-color);
+    fill: var(--primary-color);
+  }
+
+  .retweet-user {
+    font-size: 0.9em;
+    font-weight: 500;
+    color: var(--text-secondary);
+    transition: color 0.2s ease;
+  }
+
+  .tweet-card:hover .retweet-user {
+    color: var(--primary-color);
+  }
+
+  .tweet-status-icons {
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+  }
+
+  .card-ic.heart-icon {
+    color: #f91880;
+  }
+
+  .card-ic.bookmark-icon {
+    color: var(--primary-color);
+  }
+
+  .card-ic.retweet-icon {
+    color: #00ba7c;
+  }
+
+  .tweet-card:hover .card-ic.heart-icon {
+    fill: #f91880;
+  }
+
+  .tweet-card:hover .card-ic.bookmark-icon {
+    fill: var(--primary-color);
+  }
+
+  .tweet-content-container {
+    flex-grow: 1;
+    margin-bottom: 1rem;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .tweet-text {
+    font-size: 0.95em;
+    line-height: 1.5;
+    white-space: pre-wrap;
+    word-break: break-word;
+    margin: 0;
+  }
+
+  :global(.tweet-url-text) {
+    color: var(--primary-color);
+  }
+
+  .footnote {
+    font-size: 0.85em;
+    color: var(--text-secondary);
+    margin-top: 2em;
+    text-align: left;
+  }
+
+  .pagination-controls {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    justify-content: center;
+    align-items: center;
+    gap: 1rem;
+    margin: 2em 0;
+    font-family: var(--font-family-sans);
+  }
+
+  .nav-button {
+    color: var(--text-secondary);
+    font-size: 0.9em;
+    font-weight: bold;
+    text-decoration: none;
+    transition: all 0.2s ease-in-out;
+    box-shadow: inset 0 -0.12em 0 var(--primary-color);
+    padding: 0.2em 0.1em;
+  }
+
+  .nav-button:hover:not(.disabled) {
+    box-shadow: inset 0 -1.5em 0 var(--primary-color);
+    color: #fff;
+  }
+
+  .nav-button.disabled,
+  .nav-button[aria-disabled="true"] {
+    opacity: 0.5;
+    cursor: not-allowed;
+    pointer-events: none;
+    box-shadow: inset 0 -0.12em 0 var(--text-secondary);
+  }
+
+  .page-select-container {
+    display: flex;
+    align-items: center;
+    font-size: 0.9em;
+    white-space: nowrap;
+    gap: 0.25rem;
+  }
+
+  .mx-1 {
+    margin-inline: 0.25rem;
+  }
+</style>
