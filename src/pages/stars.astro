@@ -263,13 +263,6 @@ const structuredDataItems = starredRepos.slice(0, 100).map((repo) => ({
                             data-list-names={JSON.stringify(lists)}
                         >
                             <div class="repo-card-header">
-                                <img
-                                    src={repo.owner.avatar_url}
-                                    alt={`${repo.owner.login} avatar`}
-                                    width="24"
-                                    height="24"
-                                    class="repo-owner-avatar"
-                                />
                                 <span class="repo-full-name">
                                     {repo.full_name}
                                 </span>
@@ -483,10 +476,6 @@ const structuredDataItems = starredRepos.slice(0, 100).map((repo) => ({
         display: flex;
         align-items: center;
         gap: 0.5rem;
-    }
-
-    .repo-owner-avatar {
-        border-radius: 50%;
     }
 
     .repo-full-name {

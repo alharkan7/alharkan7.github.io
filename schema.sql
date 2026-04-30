@@ -39,7 +39,7 @@ CREATE TABLE IF NOT EXISTS chrome_bookmarks (
     date_added BIGINT,
     parent_id INTEGER REFERENCES chrome_bookmarks(id) ON DELETE CASCADE,
     source TEXT,
-    path TEXT,
+    path TEXT UNIQUE,
     parent_path TEXT,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
@@ -63,6 +63,7 @@ CREATE TABLE IF NOT EXISTS x_tweets (
     article_title TEXT,
     entities JSONB DEFAULT '{}',
     synced_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    id_num BIGINT GENERATED ALWAYS AS (id::bigint) STORED,
     CONSTRAINT valid_type CHECK (is_bookmark = TRUE OR is_like = TRUE OR is_retweet = TRUE)
 );
 
