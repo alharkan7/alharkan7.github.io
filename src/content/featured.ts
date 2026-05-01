@@ -2,6 +2,14 @@ const sortByDate = true;
 
 const rawProjects = [
   {
+    title: "1.600.000 Tahun Sejarah Nusantara",
+    subtitle: "",
+    type: "visualization",
+    date: "2026-01-16",
+    url: "https://alhrkn.vercel.app/vast-timeline",
+    coverImage: "https://ik.imagekit.io/raihankalla/research_section_cover/nusantara-timeline.png",
+  },
+  {
     title: "Kekayaan Bahasa Nusantara",
     subtitle: "",
     type: "visualization",
