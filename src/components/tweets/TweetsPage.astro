@@ -1,7 +1,7 @@
 ---
 import BaseLayout from "../../layouts/BaseLayout.astro";
 import TweetIcons from "../../components/tweets/TweetIcons.astro";
-import type { TweetsViewModel } from "../../lib/tweets-query";
+import { tweetPublicUrl, type TweetsViewModel } from "../../lib/tweets-query";
 
 interface Props {
   view: TweetsViewModel;
@@ -188,7 +188,7 @@ const description =
 
             displayText = labelUrlOnlyTweet(displayText);
 
-            const viewUrl = `https://x.com/i/web/status/${tweet.id}`;
+            const viewUrl = tweetPublicUrl(tweet.id);
 
             return (
               <a

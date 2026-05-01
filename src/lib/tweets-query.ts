@@ -20,6 +20,16 @@ const HIDDEN_SUBSTR =
 
 export const TWEETS_PAGE_SIZE = 30;
 
+/**
+ * Public tweet permalink for links and JSON-LD.
+ * Avoid `/i/web/status/{id}` — mobile/X apps often mishandle that path when opening
+ * from an external site; X resolves `/username/status/{id}` by tweet id and ignores a
+ * placeholder username (see X developer blog on canonical tweet URLs).
+ */
+export function tweetPublicUrl(tweetId: string): string {
+  return `https://x.com/twitter/status/${tweetId}`;
+}
+
 export function createTweetsSupabase(): SupabaseClient | null {
   const supabaseUrl = import.meta.env.SUPABASE_URL;
   const supabaseAnonKey = import.meta.env.SUPABASE_ANON_KEY;
@@ -143,7 +153,7 @@ export async function getStructuredTweetItems(
     name:
       (tweet.text || "").substring(0, 100) +
       ((tweet.text || "").length > 100 ? "..." : ""),
-    url: `https://twitter.com/i/web/status/${tweet.id}`,
+    url: tweetPublicUrl(tweet.id),
   }));
 }
 
