@@ -17,6 +17,16 @@ function colorizeUrls(text: string): string {
   );
 }
 
+/** Posts that are only a link (e.g. shared articles) read better with a short label. */
+function labelUrlOnlyTweet(text: string): string {
+  const trimmed = text.trim();
+  if (!trimmed) return text;
+  if (/^https?:\/\/\S+$/.test(trimmed)) {
+    return `X Article: ${trimmed}`;
+  }
+  return text;
+}
+
 const title = "Saved Tweets";
 const description =
   "A curated list of liked, bookmarked, and retweeted posts from Twitter.";
@@ -175,6 +185,8 @@ const description =
               retweetUser = rtMatch[1];
               displayText = displayText.replace(rtMatch[0], "");
             }
+
+            displayText = labelUrlOnlyTweet(displayText);
 
             const viewUrl = `https://x.com/i/web/status/${tweet.id}`;
 
