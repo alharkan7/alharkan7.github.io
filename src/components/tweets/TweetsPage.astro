@@ -133,12 +133,12 @@ const description =
               class:list={["filter-toggle", { active: v.filters.showLikes }]}
             >
               <svg
-                class="filter-ic heart-solid heart-ic"
+                class="filter-ic icon-stroke"
                 width="16"
                 height="16"
                 aria-hidden="true"
               >
-                <use href="#tweet-ic-heart"></use>
+                <use href="#tweet-ic-heart-outline"></use>
               </svg>
               <span class="filter-text">Likes</span>
             </a>
@@ -150,7 +150,7 @@ const description =
               ]}
             >
               <svg
-                class="filter-ic icon-stroke retweet-ic"
+                class="filter-ic icon-stroke"
                 width="16"
                 height="16"
                 aria-hidden="true"
@@ -427,37 +427,23 @@ const description =
     color: #f91880;
   }
 
+  .retweet-ic {
+    color: #00ba7c;
+  }
+
   .filter-toggle.active svg.icon-stroke {
-    fill: none;
-  }
-
-  a.filter-toggle:has(.heart-ic):hover {
-    border-color: #f91880;
-    color: #f91880;
-  }
-
-  a.filter-toggle:has(.heart-ic).active {
-    background-color: color-mix(in srgb, #f91880 15%, transparent);
-    border-color: #f91880;
-    color: #f91880;
-  }
-
-  a.filter-toggle:has(.retweet-ic):hover {
-    border-color: #00ba7c;
-    color: #00ba7c;
-  }
-
-  a.filter-toggle:has(.retweet-ic).active {
-    background-color: color-mix(in srgb, #00ba7c 15%, transparent);
-    border-color: #00ba7c;
-    color: #00ba7c;
+    fill: currentColor;
+    stroke: currentColor;
   }
 
   @media (max-width: 480px) {
-    .filter-text {
-      display: none;
+    .tweets-filter-toggles {
+      width: 100%;
+      margin-left: 0;
     }
     .filter-toggle {
+      flex: 1;
+      justify-content: center;
       padding: 0.4rem 0.6rem;
     }
   }
