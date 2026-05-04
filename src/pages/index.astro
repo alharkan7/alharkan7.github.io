@@ -46,14 +46,14 @@ const paginatedPosts = sortedPosts.slice(0, postsPerPage);
 >
   <div class="container">
     <h1>{title}</h1>
-    <p><b>{description}</b></p>
+    <!-- <p><b>{description}</b></p> -->
     <QuickLinks />
     <hr />
     <FeaturedSection
-      sectionTitle="Research Pages"
-      sectionSubtitle="This is a list of special pages showcasing some research projects that don't fit the blog formatting."
+      sectionTitle="Visual Pages"
       items={featuredProjects.slice(0, 6)}
     />
+    <!-- sectionSubtitle="This is a list of special pages showcasing some research projects that don't fit the blog formatting." -->
     <div class="see-more-container">
       <a href="/data" class="see-more-link">See More →</a>
     </div>
