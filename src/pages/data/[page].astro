@@ -87,6 +87,15 @@ const types = [
             }
           </select>
         </div>
+
+        <div class="sort-wrapper">
+          <select id="sort-select" aria-label="Sort projects">
+            <option value="date-desc">Date ↓</option>
+            <option value="date-asc">Date ↑</option>
+            <option value="title-asc">Title A-Z</option>
+            <option value="title-desc">Title Z-A</option>
+          </select>
+        </div>
       </div>
     </header>
 
@@ -154,10 +163,64 @@ const types = [
   <script define:vars={{ allProjects }}>
     const searchInput = document.getElementById("project-search");
     const typeFilter = document.getElementById("type-filter");
+    const sortSelect = document.getElementById("sort-select");
     const paginatedGrid = document.getElementById("paginated-grid");
     const filteredGrid = document.getElementById("filtered-grid");
     const noResults = document.getElementById("no-results");
     const paginationControls = document.getElementById("pagination-controls");
+
+    function sortProjects(projects) {
+      const sortValue = sortSelect.value;
+      return [...projects].sort((a, b) => {
+        if (sortValue === "date-desc") {
+          const dateA = new Date(a.date || 0).getTime();
+          const dateB = new Date(b.date || 0).getTime();
+          return dateB - dateA;
+        }
+        if (sortValue === "date-asc") {
+          const dateA = new Date(a.date || 0).getTime();
+          const dateB = new Date(b.date || 0).getTime();
+          return dateA - dateB;
+        }
+        if (sortValue === "title-asc") {
+          return a.title.localeCompare(b.title);
+        }
+        if (sortValue === "title-desc") {
+          return b.title.localeCompare(a.title);
+        }
+        return 0;
+      });
+    }
+
+    function renderCards(projects) {
+      return projects
+        .map(
+          (project) => `
+        <a
+          href="${project.url}"
+          class="data-card"
+          target="${project.url.startsWith("http") ? "_blank" : "_self"}"
+          rel="${project.url.startsWith("http") ? "noopener noreferrer" : ""}"
+        >
+          <div class="card-image-wrapper">
+            <img
+              src="${project.coverImage}"
+              alt="${project.title}"
+              loading="lazy"
+              class="card-image"
+            />
+            ${project.type ? `<span class="card-type">${project.type}</span>` : ""}
+          </div>
+          <div class="card-content">
+            <h3 class="card-title">${project.title}</h3>
+            ${project.date ? `<time class="card-date">${new Date(project.date).toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric" })}</time>` : ""}
+            ${project.subtitle ? `<p class="card-subtitle">${project.subtitle}</p>` : ""}
+          </div>
+        </a>
+      `,
+        )
+        .join("");
+    }
 
     function filterProjects() {
       const searchTerm = searchInput.value.toLowerCase().trim();
@@ -169,6 +232,9 @@ const types = [
         filteredGrid.style.display = "none";
         noResults.style.display = "none";
         if (paginationControls) paginationControls.style.display = "flex";
+
+        const sorted = sortProjects(allProjects);
+        paginatedGrid.innerHTML = renderCards(sorted);
         return;
       }
 
@@ -191,38 +257,14 @@ const types = [
         filteredGrid.style.display = "grid";
         noResults.style.display = "none";
 
-        filteredGrid.innerHTML = filtered
-          .map(
-            (project) => `
-          <a
-            href="${project.url}"
-            class="data-card"
-            target="${project.url.startsWith("http") ? "_blank" : "_self"}"
-            rel="${project.url.startsWith("http") ? "noopener noreferrer" : ""}"
-          >
-            <div class="card-image-wrapper">
-              <img
-                src="${project.coverImage}"
-                alt="${project.title}"
-                loading="lazy"
-                class="card-image"
-              />
-              ${project.type ? `<span class="card-type">${project.type}</span>` : ""}
-            </div>
-            <div class="card-content">
-              <h3 class="card-title">${project.title}</h3>
-              ${project.date ? `<time class="card-date">${new Date(project.date).toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric" })}</time>` : ""}
-              ${project.subtitle ? `<p class="card-subtitle">${project.subtitle}</p>` : ""}
-            </div>
-          </a>
-        `,
-          )
-          .join("");
+        const sorted = sortProjects(filtered);
+        filteredGrid.innerHTML = renderCards(sorted);
       }
     }
 
     searchInput?.addEventListener("input", filterProjects);
     typeFilter?.addEventListener("change", filterProjects);
+    sortSelect?.addEventListener("change", filterProjects);
   </script>
 
   <style is:global>
@@ -253,7 +295,7 @@ const types = [
 
     .search-wrapper {
       position: relative;
-      flex: 1;
+      flex: 1 1 100%;
       min-width: 250px;
     }
 
@@ -288,6 +330,34 @@ const types = [
 
     .type-filter-wrapper {
       min-width: 150px;
+    }
+
+    .sort-wrapper {
+      min-width: 140px;
+    }
+
+    #sort-select {
+      width: 100%;
+      padding: 0.75rem 1rem;
+      border-radius: 8px;
+      border: 1px solid var(--border-color);
+      background: var(--background-elevated, rgba(0, 0, 0, 0.03));
+      color: var(--text-primary);
+      font-family: inherit;
+      font-size: 1rem;
+      cursor: pointer;
+      appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 12px center;
+      padding-right: 2.5rem;
+      transition: all 0.2s ease;
+    }
+
+    #sort-select:focus {
+      outline: none;
+      border-color: var(--primary-color);
+      background-color: var(--background-body);
     }
 
     #type-filter {
@@ -422,8 +492,15 @@ const types = [
         gap: 1.75rem 1rem;
       }
       .filter-controls {
-        flex-direction: column;
-        align-items: stretch;
+        flex-wrap: wrap;
+      }
+      .search-wrapper {
+        flex: 1 1 100%;
+      }
+      .type-filter-wrapper,
+      .sort-wrapper {
+        flex: 1 1 calc(50% - 0.5rem);
+        min-width: 0;
       }
     }
 
