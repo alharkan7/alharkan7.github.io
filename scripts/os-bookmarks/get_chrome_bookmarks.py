@@ -293,7 +293,8 @@ def main():
             dbname=DB_NAME,
             user=DB_USER,
             password=DB_PASSWORD,
-            port=DB_PORT
+            port=DB_PORT,
+            connect_timeout=10
         )
         cur = conn.cursor()
         print("Successfully connected to the database.")
