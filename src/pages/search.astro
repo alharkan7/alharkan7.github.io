@@ -1,4 +1,6 @@
 ---
+export const prerender = true;
+
 import BaseLayout from "../layouts/BaseLayout.astro";
 
 const title = "Search";
@@ -16,14 +18,36 @@ const sortedPosts = allPosts.sort(
     new Date(a.frontmatter.publishDate).valueOf(),
 );
 
-// Prepare posts data for client-side use
-const posts = sortedPosts.map((post:any) => ({
-  title: post.frontmatter.title,
-  description: post.frontmatter.description,
-  publishDate: post.frontmatter.publishDate,
-  slug: post.file.split("/").pop()?.split(".").shift() || "",
-  content: post.rawContent?.() || "",
-}));
+// Prepare posts data for client-side use (skip posts without required fields)
+const posts = sortedPosts
+  .filter((post: any) => post.frontmatter.title && post.frontmatter.publishDate)
+  .map((post:any) => ({
+    title: post.frontmatter.title,
+    description: post.frontmatter.description || "",
+    publishDate: post.frontmatter.publishDate,
+    slug: post.file.split("/").pop()?.split(".").shift() || "",
+    content: post.rawContent?.() || "",
+  }));
+
+// Add featured HTML pages
+const featuredHtmlGlob = import.meta.glob("../featured/*.html", {
+  query: "?raw",
+  eager: true,
+});
+const featuredPages = Object.entries(featuredHtmlGlob).map(([path, mod]: [string, any]) => {
+  const html: string = mod.default || "";
+  const titleMatch = html.match(/<title[^>]*>([^<]+)<\/title>/i);
+  const descMatch = html.match(/<meta[^>]+name=["']description["'][^>]+content=["']([^"']+)["']/i)
+    || html.match(/<meta[^>]+content=["']([^"']+)["'][^>]+name=["']description["']/i);
+  const slug = path.split("/").pop()?.split(".").shift() || "";
+  return {
+    title: titleMatch ? titleMatch[1].trim() : slug,
+    description: descMatch ? descMatch[1].trim() : "",
+    publishDate: "",
+    slug,
+    content: "",
+  };
+}).filter((p) => p.title);
 ---
 
 <BaseLayout
@@ -32,7 +56,7 @@ const posts = sortedPosts.map((post:any) => ({
   permalink={permalink ?? "/"}
   current="search"
 >
-  <div class="container">
+  <div class="container" id="searchContainer" data-posts={JSON.stringify([...posts, ...featuredPages])}>
     <h1>Search</h1>
 
     <div class="search-container">
@@ -68,62 +92,82 @@ const posts = sortedPosts.map((post:any) => ({
       <!-- Results will be populated here -->
     </div>
   </div>
+
+  <script is:inline>
+    (function() {
+      function initSearch() {
+        const container = document.getElementById("searchContainer");
+        if (!container) return;
+
+        const postsData = container.dataset.posts;
+        if (!postsData) {
+          console.error("Posts data not found");
+          return;
+        }
+
+        const posts = JSON.parse(postsData);
+        const searchInput = document.getElementById("searchInput");
+        const searchButton = document.getElementById("searchButton");
+        const searchResults = document.getElementById("searchResults");
+
+        if (!searchInput || !searchButton || !searchResults) {
+          console.error("Required DOM elements not found");
+          return;
+        }
+
+        function performSearch() {
+          const query = searchInput.value.toLowerCase();
+          if (!query) {
+            searchResults.innerHTML = "";
+            return;
+          }
+
+          const filteredPosts = posts.filter(
+            (post) =>
+              (post.title || "").toLowerCase().includes(query) ||
+              (post.description || "").toLowerCase().includes(query) ||
+              (post.content || "").toLowerCase().includes(query),
+          );
+
+          searchResults.innerHTML = filteredPosts
+            .map(
+              (post) => `
+            <div class="post-item">
+              <h2>
+                <a href="/${post.slug}">${post.title}</a>
+              </h2>
+              <p>${post.description}</p>
+              <div class="post-item-footer">
+                <span class="post-item-date">— ${post.publishDate}</span>
+              </div>
+            </div>
+            <hr />
+          `,
+            )
+            .join("");
+
+          if (filteredPosts.length === 0) {
+            searchResults.innerHTML = "<p>No results found.</p>";
+          }
+        }
+
+        // Event listeners
+        searchButton.addEventListener("click", performSearch);
+        searchInput.addEventListener("keypress", (e) => {
+          if (e.key === "Enter") {
+            performSearch();
+          }
+        });
+      }
+
+      if (document.readyState === "loading") {
+        document.addEventListener("DOMContentLoaded", initSearch);
+      } else {
+        initSearch();
+      }
+    })();
+  </script>
 </BaseLayout>
-
-<script define:vars={{ posts }}>
-  const searchInput = document.getElementById("searchInput");
-  const searchButton = document.getElementById("searchButton");
-  const searchResults = document.getElementById("searchResults");
-
-  if (!searchInput || !searchButton || !searchResults) {
-    console.error("Required DOM elements not found");
-    throw new Error("Required DOM elements not found");
-  }
-
-  function performSearch() {
-    const query = searchInput.value.toLowerCase();
-    if (!query) {
-      searchResults.innerHTML = "";
-      return;
-    }
-
-    const filteredPosts = posts.filter(
-      (post) =>
-        post.title.toLowerCase().includes(query) ||
-        post.description.toLowerCase().includes(query) ||
-        post.content.toLowerCase().includes(query),
-    );
-
-    searchResults.innerHTML = filteredPosts
-      .map(
-        (post) => `
-      <div class="post-item">
-        <h2>
-          <a href="/${post.slug}">${post.title}</a>
-        </h2>
-        <p>${post.description}</p>
-        <div class="post-item-footer">
-          <span class="post-item-date">— ${post.publishDate}</span>
-        </div>
-      </div>
-      <hr />
-    `,
-      )
-      .join("");
-
-    if (filteredPosts.length === 0) {
-      searchResults.innerHTML = "<p>No results found.</p>";
-    }
-  }
-
-  // Event listeners
-  searchButton.addEventListener("click", performSearch);
-  searchInput.addEventListener("keypress", (e) => {
-    if (e.key === "Enter") {
-      performSearch();
-    }
-  });
-</script>
 
 <style>
   h1 {
