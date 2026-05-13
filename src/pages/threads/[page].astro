@@ -87,6 +87,16 @@ const permalink = `${Astro?.site?.href}short`;
     display: grid;
     gap: 1rem;
     margin-bottom: 2rem;
+    max-width: 100%;
+    overflow: hidden;
+  }
+
+  .tweets-container :global(iframe),
+  .tweets-container :global(.twitter-tweet),
+  .tweets-container :global(blockquote) {
+    max-width: 100% !important;
+    min-width: 0 !important;
+    width: 100% !important;
   }
 
   .pagination {
