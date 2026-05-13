@@ -65,27 +65,25 @@ const description =
           aria-label="Filter saved tweets"
         >
           <form class="tweets-toolbar-form" method="get" action="/tweets">
-            {
-              v.filterNonDefault && (
-                <>
-                  <input
-                    type="hidden"
-                    name="bookmarks"
-                    value={String(v.filters.showBookmarks)}
-                  />
-                  <input
-                    type="hidden"
-                    name="likes"
-                    value={String(v.filters.showLikes)}
-                  />
-                  <input
-                    type="hidden"
-                    name="retweets"
-                    value={String(v.filters.showRetweets)}
-                  />
-                </>
-              )
-            }
+            {v.filterNonDefault && (
+              <>
+                <input
+                  type="hidden"
+                  name="bookmarks"
+                  value={String(v.filters.showBookmarks)}
+                />
+                <input
+                  type="hidden"
+                  name="likes"
+                  value={String(v.filters.showLikes)}
+                />
+                <input
+                  type="hidden"
+                  name="retweets"
+                  value={String(v.filters.showRetweets)}
+                />
+              </>
+            )}
             <div class="tweets-toolbar-field tweets-search-wrap">
               <div class="tweets-search-inner">
                 <span class="tweets-search-icon" aria-hidden="true">
@@ -100,8 +98,8 @@ const description =
                     stroke-linecap="round"
                     stroke-linejoin="round"
                   >
-                    <circle cx="11" cy="11" r="8"></circle>
-                    <path d="m21 21-4.35-4.35"></path>
+                    <circle cx="11" cy="11" r="8" />
+                    <path d="m21 21-4.35-4.35" />
                   </svg>
                 </span>
                 <input
@@ -134,7 +132,7 @@ const description =
                 height="16"
                 aria-hidden="true"
               >
-                <use href="#tweet-ic-bookmark"></use>
+                <use href="#tweet-ic-bookmark" />
               </svg>
               <span class="filter-text">Bookmarks</span>
             </a>
@@ -148,16 +146,13 @@ const description =
                 height="16"
                 aria-hidden="true"
               >
-                <use href="#tweet-ic-heart-outline"></use>
+                <use href="#tweet-ic-heart-outline" />
               </svg>
               <span class="filter-text">Likes</span>
             </a>
             <a
               href={v.hrefRetweets}
-              class:list={[
-                "filter-toggle",
-                { active: v.filters.showRetweets },
-              ]}
+              class:list={["filter-toggle", { active: v.filters.showRetweets }]}
             >
               <svg
                 class="filter-ic icon-stroke"
@@ -165,7 +160,7 @@ const description =
                 height="16"
                 aria-hidden="true"
               >
-                <use href="#tweet-ic-repeat"></use>
+                <use href="#tweet-ic-repeat" />
               </svg>
               <span class="filter-text">Retweets</span>
             </a>
@@ -251,10 +246,7 @@ const description =
                 </div>
 
                 <div class="tweet-content-container">
-                  <p
-                    class="tweet-text"
-                    set:html={colorizeUrls(displayText)}
-                  />
+                  <p class="tweet-text" set:html={colorizeUrls(displayText)} />
                 </div>
               </a>
             );
@@ -302,7 +294,7 @@ const description =
     <hr class="mt-8" />
 
     <p class="footnote text-sm">
-      This list is automatically updated daily (latest: {v.lastUpdateDate}).
+      This list is automatically updated weekly (latest: {v.lastUpdateDate}).
     </p>
   </div>
 </BaseLayout>
@@ -413,11 +405,7 @@ const description =
   }
 
   .filter-toggle.active {
-    background-color: color-mix(
-      in srgb,
-      var(--primary-color) 15%,
-      transparent
-    );
+    background-color: color-mix(in srgb, var(--primary-color) 15%, transparent);
     border-color: var(--primary-color);
     color: var(--primary-color);
   }
