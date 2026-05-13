@@ -736,11 +736,19 @@ if __name__ == "__main__":
                 if conn: conn.rollback() # General rollback for other exceptions in GitHub block
 
         # --- X (Twitter) Bookmarks & Likes ---
+        # Only run on weekly sync days (1, 8, 15, 22, 29) to avoid hammering the API daily
+        X_SYNC_DAYS = {1, 8, 15, 22, 29}
+        from datetime import date as _date
+        today_day = _date.today().day
+        x_sync_due = today_day in X_SYNC_DAYS
         try:
-            print("\nFetching X (Twitter) interactions...")
-            if not X_REFRESH_TOKEN:
-                print("Info: X_REFRESH_TOKEN not set in environment. Skipping X sync.", file=sys.stderr)
+            if not x_sync_due:
+                print(f"\nSkipping X (Twitter) sync (today is day {today_day}; runs on days {sorted(X_SYNC_DAYS)}).")
             else:
+                print(f"\nFetching X (Twitter) interactions (day {today_day} is a sync day)...")
+            if x_sync_due and not X_REFRESH_TOKEN:
+                print("Info: X_REFRESH_TOKEN not set in environment. Skipping X sync.", file=sys.stderr)
+            elif x_sync_due:
                 access_token = refresh_x_token()
                 
                 if access_token:
