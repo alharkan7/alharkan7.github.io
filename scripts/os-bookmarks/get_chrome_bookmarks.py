@@ -27,6 +27,22 @@ DB_NAME = os.getenv("SUPABASE_DB_NAME", "postgres")
 DB_USER = os.getenv("SUPABASE_DB_USER", "postgres")
 DB_PASSWORD = os.getenv("SUPABASE_DB_PASSWORD")
 DB_PORT = os.getenv("SUPABASE_DB_PORT", "5432")
+DB_SSLMODE = os.getenv("SUPABASE_DB_SSLMODE", "require")
+DB_CONNECT_TIMEOUT = os.getenv("SUPABASE_DB_CONNECT_TIMEOUT", "10")
+
+
+def get_db_connection():
+    """Creates a PostgreSQL connection using the configured Supabase settings."""
+    print(f"Attempting to connect to database {DB_NAME} on {DB_HOST}:{DB_PORT}...")
+    return psycopg2.connect(
+        host=DB_HOST,
+        dbname=DB_NAME,
+        user=DB_USER,
+        password=DB_PASSWORD,
+        port=DB_PORT,
+        sslmode=DB_SSLMODE,
+        connect_timeout=DB_CONNECT_TIMEOUT,
+    )
 
 def trigger_vercel_deploy(hook_url):
     """Triggers a Vercel deployment hook."""
@@ -233,12 +249,7 @@ def process_filtered_structure_for_db(node_data, parent_id_in_db, parent_full_pa
     current_item_db_id = None
     node_name = node_data.get('name') # For constructing the child's parent_full_path
 
-    try:
-        current_item_db_id = insert_or_get_id(node_data, parent_id_in_db, parent_full_path, source_key, existing_paths_in_db_set, cursor, connection)
-    except psycopg2.Error:
-        # Error already printed and handled by insert_or_get_id (rollback, re-raise)
-        # Stop processing this node and its children if insert/get_id failed criticaly.
-        return
+    current_item_db_id = insert_or_get_id(node_data, parent_id_in_db, parent_full_path, source_key, existing_paths_in_db_set, cursor, connection)
 
     if node_data.get('type') == 'folder' and current_item_db_id is not None:
         # Construct the parent_full_path for children of *this* node
@@ -282,20 +293,14 @@ def main():
     }
 
     if not bookmarks_path:
-        print(f"Error: Could not automatically locate a Chrome bookmarks file.", file=sys.stderr)
+        print("Error: Could not automatically locate a Chrome bookmarks file.", file=sys.stderr)
         print("Please ensure Chrome is installed and check your profile directories.", file=sys.stderr)
         sys.exit(1)
 
     conn = None
+    sync_failed = False
     try:
-        conn = psycopg2.connect(
-            host=DB_HOST,
-            dbname=DB_NAME,
-            user=DB_USER,
-            password=DB_PASSWORD,
-            port=DB_PORT,
-            connect_timeout=10
-        )
+        conn = get_db_connection()
         cur = conn.cursor()
         print("Successfully connected to the database.")
 
@@ -375,6 +380,7 @@ def main():
                 except Exception as e:
                     print(f"Critical error while processing root '{root_data_to_insert.get('name')}' : {e}. Rolling back changes for this root.", file=sys.stderr)
                     conn.rollback()
+                    raise
         
         # --- Deletion Logic ---
         if source_keys_processed_this_run:
@@ -407,7 +413,7 @@ def main():
                         except psycopg2.Error as e_del:
                             print(f"Error deleting path '{path_to_del}': {e_del}", file=sys.stderr)
                             conn.rollback() # Rollback this specific deletion attempt
-                            # Potentially re-raise or log more severely if a single deletion failure is critical
+                            raise
                     
                     if deleted_count_global > 0: # Only commit if actual deletions happened
                         conn.commit()
@@ -420,7 +426,8 @@ def main():
 
             except psycopg2.Error as e_sync:
                 print(f"Error during deletion sync phase: {e_sync}", file=sys.stderr)
-                conn.rollback() 
+                conn.rollback()
+                raise
         else:
             print("\nSkipping deletion sync as no bookmark sources were processed in this run.")
 
@@ -437,10 +444,12 @@ def main():
 
     except psycopg2.Error as e:
         print(f"Database connection or operational error: {e}", file=sys.stderr)
+        sync_failed = True
         if conn:
             conn.rollback() # Rollback any pending transaction
     except Exception as e:
         print(f"An unexpected error occurred: {e}", file=sys.stderr)
+        sync_failed = True
         if conn:
             conn.rollback()
     finally:
@@ -448,18 +457,22 @@ def main():
             conn.close()
             print("Database connection closed.")
 
-        # Trigger Vercel build if any changes were made
-        changes_made = newly_added_count_global > 0 or deleted_count_global > 0
-
-        if changes_made:
-            vercel_hook_url = os.getenv("VERCEL_DEPLOY_HOOK_URL")
-            if vercel_hook_url:
-                print("\nAttempting to trigger Vercel deployment...")
-                trigger_vercel_deploy(vercel_hook_url)
-            else:
-                print("\nInfo: VERCEL_DEPLOY_HOOK_URL not set in environment. Skipping Vercel build trigger despite changes.", file=sys.stderr)
+        if sync_failed:
+            print("\nBookmark sync failed. Skipping Vercel build trigger.", file=sys.stderr)
+            sys.exit(1)
         else:
-            print("\nNo changes detected in database. Skipping Vercel build trigger.")
+            # Trigger Vercel build if any changes were made
+            changes_made = newly_added_count_global > 0 or deleted_count_global > 0
+
+            if changes_made:
+                vercel_hook_url = os.getenv("VERCEL_DEPLOY_HOOK_URL")
+                if vercel_hook_url:
+                    print("\nAttempting to trigger Vercel deployment...")
+                    trigger_vercel_deploy(vercel_hook_url)
+                else:
+                    print("\nInfo: VERCEL_DEPLOY_HOOK_URL not set in environment. Skipping Vercel build trigger despite changes.", file=sys.stderr)
+            else:
+                print("\nNo changes detected in database. Skipping Vercel build trigger.")
 
 if __name__ == "__main__":
     main() 
