@@ -5,8 +5,6 @@ import BaseLayout from "../layouts/BaseLayout.astro";
 // import bookmarksDataUntyped from "../../scripts/os-bookmarks/chrome_bookmarks.json" assert { type: "json" };
 import { createClient } from "@supabase/supabase-js";
 import { Search } from "lucide-react";
-import fs from "fs";
-import path from "path";
 import BookmarkNodeComponent from "../components/BookmarkNode.astro"; // Import the new component
 import type {
     BookmarkNode as ComponentBookmarkNode, // Rename to avoid conflict
@@ -361,7 +359,7 @@ const { roots: bookmarkRoots, lastUpdatedAt } =
 
 let lastUpdateDate = lastUpdatedAt || "Unknown";
 
-const title = "Bookmarks";
+const title = "Al Harkan's Bookmarks";
 const description =
     "Bookmarks on AI Research, Business, Software, and Digital Media";
 const permalink = Astro.site?.href

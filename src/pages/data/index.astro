@@ -9,7 +9,7 @@ const totalPages = Math.ceil(featuredProjects.length / projectsPerPage);
 const initialProjects = featuredProjects.slice(0, projectsPerPage);
 const allProjects = featuredProjects;
 
-const title = "Visual Pages";
+const title = "Al's Research Pages";
 const description =
   "This is a list of special pages showcasing some research projects that don't fit the blog formatting.";
 const permalink = Astro.site?.href ? `${Astro.site.href}data` : "/data";
@@ -27,7 +27,7 @@ const types = [
 >
   <div class="container">
     <header class="page-header">
-      <h1>{title}</h1>
+      <h1>Visual Pages</h1>
       <!-- <p class="description">{description}</p> -->
 
       <div class="filter-controls">
