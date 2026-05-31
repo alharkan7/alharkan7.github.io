@@ -1,5 +1,6 @@
 export const reelsUrls: string[] = [
-  "https://www.instagram.com/p/DW89lSykqCS/",
+  "https://www.instagram.com/reel/DY9kuBwSQmQ/",
+  "https://www.instagram.com/reel/DW89lSykqCS/",
   "https://www.instagram.com/reel/DU-zbiBkob6/",
   "https://www.instagram.com/reel/DUnp1GEknGg/",
   "https://www.instagram.com/reel/DUatBO8Eqw0/",
@@ -7,7 +8,7 @@ export const reelsUrls: string[] = [
   "https://www.instagram.com/reel/DT7yTZ6EigM/",
   "https://www.instagram.com/reel/DTc5UxrEnP1/",
   "https://www.instagram.com/reel/DShyKSXkkbv/",
-  "https://www.instagram.com/reel/DQ4MY9mkpJU/",
+  "https://www.instagram.com/reel/DQ4MY9mkpJU/"
 ];
 
 export function getReelEmbed(url: string) {
