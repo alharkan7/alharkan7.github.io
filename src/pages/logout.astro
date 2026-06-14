@@ -41,12 +41,16 @@ Astro.cookies.delete('session', {
 </style>
 
 <script>
-  import { logout } from "../lib/auth";
+  import { supabase } from '../lib/supabase';
   
   const performLogout = async () => {
     try {
-      // Sign out using our auth utility
-      const result = await logout();
+      // Sign out using Supabase
+      const { error } = await supabase.auth.signOut();
+      
+      if (error) {
+        console.error("Error signing out from Supabase:", error);
+      }
       
       // Add a small delay to show the loading state
       await new Promise(resolve => setTimeout(resolve, 500));

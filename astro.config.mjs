@@ -13,6 +13,7 @@ import tailwind from '@astrojs/tailwind';
 
 export default defineConfig({
   vite: {
+    envPrefix: ['VITE_', 'PUBLIC_', 'NEXT_PUBLIC_'],
     server: {
       allowedHosts: ['.trycloudflare.com', 'localhost'],
     },

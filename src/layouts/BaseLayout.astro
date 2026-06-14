@@ -27,6 +27,19 @@ const {
   publishDate,
   items,
 } = Astro.props;
+
+// Protected Routes Logic
+const currentPath = Astro.url.pathname;
+// Remove trailing slash for consistent matching
+const normalizedPath = currentPath.endsWith('/') && currentPath.length > 1 ? currentPath.slice(0, -1) : currentPath;
+
+const protectedRoutesStr = import.meta.env.NEXT_PUBLIC_PROTECTED_ROUTES || import.meta.env.PUBLIC_PROTECTED_ROUTES || "";
+const protectedRoutes = protectedRoutesStr.split(',').map((r: string) => r.trim()).filter(Boolean);
+
+const isProtected = protectedRoutes.some((route: string) => {
+  const normalizedRoute = route.endsWith('/') && route.length > 1 ? route.slice(0, -1) : route;
+  return normalizedPath === normalizedRoute || normalizedPath.startsWith(normalizedRoute + '/');
+});
 ---
 
 <html lang="en">
@@ -41,9 +54,20 @@ const {
       publishDate={publishDate}
       items={items}
     />
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
   </head>
   <body>
-    <div class="layout">
+    {isProtected && (
+      <div id="auth-guard-loading" class="fixed inset-0 z-[100] flex items-center justify-center bg-white dark:bg-gray-900">
+        <div class="text-center bg-gray-50 dark:bg-[#070A12] p-8 rounded-2xl shadow-xl max-w-sm w-full mx-4 border border-gray-100 dark:border-gray-800">
+          <div id="auth-spinner" class="inline-block animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-gray-900 dark:border-white mb-4"></div>
+          <h2 id="auth-title" class="text-2xl font-bold text-gray-800 dark:text-white">Verifying access</h2>
+          <p id="auth-subtitle" class="text-gray-600 dark:text-gray-400 mt-2 mb-6">Checking your session...</p>
+          <div id="google-btn-container" class="flex justify-center min-h-[44px]" style="display: none;"></div>
+        </div>
+      </div>
+    )}
+    <div class="layout" style={isProtected ? "visibility: hidden;" : ""}>
       <Header current={current} />
 
       <main>
@@ -54,6 +78,96 @@ const {
     </div>
     <Analytics client:only="react" />
     <SpeedInsights client:only="react" />
+
+    <script>
+      import { supabase } from '../lib/supabase';
+      
+      const checkAuth = async () => {
+        const loadingScreen = document.getElementById('auth-guard-loading');
+        const layout = document.querySelector('.layout') as HTMLElement;
+        const spinner = document.getElementById('auth-spinner');
+        const title = document.getElementById('auth-title');
+        const subtitle = document.getElementById('auth-subtitle');
+        const btnContainer = document.getElementById('google-btn-container');
+        
+        if (loadingScreen) {
+          // Verify session via Supabase
+          const { data: { session }, error } = await supabase.auth.getSession();
+          
+          if (!session) {
+            // Show the login UI
+            if (spinner) spinner.style.display = 'none';
+            if (title) title.innerText = 'Authentication Required';
+            if (subtitle) subtitle.innerText = 'Please sign in to view this page.';
+            if (btnContainer) btnContainer.style.display = 'flex';
+            
+            const clientId = import.meta.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID || import.meta.env.PUBLIC_GOOGLE_CLIENT_ID;
+            
+            const initGoogle = () => {
+              const google = (window as any).google;
+              google.accounts.id.initialize({
+                client_id: clientId,
+                callback: async (response: any) => {
+                  // Re-show loading state while saving to Supabase
+                  if (btnContainer) btnContainer.style.display = 'none';
+                  if (spinner) spinner.style.display = 'inline-block';
+                  if (title) title.innerText = 'Signing you in...';
+                  if (subtitle) subtitle.innerText = 'Establishing secure session';
+                  
+                  // Send the Google ID token to Supabase
+                  const { error: signInError } = await supabase.auth.signInWithIdToken({
+                    provider: 'google',
+                    token: response.credential
+                  });
+                  
+                  if (signInError) {
+                    console.error("Error linking Google to Supabase:", signInError);
+                    if (title) title.innerText = 'Login Error';
+                    if (subtitle) subtitle.innerHTML = '<span class="text-red-500">Could not save session. Try again.</span>';
+                    if (spinner) spinner.style.display = 'none';
+                    if (btnContainer) btnContainer.style.display = 'flex';
+                  } else {
+                    // Authenticated! Show the content
+                    loadingScreen.style.display = 'none';
+                    if (layout) layout.style.visibility = 'visible';
+                  }
+                }
+              });
+              
+              // Render the native Google button
+              google.accounts.id.renderButton(btnContainer, { 
+                theme: 'outline', 
+                size: 'large',
+                shape: 'rectangular',
+                text: 'signin_with'
+              });
+            };
+
+            // Wait for the Google script to be available
+            if ((window as any).google?.accounts?.id) {
+              initGoogle();
+            } else {
+              const checkInterval = setInterval(() => {
+                if ((window as any).google?.accounts?.id) {
+                  clearInterval(checkInterval);
+                  initGoogle();
+                }
+              }, 100);
+            }
+          } else {
+            // Authenticated! Show the content
+            loadingScreen.style.display = 'none';
+            if (layout) layout.style.visibility = 'visible';
+          }
+        }
+      };
+
+      // Run immediately for normal page loads
+      checkAuth();
+      
+      // Also run on Astro view transitions navigation
+      document.addEventListener('astro:page-load', checkAuth);
+    </script>
   </body>
 </html>
 
