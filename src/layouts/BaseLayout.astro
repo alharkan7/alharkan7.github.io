@@ -97,6 +97,7 @@ const isProtected = protectedRoutes.some((route: string) => {
         if (loadingScreen) {
           // Verify session via Supabase
           const { data: { session }, error } = await supabase.auth.getSession();
+          if (error) console.error("Session check error:", error);
           
           if (!session) {
             // If the user navigated here via Astro View Transitions, Google's dynamically 

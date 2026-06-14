@@ -51,6 +51,13 @@ Astro.cookies.delete('session', {
       if (error) {
         console.error("Error signing out from Supabase:", error);
       }
+
+      // Force clear Supabase local storage keys as a fallback for production
+      Object.keys(localStorage).forEach(key => {
+        if (key.startsWith('sb-') && key.endsWith('-auth-token')) {
+          localStorage.removeItem(key);
+        }
+      });
       
       // Add a small delay to show the loading state
       await new Promise(resolve => setTimeout(resolve, 500));
@@ -64,6 +71,13 @@ Astro.cookies.delete('session', {
     }
   };
 
-  // Execute logout when the page loads
+  // Execute logout when the page loads (hard refresh)
   performLogout();
+
+  // Execute logout when returning via Astro View Transitions (soft navigation)
+  document.addEventListener('astro:page-load', () => {
+    if (window.location.pathname === '/logout' || window.location.pathname === '/logout/') {
+      performLogout();
+    }
+  });
 </script>
