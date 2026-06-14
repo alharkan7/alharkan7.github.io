@@ -58,12 +58,12 @@ const isProtected = protectedRoutes.some((route: string) => {
   </head>
   <body>
     {isProtected && (
-      <div id="auth-guard-loading" class="fixed inset-0 z-[100] flex items-center justify-center bg-white dark:bg-gray-900">
-        <div class="text-center bg-gray-50 dark:bg-[#070A12] p-8 rounded-2xl shadow-xl max-w-sm w-full mx-4 border border-gray-100 dark:border-gray-800">
-          <div id="auth-spinner" class="inline-block animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-gray-900 dark:border-white mb-4"></div>
-          <h2 id="auth-title" class="text-2xl font-bold text-gray-800 dark:text-white">Verifying access</h2>
-          <p id="auth-subtitle" class="text-gray-600 dark:text-gray-400 mt-2 mb-6">Checking your session...</p>
-          <div id="google-btn-container" class="flex justify-center min-h-[44px]" style="display: none;"></div>
+      <div id="auth-guard-loading" style="position: fixed; inset: 0; z-index: 9999; display: flex; align-items: center; justify-content: center; background-color: var(--background-body, #ffffff);">
+        <div style="text-align: center; background-color: var(--background-alt, #f9fafb); padding: 2rem; border-radius: 1rem; box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1); max-width: 24rem; width: 100%; margin: 0 1rem; border: 1px solid var(--color-border, #f3f4f6);">
+          <div id="auth-spinner" style="display: inline-block; border-radius: 50%; height: 3rem; width: 3rem; border-top: 2px solid var(--text-main, #111827); border-bottom: 2px solid var(--text-main, #111827); animation: spin 1s linear infinite; margin-bottom: 1rem;"></div>
+          <h2 id="auth-title" style="font-size: 1.5rem; font-weight: 700; color: var(--text-main, #1f2937); margin: 0;">Verifying access</h2>
+          <p id="auth-subtitle" style="color: var(--text-secondary, #4b5563); margin-top: 0.5rem; margin-bottom: 1.5rem;">Checking your session...</p>
+          <div id="google-btn-container" style="display: none; justify-content: center; min-height: 44px; width: 100%;"></div>
         </div>
       </div>
     )}
@@ -90,11 +90,23 @@ const isProtected = protectedRoutes.some((route: string) => {
         const subtitle = document.getElementById('auth-subtitle');
         const btnContainer = document.getElementById('google-btn-container');
         
+        // Track if this is a fresh page load or an Astro View Transition
+        const isHardLoad = !(window as any).__FIRST_LOAD_DONE;
+        (window as any).__FIRST_LOAD_DONE = true;
+
         if (loadingScreen) {
           // Verify session via Supabase
           const { data: { session }, error } = await supabase.auth.getSession();
           
           if (!session) {
+            // If the user navigated here via Astro View Transitions, Google's dynamically 
+            // injected iframe CSS gets stripped out, causing the giant logo bug.
+            // We force a hard reload so Google can properly inject its CSS into the <head>.
+            if (!isHardLoad) {
+              window.location.reload();
+              return;
+            }
+
             // Show the login UI
             if (spinner) spinner.style.display = 'none';
             if (title) title.innerText = 'Authentication Required';
@@ -162,16 +174,24 @@ const isProtected = protectedRoutes.some((route: string) => {
         }
       };
 
+      const runAuth = () => {
+        // Prevent double execution on the same page load
+        if ((window as any).__LAST_AUTH_URL === window.location.href) return;
+        (window as any).__LAST_AUTH_URL = window.location.href;
+        checkAuth();
+      };
+
       // Run immediately for normal page loads
-      checkAuth();
+      runAuth();
       
       // Also run on Astro view transitions navigation
-      document.addEventListener('astro:page-load', checkAuth);
+      document.addEventListener('astro:page-load', runAuth);
     </script>
   </body>
 </html>
 
 <style>
+  /* Layout Styles */
   .layout {
     display: flex;
     flex-direction: column;
