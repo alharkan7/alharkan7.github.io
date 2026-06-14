@@ -1,0 +1,239 @@
+---
+// src/components/PromptBlock.astro
+---
+
+<div class="prompt-component-container my-6 border border-[var(--text-secondary)] rounded-lg overflow-hidden flex flex-col group">
+  <div class="flex justify-between items-center bg-[var(--background-header)] px-4 py-2 border-b border-[var(--text-secondary)]">
+    <span class="text-xs font-semibold text-[var(--text-secondary)] uppercase tracking-wider">Prompt</span>
+    <button
+      class="copy-btn flex items-center gap-1 text-xs text-[var(--text-secondary)] hover:text-[var(--primary-color)] transition-colors p-1"
+      aria-label="Copy prompt to clipboard"
+    >
+      <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="copy-icon" style="display: block;">
+        <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+        <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+      </svg>
+      <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="check-icon text-green-500" style="display: none;">
+        <polyline points="20 6 9 17 4 12"></polyline>
+      </svg>
+      <span class="copy-text">Copy</span>
+    </button>
+  </div>
+  
+  <div class="prompt-wrapper relative bg-[var(--background-color)]">
+    <!-- max-h-[12rem] is roughly 2 paragraphs. Will be toggled by JS -->
+    <div class="prompt-content p-4 text-[var(--text-secondary)] font-sans text-[13px] leading-relaxed overflow-hidden transition-all duration-300 max-h-[12rem]">
+      <slot />
+    </div>
+    
+    <!-- Gradient fade for collapsed state -->
+    <div class="prompt-fade absolute bottom-0 left-0 w-full h-12 bg-gradient-to-t from-[var(--background-color)] to-transparent pointer-events-none transition-opacity duration-300"></div>
+  </div>
+
+  <button class="expand-btn hidden w-full py-2 bg-[var(--background-header)] text-[var(--text-secondary)] text-xs font-semibold hover:text-[var(--primary-color)] border-t border-[var(--text-secondary)] transition-colors text-center">
+    Show more
+  </button>
+</div>
+
+<script>
+  // Reconstructs the markdown syntax from the DOM tree so the copied output perfectly matches the author's input.
+  function htmlToMarkdown(node: Node, listIndex = { value: 1 }): string {
+    let text = '';
+    
+    for (let i = 0; i < node.childNodes.length; i++) {
+      const child = node.childNodes[i];
+      
+      if (child.nodeType === Node.TEXT_NODE) {
+        let content = child.textContent || '';
+        const parentTag = (node as HTMLElement).tagName;
+        
+        // Normalize whitespace for text nodes unless they are inside a pre/code block
+        if (parentTag !== 'PRE' && parentTag !== 'CODE') {
+          content = content.replace(/[\n\r\t]+/g, ' ').replace(/ {2,}/g, ' ');
+        }
+        text += content;
+      } else if (child.nodeType === Node.ELEMENT_NODE) {
+        const element = child as HTMLElement;
+        const tag = element.tagName;
+        const parentTag = (node as HTMLElement).tagName;
+        
+        let prefix = '';
+        let suffix = '';
+        let childListIndex = { value: 1 };
+        
+        switch (tag) {
+          case 'H1': prefix = '# '; suffix = '\n\n'; break;
+          case 'H2': prefix = '## '; suffix = '\n\n'; break;
+          case 'H3': prefix = '### '; suffix = '\n\n'; break;
+          case 'H4': prefix = '#### '; suffix = '\n\n'; break;
+          case 'H5': prefix = '##### '; suffix = '\n\n'; break;
+          case 'H6': prefix = '###### '; suffix = '\n\n'; break;
+          case 'P': suffix = '\n\n'; break;
+          case 'STRONG':
+          case 'B': prefix = '**'; suffix = '**'; break;
+          case 'EM':
+          case 'I': prefix = '_'; suffix = '_'; break;
+          case 'CODE': 
+            if (parentTag !== 'PRE') {
+              prefix = '`'; suffix = '`'; 
+            }
+            break;
+          case 'PRE': prefix = '```\n'; suffix = '\n```\n\n'; break;
+          case 'LI':
+            if (parentTag === 'OL') {
+              prefix = `${listIndex.value}. `;
+              listIndex.value++;
+            } else {
+              prefix = '- ';
+            }
+            suffix = '\n';
+            break;
+          case 'UL':
+          case 'OL':
+            suffix = '\n'; 
+            break;
+          case 'BR':
+            suffix = '\n';
+            break;
+          case 'HR':
+            prefix = '---\n\n';
+            break;
+        }
+        
+        let innerText = htmlToMarkdown(element, childListIndex);
+        
+        // Clean up block elements from having extra spaces around their content
+        if (['P', 'H1', 'H2', 'H3', 'H4', 'H5', 'H6', 'LI'].includes(tag)) {
+          innerText = innerText.trim();
+        }
+        
+        if (tag === 'A') {
+          text += `[${innerText}](${element.getAttribute('href')})`;
+        } else {
+          text += `${prefix}${innerText}${suffix}`;
+        }
+      }
+    }
+    return text;
+  }
+
+  const setupPromptBlocks = () => {
+    const containers = document.querySelectorAll(".prompt-component-container");
+
+    containers.forEach((container) => {
+      if ((container as any).dataset.initialized) return;
+      (container as any).dataset.initialized = 'true';
+
+      const contentBlock = container.querySelector(".prompt-content") as HTMLElement;
+      const expandBtn = container.querySelector(".expand-btn") as HTMLButtonElement;
+      const fadeOverlay = container.querySelector(".prompt-fade") as HTMLElement;
+      const copyBtn = container.querySelector(".copy-btn") as HTMLButtonElement;
+
+      if (!contentBlock) return;
+
+      // 1. Handle Expand/Collapse Logic
+      const originalMaxHeight = contentBlock.style.maxHeight;
+      contentBlock.style.maxHeight = 'none';
+      const fullHeight = contentBlock.scrollHeight;
+      contentBlock.style.maxHeight = ''; 
+      
+      const TRUNCATE_HEIGHT = 192; // 12rem
+
+      let isExpanded = false;
+
+      if (fullHeight > TRUNCATE_HEIGHT) {
+        expandBtn.style.display = "block"; 
+        expandBtn.addEventListener("click", () => {
+          isExpanded = !isExpanded;
+          if (isExpanded) {
+            contentBlock.style.maxHeight = `${fullHeight}px`;
+            fadeOverlay.style.opacity = "0";
+            expandBtn.textContent = "Show less";
+          } else {
+            contentBlock.style.maxHeight = "12rem";
+            fadeOverlay.style.opacity = "1";
+            expandBtn.textContent = "Show more";
+          }
+        });
+      } else {
+        fadeOverlay.style.display = "none";
+      }
+
+      // 2. Handle Copy Logic using the custom markdown parser
+      if (copyBtn) {
+        copyBtn.addEventListener("click", async () => {
+          // Reconstruct the markdown exactly!
+          let textToCopy = htmlToMarkdown(contentBlock).trim();
+
+          try {
+            if (navigator.clipboard && window.isSecureContext) {
+              await navigator.clipboard.writeText(textToCopy);
+            } else {
+              const textArea = document.createElement("textarea");
+              textArea.value = textToCopy;
+              textArea.style.position = "fixed";
+              textArea.style.top = "0";
+              textArea.style.left = "0";
+              document.body.appendChild(textArea);
+              textArea.focus();
+              textArea.select();
+              document.execCommand('copy');
+              document.body.removeChild(textArea);
+            }
+            
+            // Visual feedback
+            const copyIcon = copyBtn.querySelector(".copy-icon") as HTMLElement;
+            const checkIcon = copyBtn.querySelector(".check-icon") as HTMLElement;
+            const copyText = copyBtn.querySelector(".copy-text") as HTMLElement;
+            
+            if (copyIcon && checkIcon && copyText) {
+              copyIcon.style.display = "none";
+              checkIcon.style.display = "block";
+              copyText.textContent = "Copied!";
+              
+              setTimeout(() => {
+                copyIcon.style.display = "block";
+                checkIcon.style.display = "none";
+                copyText.textContent = "Copy";
+              }, 2000);
+            }
+          } catch (err) {
+            console.error("Failed to copy text: ", err);
+          }
+        });
+      }
+    });
+  };
+
+  setupPromptBlocks();
+  document.addEventListener('astro:page-load', setupPromptBlocks);
+</script>
+
+<style>
+  .prompt-content :global(p) {
+    margin-top: 0.5em;
+    margin-bottom: 0.5em;
+  }
+  .prompt-content :global(p:first-child) {
+    margin-top: 0;
+  }
+  .prompt-content :global(p:last-child) {
+    margin-bottom: 0;
+  }
+  .prompt-content :global(ul), 
+  .prompt-content :global(ol) {
+    margin-top: 0.25em;
+    margin-bottom: 0.25em;
+    padding-left: 1.5em;
+  }
+  .prompt-content :global(ul) {
+    list-style-type: disc;
+  }
+  .prompt-content :global(ol) {
+    list-style-type: decimal;
+  }
+  .prompt-content :global(li) {
+    margin-top: 0.1em;
+    margin-bottom: 0.1em;
+  }
+</style>
