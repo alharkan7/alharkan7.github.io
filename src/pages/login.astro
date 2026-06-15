@@ -41,14 +41,7 @@ import BaseLayout from "../layouts/BaseLayout.astro";
 
           <button type="submit" class="login-button" id="submit-btn">
             <span class="btn-text">Sign in</span>
-            <span class="btn-spinner">
-              <svg class="spinner" width="20" height="20" viewBox="0 0 24 24">
-                <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" fill="none" opacity="0.25"/>
-                <path d="M12 2A10 10 0 0 1 22 12" stroke="currentColor" stroke-width="4" fill="none">
-                  <animateTransform attributeName="transform" type="rotate" from="0 12 12" to="360 12 12" dur="1s" repeatCount="indefinite"/>
-                </path>
-              </svg>
-            </span>
+            <span class="btn-spinner"></span>
           </button>
         </form>
       </div>
@@ -57,18 +50,18 @@ import BaseLayout from "../layouts/BaseLayout.astro";
 </BaseLayout>
 
 <script>
-  import { isAuthenticated, login } from "../lib/auth";
+  import { supabase } from "../lib/supabase";
 
   // Check if user is already logged in on client side
   document.addEventListener("DOMContentLoaded", async () => {
-    const authenticated = await isAuthenticated();
-    if (authenticated) {
+    const { data: { session } } = await supabase.auth.getSession();
+    if (session) {
       window.location.href = "/uncategorized";
     }
   });
 
   // User-friendly error messages
-  const errorMessages = {
+  const errorMessages: Record<string, string> = {
     'auth/invalid-credential': 'Invalid email or password. Please try again.',
     'auth/invalid-email': 'Please enter a valid email address.',
     'auth/user-not-found': 'No account found with this email.',
@@ -84,11 +77,11 @@ import BaseLayout from "../layouts/BaseLayout.astro";
     'auth/unauthenticated-domain': 'This domain is not authorized for login.',
   };
 
-  const getErrorMessage = (error) => {
-    if (error.code && errorMessages[error.code]) {
+  const getErrorMessage = (error: any) => {
+    if (error?.code && errorMessages[error.code]) {
       return errorMessages[error.code];
     }
-    if (error.message) {
+    if (error?.message) {
       const message = error.message.toLowerCase();
       if (message.includes('network') || message.includes('fetch')) {
         return 'Network error. Please check your connection.';
@@ -100,17 +93,19 @@ import BaseLayout from "../layouts/BaseLayout.astro";
     return 'Something went wrong. Please try again.';
   };
 
-  const showError = (message) => {
+  const showError = (message: string, type = 'error') => {
     const container = document.getElementById('error-container');
     if (!container) return;
 
-    container.innerHTML = `<div class="error-message shake">${message}</div>`;
-
-    // Remove shake animation after it plays
-    setTimeout(() => {
-      const errorEl = container.querySelector('.error-message');
-      errorEl?.classList.remove('shake');
-    }, 500);
+    if (type === 'success') {
+      container.innerHTML = `<div class="success-message">${message}</div>`;
+    } else {
+      container.innerHTML = `<div class="error-message shake">${message}</div>`;
+      setTimeout(() => {
+        const errorEl = container.querySelector('.error-message');
+        errorEl?.classList.remove('shake');
+      }, 500);
+    }
   };
 
   const clearError = () => {
@@ -118,12 +113,12 @@ import BaseLayout from "../layouts/BaseLayout.astro";
     if (container) container.innerHTML = '';
   };
 
-  const setLoading = (loading) => {
-    const btn = document.getElementById('submit-btn');
-    const btnText = btn?.querySelector('.btn-text');
-    const btnSpinner = btn?.querySelector('.btn-spinner');
-    const emailInput = document.getElementById('username');
-    const passwordInput = document.getElementById('password');
+  const setLoading = (loading: boolean) => {
+    const btn = document.getElementById('submit-btn') as HTMLButtonElement | null;
+    const btnText = btn?.querySelector('.btn-text') as HTMLElement | null;
+    const btnSpinner = btn?.querySelector('.btn-spinner') as HTMLElement | null;
+    const emailInput = document.getElementById('username') as HTMLInputElement | null;
+    const passwordInput = document.getElementById('password') as HTMLInputElement | null;
 
     if (btn && btnText && btnSpinner) {
       btn.disabled = loading;
@@ -151,8 +146,8 @@ import BaseLayout from "../layouts/BaseLayout.astro";
     e.preventDefault();
     clearError();
 
-    const email = document.getElementById("username")?.value;
-    const password = document.getElementById("password")?.value;
+    const email = (document.getElementById("username") as HTMLInputElement)?.value;
+    const password = (document.getElementById("password") as HTMLInputElement)?.value;
 
     // Basic validation
     if (!email || !password) {
@@ -163,22 +158,45 @@ import BaseLayout from "../layouts/BaseLayout.astro";
     setLoading(true);
 
     try {
-      const result = await login(email, password);
+      let { data, error } = await supabase.auth.signInWithPassword({ email, password });
+      
+      if (error && error.message.includes('Invalid login credentials')) {
+        // Try sign up implicitly
+        const { data: signUpData, error: signUpError } = await supabase.auth.signUp({ email, password });
+        if (signUpError) {
+          if (signUpError.message.includes('already registered') || signUpError.message.includes('User already registered')) {
+            throw new Error('Invalid password. Please try again.');
+          } else {
+            throw signUpError;
+          }
+        }
+        if (signUpData.user?.identities != null && signUpData.user.identities.length === 0) {
+          throw new Error('Email already registered. If you used Google to sign in before, please use the "Continue with Google" option, or check your password.');
+        }
 
-      if (!result.success) {
-        throw result.error;
+        if (signUpData.user && !signUpData.session) {
+          throw { message: '✨ Account created! Please check your email to verify and continue logging in.', type: 'success' };
+        }
+        data = signUpData as any;
+        error = null;
+      } else if (error) {
+        throw error;
       }
 
       // Successful login - redirect will happen
       window.location.href = "/uncategorized";
-    } catch (error) {
+    } catch (error: any) {
       console.error("Login error:", error);
-      showError(getErrorMessage(error));
-
-      // Shake animation on the form
-      const card = document.querySelector('.login-card');
-      card?.classList.add('shake');
-      setTimeout(() => card?.classList.remove('shake'), 500);
+      
+      if (error.type === 'success') {
+        showError(error.message, 'success');
+      } else {
+        showError(getErrorMessage(error));
+        // Shake animation on the form
+        const card = document.querySelector('.login-card');
+        card?.classList.add('shake');
+        setTimeout(() => card?.classList.remove('shake'), 500);
+      }
     } finally {
       setLoading(false);
     }
@@ -189,27 +207,35 @@ import BaseLayout from "../layouts/BaseLayout.astro";
   /* Login card */
   .login-card {
     width: 100%;
-    max-width: 420px;
-    padding: 2.5rem;
-    background: var(--background-alt);
-    border-radius: 1rem;
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    max-width: 440px;
+    padding: 3rem 2.5rem;
+    background: var(--background-body);
+    border: 1px solid var(--border-color);
+    border-radius: 1.5rem;
+    box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.05), 0 0 0 1px rgba(0, 0, 0, 0.02);
+    transition: box-shadow 0.3s ease;
+  }
+
+  .login-card:hover {
+    box-shadow: 0 30px 60px -20px rgba(0, 0, 0, 0.1), 0 0 0 1px rgba(0, 0, 0, 0.02);
   }
 
   .login-title {
-    font-family: var(--font-family-sans);
-    font-size: 2rem;
-    font-weight: 700;
+    font-family: var(--font-family-serif);
+    font-size: 2.25rem;
+    font-weight: 800;
     text-align: center;
     margin-bottom: 0.5rem;
     color: var(--text-main);
+    letter-spacing: -0.03em;
   }
 
   .login-subtitle {
     text-align: center;
     color: var(--text-secondary);
-    margin-bottom: 2rem;
-    font-size: 0.95rem;
+    margin-bottom: 2.5rem;
+    font-size: 1rem;
+    font-weight: 500;
   }
 
   /* Error message */
@@ -218,14 +244,28 @@ import BaseLayout from "../layouts/BaseLayout.astro";
   }
 
   .error-message {
-    padding: 0.6rem 0.8rem;
-    margin-top: 1rem;
+    padding: 0.875rem 1rem;
+    margin-top: 1.5rem;
     margin-bottom: 0.5rem;
-    background: rgba(239, 68, 68, 0.1);
-    border: 1px solid rgba(239, 68, 68, 0.3);
-    border-radius: 0.5rem;
+    background: rgba(239, 68, 68, 0.08);
+    border: 1px solid rgba(239, 68, 68, 0.2);
+    border-radius: 0.75rem;
     color: #ef4444;
-    font-size: 0.85rem;
+    font-size: 0.875rem;
+    font-weight: 500;
+    text-align: center;
+  }
+
+  .success-message {
+    padding: 0.875rem 1rem;
+    margin-top: 1.5rem;
+    margin-bottom: 0.5rem;
+    background: rgba(13, 148, 136, 0.08);
+    border: 1px solid rgba(13, 148, 136, 0.2);
+    border-radius: 0.75rem;
+    color: var(--primary-color);
+    font-size: 0.875rem;
+    font-weight: 600;
     text-align: center;
   }
 
@@ -252,32 +292,39 @@ import BaseLayout from "../layouts/BaseLayout.astro";
     width: 100%;
     display: flex;
     flex-direction: column;
-    gap: 0.5rem;
-    margin-bottom: 1rem;
+    gap: 0.6rem;
+    margin-bottom: 1.5rem;
   }
 
   .input-label {
     font-size: 0.875rem;
-    font-weight: 500;
+    font-weight: 600;
     color: var(--text-main);
-    margin-left: 0.5rem;
+    margin-left: 0.25rem;
+    margin-top: 0.5rem;
   }
 
   .login-input {
     width: 100%;
-    padding: 0.875rem 1rem;
+    padding: 0.875rem 1.25rem;
     font-size: 1rem;
-    border: 1px solid var(--text-secondary);
-    border-radius: 0.75rem;
+    border: 1.5px solid var(--border-color);
+    border-radius: 0.875rem;
     outline: none;
-    background: var(--background-body);
+    background: var(--background-alt);
     color: var(--text-main);
-    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    transition: all 0.2s ease;
+    font-weight: 500;
+  }
+
+  .login-input:hover {
+    border-color: rgba(13, 148, 136, 0.3);
   }
 
   .login-input:focus {
     border-color: var(--primary-color);
-    box-shadow: 0 0 0 3px rgba(13, 148, 136, 0.1);
+    background: var(--background-body);
+    box-shadow: 0 0 0 4px rgba(13, 148, 136, 0.1);
   }
 
   .login-input:disabled {
@@ -287,50 +334,69 @@ import BaseLayout from "../layouts/BaseLayout.astro";
 
   .login-input::placeholder {
     color: var(--text-secondary);
-    opacity: 0.7;
+    opacity: 0.6;
+    font-weight: 400;
   }
 
   /* Button */
   .login-button {
     position: relative;
     width: 100%;
-    padding: 0.875rem 1rem;
-    font-size: 1rem;
-    font-weight: 600;
-    background: var(--primary-color);
-    color: white;
+    padding: 1rem;
+    font-size: 1.05rem;
+    font-weight: 700;
+    background: var(--text-main);
+    color: var(--background-body);
     border: none;
-    border-radius: 0.75rem;
+    border-radius: 0.875rem;
     cursor: pointer;
-    transition: all 0.2s ease;
-    margin-top: 0.5rem;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    margin-top: 1rem;
     font-family: var(--font-family-sans);
     display: flex;
     align-items: center;
     justify-content: center;
     gap: 0.5rem;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  }
+
+  :root.theme-dark .login-button {
+    background: var(--primary-color);
+    color: #000;
   }
 
   .login-button:hover:not(:disabled) {
-    opacity: 0.9;
-    transform: translateY(-1px);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
+    background: var(--primary-color);
+    color: white;
   }
 
   .login-button:active:not(:disabled) {
     transform: translateY(0);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   }
 
   .login-button:disabled {
     opacity: 0.7;
     cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
   }
 
   .btn-spinner {
     display: none;
+    width: 22px;
+    height: 22px;
+    border: 3px solid #f3f3f3;
+    border-top: 3px solid var(--primary-color);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
   }
 
-  .spinner {
-    animation: spin 1s linear infinite;
+  :root.theme-dark .btn-spinner {
+    border: 3px solid #333333;
+    border-top: 3px solid var(--primary-color);
   }
 
   @keyframes spin {

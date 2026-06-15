@@ -13,14 +13,14 @@ import LoadingScreen from './LoadingScreen.astro';
 </div>
 
 <script>
-  import { isAuthenticated } from '../lib/auth';
+  import { supabase } from '../lib/supabase';
 
   // Check authentication status on component load
   document.addEventListener('DOMContentLoaded', async () => {
     try {
-      const authenticated = await isAuthenticated();
+      const { data: { session }, error } = await supabase.auth.getSession();
 
-      if (!authenticated) {
+      if (!session || error) {
         // Redirect to login page if not authenticated
         window.location.href = '/login';
       } else {

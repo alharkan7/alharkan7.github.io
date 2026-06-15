@@ -60,10 +60,33 @@ const isProtected = protectedRoutes.some((route: string) => {
     {isProtected && (
       <div id="auth-guard-loading" style="position: fixed; inset: 0; z-index: 9999; display: flex; align-items: center; justify-content: center; background-color: var(--background-body, #ffffff);">
         <div style="text-align: center; background-color: var(--background-alt, #f9fafb); padding: 2rem; border-radius: 1rem; box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1); max-width: 24rem; width: 100%; margin: 0 1rem; border: 1px solid var(--color-border, #f3f4f6);">
-          <div id="auth-spinner" style="display: inline-block; border-radius: 50%; height: 3rem; width: 3rem; border-top: 2px solid var(--text-main, #111827); border-bottom: 2px solid var(--text-main, #111827); animation: spin 1s linear infinite; margin-bottom: 1rem;"></div>
+          <div id="auth-spinner" style="display: inline-block; border-radius: 50%; height: 40px; width: 40px; border: 3px solid #f3f3f3; border-top: 3px solid var(--primary-color, #0d9488); animation: spin 1s linear infinite; margin-bottom: 1rem;"></div>
           <h2 id="auth-title" style="font-size: 1.5rem; font-weight: 700; color: var(--text-main, #1f2937); margin: 0;">Verifying access</h2>
           <p id="auth-subtitle" style="color: var(--text-secondary, #4b5563); margin-top: 0.5rem; margin-bottom: 1.5rem;">Checking your session...</p>
           <div id="google-btn-container" style="display: none; justify-content: center; min-height: 44px; width: 100%;"></div>
+          
+          <div id="email-auth-container" style="display: none; margin-top: 1.5rem; width: 100%; text-align: left;">
+            <div style="display: flex; align-items: center; margin: 1rem 0;">
+              <div style="flex-grow: 1; height: 1px; background-color: var(--color-border, #e5e7eb);"></div>
+              <button id="toggle-email-btn" style="background: none; border: none; padding: 0 0.75rem; color: var(--text-secondary, #6b7280); font-size: 0.875rem; display: flex; align-items: center; gap: 0.25rem; cursor: pointer;">
+                or continue with email
+                <svg id="email-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="transition: transform 0.2s;"><polyline points="6 9 12 15 18 9"></polyline></svg>
+              </button>
+              <div style="flex-grow: 1; height: 1px; background-color: var(--color-border, #e5e7eb);"></div>
+            </div>
+            
+            <div id="email-auth-form-container" style="display: none; flex-direction: column; gap: 0.75rem;">
+              <form id="email-auth-form" style="display: flex; flex-direction: column; gap: 0.75rem;">
+                <input type="email" id="auth-email" placeholder="Email address" required style="width: 100%; padding: 0.75rem; border: 1px solid var(--color-border, #d1d5db); border-radius: 0.5rem; font-size: 1rem; background: var(--background-body, #ffffff); color: var(--text-main, #111827);" />
+                <input type="password" id="auth-password" placeholder="Password" required style="width: 100%; padding: 0.75rem; border: 1px solid var(--color-border, #d1d5db); border-radius: 0.5rem; font-size: 1rem; background: var(--background-body, #ffffff); color: var(--text-main, #111827);" />
+                <button type="submit" id="auth-submit-btn" style="width: 100%; padding: 0.75rem; background-color: #000000; color: #ffffff; border: none; border-radius: 0.5rem; font-size: 1rem; font-weight: 600; cursor: pointer; transition: opacity 0.2s; display: flex; align-items: center; justify-content: center; gap: 0.5rem;">
+                  <span id="auth-btn-text">Continue</span>
+                  <span id="auth-btn-spinner" style="display: none; width: 20px; height: 20px; border: 3px solid #f3f3f3; border-top: 3px solid var(--primary-color, #0d9488); border-radius: 50%; animation: spin 1s linear infinite;"></span>
+                </button>
+              </form>
+              <p id="email-auth-error" style="color: #ef4444; font-size: 0.875rem; margin-top: 0.75rem; display: none; text-align: center;"></p>
+            </div>
+          </div>
         </div>
       </div>
     )}
@@ -113,6 +136,102 @@ const isProtected = protectedRoutes.some((route: string) => {
             if (title) title.innerText = 'Authentication Required';
             if (subtitle) subtitle.innerText = 'Please sign in to view this page.';
             if (btnContainer) btnContainer.style.display = 'flex';
+            
+            const emailContainer = document.getElementById('email-auth-container');
+            if (emailContainer) emailContainer.style.display = 'block';
+
+            // Toggle email logic
+            const toggleBtn = document.getElementById('toggle-email-btn');
+            const emailFormContainer = document.getElementById('email-auth-form-container');
+            const emailChevron = document.getElementById('email-chevron');
+            if (toggleBtn && emailFormContainer && emailChevron && !(window as any).__EMAIL_TOGGLE_BOUND) {
+              (window as any).__EMAIL_TOGGLE_BOUND = true;
+              toggleBtn.addEventListener('click', () => {
+                const isHidden = emailFormContainer.style.display === 'none';
+                emailFormContainer.style.display = isHidden ? 'flex' : 'none';
+                emailChevron.style.transform = isHidden ? 'rotate(180deg)' : 'rotate(0deg)';
+              });
+            }
+
+            // Email auth logic
+            const emailForm = document.getElementById('email-auth-form');
+            if (emailForm && !(window as any).__EMAIL_AUTH_BOUND) {
+              (window as any).__EMAIL_AUTH_BOUND = true;
+              emailForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const emailInput = document.getElementById('auth-email') as HTMLInputElement;
+                const passwordInput = document.getElementById('auth-password') as HTMLInputElement;
+                const submitBtn = document.getElementById('auth-submit-btn') as HTMLButtonElement;
+                const errorEl = document.getElementById('email-auth-error');
+                const btnText = document.getElementById('auth-btn-text');
+                const btnSpinner = document.getElementById('auth-btn-spinner');
+                
+                if (!emailInput || !passwordInput || !submitBtn || !errorEl || !btnText || !btnSpinner) return;
+                
+                const email = emailInput.value;
+                const password = passwordInput.value;
+                
+                errorEl.style.display = 'none';
+                errorEl.style.backgroundColor = 'transparent';
+                errorEl.style.border = 'none';
+                errorEl.style.color = '#ef4444';
+                
+                submitBtn.disabled = true;
+                btnText.style.display = 'none';
+                btnSpinner.style.display = 'inline-block';
+                
+                try {
+                  let { data, error } = await supabase.auth.signInWithPassword({ email, password });
+                  
+                  if (error && error.message.includes('Invalid login credentials')) {
+                    // Try sign up implicitly
+                    const { data: signUpData, error: signUpError } = await supabase.auth.signUp({ email, password });
+                    if (signUpError) {
+                      if (signUpError.message.includes('already registered') || signUpError.message.includes('User already registered')) {
+                        throw new Error('Invalid password. Please try again.');
+                      } else {
+                        throw signUpError;
+                      }
+                    }
+                    if (signUpData.user?.identities != null && signUpData.user.identities.length === 0) {
+                      throw new Error('Email already registered. If you used Google to sign in before, please use the "Continue with Google" option, or check your password.');
+                    }
+
+                    if (signUpData.user && !signUpData.session) {
+                      throw { message: '✨ Account created! Please check your email to verify then continue logging in.', type: 'success' };
+                    }
+                    data = signUpData as any;
+                    error = null;
+                  } else if (error) {
+                    throw error;
+                  }
+                  
+                  // Authenticated! Show the content
+                  loadingScreen.style.display = 'none';
+                  if (layout) layout.style.visibility = 'visible';
+                } catch (err: any) {
+                  const isSuccess = err.type === 'success';
+                  errorEl.innerText = err.message || 'Authentication failed. Please try again.';
+                  if (isSuccess) {
+                    errorEl.style.color = 'var(--primary-color, #0d9488)';
+                    errorEl.style.backgroundColor = 'rgba(13, 148, 136, 0.08)';
+                    errorEl.style.border = '1px solid rgba(13, 148, 136, 0.2)';
+                    errorEl.style.padding = '0.75rem';
+                    errorEl.style.borderRadius = '0.5rem';
+                  } else {
+                    errorEl.style.color = '#ef4444';
+                    errorEl.style.backgroundColor = 'rgba(239, 68, 68, 0.08)';
+                    errorEl.style.border = '1px solid rgba(239, 68, 68, 0.2)';
+                    errorEl.style.padding = '0.75rem';
+                    errorEl.style.borderRadius = '0.5rem';
+                  }
+                  errorEl.style.display = 'block';
+                  btnText.style.display = 'inline';
+                  btnSpinner.style.display = 'none';
+                  submitBtn.disabled = false;
+                }
+              });
+            }
             
             const clientId = import.meta.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID || import.meta.env.PUBLIC_GOOGLE_CLIENT_ID;
             
