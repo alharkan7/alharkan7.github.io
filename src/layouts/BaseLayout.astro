@@ -55,11 +55,11 @@ const isProtected = protectedRoutes.some((route: string) => {
       items={items}
     />
     <script src="https://accounts.google.com/gsi/client" async defer></script>
-  </head>
-  <body>
+    <SpeedInsights client:only="react" />
+    
     {isProtected && (
-      <div id="auth-guard-loading" style="position: fixed; inset: 0; z-index: 9999; display: flex; align-items: center; justify-content: center; background-color: var(--background-body, #ffffff);">
-        <div style="text-align: center; background-color: var(--background-alt, #f9fafb); padding: 2rem; border-radius: 1rem; box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1); max-width: 24rem; width: 100%; margin: 0 1rem; border: 1px solid var(--color-border, #f3f4f6);">
+      <div id="auth-guard-loading" style="position: fixed; inset: 0; z-index: 9999; display: flex; overflow-y: auto; background-color: var(--background-body, #ffffff);">
+        <div style="text-align: center; background-color: var(--background-alt, #f9fafb); padding: 2rem; border-radius: 1rem; box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1); max-width: 24rem; width: 100%; margin: auto; border: 1px solid var(--color-border, #f3f4f6);">
           <div id="auth-spinner" style="display: inline-block; border-radius: 50%; height: 40px; width: 40px; border: 3px solid #f3f3f3; border-top: 3px solid var(--primary-color, #0d9488); animation: spin 1s linear infinite; margin-bottom: 1rem;"></div>
           <h2 id="auth-title" style="font-size: 1.5rem; font-weight: 700; color: var(--text-main, #1f2937); margin: 0;">Verifying access</h2>
           <p id="auth-subtitle" style="color: var(--text-secondary, #4b5563); margin-top: 0.5rem; margin-bottom: 1.5rem;">Checking your session...</p>
@@ -75,16 +75,25 @@ const isProtected = protectedRoutes.some((route: string) => {
               <div style="flex-grow: 1; height: 1px; background-color: var(--color-border, #e5e7eb);"></div>
             </div>
             
-            <div id="email-auth-form-container" style="display: none; flex-direction: column; gap: 0.75rem;">
-              <form id="email-auth-form" style="display: flex; flex-direction: column; gap: 0.75rem;">
-                <input type="email" id="auth-email" placeholder="Email address" required style="width: 100%; padding: 0.75rem; border: 1px solid var(--color-border, #d1d5db); border-radius: 0.5rem; font-size: 1rem; background: var(--background-body, #ffffff); color: var(--text-main, #111827);" />
-                <input type="password" id="auth-password" placeholder="Password" required style="width: 100%; padding: 0.75rem; border: 1px solid var(--color-border, #d1d5db); border-radius: 0.5rem; font-size: 1rem; background: var(--background-body, #ffffff); color: var(--text-main, #111827);" />
-                <button type="submit" id="auth-submit-btn" style="width: 100%; padding: 0.75rem; background-color: #000000; color: #ffffff; border: none; border-radius: 0.5rem; font-size: 1rem; font-weight: 600; cursor: pointer; transition: opacity 0.2s; display: flex; align-items: center; justify-content: center; gap: 0.5rem;">
-                  <span id="auth-btn-text">Continue</span>
-                  <span id="auth-btn-spinner" style="display: none; width: 20px; height: 20px; border: 3px solid #f3f3f3; border-top: 3px solid var(--primary-color, #0d9488); border-radius: 50%; animation: spin 1s linear infinite;"></span>
-                </button>
-              </form>
-              <p id="email-auth-error" style="color: #ef4444; font-size: 0.875rem; margin-top: 0.75rem; display: none; text-align: center;"></p>
+            <div id="email-auth-form-wrapper" style="display: grid; grid-template-rows: 0fr; transition: grid-template-rows 0.2s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.2s cubic-bezier(0.4, 0, 0.2, 1); opacity: 0; visibility: hidden;">
+              <div style="overflow: hidden;">
+                <div id="email-auth-form-container" style="display: flex; flex-direction: column; gap: 0.75rem; padding-top: 0.5rem;">
+                  <form id="email-auth-form" style="display: flex; flex-direction: column; gap: 0.75rem;">
+                    <input type="email" id="auth-email" placeholder="Email address" required style="width: 100%; padding: 0.75rem; border: 1px solid var(--color-border, #d1d5db); border-radius: 0.5rem; font-size: 1rem; background: var(--background-body, #ffffff); color: var(--text-main, #111827);" />
+                    <div style="position: relative; width: 100%;">
+                      <input type="password" id="auth-password" placeholder="Password" required style="width: 100%; padding: 0.75rem; padding-right: 2.75rem; border: 1px solid var(--color-border, #d1d5db); border-radius: 0.5rem; font-size: 1rem; background: var(--background-body, #ffffff); color: var(--text-main, #111827);" />
+                      <button type="button" id="toggle-password-visibility" style="position: absolute; right: 0.75rem; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; color: var(--text-secondary, #6b7280); padding: 0; display: flex;">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>
+                      </button>
+                    </div>
+                    <button type="submit" id="auth-submit-btn" style="width: 100%; padding: 0.75rem; background-color: #000000; color: #ffffff; border: none; border-radius: 0.5rem; font-size: 1rem; font-weight: 600; cursor: pointer; transition: opacity 0.2s; display: flex; align-items: center; justify-content: center; gap: 0.5rem;">
+                      <span id="auth-btn-text">Continue</span>
+                      <span id="auth-btn-spinner" style="display: none; width: 20px; height: 20px; border: 3px solid #f3f3f3; border-top: 3px solid var(--primary-color, #0d9488); border-radius: 50%; animation: spin 1s linear infinite;"></span>
+                    </button>
+                  </form>
+                  <p id="email-auth-error" style="color: #ef4444; font-size: 0.875rem; margin-top: 0.75rem; display: none; text-align: center;"></p>
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -142,16 +151,53 @@ const isProtected = protectedRoutes.some((route: string) => {
 
             // Toggle email logic
             const toggleBtn = document.getElementById('toggle-email-btn');
-            const emailFormContainer = document.getElementById('email-auth-form-container');
+            const emailFormWrapper = document.getElementById('email-auth-form-wrapper');
             const emailChevron = document.getElementById('email-chevron');
-            if (toggleBtn && emailFormContainer && emailChevron && !(window as any).__EMAIL_TOGGLE_BOUND) {
+            if (toggleBtn && emailFormWrapper && emailChevron && !(window as any).__EMAIL_TOGGLE_BOUND) {
               (window as any).__EMAIL_TOGGLE_BOUND = true;
               toggleBtn.addEventListener('click', () => {
-                const isHidden = emailFormContainer.style.display === 'none';
-                emailFormContainer.style.display = isHidden ? 'flex' : 'none';
-                emailChevron.style.transform = isHidden ? 'rotate(180deg)' : 'rotate(0deg)';
+                const isHidden = emailFormWrapper.style.opacity === '0';
+                if (isHidden) {
+                  emailFormWrapper.style.visibility = 'visible';
+                  emailFormWrapper.style.gridTemplateRows = '1fr';
+                  emailFormWrapper.style.opacity = '1';
+                  emailChevron.style.transform = 'rotate(180deg)';
+                } else {
+                  emailFormWrapper.style.gridTemplateRows = '0fr';
+                  emailFormWrapper.style.opacity = '0';
+                  emailChevron.style.transform = 'rotate(0deg)';
+                  setTimeout(() => {
+                    if (emailFormWrapper.style.opacity === '0') {
+                      emailFormWrapper.style.visibility = 'hidden';
+                    }
+                  }, 200);
+                }
               });
             }
+
+            // Password visibility toggle logic
+            const togglePasswordBtn = document.getElementById('toggle-password-visibility');
+            const passwordInput = document.getElementById('auth-password') as HTMLInputElement;
+            if (togglePasswordBtn && passwordInput && !(window as any).__PASSWORD_TOGGLE_BOUND) {
+              (window as any).__PASSWORD_TOGGLE_BOUND = true;
+              togglePasswordBtn.addEventListener('click', () => {
+                const isPassword = passwordInput.type === 'password';
+                passwordInput.type = isPassword ? 'text' : 'password';
+                togglePasswordBtn.innerHTML = isPassword 
+                  ? '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9.88 9.88a3 3 0 1 0 4.24 4.24"/><path d="M10.73 5.08A10.43 10.43 0 0 1 12 5c7 0 10 7 10 7a13.16 13.16 0 0 1-1.67 2.68"/><path d="M6.61 6.61A13.526 13.526 0 0 0 2 12s3 7 10 7a9.74 9.74 0 0 0 5.39-1.61"/><line x1="2" y1="2" x2="22" y2="22"/></svg>'
+                  : '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>';
+              });
+            }
+
+            // Keyboard overlay adjustment
+            const emailInputEl = document.getElementById('auth-email');
+            [emailInputEl, passwordInput].forEach(el => {
+              if (el) {
+                el.addEventListener('focus', () => {
+                  setTimeout(() => el.scrollIntoView({ behavior: 'smooth', block: 'center' }), 300);
+                });
+              }
+            });
 
             // Email auth logic
             const emailForm = document.getElementById('email-auth-form');
@@ -235,54 +281,85 @@ const isProtected = protectedRoutes.some((route: string) => {
             
             const clientId = import.meta.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID || import.meta.env.PUBLIC_GOOGLE_CLIENT_ID;
             
-            const initGoogle = () => {
-              const google = (window as any).google;
-              google.accounts.id.initialize({
-                client_id: clientId,
-                callback: async (response: any) => {
-                  // Re-show loading state while saving to Supabase
-                  if (btnContainer) btnContainer.style.display = 'none';
-                  if (spinner) spinner.style.display = 'inline-block';
-                  if (title) title.innerText = 'Signing you in...';
-                  if (subtitle) subtitle.innerText = 'Establishing secure session';
-                  
-                  // Send the Google ID token to Supabase
-                  const { error: signInError } = await supabase.auth.signInWithIdToken({
-                    provider: 'google',
-                    token: response.credential
-                  });
-                  
-                  if (signInError) {
-                    console.error("Error linking Google to Supabase:", signInError);
-                    if (title) title.innerText = 'Login Error';
-                    if (subtitle) subtitle.innerHTML = '<span class="text-red-500">Could not save session. Try again.</span>';
-                    if (spinner) spinner.style.display = 'none';
-                    if (btnContainer) btnContainer.style.display = 'flex';
-                  } else {
-                    // Authenticated! Show the content
-                    loadingScreen.style.display = 'none';
-                    if (layout) layout.style.visibility = 'visible';
-                  }
-                }
-              });
+            const fallbackToEmail = () => {
+              const emailFormWrapper = document.getElementById('email-auth-form-wrapper');
+              const emailChevron = document.getElementById('email-chevron');
+              const toggleBtn = document.getElementById('toggle-email-btn');
               
-              // Render the native Google button
-              google.accounts.id.renderButton(btnContainer, { 
-                theme: 'outline', 
-                size: 'large',
-                shape: 'rectangular',
-                text: 'signin_with'
-              });
+              if (emailFormWrapper) {
+                emailFormWrapper.style.visibility = 'visible';
+                emailFormWrapper.style.gridTemplateRows = '1fr';
+                emailFormWrapper.style.opacity = '1';
+              }
+              if (emailChevron) emailChevron.style.transform = 'rotate(180deg)';
+              if (toggleBtn) toggleBtn.innerHTML = 'Google Sign-In unavailable. Please use email.';
+              if (btnContainer) btnContainer.style.display = 'none';
+            };
+
+            const initGoogle = () => {
+              try {
+                const google = (window as any).google;
+                google.accounts.id.initialize({
+                  client_id: clientId,
+                  callback: async (response: any) => {
+                    // Re-show loading state while saving to Supabase
+                    if (btnContainer) btnContainer.style.display = 'none';
+                    if (spinner) spinner.style.display = 'inline-block';
+                    if (title) title.innerText = 'Signing you in...';
+                    if (subtitle) subtitle.innerText = 'Establishing secure session';
+                    
+                    // Send the Google ID token to Supabase
+                    const { error: signInError } = await supabase.auth.signInWithIdToken({
+                      provider: 'google',
+                      token: response.credential
+                    });
+                    
+                    if (signInError) {
+                      console.error("Error linking Google to Supabase:", signInError);
+                      if (title) title.innerText = 'Login Error';
+                      if (subtitle) subtitle.innerHTML = '<span class="text-red-500">Could not save session. Try again.</span>';
+                      if (spinner) spinner.style.display = 'none';
+                      if (btnContainer) btnContainer.style.display = 'flex';
+                    } else {
+                      // Authenticated! Show the content
+                      loadingScreen.style.display = 'none';
+                      if (layout) layout.style.visibility = 'visible';
+                    }
+                  }
+                });
+                
+                // Render the native Google button
+                google.accounts.id.renderButton(btnContainer, { 
+                  theme: 'outline', 
+                  size: 'large',
+                  shape: 'rectangular',
+                  text: 'signin_with'
+                });
+
+                // Check if Google button failed to render
+                setTimeout(() => {
+                  if (btnContainer && btnContainer.innerHTML.trim() === '') {
+                    fallbackToEmail();
+                  }
+                }, 1000);
+              } catch (err) {
+                fallbackToEmail();
+              }
             };
 
             // Wait for the Google script to be available
             if ((window as any).google?.accounts?.id) {
               initGoogle();
             } else {
+              let attempts = 0;
               const checkInterval = setInterval(() => {
+                attempts++;
                 if ((window as any).google?.accounts?.id) {
                   clearInterval(checkInterval);
                   initGoogle();
+                } else if (attempts > 30) { // 3 seconds timeout
+                  clearInterval(checkInterval);
+                  fallbackToEmail();
                 }
               }, 100);
             }
