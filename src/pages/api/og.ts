@@ -7,7 +7,7 @@ import { resolve } from "node:path";
 export const GET: APIRoute = async ({ url }) => {
   try {
     const searchParams = url.searchParams;
-    const title = searchParams.get("title") || "Al Harkan's Blog";
+    const title = searchParams.get("title") || "al Harkan's Blog";
     const subtitle = searchParams.get("subtitle") || "";
 
     // Try multiple possible paths for the font file
@@ -141,7 +141,7 @@ export const GET: APIRoute = async ({ url }) => {
                     type: "div",
                     props: {
                       style: { fontSize: "20px", fontWeight: 700, color: "#57534e", display: "flex", alignItems: "center" },
-                      children: "Al Harkan's Blog",
+                      children: "al Harkan's Blog",
                     },
                   },
                   {

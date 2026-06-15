@@ -2,7 +2,7 @@ type TweetEmbed = string;
 
 export const tweetEmbeds: TweetEmbed[] = [
 
-    `<blockquote class="twitter-tweet"><p lang="en" dir="ltr">Ever-growing threads on notable AI developments for research, education, and software engineering —fields that I&#39;ve been paying close attention to in the past 5 years:</p>&mdash; Al Harkan (@alhrkn) <a href="https://twitter.com/alhrkn/status/1908342469529604533?ref_src=twsrc%5Etfw">April 5, 2025</a></blockquote>`
+    `<blockquote class="twitter-tweet"><p lang="en" dir="ltr">Ever-growing threads on notable AI developments for research, education, and software engineering —fields that I&#39;ve been paying close attention to in the past 5 years:</p>&mdash; al Harkan (@alhrkn) <a href="https://twitter.com/alhrkn/status/1908342469529604533?ref_src=twsrc%5Etfw">April 5, 2025</a></blockquote>`
 ,
     `<blockquote class="twitter-tweet"><p lang="en" dir="ltr">&quot;Everything will break.<br><br>Entropy, the steady decline into disorder, that&#39;s a fundamental part of the universe.<br><br>Entropy will get us all in the end.<br><br>But that doesn&#39;t mean you shouldn&#39;t build things anyway.&quot;</p>&mdash; Al (@alhrkn) <a href="https://twitter.com/alhrkn/status/1584363585605496832?ref_src=twsrc%5Etfw">October 24, 2022</a></blockquote>`
 ,

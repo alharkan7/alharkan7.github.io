@@ -1,7 +1,7 @@
 export const config = {
   metadata: {
     title: "Beyond the Screen — Media Effects on Indonesia's 2019 Election",
-    description: "A scrollytelling analysis of how media consumption shaped voter turnout and vote direction in Indonesia's 2019 Legislative Election. Master's Thesis by Ali Al Harkan, Universitas Indonesia.",
+    description: "A scrollytelling analysis of how media consumption shaped voter turnout and vote direction in Indonesia's 2019 Legislative Election. Master's Thesis by Ali al Harkan, Universitas Indonesia.",
     brand: "Beyond the Screen",
     homeNavUrl: "/data"
   },
@@ -9,7 +9,7 @@ export const config = {
     label: "Master's Thesis",
     titleHtml: 'Beyond the <span class="hero-accent">Screen</span>',
     subtitleHtml: "Media Effects on Voter Turnout &amp; Vote Direction in Indonesia's 2019 Legislative Election",
-    authorsHtml: "Ali Al Harkan · Universitas Indonesia",
+    authorsHtml: "Ali al Harkan · Universitas Indonesia",
     teaserHtml: 'In 2019, Indonesia held one of the most complex single-day elections in the world. Against a backdrop of 17,000 islands and a booming digital landscape, a critical question emerged: <em>Does the media we consume actually dictate how we vote?</em>',
     ctaHref: "#section-context",
     stats: [
@@ -258,7 +258,7 @@ export const config = {
         <p><em>Efek Media terhadap Voter Turnout dan Vote Direction: Analisis Perilaku Pemilih pada Pemilihan Umum Legislatif Indonesia 2019</em></p>
       </div>
       <div class="footer-meta">
-        <p><strong>Research by:</strong> Ali Al Harkan</p>
+        <p><strong>Research by:</strong> Ali al Harkan</p>
         <p><strong>Institution:</strong> Universitas Indonesia</p>
         <p><strong>Program:</strong> Graduate Program in Communication Science</p>
       </div>

@@ -27,6 +27,6 @@ Apabila ketiga elemen pendidikan tersebut bekerja dengan baik, Pemerintah mampu 
 ***
 
 Malang, 28 Agustus 2016  
-Ali Al Harkan
+Ali al Harkan
 
 Tulisan ini disusun sebagai materi peserta Duta Indonesia BISA 2016.

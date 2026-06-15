@@ -91,7 +91,7 @@ export async function GET(context) {
   });
 
   return rss({
-    title: "Al Harkan's Blog",
+    title: "al Harkan's Blog",
     description: "Personal blog about data, media studies, and technology",
     site: context.site,
     items: sortedPosts.map((post) => ({
@@ -105,6 +105,6 @@ export async function GET(context) {
         : post.link,
       category: post.frontmatter?.category || post.category,
     })),
-    customData: `<language>en-us</language><managingEditor>contact@raihankalla.id (Al Harkan)</managingEditor><webMaster>contact@raihankalla.id (Al Harkan)</webMaster>`,
+    customData: `<language>en-us</language><managingEditor>contact@raihankalla.id (al Harkan)</managingEditor><webMaster>contact@raihankalla.id (al Harkan)</webMaster>`,
   });
 }

@@ -1,7 +1,7 @@
 export const config = {
     metadata: {
         title: "Predicting the Presidency with Google Trends",
-        description: "Testing Google Trends as a Predictor for the 2019 Indonesian Presidential Election. Research by Ali Al Harkan.",
+        description: "Testing Google Trends as a Predictor for the 2019 Indonesian Presidential Election. Research by Ali al Harkan.",
         brand: "Digital Crystal Ball",
         homeNavUrl: "/data"
     },
@@ -9,7 +9,7 @@ export const config = {
         label: "Conference Proceeding",
         titleHtml: 'Digital <span class="hero-accent">Crystal Ball?</span>',
         subtitleHtml: "Testing Google Trends as a Predictor for the 2019 Indonesian Presidential Election",
-        authorsHtml: "Ali Al Harkan · Universitas Indonesia",
+        authorsHtml: "Ali al Harkan · Universitas Indonesia",
         teaserHtml: 'Traditional political surveys are expensive, slow, and labor-intensive. In the era of "Big Data," Google Trends offers a seductive alternative: a free, real-time index of what millions of Indonesians are searching for. <strong>Can the search bar replace the ballot box?</strong> This study tests the accuracy and precision of Google Search data against the official 2019 KPU Real Count.',
         ctaHref: "#section-context",
         stats: [
@@ -181,7 +181,7 @@ export const config = {
         <p><em>Memprediksi Hasil Pemilu Presiden Indonesia 2019 dengan Google Trends: Uji Akurasi, Presisi dan Peluang Pemanfaatannya</em></p>
       </div>
       <div class="footer-meta">
-        <p><strong>Research by:</strong> Ali Al Harkan</p>
+        <p><strong>Research by:</strong> Ali al Harkan</p>
         <p><strong>Institution:</strong> Universitas Indonesia</p>
       </div>
       <div class="footer-actions">
