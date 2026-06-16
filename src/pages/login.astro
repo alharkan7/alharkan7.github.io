@@ -150,13 +150,30 @@ import BaseLayout from "../layouts/BaseLayout.astro";
     });
   }
 
-  // Handle mobile keyboard layout
+  // Handle mobile keyboard layout for tricky in-app browsers
   const inputs = document.querySelectorAll('.login-input');
   inputs.forEach(input => {
     input.addEventListener('focus', () => {
+      const mainEl = document.querySelector('main');
+      if (mainEl) mainEl.style.paddingBottom = '50vh';
       setTimeout(() => input.scrollIntoView({ behavior: 'smooth', block: 'center' }), 300);
     });
+    input.addEventListener('blur', () => {
+      const mainEl = document.querySelector('main');
+      if (mainEl) mainEl.style.paddingBottom = '1rem';
+    });
   });
+
+  if (window.visualViewport) {
+    const adjustViewport = () => {
+      const mainEl = document.querySelector('main');
+      if (mainEl) {
+        mainEl.style.minHeight = `${window.visualViewport?.height}px`;
+      }
+    };
+    window.visualViewport.addEventListener('resize', adjustViewport);
+    adjustViewport();
+  }
 
   // Handle login form submission
   const loginForm = document.getElementById("login-form");

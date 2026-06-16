@@ -142,7 +142,7 @@ const isProtected = protectedRoutes.some((route: string) => {
 
             // Show the login UI
             if (spinner) spinner.style.display = 'none';
-            if (title) title.innerText = 'Authentication Required';
+            if (title) title.innerText = 'Welcome, Friend!';
             if (subtitle) subtitle.innerText = 'Please sign in to view this page.';
             if (btnContainer) btnContainer.style.display = 'flex';
             
@@ -189,15 +189,33 @@ const isProtected = protectedRoutes.some((route: string) => {
               });
             }
 
-            // Keyboard overlay adjustment
+            // Keyboard overlay adjustment for tricky in-app browsers
             const emailInputEl = document.getElementById('auth-email');
             [emailInputEl, passwordInput].forEach(el => {
               if (el) {
                 el.addEventListener('focus', () => {
+                  const loadingScreen = document.getElementById('auth-guard-loading');
+                  if (loadingScreen) loadingScreen.style.paddingBottom = '50vh';
                   setTimeout(() => el.scrollIntoView({ behavior: 'smooth', block: 'center' }), 300);
+                });
+                el.addEventListener('blur', () => {
+                  const loadingScreen = document.getElementById('auth-guard-loading');
+                  if (loadingScreen) loadingScreen.style.paddingBottom = '0';
                 });
               }
             });
+
+            if (window.visualViewport) {
+              const adjustViewport = () => {
+                const loadingScreen = document.getElementById('auth-guard-loading');
+                if (loadingScreen) {
+                  loadingScreen.style.height = `${window.visualViewport?.height}px`;
+                  loadingScreen.style.bottom = 'auto';
+                }
+              };
+              window.visualViewport.addEventListener('resize', adjustViewport);
+              adjustViewport();
+            }
 
             // Email auth logic
             const emailForm = document.getElementById('email-auth-form');
@@ -292,7 +310,7 @@ const isProtected = protectedRoutes.some((route: string) => {
                 emailFormWrapper.style.opacity = '1';
               }
               if (emailChevron) emailChevron.style.transform = 'rotate(180deg)';
-              if (toggleBtn) toggleBtn.innerHTML = 'Google Sign-In unavailable. Please use email.';
+              if (toggleBtn) toggleBtn.innerHTML = 'Open in browser to use Google Sign-In, or continue with email:';
               if (btnContainer) btnContainer.style.display = 'none';
             };
 
