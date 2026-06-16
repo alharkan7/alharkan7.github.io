@@ -154,6 +154,8 @@ import BaseLayout from "../layouts/BaseLayout.astro";
   const inputs = document.querySelectorAll('.login-input');
   inputs.forEach(input => {
     input.addEventListener('focus', () => {
+      if (window.innerWidth >= 768) return; // Only apply on mobile screens
+      
       const mainEl = document.querySelector('main');
       if (mainEl) mainEl.style.paddingBottom = '50vh';
       setTimeout(() => input.scrollIntoView({ behavior: 'smooth', block: 'center' }), 300);
@@ -197,7 +199,13 @@ import BaseLayout from "../layouts/BaseLayout.astro";
       
       if (error && error.message.includes('Invalid login credentials')) {
         // Try sign up implicitly
-        const { data: signUpData, error: signUpError } = await supabase.auth.signUp({ email, password });
+        const { data: signUpData, error: signUpError } = await supabase.auth.signUp({ 
+          email, 
+          password,
+          options: {
+            emailRedirectTo: window.location.origin + window.location.pathname
+          }
+        });
         if (signUpError) {
           if (signUpError.message.includes('already registered') || signUpError.message.includes('User already registered')) {
             throw new Error('Invalid password. Please try again.');

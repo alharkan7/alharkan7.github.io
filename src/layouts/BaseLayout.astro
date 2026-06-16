@@ -194,6 +194,8 @@ const isProtected = protectedRoutes.some((route: string) => {
             [emailInputEl, passwordInput].forEach(el => {
               if (el) {
                 el.addEventListener('focus', () => {
+                  if (window.innerWidth >= 768) return; // Only apply on mobile screens
+                  
                   const loadingScreen = document.getElementById('auth-guard-loading');
                   if (loadingScreen) loadingScreen.style.paddingBottom = '50vh';
                   setTimeout(() => el.scrollIntoView({ behavior: 'smooth', block: 'center' }), 300);
@@ -249,7 +251,13 @@ const isProtected = protectedRoutes.some((route: string) => {
                   
                   if (error && error.message.includes('Invalid login credentials')) {
                     // Try sign up implicitly
-                    const { data: signUpData, error: signUpError } = await supabase.auth.signUp({ email, password });
+                    const { data: signUpData, error: signUpError } = await supabase.auth.signUp({ 
+                      email, 
+                      password,
+                      options: {
+                        emailRedirectTo: window.location.origin + window.location.pathname
+                      }
+                    });
                     if (signUpError) {
                       if (signUpError.message.includes('already registered') || signUpError.message.includes('User already registered')) {
                         throw new Error('Invalid password. Please try again.');
