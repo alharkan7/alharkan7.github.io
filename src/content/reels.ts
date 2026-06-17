@@ -1,14 +1,15 @@
 export const reelsUrls: string[] = [
-  "https://www.instagram.com/reel/DY9kuBwSQmQ/",
-  "https://www.instagram.com/reel/DW89lSykqCS/",
-  "https://www.instagram.com/reel/DU-zbiBkob6/",
-  "https://www.instagram.com/reel/DUnp1GEknGg/",
-  "https://www.instagram.com/reel/DUatBO8Eqw0/",
-  "https://www.instagram.com/reel/DULURjAki5o/",
-  "https://www.instagram.com/reel/DT7yTZ6EigM/",
-  "https://www.instagram.com/reel/DTc5UxrEnP1/",
-  "https://www.instagram.com/reel/DShyKSXkkbv/",
-  "https://www.instagram.com/reel/DQ4MY9mkpJU/"
+  "https://www.instagram.com/reels/DZmwvUdSsTD/",
+  "https://www.instagram.com/reels/DY9kuBwSQmQ/",
+  "https://www.instagram.com/reels/DW89lSykqCS/",
+  "https://www.instagram.com/reels/DU-zbiBkob6/",
+  "https://www.instagram.com/reels/DUnp1GEknGg/",
+  "https://www.instagram.com/reels/DUatBO8Eqw0/",
+  "https://www.instagram.com/reels/DULURjAki5o/",
+  "https://www.instagram.com/reels/DT7yTZ6EigM/",
+  "https://www.instagram.com/reels/DTc5UxrEnP1/",
+  "https://www.instagram.com/reels/DShyKSXkkbv/",
+  "https://www.instagram.com/reels/DQ4MY9mkpJU/"
 ];
 
 export function getReelEmbed(url: string) {
