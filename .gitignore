@@ -41,3 +41,5 @@ tokens.json
 .commandcode
 
 app-key*
+public/data/embeddings_checkpoint.jsonl
+public/data/raw_videos.json

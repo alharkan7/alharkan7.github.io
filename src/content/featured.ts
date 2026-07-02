@@ -1,4 +1,4 @@
-const sortByDate = true;
+const sortByDate = false;
 
 const rawProjects = [
   {
@@ -7,7 +7,7 @@ const rawProjects = [
     type: "visualization",
     date: "2026-01-16",
     url: "https://alhrkn.vercel.app/vast-timeline",
-    coverImage: "https://ik.imagekit.io/raihankalla/research_section_cover/nusantara-timeline.png",
+    coverImage: "https://ik.imagekit.io/raihankalla/research_section_cover/linimasa-nusantara.png",
   },
   {
     title: "Kekayaan Bahasa Nusantara",

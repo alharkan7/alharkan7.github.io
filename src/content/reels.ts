@@ -1,4 +1,6 @@
 export const reelsUrls: string[] = [
+  "https://www.instagram.com/reel/DaNUWdQy2MV/",
+  "https://www.instagram.com/reel/DaAX8G-yDXa/",
   "https://www.instagram.com/reel/DZmwvUdSsTD/",
   "https://www.instagram.com/reel/DY9kuBwSQmQ/",
   "https://www.instagram.com/reel/DW89lSykqCS/",
