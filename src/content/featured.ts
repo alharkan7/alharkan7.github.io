@@ -6,7 +6,7 @@ const rawProjects = [
     subtitle: "",
     type: "visualization",
     date: "2026-07-03",
-    url: "https://alhrkn.vercel.app/youtube-galaxy",
+    url: "/youtube-galaxy",
     coverImage: "https://ik.imagekit.io/raihankalla/research_section_cover/youtube-galaxy.png",
   },
   {

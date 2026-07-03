@@ -622,7 +622,14 @@
       const [showKnn, setShowKnn] = useState(false);
       const [activeClusters, setActiveClusters] = useState(new Set());
       const [loading, setLoading] = useState(true);
-      const [sidebarOpen, setSidebarOpen] = useState(true);
+      const [sidebarOpen, setSidebarOpen] = useState(window.innerWidth > 768);
+
+      useEffect(() => {
+        const timer = setTimeout(() => {
+          window.dispatchEvent(new Event('resize'));
+        }, 310);
+        return () => clearTimeout(timer);
+      }, [sidebarOpen, viewMode]);
 
       useEffect(() => {
         Promise.all([
@@ -662,7 +669,7 @@
       return (
         <div className="flex h-screen flex-col bg-background text-foreground">
           {/* Header */}
-          <header className="flex items-center justify-between border-b border-border bg-background px-4 py-3 shadow-md z-20">
+          <header className="flex flex-col md:flex-row md:items-center justify-between border-b border-border bg-background px-4 py-3 shadow-md z-20 gap-3">
             <div className="flex items-center gap-3">
               <button onClick={() => setSidebarOpen(!sidebarOpen)} className="p-1 hover:bg-slate-800 rounded transition text-slate-300">
                 <MenuIcon />
@@ -676,35 +683,39 @@
             </div>
             
             {/* View Mode Selector */}
-            <div className="flex items-center bg-slate-900 rounded-lg p-1 border border-slate-800">
+            <div 
+              className="flex items-center bg-slate-900 rounded-lg p-1 border border-slate-800 w-full md:w-auto overflow-x-auto hide-scrollbar"
+              style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+            >
+              <style>{`.hide-scrollbar::-webkit-scrollbar { display: none; }`}</style>
               <button 
                 onClick={() => setViewMode('3d')}
-                className={`flex items-center gap-2 px-3 py-1.5 rounded-md text-sm transition-all ${viewMode === '3d' ? 'bg-slate-800 text-white shadow' : 'text-slate-400 hover:text-white'}`}
+                className={`flex shrink-0 items-center gap-2 px-3 py-1.5 rounded-md text-sm transition-all ${viewMode === '3d' ? 'bg-slate-800 text-white shadow' : 'text-slate-400 hover:text-white'}`}
               >
                 <BoxIcon /> Embeddings
               </button>
               <button 
                 onClick={() => setViewMode('force')}
-                className={`flex items-center gap-2 px-3 py-1.5 rounded-md text-sm transition-all ${viewMode === 'force' ? 'bg-slate-800 text-white shadow' : 'text-slate-400 hover:text-white'}`}
+                className={`flex shrink-0 items-center gap-2 px-3 py-1.5 rounded-md text-sm transition-all ${viewMode === 'force' ? 'bg-slate-800 text-white shadow' : 'text-slate-400 hover:text-white'}`}
               >
                 <NetworkIcon /> Force Graph
               </button>
               <button 
                 onClick={() => setViewMode('distribution')}
-                className={`flex items-center gap-2 px-3 py-1.5 rounded-md text-sm transition-all ${viewMode === 'distribution' ? 'bg-slate-800 text-white shadow' : 'text-slate-400 hover:text-white'}`}
+                className={`flex shrink-0 items-center gap-2 px-3 py-1.5 rounded-md text-sm transition-all ${viewMode === 'distribution' ? 'bg-slate-800 text-white shadow' : 'text-slate-400 hover:text-white'}`}
               >
                 <BarChartIcon /> Distribution
               </button>
               <button 
                 onClick={() => setViewMode('stacked')}
-                className={`flex items-center gap-2 px-3 py-1.5 rounded-md text-sm transition-all ${viewMode === 'stacked' ? 'bg-slate-800 text-white shadow' : 'text-slate-400 hover:text-white'}`}
+                className={`flex shrink-0 items-center gap-2 px-3 py-1.5 rounded-md text-sm transition-all ${viewMode === 'stacked' ? 'bg-slate-800 text-white shadow' : 'text-slate-400 hover:text-white'}`}
               >
                 <StackedIcon /> Temporal Stacked
               </button>
-              <div className="w-px h-6 bg-slate-700 mx-1"></div>
+              <div className="w-px h-6 bg-slate-700 mx-1 shrink-0"></div>
               <button 
                 onClick={() => setViewMode('about')}
-                className={`flex items-center gap-2 px-3 py-1.5 rounded-md text-sm transition-all ${viewMode === 'about' ? 'bg-slate-800 text-white shadow' : 'text-slate-400 hover:text-white'}`}
+                className={`flex shrink-0 items-center gap-2 px-3 py-1.5 rounded-md text-sm transition-all ${viewMode === 'about' ? 'bg-slate-800 text-white shadow' : 'text-slate-400 hover:text-white'}`}
               >
                 <InfoIcon /> About
               </button>
@@ -714,8 +725,8 @@
           <div className="flex flex-1 overflow-hidden relative">
             
             {/* Sidebar (Moved to the left) */}
-            <aside className={`transition-all duration-300 ease-in-out border-r border-border bg-slate-900 flex flex-col z-20 ${sidebarOpen ? 'w-72' : 'w-0 opacity-0 overflow-hidden'} ${viewMode === 'about' ? 'opacity-30 pointer-events-none grayscale' : ''}`}>
-              <div className="p-4 flex flex-col h-full w-72">
+            <aside className={`transition-all duration-300 ease-in-out border-r border-border bg-slate-900 flex flex-col z-20 shrink-0 ${sidebarOpen ? 'w-64' : 'w-0 opacity-0 overflow-hidden'} ${viewMode === 'about' ? 'opacity-30 pointer-events-none grayscale' : ''}`}>
+              <div className="p-4 flex flex-col h-full w-64">
                 <div className="flex items-center justify-between mb-4">
                   <h3 className="text-white font-semibold text-sm">Semantic Clusters</h3>
                   <button 
