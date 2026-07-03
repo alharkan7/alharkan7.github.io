@@ -139,7 +139,7 @@
         }
       }, [data, layout, config, onHover, onUnhover]);
 
-      return <div ref={containerRef} className="w-full h-full" onMouseMove={onMouseMove}></div>;
+      return <div ref={containerRef} className="w-full h-full" onMouseMove={onMouseMove} style={{ touchAction: 'none' }}></div>;
     };
 
     // ----------------------------------------------------
@@ -237,10 +237,29 @@
 
       return (
         <div className="h-full w-full bg-[#020617] relative">
+          <style>{`
+            .modebar {
+              flex-direction: column !important;
+              display: flex !important;
+              align-items: flex-end !important;
+              top: 20px !important;
+              right: 20px !important;
+            }
+            .modebar-group {
+              display: flex !important;
+              flex-direction: column !important;
+              margin-bottom: 4px !important;
+              padding-left: 0 !important;
+            }
+            .modebar-btn {
+              margin-bottom: 4px !important;
+              margin-left: 0 !important;
+            }
+          `}</style>
           <PlotlyChart 
             data={plotData} 
             layout={layout} 
-            config={{ responsive: true, displayModeBar: false, scrollZoom: true }} 
+            config={{ responsive: true, scrollZoom: true }} 
             onHover={handleHover}
             onUnhover={handleUnhover}
             onMouseMove={handleMouseMove}
@@ -623,6 +642,11 @@
       const [activeClusters, setActiveClusters] = useState(new Set());
       const [loading, setLoading] = useState(true);
       const [sidebarOpen, setSidebarOpen] = useState(window.innerWidth > 768);
+      const [isTouch, setIsTouch] = useState(false);
+
+      useEffect(() => {
+        setIsTouch(('ontouchstart' in window) || (navigator.maxTouchPoints > 0) || (navigator.msMaxTouchPoints > 0));
+      }, []);
 
       useEffect(() => {
         const timer = setTimeout(() => {
@@ -667,7 +691,7 @@
       const resetFilters = () => setActiveClusters(new Set());
 
       return (
-        <div className="flex h-screen flex-col bg-background text-foreground">
+        <div className="flex h-[100dvh] flex-col bg-background text-foreground">
           {/* Header */}
           <header className="flex flex-col md:flex-row md:items-center justify-between border-b border-border bg-background px-4 py-3 shadow-md z-20 gap-3">
             <div className="flex items-center gap-3">
@@ -799,7 +823,7 @@
 
                   {/* HUD Stats */}
                   {(viewMode === '3d' || viewMode === 'force') && (
-                    <HudStats viewMode={viewMode} count={filteredData.length} showKnn={showKnn} setShowKnn={setShowKnn} />
+                    <HudStats viewMode={viewMode} count={filteredData.length} showKnn={showKnn} setShowKnn={setShowKnn} isTouch={isTouch} />
                   )}
                 </>
               )}
@@ -810,7 +834,7 @@
       );
     }
 
-    const HudStats = ({ viewMode, count, showKnn, setShowKnn }) => {
+    const HudStats = ({ viewMode, count, showKnn, setShowKnn, isTouch }) => {
       const [open, setOpen] = useState(true);
 
       if (!open) {
@@ -837,7 +861,11 @@
             {viewMode === '3d' ? '3D Embeddings Layout' : 'Force Directed Layout'}
           </h2>
           <p className="text-slate-400 text-xs mt-1">
-            {viewMode === '3d' ? "Left-click & drag to rotate • Scroll to zoom" : "Left-click & drag to rotate • Scroll to fly • Right-click to pan"}
+            {!isTouch ? (
+              <span>{viewMode === '3d' ? "Left-click & drag to rotate • Scroll to zoom" : "Left-click & drag to rotate • Scroll to fly • Right-click to pan"}</span>
+            ) : (
+              <span>{viewMode === '3d' ? "Use right toolbar to Pan/Zoom (1 Finger)" : "1-finger drag to rotate • 2-finger pinch to zoom"}</span>
+            )}
           </p>
           {viewMode === 'force' && (
             <div className="mt-3 flex items-center gap-3">
