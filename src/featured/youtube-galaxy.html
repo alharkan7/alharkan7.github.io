@@ -1,46 +1,50 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="dark">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Semantic Video Galaxy</title>
   <meta name="description" content="An interactive 3D galaxy exploring semantic clusters of YouTube history." />
-  <link rel="apple-touch-icon" sizes="180x180" href="/assets/logo.png" />
-  <link rel="canonical" href="https://raihankalla.id/youtube-galaxy" />
-
-  <!-- Open Graph / Facebook -->
-  <meta property="og:type" content="website" />
-  <meta property="og:title" content="Semantic Video Galaxy" />
-  <meta property="og:description" content="An interactive 3D galaxy exploring semantic clusters of YouTube history." />
-  <meta property="og:site_name" content="al Harkan's Blog" />
-  <meta property="og:url" content="https://raihankalla.id/youtube-galaxy" />
-  <meta property="og:locale" content="id_ID" />
-  <meta property="og:logo" content="https://www.raihankalla.id/assets/logo.png" />
-
-  <!-- Twitter -->
-  <meta name="twitter:card" content="summary_large_image" />
-  <meta name="twitter:url" content="https://raihankalla.id/youtube-galaxy" />
-  <meta name="twitter:title" content="Semantic Video Galaxy" />
-  <meta name="twitter:description" content="An interactive 3D galaxy exploring semantic clusters of YouTube history." />
   
   <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
-  
-  <!-- 3D Force Graph Library -->
-  <script src="https://unpkg.com/3d-force-graph"></script>
-
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            background: 'hsl(var(--background))',
+            foreground: 'hsl(var(--foreground))',
+            muted: 'hsl(var(--muted))',
+            'muted-foreground': 'hsl(var(--muted-foreground))',
+            border: 'hsl(var(--border))',
+          }
+        }
+      }
+    }
+  </script>
   <style>
+    :root {
+      --background: 222.2 84% 4.9%;
+      --foreground: 210 40% 98%;
+      --muted: 217.2 32.6% 17.5%;
+      --muted-foreground: 215 20.2% 65.1%;
+      --border: 217.2 32.6% 17.5%;
+    }
     body {
       margin: 0;
       overflow: hidden;
-      background-color: #020617; /* slate-950 */
+      background-color: hsl(var(--background));
+      color: hsl(var(--foreground));
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
     }
     .tooltip {
       position: absolute;
       pointer-events: none;
       z-index: 50;
-      background-color: #0f172a; /* slate-900 */
-      border: 1px solid #334155; /* slate-700 */
+      background-color: #0f172a;
+      border: 1px solid #334155;
       box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5), 0 10px 10px -5px rgba(0, 0, 0, 0.2);
       border-radius: 0.5rem;
       padding: 0.75rem;
@@ -52,7 +56,6 @@
     .tooltip.visible {
       opacity: 1;
     }
-    /* Custom scrollbar for sidebar */
     ::-webkit-scrollbar {
       width: 6px;
     }
@@ -66,284 +69,782 @@
     ::-webkit-scrollbar-thumb:hover {
       background: #475569;
     }
+    .shimmer-text {
+      animation: shimmer 2s ease-in-out infinite;
+    }
+    @keyframes shimmer {
+      0% { opacity: 1; }
+      50% { opacity: 0.5; }
+      100% { opacity: 1; }
+    }
   </style>
+
+  <!-- React & ReactDOM -->
+  <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+  <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+  <!-- Babel -->
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  
+  <!-- Visualization Libs -->
+  <script src="https://unpkg.com/3d-force-graph"></script>
+  <script src="https://cdn.plot.ly/plotly-2.27.0.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 </head>
-<body class="flex flex-col md:flex-row w-screen h-screen">
+<body>
+  <div id="root"></div>
 
-  <!-- 3D Explorer Area -->
-  <div id="explorer-container" class="relative flex-1 h-full min-h-[500px]">
-    
-    <!-- Loading Overlay -->
-    <div id="loading" class="absolute inset-0 flex items-center justify-center bg-slate-950/80 z-20 text-slate-300">
-      <div class="flex flex-col items-center gap-4">
-        <div class="w-8 h-8 border-4 border-cyan-400 border-t-transparent rounded-full animate-spin"></div>
-        <p class="animate-pulse">Loading 3D semantic layout...</p>
-      </div>
-    </div>
+  <script type="text/babel">
+    const { useState, useEffect, useRef, useMemo, useCallback } = React;
 
-    <!-- WebGL Container -->
-    <div id="3d-graph" class="absolute inset-0 w-full h-full cursor-grab"></div>
-
-    <!-- HUD Overlay -->
-    <div class="absolute bottom-4 left-4 bg-slate-900/80 backdrop-blur-sm border border-slate-700 p-3 rounded-lg pointer-events-none shadow-lg z-10">
-      <h2 class="text-white font-bold text-sm m-0">3D Semantic Video Explorer</h2>
-      <p class="text-slate-400 text-xs mt-1">Left-click to rotate &bull; Scroll to fly &bull; Right-click to pan</p>
-      <div id="stats" class="text-slate-500 text-xs mt-1">0 videos in galaxy</div>
-    </div>
-
-    <!-- Custom HTML Tooltip -->
-    <div id="tooltip" class="tooltip">
-      <img id="tt-img" src="" alt="" class="w-full h-auto aspect-video object-cover rounded mb-2 bg-slate-800 hidden">
-      <h3 id="tt-title" class="text-white font-medium text-sm line-clamp-2 leading-snug"></h3>
-      <p id="tt-channel" class="text-slate-400 text-xs mt-1"></p>
-      <div class="mt-2 flex items-center justify-between">
-        <span id="tt-cluster" class="text-[10px] font-bold px-2 py-0.5 rounded text-slate-900 truncate max-w-[150px]"></span>
-        <div class="text-[10px] uppercase tracking-wider text-cyan-400 font-semibold flex items-center gap-1">
-          <span>Click to watch</span>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Filter Sidebar -->
-  <div class="w-full md:w-64 bg-slate-900 border-l border-slate-800 p-4 flex flex-col h-full overflow-y-auto z-10">
-    <div class="flex items-center justify-between mb-4">
-      <h3 class="text-white font-semibold text-sm">Semantic Clusters</h3>
-      <button 
-        id="btn-reset"
-        class="text-xs transition-colors text-slate-600 cursor-not-allowed"
-        disabled
-      >
-        Reset Filter
-      </button>
-    </div>
-    <div id="sidebar-filters" class="flex flex-col gap-2">
-      <!-- Generated by JS -->
-    </div>
-  </div>
-
-  <script>
     const CLUSTER_COLORS = [
       "#4DE1FF", "#06D6A0", "#FFD166", "#EF476F", "#118AB2",
       "#F78C6B", "#83D483", "#00B4D8", "#F15BB5", "#FEE440", 
       "#00F5D4", "#9D4EDD"
     ];
 
-    let allData = [];
-    let clusterLabels = {};
-    let clusters = [];
-    let activeClusters = new Set();
-    let graph = null;
+    // Icons
+    const InfoIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>;
+    const HomeIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>;
+    const MenuIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="4" x2="20" y1="12" y2="12"/><line x1="4" x2="20" y1="6" y2="6"/><line x1="4" x2="20" y1="18" y2="18"/></svg>;
+    const BoxIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" x2="12" y1="22.08" y2="12"/></svg>;
+    const NetworkIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="16" y="16" width="6" height="6" rx="1"/><rect x="2" y="16" width="6" height="6" rx="1"/><rect x="9" y="2" width="6" height="6" rx="1"/><path d="M5 16v-3a1 1 0 0 1 1-1h12a1 1 0 0 1 1 1v3"/><path d="M12 12V8"/></svg>;
+    const BarChartIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="12" x2="12" y1="20" y2="10"/><line x1="18" x2="18" y1="20" y2="4"/><line x1="6" x2="6" y1="20" y2="16"/></svg>;
+    const StackedIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="M3 12h18"/><path d="M12 3v18"/></svg>;
 
-    // Load Data
-    Promise.all([
-      fetch('/data/video-embeddings.json').then(r => r.json()),
-      fetch('/data/cluster_labels.json').then(r => r.ok ? r.json() : {}).catch(() => ({}))
-    ]).then(([data, labels]) => {
-      allData = data;
-      clusterLabels = labels;
-      
-      // Extract unique clusters
-      clusters = [...new Set(data.map(d => d.cluster))].sort((a,b) => a - b);
-      
-      document.getElementById('loading').style.display = 'none';
-      
-      initSidebar();
-      initGraph();
-    }).catch(err => {
-      console.error("Failed to load data", err);
-      document.getElementById('loading').innerHTML = '<p class="text-red-400">Failed to load data.</p>';
-    });
+    // ----------------------------------------------------
+    // Plotly Wrapper
+    // ----------------------------------------------------
+    const PlotlyChart = ({ data, layout, config, onHover, onUnhover, onMouseMove }) => {
+      const containerRef = useRef(null);
 
-    // Sidebar Interaction Logic
-    function toggleCluster(c) {
-      if (activeClusters.has(c)) {
-        activeClusters.delete(c);
-      } else {
-        activeClusters.add(c);
-      }
-      updateSidebarUI();
-      updateGraphData();
-    }
-
-    document.getElementById('btn-reset').addEventListener('click', () => {
-      if (activeClusters.size > 0) {
-        activeClusters.clear();
-        updateSidebarUI();
-        updateGraphData();
-      }
-    });
-
-    function initSidebar() {
-      const container = document.getElementById('sidebar-filters');
-      container.innerHTML = '';
-      
-      clusters.forEach(c => {
-        const el = document.createElement('label');
-        el.className = "flex items-center gap-3 cursor-pointer group";
-        el.onclick = (e) => {
-          e.preventDefault(); // handled by div click to avoid double fire
-          toggleCluster(c);
-        };
-        
-        // Setup internal HTML structure
-        el.innerHTML = `
-          <div class="relative flex items-center justify-center w-5 h-5 rounded border border-slate-700 bg-slate-950 overflow-hidden transition-colors" id="swatch-border-${c}">
-            <div class="absolute inset-0 transition-opacity" id="swatch-bg-${c}" style="background-color: ${CLUSTER_COLORS[c % CLUSTER_COLORS.length]}"></div>
-            <svg id="swatch-check-${c}" class="w-3 h-3 text-slate-900 z-10 drop-shadow-sm hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7" />
-            </svg>
-          </div>
-          <span id="label-text-${c}" class="text-sm transition-colors truncate max-w-[180px]">
-            ${clusterLabels[c] || 'Cluster Group ' + (c+1)}
-          </span>
-        `;
-        container.appendChild(el);
-      });
-      
-      updateSidebarUI();
-    }
-
-    function updateSidebarUI() {
-      const isShowAll = activeClusters.size === 0;
-      
-      // Update Reset button state
-      const btnReset = document.getElementById('btn-reset');
-      if (isShowAll) {
-        btnReset.classList.remove('text-cyan-400', 'hover:text-white');
-        btnReset.classList.add('text-slate-600', 'cursor-not-allowed');
-        btnReset.disabled = true;
-      } else {
-        btnReset.classList.add('text-cyan-400', 'hover:text-white');
-        btnReset.classList.remove('text-slate-600', 'cursor-not-allowed');
-        btnReset.disabled = false;
-      }
-
-      clusters.forEach(c => {
-        const isLit = isShowAll || activeClusters.has(c);
-        
-        const border = document.getElementById(`swatch-border-${c}`);
-        const bg = document.getElementById(`swatch-bg-${c}`);
-        const check = document.getElementById(`swatch-check-${c}`);
-        const text = document.getElementById(`label-text-${c}`);
-        
-        if (isLit) {
-          border.classList.remove('border-slate-700');
-          border.classList.add('border-transparent');
-          bg.classList.remove('opacity-20');
-          bg.classList.add('opacity-100');
-          text.classList.remove('text-slate-600', 'group-hover:text-slate-400');
-          text.classList.add('text-slate-200', 'group-hover:text-white', 'font-medium');
-        } else {
-          border.classList.add('border-slate-700');
-          border.classList.remove('border-transparent');
-          bg.classList.add('opacity-20');
-          bg.classList.remove('opacity-100');
-          text.classList.add('text-slate-600', 'group-hover:text-slate-400');
-          text.classList.remove('text-slate-200', 'group-hover:text-white', 'font-medium');
+      useEffect(() => {
+        if (containerRef.current && window.Plotly) {
+          Plotly.react(containerRef.current, data, layout, config);
+          
+          const plot = containerRef.current;
+          
+          if (onHover) plot.on('plotly_hover', onHover);
+          if (onUnhover) plot.on('plotly_unhover', onUnhover);
+          
+          const handleResize = () => {
+            Plotly.Plots.resize(plot);
+          };
+          window.addEventListener('resize', handleResize);
+          
+          return () => {
+            window.removeEventListener('resize', handleResize);
+            if (onHover) plot.removeAllListeners('plotly_hover');
+            if (onUnhover) plot.removeAllListeners('plotly_unhover');
+          };
         }
+      }, [data, layout, config, onHover, onUnhover]);
 
-        if (activeClusters.has(c)) {
-          check.classList.remove('hidden');
-        } else {
-          check.classList.add('hidden');
-        }
-      });
-    }
+      return <div ref={containerRef} className="w-full h-full" onMouseMove={onMouseMove}></div>;
+    };
 
-    // 3D Graph Logic
-    function getFilteredGraphData() {
-      const SCALE_FACTOR = 50;
-      const isShowAll = activeClusters.size === 0;
-      
-      const filtered = allData.filter(d => isShowAll || activeClusters.has(d.cluster));
-      document.getElementById('stats').innerText = `${filtered.length} videos in galaxy`;
+    // ----------------------------------------------------
+    // Components
+    // ----------------------------------------------------
 
-      return {
-        nodes: filtered.map(d => ({
-          id: d.id,
-          fx: d.x * SCALE_FACTOR,
-          fy: d.y * SCALE_FACTOR,
-          fz: (d.z || 0) * SCALE_FACTOR,
-          title: d.title,
-          url: d.url,
-          thumbnail_url: d.thumbnail_url,
-          channel_title: d.channel_title,
-          year: d.year,
-          cluster: d.cluster,
-          color: CLUSTER_COLORS[d.cluster % CLUSTER_COLORS.length]
-        })),
-        links: []
-      };
-    }
+    const Scatter3DChart = ({ data, clusterLabels }) => {
+      const tooltipRef = useRef(null);
+      const ttImgRef = useRef(null);
+      const ttTitleRef = useRef(null);
 
-    function initGraph() {
-      const container = document.getElementById('3d-graph');
-      
-      graph = ForceGraph3D()(container)
-        .graphData(getFilteredGraphData())
-        .nodeLabel(() => '') // Disable default title
-        .nodeColor('color')
-        .nodeRelSize(2.5)
-        .nodeOpacity(0.85)
-        .enableNodeDrag(false)
-        .backgroundColor('#020617')
-        .showNavInfo(false)
-        .onNodeClick(node => {
-          if (node && node.url) window.open(node.url, '_blank');
-        })
-        .onNodeHover(node => {
-          const containerElem = document.getElementById('explorer-container');
-          containerElem.style.cursor = node ? 'pointer' : 'grab';
-          updateTooltip(node);
+      const plotData = useMemo(() => {
+        const clusters = [...new Set(data.map(d => d.cluster))].sort((a,b) => a - b);
+        return clusters.map(clusterId => {
+          const clusterData = data.filter(d => d.cluster === clusterId);
+          return {
+            x: clusterData.map(d => d.x),
+            y: clusterData.map(d => d.y),
+            z: clusterData.map(d => d.z || 0),
+            mode: 'markers',
+            type: 'scatter3d',
+            name: clusterLabels[clusterId] || `Cluster ${clusterId}`,
+            customdata: clusterData.map(d => ({
+              thumbnail_url: d.thumbnail_url,
+              title: d.title,
+              year: d.year
+            })),
+            hoverinfo: 'none',
+            marker: {
+              color: CLUSTER_COLORS[clusterId % CLUSTER_COLORS.length],
+              size: 4,
+              opacity: 0.8,
+              line: { color: "#374151", width: 0.5 }
+            }
+          };
         });
+      }, [data, clusterLabels]);
+
+      const layout = useMemo(() => ({
+        scene: {
+          xaxis: { 
+            title: 'X', showgrid: true, gridcolor: "#374151", zeroline: false, 
+            backgroundcolor: "#020617", showticklabels: false 
+          },
+          yaxis: { 
+            title: 'Y', showgrid: true, gridcolor: "#374151", zeroline: false, 
+            backgroundcolor: "#020617", showticklabels: false 
+          },
+          zaxis: { 
+            title: 'Z', showgrid: true, gridcolor: "#374151", zeroline: false, 
+            backgroundcolor: "#020617", showticklabels: false 
+          },
+          bgcolor: "#020617",
+          camera: {
+            eye: { x: 0.8, y: 0.8, z: 0.8 }
+          }
+        },
+        paper_bgcolor: "#020617",
+        plot_bgcolor: "#020617",
+        margin: { t: 0, r: 0, b: 0, l: 0 },
+        showlegend: false,
+        hovermode: "closest",
+      }), []);
+
+      const handleHover = (e) => {
+        if (e.points && e.points.length > 0) {
+          const point = e.points[0];
+          const customData = point.customdata;
+          if (customData) {
+            if (customData.thumbnail_url) {
+              ttImgRef.current.src = customData.thumbnail_url;
+              ttImgRef.current.classList.remove('hidden');
+            } else {
+              ttImgRef.current.classList.add('hidden');
+            }
+            ttTitleRef.current.innerText = `${customData.title} ${customData.year ? '('+customData.year+')' : ''}`;
+            tooltipRef.current.classList.add('visible');
+          }
+        }
+      };
+
+      const handleUnhover = () => {
+        tooltipRef.current.classList.remove('visible');
+      };
+
+      const handleMouseMove = (e) => {
+        const tooltip = tooltipRef.current;
+        if (tooltip && tooltip.classList.contains('visible')) {
+          const xOffset = (e.clientX > window.innerWidth - 350) ? -tooltip.offsetWidth - 10 : 10;
+          tooltip.style.transform = `translate(${xOffset}px, 10px)`;
+          tooltip.style.left = e.clientX + 'px';
+          tooltip.style.top = e.clientY + 'px';
+        }
+      };
+
+      return (
+        <div className="h-full w-full bg-[#020617] relative">
+          <PlotlyChart 
+            data={plotData} 
+            layout={layout} 
+            config={{ responsive: true, displayModeBar: false, scrollZoom: true }} 
+            onHover={handleHover}
+            onUnhover={handleUnhover}
+            onMouseMove={handleMouseMove}
+          />
+          
+          <div ref={tooltipRef} className="tooltip fixed">
+            <img ref={ttImgRef} src="" alt="" className="w-full h-auto aspect-video object-cover rounded mb-2 bg-slate-800 hidden" />
+            <h3 ref={ttTitleRef} className="text-white font-medium text-sm line-clamp-2 leading-snug"></h3>
+          </div>
+        </div>
+      );
+    };
+
+    const ForceGraphComponent = ({ data, clusterLabels, showKnn }) => {
+      const containerRef = useRef(null);
+      const graphRef = useRef(null);
+      const tooltipRef = useRef(null);
+      const ttImgRef = useRef(null);
+      const ttTitleRef = useRef(null);
+      const ttChannelRef = useRef(null);
+      const ttClusterRef = useRef(null);
+
+      useEffect(() => {
+        if (!containerRef.current) return;
         
-      // Handle tooltip positioning
-      container.addEventListener('mousemove', (e) => {
-        const tooltip = document.getElementById('tooltip');
-        // Prevent tooltip from overflowing the right side of the screen
-        const xOffset = (e.clientX > window.innerWidth - 350) ? -tooltip.offsetWidth - 15 : 15;
-        tooltip.style.transform = `translate(${xOffset}px, 15px)`;
-        tooltip.style.left = e.clientX + 'px';
-        tooltip.style.top = e.clientY + 'px';
-      });
+        if (!graphRef.current) {
+          graphRef.current = ForceGraph3D()(containerRef.current)
+            .nodeLabel(() => '')
+            .nodeColor('color')
+            .nodeRelSize(6)
+            .nodeOpacity(1)
+            .nodeResolution(24)
+            .enableNodeDrag(true)
+            .backgroundColor('#020617')
+            .showNavInfo(false)
+            .linkColor(() => 'rgba(255, 255, 255, 0.4)')
+            .linkWidth(1.5)
+            .onNodeClick(node => {
+              if (node && node.url) window.open(node.url, '_blank');
+            })
+            .onNodeHover(node => {
+              containerRef.current.style.cursor = node ? 'pointer' : 'grab';
+              if (!node) {
+                tooltipRef.current.classList.remove('visible');
+                return;
+              }
+              if (node.thumbnail_url) {
+                ttImgRef.current.src = node.thumbnail_url;
+                ttImgRef.current.classList.remove('hidden');
+              } else {
+                ttImgRef.current.classList.add('hidden');
+              }
+              ttTitleRef.current.innerText = node.title;
+              ttChannelRef.current.innerText = node.channel_title + (node.year ? ` • ${node.year}` : '');
+              ttClusterRef.current.innerText = clusterLabels[node.cluster] || `Cluster ${node.cluster + 1}`;
+              ttClusterRef.current.style.backgroundColor = node.color;
+              tooltipRef.current.classList.add('visible');
+            });
 
-      // Handle Resize
-      window.addEventListener('resize', () => {
-        graph.width(container.clientWidth).height(container.clientHeight);
-      });
+          containerRef.current.addEventListener('mousemove', (e) => {
+            const tooltip = tooltipRef.current;
+            if (tooltip) {
+              const xOffset = (e.clientX > window.innerWidth - 350) ? -tooltip.offsetWidth - 10 : 10;
+              tooltip.style.transform = `translate(${xOffset}px, 10px)`;
+              tooltip.style.left = e.clientX + 'px';
+              tooltip.style.top = e.clientY + 'px';
+            }
+          });
+          
+          window.addEventListener('resize', () => {
+            if (graphRef.current && containerRef.current) {
+              graphRef.current.width(containerRef.current.clientWidth).height(containerRef.current.clientHeight);
+            }
+          });
+        }
+
+        const activeNodeIds = new Set(data.map(d => d.id));
+        const graphData = {
+          nodes: data.map(d => ({
+            id: d.id,
+            title: d.title,
+            url: d.url,
+            thumbnail_url: d.thumbnail_url,
+            channel_title: d.channel_title,
+            year: d.year,
+            cluster: d.cluster,
+            color: CLUSTER_COLORS[d.cluster % CLUSTER_COLORS.length]
+          })),
+          links: []
+        };
+
+        const existingLinks = new Set();
+        if (showKnn) {
+          data.forEach(d => {
+            if (d.neighbors) {
+              d.neighbors.forEach(neighborId => {
+                if (activeNodeIds.has(neighborId)) {
+                  const linkKey = d.id < neighborId ? `${d.id}-${neighborId}` : `${neighborId}-${d.id}`;
+                  if (!existingLinks.has(linkKey)) {
+                    existingLinks.add(linkKey);
+                    graphData.links.push({
+                      source: d.id,
+                      target: neighborId
+                    });
+                  }
+                }
+              });
+            }
+          });
+        }
+
+        graphRef.current.graphData(graphData);
+        
+        // Add repulsive force and slight radial clustering
+        graphRef.current.d3Force('charge').strength(-25);
+        if (graphRef.current.d3Force('link')) {
+          graphRef.current.d3Force('link').distance(20).strength(0.6);
+        }
+
+        if (window.d3) {
+          const numClusters = Math.max(...data.map(d => d.cluster)) + 1;
+          const clusterCenters = Array.from({length: numClusters}, (_, i) => {
+            const phi = Math.acos(-1 + (2 * i) / numClusters);
+            const theta = Math.sqrt(numClusters * Math.PI) * phi;
+            const r = 80;
+            return {
+              x: r * Math.cos(theta) * Math.sin(phi),
+              y: r * Math.sin(theta) * Math.sin(phi),
+              z: r * Math.cos(phi)
+            };
+          });
+          
+          graphRef.current.d3Force('cluster', (alpha) => {
+            graphData.nodes.forEach(d => {
+              const center = clusterCenters[d.cluster];
+              if(center) {
+                d.vx += (center.x - d.x) * alpha * 0.25;
+                d.vy += (center.y - d.y) * alpha * 0.25;
+                d.vz += (center.z - d.z) * alpha * 0.25;
+              }
+            });
+          });
+        }
+
+      }, [data, clusterLabels, showKnn]);
+
+      return (
+        <div className="relative w-full h-full">
+          <div ref={containerRef} className="absolute inset-0 w-full h-full cursor-grab"></div>
+          
+          <div ref={tooltipRef} className="tooltip fixed">
+            <img ref={ttImgRef} src="" alt="" className="w-full h-auto aspect-video object-cover rounded mb-2 bg-slate-800 hidden" />
+            <h3 ref={ttTitleRef} className="text-white font-medium text-sm line-clamp-2 leading-snug"></h3>
+            <p ref={ttChannelRef} className="text-slate-400 text-xs mt-1"></p>
+            <div className="mt-2 flex items-center justify-between">
+              <span ref={ttClusterRef} className="text-[10px] font-bold px-2 py-0.5 rounded text-slate-900 truncate max-w-[150px]"></span>
+              <div className="text-[10px] uppercase tracking-wider text-cyan-400 font-semibold flex items-center gap-1">
+                <span>Click to watch</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      );
+    };
+
+    const DistributionChart = ({ data, clusterLabels }) => {
+      const [animateReady, setAnimateReady] = useState(false);
+      useEffect(() => {
+        const timer = setTimeout(() => setAnimateReady(true), 50);
+        return () => clearTimeout(timer);
+      }, []);
+
+      const plotData = useMemo(() => {
+        const counts = {};
+        data.forEach(d => {
+          counts[d.cluster] = (counts[d.cluster] || 0) + 1;
+        });
+
+        const clusters = Object.keys(counts).map(Number).sort((a,b) => counts[b] - counts[a]);
+        
+        return [{
+          type: "bar",
+          x: clusters.map(c => clusterLabels[c] || `Cluster ${c}`),
+          y: clusters.map(c => animateReady ? counts[c] : 0),
+          marker: {
+            color: clusters.map(c => CLUSTER_COLORS[c % CLUSTER_COLORS.length]),
+            line: { color: "rgba(0,0,0,0.2)", width: 1 },
+          },
+          hovertemplate: "<b>%{x}</b><br>Videos: %{y:,}<br><extra></extra>",
+        }];
+      }, [data, clusterLabels, animateReady]);
+
+      const layout = useMemo(() => {
+        const counts = {};
+        data.forEach(d => { counts[d.cluster] = (counts[d.cluster] || 0) + 1; });
+        const maxCount = Math.max(0, ...Object.values(counts));
+
+        return {
+          autosize: true,
+          margin: { l: 80, r: 40, t: 60, b: 120 },
+          xaxis: {
+            title: "Semantic Cluster",
+            tickangle: -45,
+            automargin: true,
+            tickfont: { color: "#d1d5db" },
+            titlefont: { color: "#f9fafb" },
+            gridcolor: "#374151",
+          },
+          yaxis: {
+            title: { text: "Number of Videos", standoff: 20 },
+            tickfont: { color: "#d1d5db" },
+            titlefont: { color: "#f9fafb" },
+            gridcolor: "#374151",
+            range: [0, maxCount * 1.05]
+          },
+          transition: {
+            duration: 800,
+            easing: 'cubic-in-out'
+          },
+          title: {
+            text: "Video Distribution by Semantic Cluster",
+            font: { size: 18, color: "#f9fafb" },
+          },
+          hovermode: "closest",
+          plot_bgcolor: "#020617",
+          paper_bgcolor: "#020617",
+        };
+      }, [data]);
+
+      return (
+        <div className="h-full w-full p-4 bg-[#020617]">
+          <PlotlyChart 
+            data={plotData} 
+            layout={layout} 
+            config={{ responsive: true, displayModeBar: false }} 
+          />
+        </div>
+      );
+    };
+
+    const AboutView = () => {
+      const [content, setContent] = useState('<div class="p-8 text-slate-400">Loading...</div>');
+      
+      useEffect(() => {
+        fetch('/youtube-galaxy/about.md')
+          .then(res => res.text())
+          .then(text => {
+            if (window.marked) {
+              setContent(window.marked.parse(text));
+            } else {
+              setContent('<div class="p-8 text-slate-400">' + text + '</div>');
+            }
+          })
+          .catch(err => setContent('<div class="p-8 text-red-400">Failed to load about page.</div>'));
+      }, []);
+      
+      return (
+        <div className="w-full h-full overflow-y-auto bg-slate-950 flex justify-center p-8">
+          <div className="max-w-3xl w-full text-slate-300">
+            <style>{`
+              .about-prose h1 { font-size: 2.25rem; font-weight: 700; color: #f8fafc; margin-bottom: 1.5rem; }
+              .about-prose h2 { font-size: 1.5rem; font-weight: 600; color: #e2e8f0; margin-top: 2rem; margin-bottom: 1rem; padding-bottom: 0.5rem; border-bottom: 1px solid #334155; }
+              .about-prose h3 { font-size: 1.25rem; font-weight: 600; color: #cbd5e1; margin-top: 1.5rem; margin-bottom: 0.75rem; }
+              .about-prose p { margin-bottom: 1.25rem; line-height: 1.7; }
+              .about-prose strong { color: #f8fafc; font-weight: 600; }
+              .about-prose a { color: #06b6d4; text-decoration: none; font-weight: 500; transition: color 0.2s; }
+              .about-prose a:hover { color: #22d3ee; text-decoration: underline; }
+              .about-prose code { background: #1e293b; padding: 0.2rem 0.4rem; border-radius: 0.25rem; font-size: 0.875em; color: #38bdf8; }
+            `}</style>
+            <div className="about-prose pb-20" dangerouslySetInnerHTML={{ __html: content }} />
+          </div>
+        </div>
+      );
+    };
+
+    const TemporalStackedChart = ({ data, clusterLabels }) => {
+      const [animateReady, setAnimateReady] = useState(false);
+      useEffect(() => {
+        const timer = setTimeout(() => setAnimateReady(true), 50);
+        return () => clearTimeout(timer);
+      }, []);
+
+      const plotData = useMemo(() => {
+        let minYear = 2010, maxYear = new Date().getFullYear();
+        if (data.length > 0) {
+          const years = data.map(d => d.year).filter(y => y);
+          if (years.length) {
+            minYear = Math.min(...years);
+            maxYear = Math.max(...years);
+          }
+        }
+        
+        const yearsList = Array.from({length: maxYear - minYear + 1}, (_, i) => minYear + i);
+        const clusters = [...new Set(data.map(d => d.cluster))].sort((a,b) => a-b);
+        
+        const traces = clusters.map(cluster => {
+          const clusterData = data.filter(d => d.cluster === cluster);
+          const yearCounts = {};
+          clusterData.forEach(d => {
+            if (d.year) yearCounts[d.year] = (yearCounts[d.year] || 0) + 1;
+          });
+          
+          return {
+            x: yearsList,
+            y: yearsList.map(y => animateReady ? (yearCounts[y] || 0) : 0),
+            name: clusterLabels[cluster] || `Cluster ${cluster}`,
+            type: "bar",
+            marker: {
+              color: CLUSTER_COLORS[cluster % CLUSTER_COLORS.length],
+              line: { color: "#374151", width: 0.5 },
+            },
+            hovertemplate: "<b>%{fullData.name}</b><br>Year: %{x}<br>Videos: %{y}<extra></extra>",
+          };
+        });
+
+        return traces;
+      }, [data, clusterLabels, animateReady]);
+
+      const layout = useMemo(() => {
+        let maxYearCount = 0;
+        const totalByYear = {};
+        data.forEach(d => {
+          if (d.year) {
+            totalByYear[d.year] = (totalByYear[d.year] || 0) + 1;
+            maxYearCount = Math.max(maxYearCount, totalByYear[d.year]);
+          }
+        });
+
+        return {
+          barmode: "stack",
+          autosize: true,
+          margin: { l: 80, r: 40, t: 60, b: 80 },
+          xaxis: {
+            title: "Publication Year",
+            tickfont: { color: "#d1d5db" },
+            titlefont: { color: "#f9fafb" },
+            gridcolor: "#374151",
+          },
+          yaxis: {
+            title: "Number of Videos",
+            tickfont: { color: "#d1d5db" },
+            titlefont: { color: "#f9fafb" },
+            gridcolor: "#374151",
+            range: [0, maxYearCount * 1.05]
+          },
+          transition: {
+            duration: 800,
+            easing: 'cubic-in-out'
+          },
+          title: {
+            text: "Temporal Evolution of Semantic Clusters",
+            font: { size: 18, color: "#f9fafb" },
+          },
+          showlegend: false,
+          hovermode: "closest",
+          plot_bgcolor: "#020617",
+          paper_bgcolor: "#020617",
+        };
+      }, [data]);
+
+      return (
+        <div className="h-full w-full p-4 bg-[#020617]">
+          <PlotlyChart 
+            data={plotData} 
+            layout={layout} 
+            config={{ responsive: true, displayModeBar: false }} 
+          />
+        </div>
+      );
+    };
+
+    // ----------------------------------------------------
+    // Main App
+    // ----------------------------------------------------
+    function App() {
+      const [allData, setAllData] = useState([]);
+      const [clusterLabels, setClusterLabels] = useState({});
+      const [viewMode, setViewMode] = useState('3d'); 
+      const [showKnn, setShowKnn] = useState(false);
+      const [activeClusters, setActiveClusters] = useState(new Set());
+      const [loading, setLoading] = useState(true);
+      const [sidebarOpen, setSidebarOpen] = useState(true);
+
+      useEffect(() => {
+        Promise.all([
+          fetch('/youtube-galaxy/video-embeddings.json').then(r => r.json()),
+          fetch('/youtube-galaxy/cluster_labels.json').then(r => r.ok ? r.json() : {}).catch(() => ({}))
+        ]).then(([data, labels]) => {
+          setAllData(data);
+          setClusterLabels(labels);
+          setLoading(false);
+        }).catch(err => {
+          console.error("Failed to load data", err);
+          setLoading(false);
+        });
+      }, []);
+
+      const clusters = useMemo(() => {
+        return [...new Set(allData.map(d => d.cluster))].sort((a,b) => a - b);
+      }, [allData]);
+
+      const filteredData = useMemo(() => {
+        if (activeClusters.size === 0) return allData;
+        return allData.filter(d => activeClusters.has(d.cluster));
+      }, [allData, activeClusters]);
+
+      const toggleCluster = (c) => {
+        const next = new Set(activeClusters);
+        if (next.has(c)) {
+          next.delete(c);
+        } else {
+          next.add(c);
+        }
+        setActiveClusters(next);
+      };
+
+      const resetFilters = () => setActiveClusters(new Set());
+
+      return (
+        <div className="flex h-screen flex-col bg-background text-foreground">
+          {/* Header */}
+          <header className="flex items-center justify-between border-b border-border bg-background px-4 py-3 shadow-md z-20">
+            <div className="flex items-center gap-3">
+              <button onClick={() => setSidebarOpen(!sidebarOpen)} className="p-1 hover:bg-slate-800 rounded transition text-slate-300">
+                <MenuIcon />
+              </button>
+              <a href="/data" className="p-1 hover:bg-slate-800 rounded transition text-slate-400 hover:text-white" title="Home">
+                <HomeIcon />
+              </a>
+              <h1 className="font-semibold text-lg flex items-center gap-2 ml-1">
+                <span className="text-slate-100">Semantic Video Galaxy</span>
+              </h1>
+            </div>
+            
+            {/* View Mode Selector */}
+            <div className="flex items-center bg-slate-900 rounded-lg p-1 border border-slate-800">
+              <button 
+                onClick={() => setViewMode('3d')}
+                className={`flex items-center gap-2 px-3 py-1.5 rounded-md text-sm transition-all ${viewMode === '3d' ? 'bg-slate-800 text-white shadow' : 'text-slate-400 hover:text-white'}`}
+              >
+                <BoxIcon /> Embeddings
+              </button>
+              <button 
+                onClick={() => setViewMode('force')}
+                className={`flex items-center gap-2 px-3 py-1.5 rounded-md text-sm transition-all ${viewMode === 'force' ? 'bg-slate-800 text-white shadow' : 'text-slate-400 hover:text-white'}`}
+              >
+                <NetworkIcon /> Force Graph
+              </button>
+              <button 
+                onClick={() => setViewMode('distribution')}
+                className={`flex items-center gap-2 px-3 py-1.5 rounded-md text-sm transition-all ${viewMode === 'distribution' ? 'bg-slate-800 text-white shadow' : 'text-slate-400 hover:text-white'}`}
+              >
+                <BarChartIcon /> Distribution
+              </button>
+              <button 
+                onClick={() => setViewMode('stacked')}
+                className={`flex items-center gap-2 px-3 py-1.5 rounded-md text-sm transition-all ${viewMode === 'stacked' ? 'bg-slate-800 text-white shadow' : 'text-slate-400 hover:text-white'}`}
+              >
+                <StackedIcon /> Temporal Stacked
+              </button>
+              <div className="w-px h-6 bg-slate-700 mx-1"></div>
+              <button 
+                onClick={() => setViewMode('about')}
+                className={`flex items-center gap-2 px-3 py-1.5 rounded-md text-sm transition-all ${viewMode === 'about' ? 'bg-slate-800 text-white shadow' : 'text-slate-400 hover:text-white'}`}
+              >
+                <InfoIcon /> About
+              </button>
+            </div>
+          </header>
+
+          <div className="flex flex-1 overflow-hidden relative">
+            
+            {/* Sidebar (Moved to the left) */}
+            <aside className={`transition-all duration-300 ease-in-out border-r border-border bg-slate-900 flex flex-col z-20 ${sidebarOpen ? 'w-72' : 'w-0 opacity-0 overflow-hidden'} ${viewMode === 'about' ? 'opacity-30 pointer-events-none grayscale' : ''}`}>
+              <div className="p-4 flex flex-col h-full w-72">
+                <div className="flex items-center justify-between mb-4">
+                  <h3 className="text-white font-semibold text-sm">Semantic Clusters</h3>
+                  <button 
+                    onClick={resetFilters}
+                    disabled={activeClusters.size === 0}
+                    className={`text-xs transition-colors ${activeClusters.size > 0 ? 'text-cyan-400 hover:text-cyan-300' : 'text-slate-600 cursor-not-allowed'}`}
+                  >
+                    Reset
+                  </button>
+                </div>
+                
+                <div className="flex-1 overflow-y-auto pr-2 space-y-2">
+                  {clusters.map(c => {
+                    const isLit = activeClusters.size === 0 || activeClusters.has(c);
+                    const color = CLUSTER_COLORS[c % CLUSTER_COLORS.length];
+                    const label = clusterLabels[c] || `Cluster ${c + 1}`;
+                    
+                    return (
+                      <label key={c} className="flex items-center gap-3 cursor-pointer group p-1.5 rounded hover:bg-slate-800 transition">
+                        <input 
+                          type="checkbox" 
+                          className="hidden" 
+                          checked={activeClusters.has(c)}
+                          onChange={() => toggleCluster(c)}
+                        />
+                        <div className={`relative flex items-center justify-center w-5 h-5 rounded border overflow-hidden transition-colors ${isLit ? 'border-transparent' : 'border-slate-700'}`}>
+                          <div className={`absolute inset-0 transition-opacity ${isLit ? 'opacity-100' : 'opacity-20'}`} style={{ backgroundColor: color }}></div>
+                          {activeClusters.has(c) && (
+                            <svg className="w-3 h-3 text-slate-900 z-10 drop-shadow-sm" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M5 13l4 4L19 7" />
+                            </svg>
+                          )}
+                        </div>
+                        <span className={`text-sm transition-colors truncate max-w-[180px] ${isLit ? 'text-slate-200 font-medium group-hover:text-white' : 'text-slate-500 group-hover:text-slate-400'}`}>
+                          {label}
+                        </span>
+                      </label>
+                    );
+                  })}
+                </div>
+              </div>
+            </aside>
+
+            {/* Main Content Area */}
+            <main className="flex-1 relative bg-[#020617]">
+              {loading ? (
+                <div className="absolute inset-0 flex items-center justify-center bg-slate-950/80 z-20 text-slate-300">
+                  <div className="flex flex-col items-center gap-4">
+                    <div className="w-8 h-8 border-4 border-cyan-400 border-t-transparent rounded-full animate-spin"></div>
+                    <p className="shimmer-text">Loading semantic galaxy...</p>
+                  </div>
+                </div>
+              ) : (
+                <>
+                  {viewMode === '3d' && (
+                    <Scatter3DChart data={filteredData} clusterLabels={clusterLabels} />
+                  )}
+                  {viewMode === 'force' && (
+                    <ForceGraphComponent data={filteredData} clusterLabels={clusterLabels} showKnn={showKnn} />
+                  )}
+                  {viewMode === 'distribution' && (
+                    <DistributionChart data={filteredData} clusterLabels={clusterLabels} />
+                  )}
+                  {viewMode === 'stacked' && (
+                    <TemporalStackedChart data={filteredData} clusterLabels={clusterLabels} />
+                  )}
+                  {viewMode === 'about' && (
+                    <AboutView />
+                  )}
+
+                  {/* HUD Stats */}
+                  {(viewMode === '3d' || viewMode === 'force') && (
+                    <HudStats viewMode={viewMode} count={filteredData.length} showKnn={showKnn} setShowKnn={setShowKnn} />
+                  )}
+                </>
+              )}
+            </main>
+
+          </div>
+        </div>
+      );
     }
 
-    function updateGraphData() {
-      if (graph) {
-        graph.graphData(getFilteredGraphData());
-      }
-    }
+    const HudStats = ({ viewMode, count, showKnn, setShowKnn }) => {
+      const [open, setOpen] = useState(true);
 
-    function updateTooltip(node) {
-      const tooltip = document.getElementById('tooltip');
-      if (!node) {
-        tooltip.classList.remove('visible');
-        return;
-      }
-      
-      const img = document.getElementById('tt-img');
-      if (node.thumbnail_url) {
-        img.src = node.thumbnail_url;
-        img.classList.remove('hidden');
-      } else {
-        img.classList.add('hidden');
+      if (!open) {
+        return (
+          <button 
+            onClick={() => setOpen(true)}
+            className="absolute bottom-4 left-4 w-10 h-10 bg-slate-900/80 backdrop-blur-sm border border-slate-700 rounded-full flex items-center justify-center text-slate-300 hover:text-white hover:bg-slate-800 transition-all shadow-lg z-10"
+            title="Show Layout Info"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+          </button>
+        );
       }
 
-      document.getElementById('tt-title').innerText = node.title;
-      document.getElementById('tt-channel').innerText = node.channel_title + (node.year ? ` • ${node.year}` : '');
-      
-      const clusterSpan = document.getElementById('tt-cluster');
-      clusterSpan.innerText = clusterLabels[node.cluster] || `Cluster ${node.cluster + 1}`;
-      clusterSpan.style.backgroundColor = CLUSTER_COLORS[node.cluster % CLUSTER_COLORS.length];
-      
-      tooltip.classList.add('visible');
-    }
+      return (
+        <div className="absolute bottom-4 left-4 bg-slate-900/80 backdrop-blur-sm border border-slate-700 p-3 rounded-lg shadow-lg z-10 min-w-[220px] pointer-events-auto">
+          <button 
+            onClick={() => setOpen(false)}
+            className="absolute top-2 right-2 p-1 text-slate-500 hover:text-white transition-colors rounded hover:bg-slate-800"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+          </button>
+          <h2 className="text-white font-bold text-sm m-0 pr-6">
+            {viewMode === '3d' ? '3D Embeddings Layout' : 'Force Directed Layout'}
+          </h2>
+          <p className="text-slate-400 text-xs mt-1">
+            {viewMode === '3d' ? "Left-click & drag to rotate • Scroll to zoom" : "Left-click & drag to rotate • Scroll to fly • Right-click to pan"}
+          </p>
+          {viewMode === 'force' && (
+            <div className="mt-3 flex items-center gap-3">
+              <span className="text-slate-300 text-xs font-medium">Show KNN Links</span>
+              <button 
+                onClick={() => setShowKnn(!showKnn)}
+                className={`relative inline-flex h-4 w-8 items-center rounded-full transition-colors ${showKnn ? 'bg-cyan-500' : 'bg-slate-600'}`}
+              >
+                <span className={`inline-block h-3 w-3 transform rounded-full bg-white transition-transform ${showKnn ? 'translate-x-4' : 'translate-x-1'}`} />
+              </button>
+            </div>
+          )}
+          <div className="text-slate-500 text-xs mt-2">{count} videos visible</div>
+        </div>
+      );
+    };
+
+    ReactDOM.render(<App />, document.getElementById('root'));
   </script>
 </body>
 </html>

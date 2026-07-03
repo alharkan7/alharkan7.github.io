@@ -2,6 +2,14 @@ const sortByDate = false;
 
 const rawProjects = [
   {
+    title: "My YouTube Galaxy",
+    subtitle: "",
+    type: "visualization",
+    date: "2026-07-03",
+    url: "https://alhrkn.vercel.app/youtube-galaxy",
+    coverImage: "https://ik.imagekit.io/raihankalla/research_section_cover/youtube-galaxy.png",
+  },
+  {
     title: "1.600.000 Tahun Sejarah Nusantara",
     subtitle: "",
     type: "visualization",
