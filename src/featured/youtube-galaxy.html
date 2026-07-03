@@ -114,15 +114,81 @@
     // ----------------------------------------------------
     // Plotly Wrapper
     // ----------------------------------------------------
+
+    /**
+     * Reads the live camera state from Plotly's internal WebGL scene object.
+     * This is the *actual* camera the user sees, which may differ from
+     * plot.layout.scene.camera after a scroll-wheel zoom (since wheel zoom
+     * updates the WebGL camera but never flushes to layout.scene.camera).
+     */
+    function getLiveCamera(plot) {
+      try {
+        const sceneLayout = plot._fullLayout && plot._fullLayout.scene;
+        if (sceneLayout && sceneLayout._scene) {
+          return sceneLayout._scene.getCamera();
+        }
+      } catch (_) {}
+      return null;
+    }
+
+    /**
+     * Flushes the live WebGL camera state into plot.layout.scene.camera.
+     * This bridges the gap that Plotly leaves: scroll-wheel zoom modifies
+     * the WebGL camera directly without updating the layout object.
+     * By syncing before any relayout (e.g. modebar click), we prevent
+     * Plotly from reading stale coordinates and snapping the view back.
+     */
+    function syncCameraToLayout(plot) {
+      const cam = getLiveCamera(plot);
+      if (cam) {
+        if (!plot.layout.scene) plot.layout.scene = {};
+        plot.layout.scene.camera = cam;
+        // Also sync into _fullLayout so both are consistent
+        if (plot._fullLayout && plot._fullLayout.scene) {
+          plot._fullLayout.scene.camera = cam;
+        }
+      }
+    }
+
     const PlotlyChart = ({ data, layout, config, onHover, onUnhover, onMouseMove }) => {
       const containerRef = useRef(null);
 
       useEffect(() => {
         if (containerRef.current && window.Plotly) {
-          Plotly.react(containerRef.current, data, layout, config);
-          
           const plot = containerRef.current;
+          Plotly.react(plot, data, layout, config);
           
+          // -------------------------------------------------------
+          // FIX: Intercept modebar clicks to sync live camera state.
+          //
+          // Mouse-wheel zoom updates the WebGL camera but never fires
+          // plotly_relayout, leaving plot.layout.scene.camera stale.
+          // When a modebar button is clicked, Plotly internally calls
+          // relayout({scene.dragmode: '...'}) which re-evaluates the
+          // 3D scene using those stale coordinates, wiping the zoom.
+          //
+          // We attach a capturing-phase click listener on the modebar
+          // container. Before the click propagates to Plotly's handler,
+          // we read the live camera from the WebGL scene and write it
+          // into plot.layout.scene.camera. When Plotly then processes
+          // the relayout, it reads the *current* camera state instead
+          // of the stale one, preserving the user's zoom.
+          // -------------------------------------------------------
+          const modebar = plot.querySelector('.modebar');
+          const handleModebarClick = () => {
+            syncCameraToLayout(plot);
+          };
+          if (modebar) {
+            modebar.addEventListener('click', handleModebarClick, true); // capturing phase
+          }
+
+          // Also sync on plotly_relayout to keep layout.scene.camera
+          // up-to-date after drag interactions (orbit/pan) complete.
+          const handleRelayout = () => {
+            syncCameraToLayout(plot);
+          };
+          plot.on('plotly_relayout', handleRelayout);
+
           if (onHover) plot.on('plotly_hover', onHover);
           if (onUnhover) plot.on('plotly_unhover', onUnhover);
           
@@ -133,6 +199,10 @@
           
           return () => {
             window.removeEventListener('resize', handleResize);
+            if (modebar) {
+              modebar.removeEventListener('click', handleModebarClick, true);
+            }
+            plot.removeAllListeners('plotly_relayout');
             if (onHover) plot.removeAllListeners('plotly_hover');
             if (onUnhover) plot.removeAllListeners('plotly_unhover');
           };
@@ -170,7 +240,7 @@
             hoverinfo: 'none',
             marker: {
               color: CLUSTER_COLORS[clusterId % CLUSTER_COLORS.length],
-              size: 4,
+              size: 3,
               opacity: 0.8,
               line: { color: "#374151", width: 0.5 }
             }
@@ -180,6 +250,9 @@
 
       const layout = useMemo(() => ({
         scene: {
+          uirevision: 'true',
+          aspectmode: 'manual',
+          aspectratio: { x: 4, y: 4, z: 4 },
           xaxis: { 
             title: 'X', showgrid: true, gridcolor: "#374151", zeroline: false, 
             backgroundcolor: "#020617", showticklabels: false 
@@ -194,7 +267,7 @@
           },
           bgcolor: "#020617",
           camera: {
-            eye: { x: 0.8, y: 0.8, z: 0.8 }
+            eye: { x: 3.2, y: 3.2, z: 3.2 }
           }
         },
         paper_bgcolor: "#020617",
@@ -202,9 +275,10 @@
         margin: { t: 0, r: 0, b: 0, l: 0 },
         showlegend: false,
         hovermode: "closest",
+        uirevision: 'true',
       }), []);
 
-      const handleHover = (e) => {
+      const handleHover = useCallback((e) => {
         if (e.points && e.points.length > 0) {
           const point = e.points[0];
           const customData = point.customdata;
@@ -219,13 +293,13 @@
             tooltipRef.current.classList.add('visible');
           }
         }
-      };
+      }, []);
 
-      const handleUnhover = () => {
+      const handleUnhover = useCallback(() => {
         tooltipRef.current.classList.remove('visible');
-      };
+      }, []);
 
-      const handleMouseMove = (e) => {
+      const handleMouseMove = useCallback((e) => {
         const tooltip = tooltipRef.current;
         if (tooltip && tooltip.classList.contains('visible')) {
           const xOffset = (e.clientX > window.innerWidth - 350) ? -tooltip.offsetWidth - 10 : 10;
@@ -233,7 +307,9 @@
           tooltip.style.left = e.clientX + 'px';
           tooltip.style.top = e.clientY + 'px';
         }
-      };
+      }, []);
+
+      const config = useMemo(() => ({ responsive: true, scrollZoom: true, displayModeBar: true }), []);
 
       return (
         <div className="h-full w-full bg-[#020617] relative">
@@ -259,7 +335,7 @@
           <PlotlyChart 
             data={plotData} 
             layout={layout} 
-            config={{ responsive: true, scrollZoom: true }} 
+            config={config} 
             onHover={handleHover}
             onUnhover={handleUnhover}
             onMouseMove={handleMouseMove}
