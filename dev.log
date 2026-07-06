@@ -1,0 +1,23 @@
+
+> raihankalla.id@1.0.0 dev /app
+> astro dev
+
+▶ Astro collects anonymous usage data.
+  This information helps us improve Astro.
+  Run "astro telemetry disable" to opt-out.
+  https://astro.build/telemetry
+
+07:01:26 [types] Generated 1ms
+07:01:26 [content] Syncing content
+07:01:26 [content] Synced content
+07:01:26 [vite] Forced re-optimization of dependencies
+
+ astro  v5.16.6 ready in 1641 ms
+
+┃ Local    http://localhost:4321/
+┃ Network  http://192.168.0.2:4321/
+
+07:01:26 watching for file changes...
+
+ update  ▶ New version of Astro available: 7.0.6
+  Run pnpm dlx @astrojs/upgrade to update
