@@ -2,9 +2,34 @@
 <html lang="en" class="dark">
 <head>
   <meta charset="UTF-8">
+  <meta name="description" content="An interactive 3D galaxy exploring semantic clusters of YouTube history." />
+  <link rel="apple-touch-icon" sizes="180x180" href="/assets/logo.png" />
+  <link rel="icon" type="image/png" sizes="32x32" href="/assets/favicon.png" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Semantic Video Galaxy</title>
-  <meta name="description" content="An interactive 3D galaxy exploring semantic clusters of YouTube history." />
+
+  <link rel="canonical" href="https://raihankalla.id/youtube-galaxy" />
+
+  <!-- Open Graph / Facebook -->
+  <meta property="og:type" content="website" />
+  <meta property="og:title" content="Semantic Video Galaxy" />
+  <meta property="og:description" content="An interactive 3D galaxy exploring semantic clusters of YouTube history." />
+  <meta property="og:image" content="https://ik.imagekit.io/raihankalla/research_section_cover/youtube-galaxy.png" />
+  <meta property="og:image:alt" content="Semantic Video Galaxy" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta property="og:image:secure_url" content="https://ik.imagekit.io/raihankalla/research_section_cover/youtube-galaxy.png" />
+  <meta property="og:site_name" content="al Harkan's Blog" />
+  <meta property="og:url" content="https://raihankalla.id/youtube-galaxy" />
+  <meta property="og:locale" content="en_US" />
+  <meta property="og:logo" content="https://www.raihankalla.id/assets/logo.png" />
+
+  <!-- Twitter -->
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:url" content="https://raihankalla.id/youtube-galaxy" />
+  <meta name="twitter:title" content="Semantic Video Galaxy" />
+  <meta name="twitter:description" content="An interactive 3D galaxy exploring semantic clusters of YouTube history." />
+  <meta name="twitter:image" content="https://ik.imagekit.io/raihankalla/research_section_cover/youtube-galaxy.png" />
   
   <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
@@ -580,7 +605,7 @@
       const [content, setContent] = useState('<div class="p-8 text-slate-400">Loading...</div>');
       
       useEffect(() => {
-        fetch('/youtube-galaxy/about.md')
+        fetch('/components/youtube-galaxy/about.md')
           .then(res => res.text())
           .then(text => {
             if (window.marked) {
@@ -733,8 +758,8 @@
 
       useEffect(() => {
         Promise.all([
-          fetch('/youtube-galaxy/video-embeddings.json').then(r => r.json()),
-          fetch('/youtube-galaxy/cluster_labels.json').then(r => r.ok ? r.json() : {}).catch(() => ({}))
+          fetch('/components/youtube-galaxy/video-embeddings.json').then(r => r.json()),
+          fetch('/components/youtube-galaxy/cluster_labels.json').then(r => r.ok ? r.json() : {}).catch(() => ({}))
         ]).then(([data, labels]) => {
           setAllData(data);
           setClusterLabels(labels);

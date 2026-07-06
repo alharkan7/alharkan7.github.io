@@ -1,0 +1,1825 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="description" content="Interactive 3D map visualization showing the distribution of SPPG locations across Indonesia." />
+    <link rel="apple-touch-icon" sizes="180x180" href="/assets/logo.png" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/assets/favicon.png" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Sebaran Lokasi SPPG di Indonesia</title>
+
+    <link rel="canonical" href="https://raihankalla.id/sebaran-sppg" />
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Sebaran Lokasi SPPG di Indonesia" />
+    <meta property="og:description" content="Interactive 3D map visualization showing the distribution of SPPG locations across Indonesia." />
+    <meta property="og:image" content="https://ik.imagekit.io/raihankalla/research_section_cover/sebaran-sppg.png" />
+    <meta property="og:image:alt" content="Sebaran Lokasi SPPG di Indonesia" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:secure_url" content="https://ik.imagekit.io/raihankalla/research_section_cover/sebaran-sppg.png" />
+    <meta property="og:site_name" content="al Harkan's Blog" />
+    <meta property="og:url" content="https://raihankalla.id/sebaran-sppg" />
+    <meta property="og:locale" content="en_US" />
+    <meta property="og:logo" content="https://www.raihankalla.id/assets/logo.png" />
+
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:url" content="https://raihankalla.id/sebaran-sppg" />
+    <meta name="twitter:title" content="Sebaran Lokasi SPPG di Indonesia" />
+    <meta name="twitter:description" content="Interactive 3D map visualization showing the distribution of SPPG locations across Indonesia." />
+    <meta name="twitter:image" content="https://ik.imagekit.io/raihankalla/research_section_cover/sebaran-sppg.png" />
+
+    <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
+    <!-- Load ECharts and ECharts-GL -->
+    <script src="https://cdn.jsdelivr.net/npm/echarts@5.5.0/dist/echarts.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/echarts-gl@2.0.9/dist/echarts-gl.min.js"></script>
+    <!-- Icons (Lucide) -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+      body {
+        margin: 0;
+        overflow: hidden;
+        background: #ffffff; /* Clean white background */
+        color: #1e293b;
+        font-family: 'Lora', serif;
+      }
+      #chart-container {
+        width: 100vw;
+        height: 100vh;
+        position: absolute;
+        top: 0;
+        left: 0;
+        z-index: 1;
+        touch-action: none; /* Crucial for allowing 2-finger pan on mobile */
+      }
+      .overlay {
+        position: absolute;
+        top: 5.5rem;
+        left: 2rem;
+        width: 380px;
+        max-width: calc(100vw - 4rem);
+        z-index: 10;
+        background: rgba(255, 255, 255, 0.85);
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        border: 1px solid rgba(0, 0, 0, 0.1);
+        padding: 1.5rem;
+        border-radius: 16px;
+        box-sizing: border-box;
+        box-shadow: 0 10px 30px -10px rgba(0,0,0,0.5);
+        pointer-events: auto; /* allow clicking inside */
+        transition: opacity 0.3s ease, transform 0.3s ease;
+      }
+      .overlay.hidden {
+        opacity: 0;
+        pointer-events: none;
+        transform: translateY(-10px);
+      }
+      .overlay-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+      }
+      #hide-info {
+        position: absolute;
+        top: 1rem;
+        right: 1rem;
+      }
+      h1 {
+        margin: 0 0 0.5rem 0;
+        font-size: 1.8rem;
+        color: #1e293b;
+        background: none;
+        -webkit-text-fill-color: initial;
+        -webkit-background-clip: initial;
+        background-clip: initial;
+      }
+      p {
+        margin: 0;
+        color: #475569;
+        font-size: 0.95rem;
+        line-height: 1.5;
+      }
+      .source-link {
+        color: #ea580c;
+        text-decoration: none;
+        font-weight: 500;
+        border-bottom: 1px solid transparent;
+        transition: border-color 0.2s, color 0.2s;
+      }
+      .source-link:hover {
+        color: #c2410c;
+        border-bottom-color: currentColor;
+      }
+      
+      /* Legend styling */
+      .legend-box {
+        margin-top: 1rem;
+        background: rgba(255, 255, 255, 0.5);
+        border: 1px solid rgba(0, 0, 0, 0.1);
+        border-radius: 8px;
+        padding: 1rem;
+      }
+      .legend-title {
+        font-size: 0.9rem;
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+        color: #1e293b;
+      }
+      .legend-item {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        margin-bottom: 0.5rem;
+        font-size: 0.85rem;
+        color: #334155;
+      }
+      .legend-color-gradient {
+        width: 16px;
+        height: 40px;
+        border-radius: 4px;
+        background: linear-gradient(to top, #f59e0b, #ea580c, #dc2626, #991b1b, #7f1d1d);
+      }
+      .legend-color-flat {
+        width: 16px;
+        height: 16px;
+        border-radius: 4px;
+        background: #f2efe9;
+        border: 1px solid #d6d3d1;
+      }
+
+      /* Settings styling */
+      .settings-box {
+        margin-top: 1rem;
+        background: rgba(255, 255, 255, 0.5);
+        border: 1px solid rgba(0, 0, 0, 0.1);
+        border-radius: 8px;
+        padding: 1rem;
+      }
+      .setting-item {
+        margin-bottom: 0.75rem;
+        display: flex;
+        flex-direction: column;
+        gap: 0.25rem;
+      }
+      .setting-item:last-child {
+        margin-bottom: 0;
+      }
+      .setting-item label {
+        font-size: 0.85rem;
+        color: #334155;
+        display: flex;
+        justify-content: space-between;
+        font-weight: 500;
+      }
+      .setting-item input[type="range"] {
+        width: 100%;
+        accent-color: #ea580c;
+      }
+      .setting-item select {
+        background: rgba(255, 255, 255, 0.8);
+        color: #1e293b;
+        border: 1px solid rgba(0, 0, 0, 0.1);
+        padding: 0.4rem 0.5rem;
+        border-radius: 4px;
+        font-family: inherit;
+        font-size: 0.85rem;
+        outline: none;
+        cursor: pointer;
+        transition: border-color 0.2s;
+      }
+      .setting-item select:hover {
+        border-color: rgba(0, 0, 0, 0.3);
+      }
+
+      .controls-hint {
+        margin-top: 1rem;
+        padding-top: 1rem;
+        border-top: 1px solid rgba(255, 255, 255, 0.1);
+        font-size: 0.85rem;
+        color: #ea580c;
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+      }
+      .controls-hint span {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+      }
+
+      /* Click Info Card */
+      .info-card {
+        position: absolute;
+        bottom: 6rem;
+        right: 2rem;
+        z-index: 1000;
+        background: rgba(255, 255, 255, 0.9);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+        border: 1px solid rgba(0, 0, 0, 0.1);
+        border-radius: 12px;
+        padding: 0.75rem 2.5rem 0.75rem 1rem;
+        width: auto;
+        min-width: 220px;
+        box-sizing: border-box;
+        box-shadow: 0 10px 30px -10px rgba(0,0,0,0.15);
+        pointer-events: auto;
+        opacity: 1;
+        transition: opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      }
+      .info-card.hidden {
+        opacity: 0;
+        pointer-events: none;
+      }
+      .info-row {
+        display: flex;
+        align-items: baseline;
+        gap: 0.4rem;
+        flex-wrap: wrap;
+      }
+      .info-city {
+        margin: 0;
+        font-size: 1rem;
+        font-weight: 700;
+        color: #1e293b;
+      }
+      .info-province {
+        color: #64748b;
+        font-size: 0.85rem;
+      }
+      .stat-label {
+        font-size: 0.9rem;
+        color: #475569;
+        font-weight: 500;
+      }
+      .stat-value {
+        font-size: 1rem;
+        font-weight: 700;
+        color: #ea580c;
+      }
+      
+      #close-info-card {
+        position: absolute;
+        top: 0.5rem;
+        right: 0.5rem;
+        background: transparent;
+        border: none;
+        color: #475569;
+        cursor: pointer;
+        padding: 4px;
+        border-radius: 6px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: color 0.2s, background 0.2s;
+      }
+      #close-info-card:hover {
+        color: #fff;
+        background: rgba(255, 255, 255, 0.1);
+      }
+      #close-info-card svg {
+        width: 16px;
+        height: 16px;
+      }
+
+      /* Toggle buttons (general) */
+      .toggle-btn {
+        background: transparent;
+        border: none;
+        color: #475569;
+        cursor: pointer;
+        font-size: 1.2rem;
+        padding: 0.25rem;
+        transition: color 0.2s;
+        border-radius: 8px;
+        line-height: 0;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+      }
+      .toggle-btn:hover {
+        color: #fff;
+        background: rgba(255, 255, 255, 0.06);
+      }
+      .toggle-btn svg {
+        width: 20px;
+        height: 20px;
+      }
+      .top-left-actions {
+        position: absolute;
+        top: 2rem;
+        left: 2rem;
+        z-index: 9;
+        display: flex;
+        gap: 0.5rem;
+      }
+      .show-info-btn, .home-btn {
+        background: rgba(255, 255, 255, 0.85);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(0, 0, 0, 0.1);
+        color: #1e293b;
+        width: 44px;
+        height: 44px;
+        padding: 0;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: all 0.2s;
+        opacity: 1;
+        pointer-events: auto;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        text-decoration: none;
+      }
+      .show-info-btn:hover, .home-btn:hover {
+        background: rgba(255, 255, 255, 1);
+        border-color: #ea580c;
+        color: #ea580c;
+      }
+      .show-info-btn.hidden {
+        opacity: 0;
+        pointer-events: none;
+        display: none;
+      }
+
+      .home-link {
+        position: absolute;
+        bottom: 2rem;
+        left: 2rem;
+        z-index: 10;
+        color: #1e293b;
+        text-decoration: none;
+        background: rgba(255, 255, 255, 0.1);
+        padding: 0 1.5rem;
+        height: 48px;
+        border-radius: 8px;
+        border: 1px solid rgb(110, 110, 110, 0.5);
+        backdrop-filter: blur(10px);
+        transition: all 0.2s;
+        font-weight: 500;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-family: inherit;
+        font-size: 1rem;
+        box-sizing: border-box;
+      }
+      .home-link:hover {
+        background: rgba(255, 255, 255, 0.2);
+        border-color: #ea580c;
+        transform: translateY(-2px);
+      }
+
+      .rotation-toggle-btn {
+        position: absolute;
+        bottom: 2rem;
+        right: 2rem;
+        z-index: 10;
+        color: #1e293b;
+        background: rgba(255, 255, 255, 0.1);
+        padding: 0 1.5rem;
+        height: 48px;
+        border-radius: 8px;
+        border: 1px solid rgb(110, 110, 110, 0.5);
+        backdrop-filter: blur(10px);
+        transition: all 0.2s;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        cursor: pointer;
+        font-weight: 500;
+        font-family: inherit;
+        font-size: 1rem;
+        box-sizing: border-box;
+      }
+      .rotation-toggle-btn:hover {
+        background: rgba(255, 255, 255, 0.2);
+        border-color: #ea580c;
+        color: #ea580c;
+        transform: translateY(-2px);
+      }
+
+      /* Data View Styles */
+      .show-data-btn {
+        position: absolute;
+        top: 2rem;
+        right: 2rem;
+        z-index: 9;
+        background: rgba(255, 255, 255, 0.85);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(0, 0, 0, 0.1);
+        color: #1e293b;
+        width: 44px;
+        height: 44px;
+        padding: 0;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: all 0.2s;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+      }
+      .show-data-btn:hover {
+        background: rgba(255, 255, 255, 1);
+        border-color: #ea580c;
+      }
+
+      .data-view {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        height: 100dvh;
+        background: #f8fafc;
+        z-index: 50;
+        display: flex;
+        flex-direction: column;
+        padding: 2rem;
+        box-sizing: border-box;
+        transition: opacity 0.3s ease, transform 0.3s ease;
+      }
+      .data-view-inner {
+        width: 100%;
+        max-width: 800px;
+        margin: 0 auto;
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+      }
+      .data-view.hidden {
+        opacity: 0;
+        pointer-events: none;
+        transform: scale(0.98);
+      }
+      .data-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 2rem;
+      }
+      .data-header h2 {
+        margin: 0;
+        color: #1e293b;
+        font-size: 2rem;
+      }
+      .data-controls {
+        display: flex;
+        gap: 1rem;
+        align-items: center;
+      }
+      .btn-secondary {
+        background: white;
+        border: 1px solid #cbd5e1;
+        padding: 0.5rem 1rem;
+        border-radius: 6px;
+        color: #334155;
+        font-family: inherit;
+        cursor: pointer;
+        font-weight: 500;
+        transition: all 0.2s;
+        white-space: nowrap;
+      }
+      .btn-secondary:hover {
+        background: #f1f5f9;
+        border-color: #94a3b8;
+      }
+      #close-data-view {
+        width: 40px;
+        height: 40px;
+        padding: 0;
+        background: rgba(0,0,0,0.05);
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border: none;
+        cursor: pointer;
+        color: #475569;
+        transition: all 0.2s;
+      }
+      #close-data-view:hover {
+        background: rgba(0,0,0,0.1);
+        color: #1e293b;
+      }
+      .table-container {
+        flex: 1;
+        overflow-y: auto;
+        background: white;
+        border-radius: 12px;
+        border: 1px solid #e2e8f0;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+      }
+      #data-table {
+        width: 100%;
+        border-collapse: collapse;
+      }
+      #data-table th, #data-table td {
+        padding: 1rem;
+        text-align: left;
+        border-bottom: 1px solid #e2e8f0;
+        vertical-align: top;
+      }
+      #data-table th:last-child, #data-table td:last-child {
+        text-align: right;
+      }
+      #data-table th {
+        background: #f8fafc;
+        font-weight: 600;
+        color: #475569;
+        position: sticky;
+        top: 0;
+        z-index: 2;
+        white-space: nowrap;
+      }
+      th.sortable {
+        cursor: pointer;
+        user-select: none;
+        transition: background 0.2s;
+      }
+      th.sortable:hover {
+        background: #f1f5f9;
+      }
+      .sort-icon {
+        display: inline-flex;
+        align-items: center;
+        width: 14px;
+        height: 14px;
+        vertical-align: middle;
+        margin-left: 4px;
+        color: #94a3b8;
+      }
+      th.sort-active .sort-icon {
+        color: #1e293b;
+      }
+      .row-province {
+        background: #fff;
+        cursor: pointer;
+        font-weight: 600;
+        transition: background 0.2s;
+      }
+      .row-province:hover {
+        background: #f1f5f9;
+      }
+      .row-city {
+        background: #f8fafc;
+        display: none;
+      }
+      .row-city.visible {
+        display: table-row;
+      }
+      .city-name {
+        padding-left: 2.5rem !important;
+        color: #475569;
+        font-weight: 400;
+        line-height: 1.5;
+      }
+      .prov-name-inner {
+        display: flex;
+        align-items: flex-start;
+      }
+      .prov-icon {
+        flex: 0 0 24px;
+        display: inline-flex;
+        margin-top: 4px;
+        transition: transform 0.2s;
+      }
+      .prov-text {
+        flex: 1;
+        line-height: 1.5;
+      }
+      .row-province.expanded .prov-icon {
+        transform: rotate(90deg);
+      }
+
+      /* Mobile Touch Mode Toolbar */
+      .mobile-toolbar {
+        position: absolute;
+        top: calc(2rem + 44px + 0.75rem);
+        right: 2rem;
+        z-index: 8;
+        display: none; /* Shown via JS on touch devices */
+        flex-direction: column;
+        background: rgba(255, 255, 255, 0.85);
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        border: 1px solid rgba(0, 0, 0, 0.1);
+        border-radius: 12px;
+        padding: 4px;
+        gap: 4px;
+        width: 44px;
+        box-sizing: border-box;
+        box-shadow: 0 10px 30px -10px rgba(0,0,0,0.15);
+      }
+      .mode-btn {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: transparent;
+        border: none;
+        border-radius: 8px;
+        width: 34px;
+        height: 34px;
+        cursor: pointer;
+        color: #64748b;
+        transition: all 0.2s ease;
+        -webkit-tap-highlight-color: transparent;
+        box-sizing: border-box;
+      }
+      .mode-btn svg {
+        width: 18px !important;
+        height: 18px !important;
+        flex-shrink: 0;
+      }
+      .show-info-btn svg,
+      .show-data-btn svg,
+      .rotation-toggle-btn svg {
+        width: 18px !important;
+        height: 18px !important;
+        flex-shrink: 0;
+      }
+      .toggle-btn svg {
+        width: 20px !important;
+        height: 20px !important;
+        flex-shrink: 0;
+      }
+      #close-info-card svg,
+      .hint-desktop svg,
+      .hint-mobile svg {
+        width: 16px !important;
+        height: 16px !important;
+        flex-shrink: 0;
+      }
+      .mode-btn.active {
+        background: #ea580c;
+        color: white;
+        box-shadow: 0 2px 10px rgba(234, 88, 12, 0.35);
+      }
+      .mode-btn:not(.active):active {
+        background: rgba(0, 0, 0, 0.06);
+      }
+
+      @media (max-width: 768px) {
+        .mobile-toolbar {
+          top: calc(1rem + 44px + 0.5rem);
+          right: 1rem;
+        }
+        .data-view {
+          padding: 1rem;
+          padding-bottom: 2rem;
+        }
+        .overlay {
+          top: calc(1rem + 44px + 0.5rem);
+          left: 1rem;
+          right: 1rem;
+          width: auto;
+          max-width: none;
+        }
+        .top-left-actions {
+          top: 1rem;
+          left: 1rem;
+        }
+        .show-data-btn {
+          top: 1rem;
+          right: 1rem;
+        }
+        .home-link {
+          bottom: 2rem;
+          left: 1rem;
+          padding: 0 1rem;
+          height: 40px;
+        }
+        .rotation-toggle-btn {
+          bottom: 2rem;
+          right: 1rem;
+          padding: 0 1rem;
+          height: 40px;
+        }
+        .info-card {
+          bottom: calc(2rem + 40px + 1rem);
+          right: 1rem;
+        }
+        .info-card .info-row:first-of-type {
+          flex-direction: column-reverse;
+          align-items: flex-start;
+          gap: 0.15rem;
+        }
+        #th-name, #data-table td:first-child {
+          width: 60%;
+        }
+        #th-count, #data-table td:last-child {
+          width: 40%;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div id="chart-container"></div>
+    
+    <div class="top-left-actions">
+      <a href="/data" class="home-btn" aria-label="Back to Data" title="Back to Data">
+        <i data-lucide="home" aria-hidden="true" style="width: 18px; height: 18px;"></i>
+      </a>
+      <button id="show-info" class="show-info-btn hidden" aria-label="Show info" title="Show info">
+        <i data-lucide="info" aria-hidden="true" style="width: 18px; height: 18px;"></i>
+      </button>
+    </div>
+
+    <button id="show-data-btn" class="show-data-btn" aria-label="Show Data Table" title="Show Data Table">
+      <i data-lucide="table" aria-hidden="true" style="width: 18px; height: 18px;"></i>
+    </button>
+
+    <div id="info-overlay" class="overlay">
+      <div class="overlay-header">
+        <h1>Sebaran Lokasi SPPG</h1>
+        <button id="hide-info" class="toggle-btn" aria-label="Hide info" title="Hide info">
+          <i data-lucide="x" aria-hidden="true" style="width: 18px; height: 18px;"></i>
+        </button>
+      </div>
+      <p>As of <b>5 June 2026 21:14:30 WIB</b> (<a href="https://www.bgn.go.id/operasional-sppg" class="source-link" target="_blank" rel="noopener noreferrer">bgn.go.id</a>)</p>
+      
+      <div class="legend-box">
+        <div class="legend-title">Legend</div>
+        <div class="legend-item">
+          <div class="legend-color-gradient"></div>
+          <div>
+            <strong>Data Spikes:</strong> Quantity per regency/city.<br>
+            <span style="font-size: 0.8em; color: #475569;">Taller height and deeper colors indicate higher counts.</span>
+          </div>
+        </div>
+        <div class="legend-item">
+          <div class="legend-color-flat" style="background: linear-gradient(to top, #f2efe9, #e07a5f); height: 40px;"></div>
+          <div>
+            <strong>Base Map:</strong> Regional density heatmap.<br>
+            <span style="font-size: 0.8em; color: #475569;">Lighter areas represent low density, deeper areas indicate higher density.</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="settings-box">
+        <div class="legend-title">Color Palette</div>
+        
+        <div class="setting-item">
+          <select id="color-palette">
+            <option value="warm">Warm Sunrise</option>
+            <option value="blue">Deep Ocean Blue</option>
+            <option value="mono">Monochrome Red</option>
+          </select>
+        </div>
+      </div>
+
+      <ul id="controls-hint-list" class="controls-hint" style="list-style: none; margin: 1rem 0 0 0; padding: 1rem 0 0 0; display: flex; flex-direction: column; gap: 0.5rem; color: #334155; font-size: 0.85rem;">
+        <!-- Desktop hints (hidden on touch devices via JS) -->
+        <li class="hint-desktop" style="display: flex; align-items: center; gap: 0.5rem;">
+          <i data-lucide="mouse-pointer-click" style="width: 16px; height: 16px;"></i>
+          <span><strong>Click &amp; Drag</strong> to rotate map</span>
+        </li>
+        <li class="hint-desktop" style="display: flex; align-items: center; gap: 0.5rem;">
+          <i data-lucide="zoom-in" style="width: 16px; height: 16px;"></i>
+          <span><strong>Scroll</strong> to zoom</span>
+        </li>
+        <li class="hint-desktop" style="display: flex; align-items: center; gap: 0.5rem;">
+          <i data-lucide="map-pin" style="width: 16px; height: 16px;"></i>
+          <span><strong>Click region</strong> to view details</span>
+        </li>
+        <li class="hint-desktop" style="display: flex; align-items: center; gap: 0.5rem;">
+          <i data-lucide="keyboard" style="width: 16px; height: 16px;"></i>
+          <span><strong>Spacebar</strong> to pause/resume</span>
+        </li>
+        <!-- Mobile hints (hidden on desktop via JS) -->
+        <li class="hint-mobile" style="display: none; align-items: center; gap: 0.5rem;">
+          <i data-lucide="layout-grid" style="width: 16px; height: 16px;"></i>
+          <span>Use the <strong>toolbar below</strong> to switch modes</span>
+        </li>
+        <li class="hint-mobile" style="display: none; align-items: center; gap: 0.5rem;">
+          <i data-lucide="rotate-cw" style="width: 16px; height: 16px;"></i>
+          <span><strong>Rotate</strong> mode: drag to orbit, pinch to zoom</span>
+        </li>
+        <li class="hint-mobile" style="display: none; align-items: center; gap: 0.5rem;">
+          <i data-lucide="move" style="width: 16px; height: 16px;"></i>
+          <span><strong>Pan</strong> mode: drag to move the map</span>
+        </li>
+        <li class="hint-mobile" style="display: none; align-items: center; gap: 0.5rem;">
+          <i data-lucide="crosshair" style="width: 16px; height: 16px;"></i>
+          <span><strong>Select</strong> mode: tap a region for details</span>
+        </li>
+      </ul>
+    </div>
+
+    <!-- Click Info Card -->
+    <div id="click-info-card" class="info-card hidden">
+      <button id="close-info-card" class="toggle-btn" aria-label="Close" title="Close">
+        <i data-lucide="x" aria-hidden="true" style="width: 16px; height: 16px;"></i>
+      </button>
+      <div class="info-row" style="margin-bottom: 0.25rem;">
+        <div id="info-city" class="info-city">City Name</div>
+        <div id="info-province" class="info-province">Province</div>
+      </div>
+      <div class="info-row">
+        <div class="stat-label">Count:</div>
+        <div id="info-count" class="stat-value">0</div>
+      </div>
+    </div>
+
+    <a href="/" class="home-link">
+      <span>←</span> Home
+    </a>
+
+    <button id="rotation-toggle-btn" class="rotation-toggle-btn" title="Toggle Rotation (Space)">
+      <i data-lucide="pause" aria-hidden="true" id="rotation-icon" style="width: 18px; height: 18px;"></i>
+      <span id="rotation-text">Pause</span>
+    </button>
+
+    <!-- Mobile Touch Mode Toolbar -->
+    <div id="mobile-toolbar" class="mobile-toolbar">
+      <button id="mode-rotate" class="mode-btn active" data-mode="rotate" aria-label="Rotate mode" title="Rotate Mode">
+        <i data-lucide="rotate-cw" aria-hidden="true" style="width: 18px; height: 18px;"></i>
+      </button>
+      <button id="mode-pan" class="mode-btn" data-mode="pan" aria-label="Pan mode" title="Pan Mode">
+        <i data-lucide="move" aria-hidden="true" style="width: 18px; height: 18px;"></i>
+      </button>
+      <button id="mode-select" class="mode-btn" data-mode="select" aria-label="Select mode" title="Select Mode">
+        <i data-lucide="crosshair" aria-hidden="true" style="width: 18px; height: 18px;"></i>
+      </button>
+    </div>
+
+    <!-- Data View Container -->
+    <div id="data-view-container" class="data-view hidden">
+      <div class="data-view-inner">
+        <div class="data-header">
+          <h2>Sebaran Lokasi SPPG</h2>
+          <div class="data-controls">
+            <button id="toggle-all-cities" class="btn-secondary">Show All</button>
+            <button id="close-data-view" aria-label="Close Data View" title="Close Data View">
+              <i data-lucide="x" aria-hidden="true" style="width: 18px; height: 18px;"></i>
+            </button>
+          </div>
+        </div>
+        <div class="table-container">
+          <table id="data-table">
+            <thead>
+              <tr>
+                <th id="th-name" class="sortable" data-sort="name">Provinsi & Kota/Kab. <span class="sort-icon"></span></th>
+                <th id="th-count" class="sortable sort-active" data-sort="count">Total<span class="sort-icon"><i data-lucide="arrow-down" style="width:14px;height:14px;"></i></span></th>
+              </tr>
+            </thead>
+            <tbody id="data-table-body">
+              <!-- Populated by JS -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      if (window.lucide?.createIcons) window.lucide.createIcons();
+
+      // Toggle desktop/mobile control hints based on touch capability
+      const hasTouch = ('ontouchstart' in window) || navigator.maxTouchPoints > 0;
+      if (hasTouch) {
+        document.querySelectorAll('.hint-desktop').forEach(el => el.style.display = 'none');
+        document.querySelectorAll('.hint-mobile').forEach(el => el.style.display = 'flex');
+      }
+
+      if (window.innerWidth <= 768) {
+        document.getElementById('info-overlay').classList.add('hidden');
+        document.getElementById('show-info').classList.remove('hidden');
+      }
+
+      document.getElementById('hide-info').addEventListener('click', () => {
+        document.getElementById('info-overlay').classList.add('hidden');
+        document.getElementById('show-info').classList.remove('hidden');
+      });
+      document.getElementById('show-info').addEventListener('click', () => {
+        document.getElementById('info-overlay').classList.remove('hidden');
+        document.getElementById('show-info').classList.add('hidden');
+      });
+    </script>
+    <script type="module">
+// Main JavaScript for 3D Map Visualization
+
+// Name mapping from SPPG data names to geoBoundaries shapeName values.
+// The new GeoJSON (geoBoundaries IDN ADM2, 519 features, BPS-sourced) includes
+// separate features for every Kota and Kabupaten, so only genuine spelling
+// differences need mapping — no more many-to-one parent-regency fallbacks.
+const NAME_MAPPING = {
+  // Spacing / compound-word differences
+  'KARANGASEM': 'KARANG ASEM',
+  'GUNUNGKIDUL': 'GUNUNG KIDUL',
+  'BATANGHARI': 'BATANG HARI',
+  'BANYUASIN': 'BANYU ASIN',
+  'LABUHANBATU': 'LABUHAN BATU',
+  'LABUHANBATU SELATAN': 'LABUHAN BATU SELATAN',
+  'LABUHANBATU UTARA': 'LABUHAN BATU UTARA',
+  'MUKO MUKO': 'MUKOMUKO',
+  'KOTABARU': 'KOTA BARU',
+  'TULANG BAWANG': 'TULANGBAWANG',
+  'FAK FAK': 'FAKFAK',
+
+  // Hyphen differences
+  'TOJO UNA UNA': 'TOJO UNA-UNA',
+  'TOLI TOLI': 'TOLI-TOLI',
+
+  // Kota compound-word differences
+  'KOTA BANJARBARU': 'KOTA BANJAR BARU',
+  'KOTA BAU BAU': 'KOTA BAUBAU',
+  'KOTA LUBUK LINGGAU': 'KOTA LUBUKLINGGAU',
+  'KOTA SAWAHLUNTO': 'KOTA SAWAH LUNTO',
+  'KOTA PEMATANGSIANTAR': 'KOTA PEMATANG SIANTAR',
+  'KOTA PADANG SIDEMPUAN': 'KOTA PADANGSIDIMPUAN',
+
+  // Historical name changes
+  'MAHAKAM ULU': 'MAHAKAM HULU',
+  'TOBA': 'TOBA SAMOSIR',
+  'PASANGKAYU': 'MAMUJU UTARA', // renamed from Mamuju Utara
+  'KEPULAUAN TANIMBAR': 'MALUKU TENGGARA BARAT', // renamed from MTB
+
+  // Jakarta administrative prefixes
+  'ADM. KEP. SERIBU': 'KEPULAUAN SERIBU',
+  'KOTA ADM. JAKARTA BARAT': 'KOTA JAKARTA BARAT',
+  'KOTA ADM. JAKARTA PUSAT': 'KOTA JAKARTA PUSAT',
+  'KOTA ADM. JAKARTA SELATAN': 'KOTA JAKARTA SELATAN',
+  'KOTA ADM. JAKARTA TIMUR': 'KOTA JAKARTA TIMUR',
+  'KOTA ADM. JAKARTA UTARA': 'KOTA JAKARTA UTARA',
+
+  // Abbreviated prefix
+  'KEP. SIAU TAGULANDANG BIARO': 'SIAU TAGULANDANG BIARO',
+  'KAB TIMOR TENGAH SELATAN': 'TIMOR TENGAH SELATAN',
+};
+
+// Normalize SPPG city name to match GeoJSON shapeName
+function normalizeCityName(sppgCity) {
+  let name = sppgCity.toUpperCase().trim();
+
+  // Check direct mapping first
+  if (NAME_MAPPING[name]) return NAME_MAPPING[name];
+
+  // Remove KAB/KAB. prefix
+  const withoutKab = name.replace(/^KAB\.?\s+/, '').trim();
+  if (withoutKab !== name) {
+    if (NAME_MAPPING[withoutKab]) return NAME_MAPPING[withoutKab];
+    name = withoutKab;
+  }
+
+  // Collapse whitespace and normalize
+  name = name.replace(/\s+/g, ' ').trim();
+
+  // Final mapping check after normalization
+  if (NAME_MAPPING[name]) return NAME_MAPPING[name];
+
+  return name;
+}
+
+async function initMap() {
+  const chartDom = document.getElementById('chart-container');
+  const myChart = echarts.init(chartDom);
+
+  // Show loading spinner
+  myChart.showLoading({
+    text: 'Loading Map Data...',
+    color: '#38bdf8',
+    textColor: '#f8fafc',
+    maskColor: 'rgba(15, 23, 42, 0.8)'
+  });
+
+  try {
+    // Fetch Indonesia GeoJSON (local, geoBoundaries IDN ADM2 simplified)
+    const geoJsonUrl = '/assets/indonesia-adm.geojson';
+    const response = await fetch(geoJsonUrl);
+    if (!response.ok) throw new Error('Failed to load GeoJSON');
+    const geoJson = await response.json();
+
+    // Normalize feature name property: geoBoundaries uses "shapeName",
+    // ECharts geo3D expects "name" or "NAME_2" — unify to "name".
+    geoJson.features.forEach(feature => {
+      const shapeName = feature.properties.shapeName || '';
+      feature.properties.name = shapeName;
+      feature.properties.NAME_2 = shapeName; // compat
+    });
+
+    // Fetch SPPG data
+    const sppgResponse = await fetch('/components/sebaran-sppg/data-sppg.json');
+    if (!sppgResponse.ok) {
+      throw new Error('Failed to load SPPG data');
+    }
+    const sppgData = await sppgResponse.json();
+
+    // Create a map of normalized city names to their data
+    const sppgDataMap = new Map();
+
+    for (const item of sppgData) {
+      const sppgCity = item.CITY_REGENCY;
+      const normalizedCity = normalizeCityName(sppgCity);
+      sppgDataMap.set(normalizedCity, {
+        count: item.COUNT,
+        province: item.PROVINCE,
+        originalName: sppgCity
+      });
+    }
+
+    // Collect all GeoJSON city names for matching
+    const geoJsonCityNames = new Set();
+    geoJson.features.forEach(feature => {
+      const name = feature.properties.name;
+      if (name) {
+        geoJsonCityNames.add(name.toUpperCase());
+      }
+    });
+
+    // Check for unmapped cities — try KOTA prefix addition and partial match
+    const unmappedCities = [];
+    for (const [city, data] of [...sppgDataMap.entries()]) {
+      if (geoJsonCityNames.has(city)) continue;
+
+      // Try adding KOTA prefix
+      if (geoJsonCityNames.has('KOTA ' + city)) {
+        sppgDataMap.set('KOTA ' + city, data);
+        sppgDataMap.delete(city);
+        continue;
+      }
+
+      // Try partial match
+      let found = false;
+      for (const geoName of geoJsonCityNames) {
+        if (geoName.includes(city) || city.includes(geoName)) {
+          sppgDataMap.set(geoName, data);
+          sppgDataMap.delete(city);
+          found = true;
+          break;
+        }
+      }
+      if (!found) {
+        unmappedCities.push({ city, original: data.originalName });
+      }
+    }
+
+    if (unmappedCities.length > 0) {
+      console.warn(`${unmappedCities.length} cities could not be mapped to GeoJSON:`,
+        unmappedCities.map(c => c.original).join(', '));
+    }
+
+    // Generate bar data for matched cities
+    const populationData = [];
+
+    geoJson.features.forEach((feature) => {
+      const name = feature.properties.name;
+      const nameUpper = name.toUpperCase();
+
+      // Get data from SPPG if available
+      const sppgInfo = sppgDataMap.get(nameUpper);
+
+      if (sppgInfo) {
+        // Collect coordinates for centroid calculation
+        const coordsList = [];
+        if (feature.geometry) {
+          if (feature.geometry.type === 'Polygon') {
+            feature.geometry.coordinates.forEach(ring => coordsList.push(...ring));
+          } else if (feature.geometry.type === 'MultiPolygon') {
+            feature.geometry.coordinates.forEach(poly => {
+              poly.forEach(ring => coordsList.push(...ring));
+            });
+          }
+        }
+
+        // Place one bar per region at its centroid
+        if (coordsList.length > 0) {
+          const lng = coordsList.reduce((sum, c) => sum + c[0], 0) / coordsList.length;
+          const lat = coordsList.reduce((sum, c) => sum + c[1], 0) / coordsList.length;
+
+          const value = sppgInfo.count;
+          populationData.push({
+            value: [lng, lat, value],
+            province: sppgInfo.province,
+            cityName: name,
+            count: sppgInfo.count
+          });
+        }
+      }
+    });
+
+    // Helper to interpolate colors
+    function interpolateColor(color1, color2, factor) {
+      const result = color1.slice();
+      for (let i = 0; i < 3; i++) {
+        result[i] = Math.round(result[i] + factor * (color2[i] - color1[i]));
+      }
+      return result;
+    }
+
+    const baseMapColors = {
+      warm: { good: [255, 255, 255], poor: [224, 122, 95] },
+      blue: { good: [255, 255, 255], poor: [120, 160, 210] },
+      mono: { good: [255, 255, 255], poor: [220, 110, 110] }
+    };
+
+    function getRegionsData(paletteId) {
+      const colors = baseMapColors[paletteId] || baseMapColors.blue;
+      return geoJson.features.map((feature) => {
+        const name = feature.properties.name;
+        const sppgInfo = sppgDataMap.get(name.toUpperCase());
+
+        let count = 50; // Default medium value
+        if (sppgInfo) {
+          count = Math.min(sppgInfo.count, 150);
+        }
+
+        const factor = (count - 10) / 140;
+        const rgb = interpolateColor(colors.good, colors.poor, Math.max(0, Math.min(1, factor)));
+
+        return {
+          name: name,
+          itemStyle: {
+            color: `rgb(${rgb[0]}, ${rgb[1]}, ${rgb[2]})`
+          }
+        };
+      });
+    }
+
+    const regionsData = getRegionsData('blue');
+
+    // Register the map
+    echarts.registerMap('indonesia', geoJson);
+
+    // Find max value for scaling
+    const maxValue = Math.max(...populationData.map(d => d.value[2]), 1);
+
+    // Map Configuration
+    // Detect touch capability once (used by tooltip formatter and touch engine below)
+    const isTouchDevice = ('ontouchstart' in window) || navigator.maxTouchPoints > 0;
+    let currentMode = 'rotate'; // 'rotate' | 'pan' | 'select' — mobile toolbar mode
+
+    const option = {
+      backgroundColor: '#ffffff',
+
+      tooltip: {
+        show: true,
+        trigger: 'item',
+        formatter: function(params) {
+          // On mobile in SELECT mode, taps trigger the tooltip internally.
+          // Intercept to show our custom info card instead of the native tooltip.
+          if (isTouchDevice && currentMode === 'select' && window.showCityInfoCard) {
+            const name = params.name || (params.data && params.data.cityName);
+            if (name) {
+              setTimeout(() => window.showCityInfoCard(name), 0);
+            }
+          }
+          return '';
+        },
+        backgroundColor: 'transparent',
+        borderColor: 'transparent',
+        padding: 0,
+        textStyle: { color: 'transparent' },
+        extraCssText: 'box-shadow: none; pointer-events: none;'
+      },
+
+      visualMap: {
+        show: false,
+        min: 0,
+        max: maxValue,
+        inRange: {
+          color: ['#f59e0b', '#ea580c', '#dc2626', '#991b1b', '#7f1d1d']
+        }
+      },
+
+      geo3D: {
+        map: 'indonesia',
+        environment: '#ffffff',
+        roam: true,
+        regionHeight: 0.05,
+        regions: regionsData,
+
+        postEffect: {
+          enable: false,
+          bloom: {
+            enable: false,
+            bloomIntensity: 0.2
+          }
+        },
+
+        groundPlane: {
+          show: false,
+          color: '#020617'
+        },
+
+        shading: 'color',
+
+        itemStyle: {
+          color: '#ffffff',
+          opacity: 0.95,
+          borderWidth: 0.8,
+          borderColor: 'rgba(0, 0, 0, 0.15)'
+        },
+
+        viewControl: {
+          minDistance: 10,
+          maxDistance: 400,
+          autoRotate: true,
+          autoRotateAfterStill: 99999999,
+          autoRotateSpeed: 1.5,
+          distance: window.innerWidth <= 768 ? 60 : 50,
+          alpha: 40,
+          beta: -20,
+          center: window.innerWidth <= 768 ? [-16, -2, 0] : [0, -5, 0],
+          panMouseButton: 'right',
+          rotateMouseButton: 'left',
+          zoomSensitivity: 2,
+          panSensitivity: 2,
+          rotateSensitivity: 2
+        },
+
+        emphasis: {
+          label: {
+            show: true,
+            formatter: function(params) {
+              const nameUpper = params.name.toUpperCase();
+              
+              // Track hover natively from the WebGL emphasis engine
+              window.__lastHoveredGeo = params.name;
+              
+              const sppgInfo = sppgDataMap.get(nameUpper);
+              if (sppgInfo) {
+                return params.name + ' (' + sppgInfo.count + ')';
+              }
+              return params.name;
+            },
+            textStyle: {
+              color: '#0f172a',
+              fontSize: 14,
+              fontWeight: 'bold',
+              backgroundColor: 'rgba(255,255,255,0.9)',
+              padding: [4, 8],
+              borderRadius: 4
+            }
+          },
+          itemStyle: {
+            color: '#f8fafc',
+            opacity: 1
+          }
+        },
+
+        light: {
+          main: {
+            intensity: 1.2,
+            shadow: true,
+            alpha: 40,
+            beta: -30
+          },
+          ambient: {
+            intensity: 0.5
+          }
+        }
+      },
+
+      series: [
+        {
+          type: 'bar3D',
+          coordinateSystem: 'geo3D',
+          shading: 'color',
+          tooltip: {
+            show: false
+          },
+          // Start with zero heights for animation
+          data: populationData.map(item => {
+            if (typeof item === 'object') {
+              return { ...item, value: [item.value[0], item.value[1], 0] };
+            }
+            return [item[0], item[1], 0];
+          }),
+          barSize: 0.15,
+          minHeight: 0,
+          itemStyle: {
+            opacity: 0.8
+          },
+          label: {
+            show: false
+          },
+          emphasis: {
+            itemStyle: {
+              opacity: 1,
+              color: '#38bdf8'
+            },
+            label: {
+              show: false
+            }
+          },
+          animation: true,
+          animationDurationUpdate: 2000,
+          animationEasingUpdate: 'cubicOut'
+        }
+      ]
+    };
+
+    myChart.hideLoading();
+
+    // Create a lookup map for tooltip data
+    const tooltipDataMap = new Map();
+    populationData.forEach(item => {
+      const value = typeof item === 'object' && item.value ? item.value : item;
+      const key = `${value[0].toFixed(4)}_${value[1].toFixed(4)}`;
+      tooltipDataMap.set(key, {
+        province: typeof item === 'object' ? item.province : 'Unknown',
+        cityName: typeof item === 'object' ? item.cityName : 'Unknown',
+        count: typeof item === 'object' ? item.count : (value[2] || 0)
+      });
+    });
+
+    // Store globally for tooltip formatter access
+    window.tooltipDataMap = tooltipDataMap;
+
+    myChart.setOption(option);
+
+    // Trigger animation to rise up the spikes
+    setTimeout(() => {
+      myChart.setOption({
+        series: [{
+          data: populationData,
+          minHeight: 0.2
+        }]
+      });
+    }, 100);
+
+    window.addEventListener('resize', () => {
+      myChart.resize();
+    });
+
+
+    // ══════════════════════════════════════════════════════════════════════
+    // MOBILE INTERACTION MODE SYSTEM
+    // ══════════════════════════════════════════════════════════════════════
+    // ECharts GL's touch system can't be reliably overridden:
+    //   - 1-finger drag = rotate (hardcoded)
+    //   - 2-finger pinch = zoom (hardcoded)
+    //   - No 2-finger pan support
+    //   - Tap-to-select conflicts with rotation
+    //
+    // Solution: A mode-switching toolbar (like matplotlib 3D controls).
+    // Each mode maps the single-finger gesture to ONE clear action,
+    // eliminating all ambiguity.
+    //
+    //   ROTATE: Default ECharts GL behavior (1-finger rotate, pinch zoom)
+    //   PAN:    1-finger drag pans the map (rotation disabled)
+    //   SELECT: Tap to select a region/bar (rotation disabled, pinch zoom enabled)
+    //
+    // The toolbar only appears on touch devices. Desktop uses standard
+    // mouse interaction (left-click rotate, right-click pan, scroll zoom).
+    // ══════════════════════════════════════════════════════════════════════
+
+    // Track hover state for reliable clicks on 3D objects
+    let lastHoveredCity = null;
+    let hoverTimeout = null;
+
+    myChart.on('mouseover', function(params) {
+      if (hoverTimeout) { clearTimeout(hoverTimeout); hoverTimeout = null; }
+      if (params.name) {
+        lastHoveredCity = params.name;
+      } else if (params.data && params.data.cityName) {
+        lastHoveredCity = params.data.cityName;
+      }
+    });
+
+    myChart.on('mouseout', function() {
+      hoverTimeout = setTimeout(() => { lastHoveredCity = null; }, 150);
+    });
+
+    window.showCityInfoCard = function(cityName) {
+      if (!cityName || cityName === 'Unknown') return;
+      let province = 'Unknown';
+      let count = 0;
+      const sppgInfo = sppgDataMap.get(cityName.toUpperCase());
+      if (sppgInfo) { province = sppgInfo.province; count = sppgInfo.count; }
+
+      document.getElementById('info-city').textContent = cityName;
+      document.getElementById('info-province').textContent = province;
+      document.getElementById('info-count').textContent = new Intl.NumberFormat('id-ID').format(count);
+      document.getElementById('click-info-card').classList.remove('hidden');
+    };
+
+    // Native ECharts click — works reliably on desktop and via synthetic mouse clicks on mobile
+    myChart.on('click', function(params) {
+      // On touch devices, only respond in select mode
+      if (isTouchDevice && currentMode !== 'select') return;
+
+      if (params.seriesType === 'bar3D' && params.data && params.data.cityName) {
+        window.showCityInfoCard(params.data.cityName);
+      }
+      if (params.componentType === 'geo3D' && params.name) {
+        window.showCityInfoCard(params.name);
+      }
+    });
+
+    // ── ZRender Click Fallback ─────────────────────────
+    // This handles cases where ECharts GL native click fails to trigger on the geo3D base map.
+    // Works natively on desktop, and on mobile via our synthetic mouse events in Select mode.
+    let zrMouseDownX = 0, zrMouseDownY = 0;
+    myChart.getZr().on('mousedown', function(e) {
+      zrMouseDownX = e.offsetX; zrMouseDownY = e.offsetY;
+    });
+    myChart.getZr().on('mouseup', function(e) {
+      if (isTouchDevice && currentMode !== 'select') return;
+      if (Math.abs(e.offsetX - zrMouseDownX) > 10 || Math.abs(e.offsetY - zrMouseDownY) > 10) return;
+      const cityName = lastHoveredCity || window.__lastHoveredGeo;
+      if (cityName) window.showCityInfoCard(cityName);
+    });
+
+    function dispatchSyntheticMouse(type, clientX, clientY, button = 0, buttons = 1, dx = 0, dy = 0) {
+      let targetEl = myChart.getZr().dom;
+      if (!targetEl) return;
+      const canvas = targetEl.querySelector('canvas');
+      if (canvas) targetEl = canvas;
+
+      const rect = targetEl.getBoundingClientRect();
+      const offsetX = clientX - rect.left;
+      const offsetY = clientY - rect.top;
+
+      const opts = {
+        clientX: clientX,
+        clientY: clientY,
+        screenX: clientX,
+        screenY: clientY,
+        button: button,
+        buttons: buttons,
+        bubbles: true,
+        cancelable: true,
+        view: window
+      };
+      
+      const ev = new MouseEvent(type, opts);
+
+      Object.defineProperty(ev, 'offsetX', { value: offsetX, configurable: true });
+      Object.defineProperty(ev, 'offsetY', { value: offsetY, configurable: true });
+      Object.defineProperty(ev, 'movementX', { value: dx, configurable: true });
+      Object.defineProperty(ev, 'movementY', { value: dy, configurable: true });
+      Object.defineProperty(ev, 'which', { value: button === 2 ? 3 : 1, configurable: true });
+      
+      targetEl.dispatchEvent(ev);
+    }
+
+    // ── Mode switching engine (touch devices only) ──────────────────────
+    function setMode(mode) {
+      currentMode = mode;
+
+      // Auto-pause rotation when switching away from rotate mode
+      if (mode !== 'rotate' && isRotating) {
+        setRotation(false);
+      }
+
+      // Update toolbar active state
+      document.querySelectorAll('.mode-btn').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.mode === mode);
+      });
+    }
+
+    if (isTouchDevice) {
+      // Show the toolbar and adjust layout
+      const toolbar = document.getElementById('mobile-toolbar');
+      if (toolbar) {
+        toolbar.style.display = 'flex';
+        document.body.classList.add('has-touch-toolbar');
+      }
+
+      // Toolbar button clicks
+      document.querySelectorAll('.mode-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          setMode(btn.dataset.mode);
+        });
+      });
+
+      // ── PAN MODE: 1-finger drag pans the map ────────────────────────
+      // We map 1-finger drag to a synthetic right-mouse drag, which ECharts GL
+      // handles natively (and flawlessly) for panning.
+      let isPanning = false;
+      let lastPanTouch = null;
+
+      chartDom.addEventListener('touchstart', function(e) {
+        if (currentMode === 'pan' && e.touches.length === 1) {
+          isPanning = true;
+          e.stopPropagation();
+          const touch = e.touches[0];
+          lastPanTouch = { x: touch.clientX, y: touch.clientY };
+          dispatchSyntheticMouse('mousedown', touch.clientX, touch.clientY, 2, 2, 0, 0);
+        } else if (currentMode === 'pan') {
+          isPanning = false;
+        }
+      }, { capture: true, passive: false });
+
+      chartDom.addEventListener('touchmove', function(e) {
+        if (currentMode !== 'pan') return;
+        if (e.touches.length !== 1 || !isPanning) {
+          if (currentMode === 'pan') isPanning = false;
+          return;
+        }
+
+        e.stopPropagation();
+        const touch = e.touches[0];
+        const dx = lastPanTouch ? touch.clientX - lastPanTouch.x : 0;
+        const dy = lastPanTouch ? touch.clientY - lastPanTouch.y : 0;
+        lastPanTouch = { x: touch.clientX, y: touch.clientY };
+        
+        dispatchSyntheticMouse('mousemove', touch.clientX, touch.clientY, 2, 2, dx, dy);
+      }, { capture: true, passive: false });
+
+      chartDom.addEventListener('touchend', function(e) {
+        if (currentMode === 'pan') {
+          if (isPanning && e.changedTouches && e.changedTouches.length > 0) {
+            const touch = e.changedTouches[0];
+            dispatchSyntheticMouse('mouseup', touch.clientX, touch.clientY, 2, 0);
+          }
+          isPanning = false;
+        }
+      }, { capture: true, passive: true });
+
+      // ── SELECT MODE: tap to select nearest element ──────────────────
+      let selectTap = null;
+
+      chartDom.addEventListener('touchstart', function(e) {
+        if (currentMode === 'select' && e.touches.length === 1) {
+          const touch = e.touches[0];
+          selectTap = {
+            clientX: touch.clientX,
+            clientY: touch.clientY,
+            time: Date.now()
+          };
+          // Intercept touchstart to prevent ECharts GL from starting a drag/rotation
+          e.stopPropagation();
+        } else if (currentMode === 'select') {
+          selectTap = null;
+        }
+      }, { capture: true, passive: false });
+
+      chartDom.addEventListener('touchmove', function(e) {
+        if (currentMode !== 'select') return;
+        // Only isolate single-finger gestures; preserve multi-finger pinch-zoom
+        if (e.touches.length !== 1) return;
+        if (selectTap) {
+          const touch = e.touches[0];
+          const dx = Math.abs(touch.clientX - selectTap.clientX);
+          const dy = Math.abs(touch.clientY - selectTap.clientY);
+          if (dx > 10 || dy > 10) selectTap = null; // It's a drag, not a tap
+        }
+        e.stopPropagation();
+      }, { capture: true, passive: false });
+
+      chartDom.addEventListener('touchend', function(e) {
+        if (currentMode !== 'select') return;
+        if (!selectTap) return;
+        
+        // Prevent default browser click emulation
+        if (e.cancelable) {
+          e.preventDefault();
+        }
+        // Prevent event from bubbling down to ECharts touch handlers
+        e.stopPropagation();
+
+        if (Date.now() - selectTap.time > 500) { selectTap = null; return; }
+
+        const clientX = selectTap.clientX;
+        const clientY = selectTap.clientY;
+        selectTap = null;
+
+        // Dispatches synthetic mouse events at the tap coordinates.
+        // This makes ECharts GL run its native WebGL raycaster on mobile!
+        dispatchSyntheticMouse('mousemove', clientX, clientY, 0, 1);
+        dispatchSyntheticMouse('mousedown', clientX, clientY, 0, 1);
+        dispatchSyntheticMouse('mouseup', clientX, clientY, 0, 0);
+        dispatchSyntheticMouse('click', clientX, clientY, 0, 0);
+      }, { capture: true, passive: false });
+    }
+
+    let isRotating = true;
+
+    function setRotation(state) {
+      isRotating = state;
+      myChart.setOption({ geo3D: { viewControl: { autoRotate: state } } });
+      updateRotationIcon();
+    }
+
+    function updateRotationIcon() {
+      const toggleBtn = document.getElementById('rotation-toggle-btn');
+      if (toggleBtn) {
+        toggleBtn.innerHTML = `<i data-lucide="${isRotating ? 'pause' : 'play'}" aria-hidden="true" style="width: 18px; height: 18px;"></i><span id="rotation-text">${isRotating ? 'Pause' : 'Resume'}</span>`;
+        if (window.lucide && window.lucide.createIcons) window.lucide.createIcons();
+      }
+    }
+
+    // Toggle on spacebar
+    document.addEventListener('keydown', (e) => {
+      if (e.code === 'Space' && e.target.tagName !== 'INPUT' && e.target.tagName !== 'TEXTAREA') {
+        e.preventDefault();
+        setRotation(!isRotating);
+      }
+    });
+
+    // Stop rotation when the user interacts anywhere on the map.
+    // On touch devices in rotate mode, any touch stops auto-rotate.
+    // In pan/select modes, rotation is already paused by setMode().
+    myChart.getZr().on('mousedown', function() {
+      if (!isRotating) return;
+      // On touch devices, only auto-stop in rotate mode
+      if (isTouchDevice && currentMode !== 'rotate') return;
+      isRotating = false;
+      updateRotationIcon();
+    });
+
+    // Handle close button
+    const closeBtn = document.getElementById('close-info-card');
+    if (closeBtn) {
+      closeBtn.addEventListener('click', () => {
+        document.getElementById('click-info-card').classList.add('hidden');
+      });
+    }
+
+    const palettes = {
+      blue: ['#bfdbfe', '#60a5fa', '#3b82f6', '#1d4ed8', '#1e3a8a'],
+      warm: ['#f59e0b', '#ea580c', '#dc2626', '#991b1b', '#7f1d1d'],
+      mono: ['#fca5a5', '#f87171', '#ef4444', '#dc2626', '#b91c1c']
+    };
+
+    // Handle toggle button
+    const toggleBtn = document.getElementById('rotation-toggle-btn');
+    if (toggleBtn) {
+      toggleBtn.addEventListener('click', () => {
+        setRotation(!isRotating);
+      });
+    }
+
+    document.getElementById('color-palette').addEventListener('change', (e) => {
+      const paletteId = e.target.value;
+      const newPalette = palettes[paletteId];
+      
+      myChart.setOption({
+        visualMap: {
+          inRange: { color: newPalette }
+        },
+        geo3D: {
+          regions: getRegionsData(paletteId)
+        }
+      });
+      
+      document.querySelector('.legend-color-gradient').style.background = `linear-gradient(to top, ${newPalette.join(', ')})`;
+      
+      const flatBox = document.querySelector('.legend-color-flat');
+      if (flatBox) {
+        const c1 = baseMapColors[paletteId].good;
+        const c2 = baseMapColors[paletteId].poor;
+        flatBox.style.background = `linear-gradient(to top, rgb(${c1[0]},${c1[1]},${c1[2]}), rgb(${c2[0]},${c2[1]},${c2[2]}))`;
+      }
+    });
+
+    // -- Data View Table Generation --
+    const provinceMap = new Map();
+    for (const item of sppgData) {
+      const prov = item.PROVINCE || 'Unknown';
+      if (!provinceMap.has(prov)) {
+        provinceMap.set(prov, { name: prov, total: 0, cities: [] });
+      }
+      const pData = provinceMap.get(prov);
+      pData.total += item.COUNT;
+      pData.cities.push({ name: item.CITY_REGENCY, count: item.COUNT });
+    }
+
+    const provincesBase = Array.from(provinceMap.values());
+    let currentSortBy = 'count';
+    let currentSortOrder = 'desc';
+    let allExpanded = false;
+
+    function renderTable() {
+      const tbody = document.getElementById('data-table-body');
+      if (!tbody) return;
+      
+      tbody.innerHTML = '';
+      
+      // Sort provinces
+      provincesBase.sort((a, b) => {
+        if (currentSortBy === 'name') {
+          return currentSortOrder === 'asc' ? a.name.localeCompare(b.name) : b.name.localeCompare(a.name);
+        } else {
+          return currentSortOrder === 'asc' ? a.total - b.total : b.total - a.total;
+        }
+      });
+
+      provincesBase.forEach((prov, pIndex) => {
+        // Province row
+        const pRow = document.createElement('tr');
+        pRow.className = 'row-province' + (allExpanded ? ' expanded' : '');
+        pRow.dataset.provIndex = pIndex;
+        
+        pRow.innerHTML = `
+          <td class="prov-name-cell">
+            <div class="prov-name-inner">
+              <span class="prov-icon"><i data-lucide="chevron-right" style="width:16px;height:16px;"></i></span>
+              <span class="prov-text">${prov.name}</span>
+            </div>
+          </td>
+          <td>${new Intl.NumberFormat('id-ID').format(prov.total)}</td>
+        `;
+        tbody.appendChild(pRow);
+
+        // Sort cities
+        prov.cities.sort((a, b) => {
+          if (currentSortBy === 'name') {
+            return currentSortOrder === 'asc' ? a.name.localeCompare(b.name) : b.name.localeCompare(a.name);
+          } else {
+            return currentSortOrder === 'asc' ? a.count - b.count : b.count - a.count;
+          }
+        });
+
+        // City rows
+        prov.cities.forEach(city => {
+          const cRow = document.createElement('tr');
+          cRow.className = `row-city prov-group-${pIndex}` + (allExpanded ? ' visible' : '');
+          cRow.innerHTML = `
+            <td class="city-name">${city.name}</td>
+            <td>${new Intl.NumberFormat('id-ID').format(city.count)}</td>
+          `;
+          tbody.appendChild(cRow);
+        });
+
+        // Click handler to toggle cities
+        pRow.addEventListener('click', () => {
+          const isExpanded = pRow.classList.toggle('expanded');
+          const cityRows = document.querySelectorAll(`.prov-group-${pIndex}`);
+          cityRows.forEach(row => {
+            if (isExpanded) {
+              row.classList.add('visible');
+            } else {
+              row.classList.remove('visible');
+            }
+          });
+        });
+      });
+      if (window.lucide && window.lucide.createIcons) window.lucide.createIcons();
+    }
+
+    renderTable();
+
+    // Sorting Headers
+    document.querySelectorAll('#data-table th.sortable').forEach(th => {
+      th.addEventListener('click', () => {
+        const sortBy = th.dataset.sort;
+        if (currentSortBy === sortBy) {
+          currentSortOrder = currentSortOrder === 'asc' ? 'desc' : 'asc';
+        } else {
+          currentSortBy = sortBy;
+          currentSortOrder = sortBy === 'name' ? 'asc' : 'desc';
+        }
+        
+        // Update header UI
+        document.querySelectorAll('#data-table th.sortable').forEach(h => {
+          h.classList.remove('sort-active');
+          h.querySelector('.sort-icon').innerHTML = '';
+        });
+        th.classList.add('sort-active');
+        const iconName = currentSortOrder === 'asc' ? 'arrow-up' : 'arrow-down';
+        th.querySelector('.sort-icon').innerHTML = `<i data-lucide="${iconName}" style="width:14px;height:14px;"></i>`;
+        
+        renderTable();
+      });
+    });
+
+    // Toggle Data View
+    const btnShowData = document.getElementById('show-data-btn');
+    const btnCloseData = document.getElementById('close-data-view');
+    const dataContainer = document.getElementById('data-view-container');
+
+    if (btnShowData && btnCloseData && dataContainer) {
+      btnShowData.addEventListener('click', () => {
+        dataContainer.classList.remove('hidden');
+      });
+      btnCloseData.addEventListener('click', () => {
+        dataContainer.classList.add('hidden');
+      });
+    }
+
+    // Show/Hide All Toggle
+    const btnToggleAll = document.getElementById('toggle-all-cities');
+    if (btnToggleAll) {
+      btnToggleAll.addEventListener('click', () => {
+        allExpanded = !allExpanded;
+        btnToggleAll.textContent = allExpanded ? 'Hide All' : 'Show All';
+        renderTable();
+      });
+    }
+
+  } catch (error) {
+    console.error('Error loading map data:', error);
+    myChart.hideLoading();
+    const chartContainer = document.getElementById('chart-container');
+    chartContainer.innerHTML = `
+      <div style="color: #ef4444; text-align: center; margin-top: 20%; font-family: Outfit, sans-serif;">
+        <h2>Failed to load map data</h2>
+        <p>Please check your internet connection or try again later.</p>
+        <p style="font-size: 0.8rem; color: #94a3b8; margin-top: 1rem;">${error.message}</p>
+      </div>
+    `;
+  }
+}
+
+document.addEventListener('DOMContentLoaded', initMap);
+
+</script>
+  </body>
+</html>

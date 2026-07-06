@@ -1,0 +1,2512 @@
+[
+  {
+    "PROVINCE": "ACEH",
+    "CITY_REGENCY": "ACEH BARAT",
+    "COUNT": 24
+  },
+  {
+    "PROVINCE": "ACEH",
+    "CITY_REGENCY": "ACEH BARAT DAYA",
+    "COUNT": 20
+  },
+  {
+    "PROVINCE": "ACEH",
+    "CITY_REGENCY": "ACEH BESAR",
+    "COUNT": 60
+  },
+  {
+    "PROVINCE": "ACEH",
+    "CITY_REGENCY": "ACEH JAYA",
+    "COUNT": 12
+  },
+  {
+    "PROVINCE": "ACEH",
+    "CITY_REGENCY": "ACEH SELATAN",
+    "COUNT": 32
+  },
+  {
+    "PROVINCE": "ACEH",
+    "CITY_REGENCY": "ACEH SINGKIL",
+    "COUNT": 17
+  },
+  {
+    "PROVINCE": "ACEH",
+    "CITY_REGENCY": "ACEH TAMIANG",
+    "COUNT": 38
+  },
+  {
+    "PROVINCE": "ACEH",
+    "CITY_REGENCY": "ACEH TENGAH",
+    "COUNT": 25
+  },
+  {
+    "PROVINCE": "ACEH",
+    "CITY_REGENCY": "ACEH TENGGARA",
+    "COUNT": 50
+  },
+  {
+    "PROVINCE": "ACEH",
+    "CITY_REGENCY": "ACEH TIMUR",
+    "COUNT": 57
+  },
+  {
+    "PROVINCE": "ACEH",
+    "CITY_REGENCY": "ACEH UTARA",
+    "COUNT": 86
+  },
+  {
+    "PROVINCE": "ACEH",
+    "CITY_REGENCY": "BENER MERIAH",
+    "COUNT": 18
+  },
+  {
+    "PROVINCE": "ACEH",
+    "CITY_REGENCY": "BIREUEN",
+    "COUNT": 61
+  },
+  {
+    "PROVINCE": "ACEH",
+    "CITY_REGENCY": "GAYO LUES",
+    "COUNT": 17
+  },
+  {
+    "PROVINCE": "ACEH",
+    "CITY_REGENCY": "KOTA BANDA ACEH",
+    "COUNT": 41
+  },
+  {
+    "PROVINCE": "ACEH",
+    "CITY_REGENCY": "KOTA LANGSA",
+    "COUNT": 28
+  },
+  {
+    "PROVINCE": "ACEH",
+    "CITY_REGENCY": "KOTA LHOKSEUMAWE",
+    "COUNT": 27
+  },
+  {
+    "PROVINCE": "ACEH",
+    "CITY_REGENCY": "KOTA SABANG",
+    "COUNT": 3
+  },
+  {
+    "PROVINCE": "ACEH",
+    "CITY_REGENCY": "KOTA SUBULUSSALAM",
+    "COUNT": 16
+  },
+  {
+    "PROVINCE": "ACEH",
+    "CITY_REGENCY": "NAGAN RAYA",
+    "COUNT": 18
+  },
+  {
+    "PROVINCE": "ACEH",
+    "CITY_REGENCY": "PIDIE",
+    "COUNT": 63
+  },
+  {
+    "PROVINCE": "ACEH",
+    "CITY_REGENCY": "PIDIE JAYA",
+    "COUNT": 22
+  },
+  {
+    "PROVINCE": "ACEH",
+    "CITY_REGENCY": "SIMEULUE",
+    "COUNT": 11
+  },
+  {
+    "PROVINCE": "BALI",
+    "CITY_REGENCY": "BADUNG",
+    "COUNT": 31
+  },
+  {
+    "PROVINCE": "BALI",
+    "CITY_REGENCY": "BANGLI",
+    "COUNT": 13
+  },
+  {
+    "PROVINCE": "BALI",
+    "CITY_REGENCY": "BULELENG",
+    "COUNT": 46
+  },
+  {
+    "PROVINCE": "BALI",
+    "CITY_REGENCY": "GIANYAR",
+    "COUNT": 32
+  },
+  {
+    "PROVINCE": "BALI",
+    "CITY_REGENCY": "JEMBRANA",
+    "COUNT": 31
+  },
+  {
+    "PROVINCE": "BALI",
+    "CITY_REGENCY": "KARANGASEM",
+    "COUNT": 25
+  },
+  {
+    "PROVINCE": "BALI",
+    "CITY_REGENCY": "KLUNGKUNG",
+    "COUNT": 13
+  },
+  {
+    "PROVINCE": "BALI",
+    "CITY_REGENCY": "KOTA DENPASAR",
+    "COUNT": 49
+  },
+  {
+    "PROVINCE": "BALI",
+    "CITY_REGENCY": "TABANAN",
+    "COUNT": 38
+  },
+  {
+    "PROVINCE": "BANTEN",
+    "CITY_REGENCY": "KOTA CILEGON",
+    "COUNT": 57
+  },
+  {
+    "PROVINCE": "BANTEN",
+    "CITY_REGENCY": "KOTA SERANG",
+    "COUNT": 103
+  },
+  {
+    "PROVINCE": "BANTEN",
+    "CITY_REGENCY": "KOTA TANGERANG",
+    "COUNT": 101
+  },
+  {
+    "PROVINCE": "BANTEN",
+    "CITY_REGENCY": "KOTA TANGERANG SELATAN",
+    "COUNT": 131
+  },
+  {
+    "PROVINCE": "BANTEN",
+    "CITY_REGENCY": "LEBAK",
+    "COUNT": 207
+  },
+  {
+    "PROVINCE": "BANTEN",
+    "CITY_REGENCY": "PANDEGLANG",
+    "COUNT": 204
+  },
+  {
+    "PROVINCE": "BANTEN",
+    "CITY_REGENCY": "SERANG",
+    "COUNT": 243
+  },
+  {
+    "PROVINCE": "BANTEN",
+    "CITY_REGENCY": "TANGERANG",
+    "COUNT": 357
+  },
+  {
+    "PROVINCE": "BENGKULU",
+    "CITY_REGENCY": "BENGKULU SELATAN",
+    "COUNT": 12
+  },
+  {
+    "PROVINCE": "BENGKULU",
+    "CITY_REGENCY": "BENGKULU TENGAH",
+    "COUNT": 8
+  },
+  {
+    "PROVINCE": "BENGKULU",
+    "CITY_REGENCY": "BENGKULU UTARA",
+    "COUNT": 40
+  },
+  {
+    "PROVINCE": "BENGKULU",
+    "CITY_REGENCY": "KAUR",
+    "COUNT": 7
+  },
+  {
+    "PROVINCE": "BENGKULU",
+    "CITY_REGENCY": "KEPAHIANG",
+    "COUNT": 8
+  },
+  {
+    "PROVINCE": "BENGKULU",
+    "CITY_REGENCY": "KOTA BENGKULU",
+    "COUNT": 48
+  },
+  {
+    "PROVINCE": "BENGKULU",
+    "CITY_REGENCY": "LEBONG",
+    "COUNT": 9
+  },
+  {
+    "PROVINCE": "BENGKULU",
+    "CITY_REGENCY": "MUKO MUKO",
+    "COUNT": 14
+  },
+  {
+    "PROVINCE": "BENGKULU",
+    "CITY_REGENCY": "REJANG LEBONG",
+    "COUNT": 14
+  },
+  {
+    "PROVINCE": "BENGKULU",
+    "CITY_REGENCY": "SELUMA",
+    "COUNT": 15
+  },
+  {
+    "PROVINCE": "DAERAH ISTIMEWA YOGYAKARTA",
+    "CITY_REGENCY": "BANTUL",
+    "COUNT": 135
+  },
+  {
+    "PROVINCE": "DAERAH ISTIMEWA YOGYAKARTA",
+    "CITY_REGENCY": "GUNUNGKIDUL",
+    "COUNT": 76
+  },
+  {
+    "PROVINCE": "DAERAH ISTIMEWA YOGYAKARTA",
+    "CITY_REGENCY": "KOTA YOGYAKARTA",
+    "COUNT": 53
+  },
+  {
+    "PROVINCE": "DAERAH ISTIMEWA YOGYAKARTA",
+    "CITY_REGENCY": "KULON PROGO",
+    "COUNT": 56
+  },
+  {
+    "PROVINCE": "DAERAH ISTIMEWA YOGYAKARTA",
+    "CITY_REGENCY": "SLEMAN",
+    "COUNT": 141
+  },
+  {
+    "PROVINCE": "DKI JAKARTA",
+    "CITY_REGENCY": "ADM. KEP. SERIBU",
+    "COUNT": 7
+  },
+  {
+    "PROVINCE": "DKI JAKARTA",
+    "CITY_REGENCY": "KOTA ADM. JAKARTA BARAT",
+    "COUNT": 79
+  },
+  {
+    "PROVINCE": "DKI JAKARTA",
+    "CITY_REGENCY": "KOTA ADM. JAKARTA PUSAT",
+    "COUNT": 52
+  },
+  {
+    "PROVINCE": "DKI JAKARTA",
+    "CITY_REGENCY": "KOTA ADM. JAKARTA SELATAN",
+    "COUNT": 152
+  },
+  {
+    "PROVINCE": "DKI JAKARTA",
+    "CITY_REGENCY": "KOTA ADM. JAKARTA TIMUR",
+    "COUNT": 269
+  },
+  {
+    "PROVINCE": "DKI JAKARTA",
+    "CITY_REGENCY": "KOTA ADM. JAKARTA UTARA",
+    "COUNT": 120
+  },
+  {
+    "PROVINCE": "GORONTALO",
+    "CITY_REGENCY": "BOALEMO",
+    "COUNT": 8
+  },
+  {
+    "PROVINCE": "GORONTALO",
+    "CITY_REGENCY": "BONE BOLANGO",
+    "COUNT": 16
+  },
+  {
+    "PROVINCE": "GORONTALO",
+    "CITY_REGENCY": "GORONTALO",
+    "COUNT": 46
+  },
+  {
+    "PROVINCE": "GORONTALO",
+    "CITY_REGENCY": "GORONTALO UTARA",
+    "COUNT": 14
+  },
+  {
+    "PROVINCE": "GORONTALO",
+    "CITY_REGENCY": "KOTA GORONTALO",
+    "COUNT": 21
+  },
+  {
+    "PROVINCE": "GORONTALO",
+    "CITY_REGENCY": "POHUWATO",
+    "COUNT": 12
+  },
+  {
+    "PROVINCE": "JAMBI",
+    "CITY_REGENCY": "BATANGHARI",
+    "COUNT": 17
+  },
+  {
+    "PROVINCE": "JAMBI",
+    "CITY_REGENCY": "BUNGO",
+    "COUNT": 13
+  },
+  {
+    "PROVINCE": "JAMBI",
+    "CITY_REGENCY": "KERINCI",
+    "COUNT": 28
+  },
+  {
+    "PROVINCE": "JAMBI",
+    "CITY_REGENCY": "KOTA JAMBI",
+    "COUNT": 53
+  },
+  {
+    "PROVINCE": "JAMBI",
+    "CITY_REGENCY": "KOTA SUNGAI PENUH",
+    "COUNT": 11
+  },
+  {
+    "PROVINCE": "JAMBI",
+    "CITY_REGENCY": "MERANGIN",
+    "COUNT": 22
+  },
+  {
+    "PROVINCE": "JAMBI",
+    "CITY_REGENCY": "MUARO JAMBI",
+    "COUNT": 24
+  },
+  {
+    "PROVINCE": "JAMBI",
+    "CITY_REGENCY": "SAROLANGUN",
+    "COUNT": 16
+  },
+  {
+    "PROVINCE": "JAMBI",
+    "CITY_REGENCY": "TANJUNG JABUNG BARAT",
+    "COUNT": 19
+  },
+  {
+    "PROVINCE": "JAMBI",
+    "CITY_REGENCY": "TANJUNG JABUNG TIMUR",
+    "COUNT": 16
+  },
+  {
+    "PROVINCE": "JAMBI",
+    "CITY_REGENCY": "TEBO",
+    "COUNT": 15
+  },
+  {
+    "PROVINCE": "JAWA BARAT",
+    "CITY_REGENCY": "BANDUNG",
+    "COUNT": 555
+  },
+  {
+    "PROVINCE": "JAWA BARAT",
+    "CITY_REGENCY": "BANDUNG BARAT",
+    "COUNT": 253
+  },
+  {
+    "PROVINCE": "JAWA BARAT",
+    "CITY_REGENCY": "BEKASI",
+    "COUNT": 367
+  },
+  {
+    "PROVINCE": "JAWA BARAT",
+    "CITY_REGENCY": "BOGOR",
+    "COUNT": 743
+  },
+  {
+    "PROVINCE": "JAWA BARAT",
+    "CITY_REGENCY": "CIAMIS",
+    "COUNT": 199
+  },
+  {
+    "PROVINCE": "JAWA BARAT",
+    "CITY_REGENCY": "CIANJUR",
+    "COUNT": 380
+  },
+  {
+    "PROVINCE": "JAWA BARAT",
+    "CITY_REGENCY": "CIREBON",
+    "COUNT": 304
+  },
+  {
+    "PROVINCE": "JAWA BARAT",
+    "CITY_REGENCY": "GARUT",
+    "COUNT": 498
+  },
+  {
+    "PROVINCE": "JAWA BARAT",
+    "CITY_REGENCY": "INDRAMAYU",
+    "COUNT": 209
+  },
+  {
+    "PROVINCE": "JAWA BARAT",
+    "CITY_REGENCY": "KARAWANG",
+    "COUNT": 319
+  },
+  {
+    "PROVINCE": "JAWA BARAT",
+    "CITY_REGENCY": "KOTA BANDUNG",
+    "COUNT": 293
+  },
+  {
+    "PROVINCE": "JAWA BARAT",
+    "CITY_REGENCY": "KOTA BANJAR",
+    "COUNT": 42
+  },
+  {
+    "PROVINCE": "JAWA BARAT",
+    "CITY_REGENCY": "KOTA BEKASI",
+    "COUNT": 281
+  },
+  {
+    "PROVINCE": "JAWA BARAT",
+    "CITY_REGENCY": "KOTA BOGOR",
+    "COUNT": 155
+  },
+  {
+    "PROVINCE": "JAWA BARAT",
+    "CITY_REGENCY": "KOTA CIMAHI",
+    "COUNT": 72
+  },
+  {
+    "PROVINCE": "JAWA BARAT",
+    "CITY_REGENCY": "KOTA CIREBON",
+    "COUNT": 51
+  },
+  {
+    "PROVINCE": "JAWA BARAT",
+    "CITY_REGENCY": "KOTA DEPOK",
+    "COUNT": 216
+  },
+  {
+    "PROVINCE": "JAWA BARAT",
+    "CITY_REGENCY": "KOTA SUKABUMI",
+    "COUNT": 55
+  },
+  {
+    "PROVINCE": "JAWA BARAT",
+    "CITY_REGENCY": "KOTA TASIKMALAYA",
+    "COUNT": 141
+  },
+  {
+    "PROVINCE": "JAWA BARAT",
+    "CITY_REGENCY": "KUNINGAN",
+    "COUNT": 183
+  },
+  {
+    "PROVINCE": "JAWA BARAT",
+    "CITY_REGENCY": "MAJALENGKA",
+    "COUNT": 170
+  },
+  {
+    "PROVINCE": "JAWA BARAT",
+    "CITY_REGENCY": "PANGANDARAN",
+    "COUNT": 58
+  },
+  {
+    "PROVINCE": "JAWA BARAT",
+    "CITY_REGENCY": "PURWAKARTA",
+    "COUNT": 174
+  },
+  {
+    "PROVINCE": "JAWA BARAT",
+    "CITY_REGENCY": "SUBANG",
+    "COUNT": 209
+  },
+  {
+    "PROVINCE": "JAWA BARAT",
+    "CITY_REGENCY": "SUKABUMI",
+    "COUNT": 402
+  },
+  {
+    "PROVINCE": "JAWA BARAT",
+    "CITY_REGENCY": "SUMEDANG",
+    "COUNT": 180
+  },
+  {
+    "PROVINCE": "JAWA BARAT",
+    "CITY_REGENCY": "TASIKMALAYA",
+    "COUNT": 326
+  },
+  {
+    "PROVINCE": "JAWA TENGAH",
+    "CITY_REGENCY": "BANJARNEGARA",
+    "COUNT": 116
+  },
+  {
+    "PROVINCE": "JAWA TENGAH",
+    "CITY_REGENCY": "BANYUMAS",
+    "COUNT": 233
+  },
+  {
+    "PROVINCE": "JAWA TENGAH",
+    "CITY_REGENCY": "BATANG",
+    "COUNT": 97
+  },
+  {
+    "PROVINCE": "JAWA TENGAH",
+    "CITY_REGENCY": "BLORA",
+    "COUNT": 103
+  },
+  {
+    "PROVINCE": "JAWA TENGAH",
+    "CITY_REGENCY": "BOYOLALI",
+    "COUNT": 138
+  },
+  {
+    "PROVINCE": "JAWA TENGAH",
+    "CITY_REGENCY": "BREBES",
+    "COUNT": 226
+  },
+  {
+    "PROVINCE": "JAWA TENGAH",
+    "CITY_REGENCY": "CILACAP",
+    "COUNT": 219
+  },
+  {
+    "PROVINCE": "JAWA TENGAH",
+    "CITY_REGENCY": "DEMAK",
+    "COUNT": 175
+  },
+  {
+    "PROVINCE": "JAWA TENGAH",
+    "CITY_REGENCY": "GROBOGAN",
+    "COUNT": 180
+  },
+  {
+    "PROVINCE": "JAWA TENGAH",
+    "CITY_REGENCY": "JEPARA",
+    "COUNT": 199
+  },
+  {
+    "PROVINCE": "JAWA TENGAH",
+    "CITY_REGENCY": "KARANGANYAR",
+    "COUNT": 107
+  },
+  {
+    "PROVINCE": "JAWA TENGAH",
+    "CITY_REGENCY": "KEBUMEN",
+    "COUNT": 190
+  },
+  {
+    "PROVINCE": "JAWA TENGAH",
+    "CITY_REGENCY": "KENDAL",
+    "COUNT": 142
+  },
+  {
+    "PROVINCE": "JAWA TENGAH",
+    "CITY_REGENCY": "KLATEN",
+    "COUNT": 158
+  },
+  {
+    "PROVINCE": "JAWA TENGAH",
+    "CITY_REGENCY": "KOTA MAGELANG",
+    "COUNT": 19
+  },
+  {
+    "PROVINCE": "JAWA TENGAH",
+    "CITY_REGENCY": "KOTA PEKALONGAN",
+    "COUNT": 41
+  },
+  {
+    "PROVINCE": "JAWA TENGAH",
+    "CITY_REGENCY": "KOTA SALATIGA",
+    "COUNT": 32
+  },
+  {
+    "PROVINCE": "JAWA TENGAH",
+    "CITY_REGENCY": "KOTA SEMARANG",
+    "COUNT": 195
+  },
+  {
+    "PROVINCE": "JAWA TENGAH",
+    "CITY_REGENCY": "KOTA SURAKARTA",
+    "COUNT": 83
+  },
+  {
+    "PROVINCE": "JAWA TENGAH",
+    "CITY_REGENCY": "KOTA TEGAL",
+    "COUNT": 34
+  },
+  {
+    "PROVINCE": "JAWA TENGAH",
+    "CITY_REGENCY": "KUDUS",
+    "COUNT": 124
+  },
+  {
+    "PROVINCE": "JAWA TENGAH",
+    "CITY_REGENCY": "MAGELANG",
+    "COUNT": 161
+  },
+  {
+    "PROVINCE": "JAWA TENGAH",
+    "CITY_REGENCY": "PATI",
+    "COUNT": 191
+  },
+  {
+    "PROVINCE": "JAWA TENGAH",
+    "CITY_REGENCY": "PEKALONGAN",
+    "COUNT": 115
+  },
+  {
+    "PROVINCE": "JAWA TENGAH",
+    "CITY_REGENCY": "PEMALANG",
+    "COUNT": 163
+  },
+  {
+    "PROVINCE": "JAWA TENGAH",
+    "CITY_REGENCY": "PURBALINGGA",
+    "COUNT": 125
+  },
+  {
+    "PROVINCE": "JAWA TENGAH",
+    "CITY_REGENCY": "PURWOREJO",
+    "COUNT": 82
+  },
+  {
+    "PROVINCE": "JAWA TENGAH",
+    "CITY_REGENCY": "REMBANG",
+    "COUNT": 90
+  },
+  {
+    "PROVINCE": "JAWA TENGAH",
+    "CITY_REGENCY": "SEMARANG",
+    "COUNT": 141
+  },
+  {
+    "PROVINCE": "JAWA TENGAH",
+    "CITY_REGENCY": "SRAGEN",
+    "COUNT": 132
+  },
+  {
+    "PROVINCE": "JAWA TENGAH",
+    "CITY_REGENCY": "SUKOHARJO",
+    "COUNT": 115
+  },
+  {
+    "PROVINCE": "JAWA TENGAH",
+    "CITY_REGENCY": "TEGAL",
+    "COUNT": 191
+  },
+  {
+    "PROVINCE": "JAWA TENGAH",
+    "CITY_REGENCY": "TEMANGGUNG",
+    "COUNT": 97
+  },
+  {
+    "PROVINCE": "JAWA TENGAH",
+    "CITY_REGENCY": "WONOGIRI",
+    "COUNT": 96
+  },
+  {
+    "PROVINCE": "JAWA TENGAH",
+    "CITY_REGENCY": "WONOSOBO",
+    "COUNT": 124
+  },
+  {
+    "PROVINCE": "JAWA TIMUR",
+    "CITY_REGENCY": "BANGKALAN",
+    "COUNT": 145
+  },
+  {
+    "PROVINCE": "JAWA TIMUR",
+    "CITY_REGENCY": "BANYUWANGI",
+    "COUNT": 160
+  },
+  {
+    "PROVINCE": "JAWA TIMUR",
+    "CITY_REGENCY": "BLITAR",
+    "COUNT": 138
+  },
+  {
+    "PROVINCE": "JAWA TIMUR",
+    "CITY_REGENCY": "BOJONEGORO",
+    "COUNT": 147
+  },
+  {
+    "PROVINCE": "JAWA TIMUR",
+    "CITY_REGENCY": "BONDOWOSO",
+    "COUNT": 84
+  },
+  {
+    "PROVINCE": "JAWA TIMUR",
+    "CITY_REGENCY": "GRESIK",
+    "COUNT": 161
+  },
+  {
+    "PROVINCE": "JAWA TIMUR",
+    "CITY_REGENCY": "JEMBER",
+    "COUNT": 255
+  },
+  {
+    "PROVINCE": "JAWA TIMUR",
+    "CITY_REGENCY": "JOMBANG",
+    "COUNT": 175
+  },
+  {
+    "PROVINCE": "JAWA TIMUR",
+    "CITY_REGENCY": "KEDIRI",
+    "COUNT": 198
+  },
+  {
+    "PROVINCE": "JAWA TIMUR",
+    "CITY_REGENCY": "KOTA BATU",
+    "COUNT": 29
+  },
+  {
+    "PROVINCE": "JAWA TIMUR",
+    "CITY_REGENCY": "KOTA BLITAR",
+    "COUNT": 34
+  },
+  {
+    "PROVINCE": "JAWA TIMUR",
+    "CITY_REGENCY": "KOTA KEDIRI",
+    "COUNT": 63
+  },
+  {
+    "PROVINCE": "JAWA TIMUR",
+    "CITY_REGENCY": "KOTA MADIUN",
+    "COUNT": 30
+  },
+  {
+    "PROVINCE": "JAWA TIMUR",
+    "CITY_REGENCY": "KOTA MALANG",
+    "COUNT": 88
+  },
+  {
+    "PROVINCE": "JAWA TIMUR",
+    "CITY_REGENCY": "KOTA MOJOKERTO",
+    "COUNT": 18
+  },
+  {
+    "PROVINCE": "JAWA TIMUR",
+    "CITY_REGENCY": "KOTA PASURUAN",
+    "COUNT": 25
+  },
+  {
+    "PROVINCE": "JAWA TIMUR",
+    "CITY_REGENCY": "KOTA PROBOLINGGO",
+    "COUNT": 37
+  },
+  {
+    "PROVINCE": "JAWA TIMUR",
+    "CITY_REGENCY": "KOTA SURABAYA",
+    "COUNT": 148
+  },
+  {
+    "PROVINCE": "JAWA TIMUR",
+    "CITY_REGENCY": "LAMONGAN",
+    "COUNT": 178
+  },
+  {
+    "PROVINCE": "JAWA TIMUR",
+    "CITY_REGENCY": "LUMAJANG",
+    "COUNT": 96
+  },
+  {
+    "PROVINCE": "JAWA TIMUR",
+    "CITY_REGENCY": "MADIUN",
+    "COUNT": 59
+  },
+  {
+    "PROVINCE": "JAWA TIMUR",
+    "CITY_REGENCY": "MAGETAN",
+    "COUNT": 70
+  },
+  {
+    "PROVINCE": "JAWA TIMUR",
+    "CITY_REGENCY": "MALANG",
+    "COUNT": 258
+  },
+  {
+    "PROVINCE": "JAWA TIMUR",
+    "CITY_REGENCY": "MOJOKERTO",
+    "COUNT": 129
+  },
+  {
+    "PROVINCE": "JAWA TIMUR",
+    "CITY_REGENCY": "NGANJUK",
+    "COUNT": 132
+  },
+  {
+    "PROVINCE": "JAWA TIMUR",
+    "CITY_REGENCY": "NGAWI",
+    "COUNT": 87
+  },
+  {
+    "PROVINCE": "JAWA TIMUR",
+    "CITY_REGENCY": "PACITAN",
+    "COUNT": 49
+  },
+  {
+    "PROVINCE": "JAWA TIMUR",
+    "CITY_REGENCY": "PAMEKASAN",
+    "COUNT": 133
+  },
+  {
+    "PROVINCE": "JAWA TIMUR",
+    "CITY_REGENCY": "PASURUAN",
+    "COUNT": 130
+  },
+  {
+    "PROVINCE": "JAWA TIMUR",
+    "CITY_REGENCY": "PONOROGO",
+    "COUNT": 85
+  },
+  {
+    "PROVINCE": "JAWA TIMUR",
+    "CITY_REGENCY": "PROBOLINGGO",
+    "COUNT": 125
+  },
+  {
+    "PROVINCE": "JAWA TIMUR",
+    "CITY_REGENCY": "SAMPANG",
+    "COUNT": 165
+  },
+  {
+    "PROVINCE": "JAWA TIMUR",
+    "CITY_REGENCY": "SIDOARJO",
+    "COUNT": 174
+  },
+  {
+    "PROVINCE": "JAWA TIMUR",
+    "CITY_REGENCY": "SITUBONDO",
+    "COUNT": 49
+  },
+  {
+    "PROVINCE": "JAWA TIMUR",
+    "CITY_REGENCY": "SUMENEP",
+    "COUNT": 114
+  },
+  {
+    "PROVINCE": "JAWA TIMUR",
+    "CITY_REGENCY": "TRENGGALEK",
+    "COUNT": 78
+  },
+  {
+    "PROVINCE": "JAWA TIMUR",
+    "CITY_REGENCY": "TUBAN",
+    "COUNT": 160
+  },
+  {
+    "PROVINCE": "JAWA TIMUR",
+    "CITY_REGENCY": "TULUNGAGUNG",
+    "COUNT": 134
+  },
+  {
+    "PROVINCE": "KALIMANTAN BARAT",
+    "CITY_REGENCY": "BENGKAYANG",
+    "COUNT": 29
+  },
+  {
+    "PROVINCE": "KALIMANTAN BARAT",
+    "CITY_REGENCY": "KAPUAS HULU",
+    "COUNT": 23
+  },
+  {
+    "PROVINCE": "KALIMANTAN BARAT",
+    "CITY_REGENCY": "KAYONG UTARA",
+    "COUNT": 25
+  },
+  {
+    "PROVINCE": "KALIMANTAN BARAT",
+    "CITY_REGENCY": "KETAPANG",
+    "COUNT": 55
+  },
+  {
+    "PROVINCE": "KALIMANTAN BARAT",
+    "CITY_REGENCY": "KOTA PONTIANAK",
+    "COUNT": 84
+  },
+  {
+    "PROVINCE": "KALIMANTAN BARAT",
+    "CITY_REGENCY": "KOTA SINGKAWANG",
+    "COUNT": 32
+  },
+  {
+    "PROVINCE": "KALIMANTAN BARAT",
+    "CITY_REGENCY": "KUBU RAYA",
+    "COUNT": 73
+  },
+  {
+    "PROVINCE": "KALIMANTAN BARAT",
+    "CITY_REGENCY": "LANDAK",
+    "COUNT": 51
+  },
+  {
+    "PROVINCE": "KALIMANTAN BARAT",
+    "CITY_REGENCY": "MELAWI",
+    "COUNT": 26
+  },
+  {
+    "PROVINCE": "KALIMANTAN BARAT",
+    "CITY_REGENCY": "MEMPAWAH",
+    "COUNT": 38
+  },
+  {
+    "PROVINCE": "KALIMANTAN BARAT",
+    "CITY_REGENCY": "SAMBAS",
+    "COUNT": 60
+  },
+  {
+    "PROVINCE": "KALIMANTAN BARAT",
+    "CITY_REGENCY": "SANGGAU",
+    "COUNT": 34
+  },
+  {
+    "PROVINCE": "KALIMANTAN BARAT",
+    "CITY_REGENCY": "SEKADAU",
+    "COUNT": 15
+  },
+  {
+    "PROVINCE": "KALIMANTAN BARAT",
+    "CITY_REGENCY": "SINTANG",
+    "COUNT": 21
+  },
+  {
+    "PROVINCE": "KALIMANTAN SELATAN",
+    "CITY_REGENCY": "BALANGAN",
+    "COUNT": 11
+  },
+  {
+    "PROVINCE": "KALIMANTAN SELATAN",
+    "CITY_REGENCY": "BANJAR",
+    "COUNT": 37
+  },
+  {
+    "PROVINCE": "KALIMANTAN SELATAN",
+    "CITY_REGENCY": "BARITO KUALA",
+    "COUNT": 15
+  },
+  {
+    "PROVINCE": "KALIMANTAN SELATAN",
+    "CITY_REGENCY": "HULU SUNGAI SELATAN",
+    "COUNT": 24
+  },
+  {
+    "PROVINCE": "KALIMANTAN SELATAN",
+    "CITY_REGENCY": "HULU SUNGAI TENGAH",
+    "COUNT": 17
+  },
+  {
+    "PROVINCE": "KALIMANTAN SELATAN",
+    "CITY_REGENCY": "HULU SUNGAI UTARA",
+    "COUNT": 20
+  },
+  {
+    "PROVINCE": "KALIMANTAN SELATAN",
+    "CITY_REGENCY": "KOTA BANJARBARU",
+    "COUNT": 33
+  },
+  {
+    "PROVINCE": "KALIMANTAN SELATAN",
+    "CITY_REGENCY": "KOTA BANJARMASIN",
+    "COUNT": 61
+  },
+  {
+    "PROVINCE": "KALIMANTAN SELATAN",
+    "CITY_REGENCY": "KOTABARU",
+    "COUNT": 7
+  },
+  {
+    "PROVINCE": "KALIMANTAN SELATAN",
+    "CITY_REGENCY": "TABALONG",
+    "COUNT": 20
+  },
+  {
+    "PROVINCE": "KALIMANTAN SELATAN",
+    "CITY_REGENCY": "TANAH BUMBU",
+    "COUNT": 28
+  },
+  {
+    "PROVINCE": "KALIMANTAN SELATAN",
+    "CITY_REGENCY": "TANAH LAUT",
+    "COUNT": 22
+  },
+  {
+    "PROVINCE": "KALIMANTAN SELATAN",
+    "CITY_REGENCY": "TAPIN",
+    "COUNT": 18
+  },
+  {
+    "PROVINCE": "KALIMANTAN TENGAH",
+    "CITY_REGENCY": "BARITO SELATAN",
+    "COUNT": 10
+  },
+  {
+    "PROVINCE": "KALIMANTAN TENGAH",
+    "CITY_REGENCY": "BARITO TIMUR",
+    "COUNT": 5
+  },
+  {
+    "PROVINCE": "KALIMANTAN TENGAH",
+    "CITY_REGENCY": "BARITO UTARA",
+    "COUNT": 6
+  },
+  {
+    "PROVINCE": "KALIMANTAN TENGAH",
+    "CITY_REGENCY": "GUNUNG MAS",
+    "COUNT": 14
+  },
+  {
+    "PROVINCE": "KALIMANTAN TENGAH",
+    "CITY_REGENCY": "KAPUAS",
+    "COUNT": 13
+  },
+  {
+    "PROVINCE": "KALIMANTAN TENGAH",
+    "CITY_REGENCY": "KATINGAN",
+    "COUNT": 8
+  },
+  {
+    "PROVINCE": "KALIMANTAN TENGAH",
+    "CITY_REGENCY": "KOTA PALANGKA RAYA",
+    "COUNT": 31
+  },
+  {
+    "PROVINCE": "KALIMANTAN TENGAH",
+    "CITY_REGENCY": "KOTAWARINGIN BARAT",
+    "COUNT": 15
+  },
+  {
+    "PROVINCE": "KALIMANTAN TENGAH",
+    "CITY_REGENCY": "KOTAWARINGIN TIMUR",
+    "COUNT": 8
+  },
+  {
+    "PROVINCE": "KALIMANTAN TENGAH",
+    "CITY_REGENCY": "LAMANDAU",
+    "COUNT": 3
+  },
+  {
+    "PROVINCE": "KALIMANTAN TENGAH",
+    "CITY_REGENCY": "MURUNG RAYA",
+    "COUNT": 13
+  },
+  {
+    "PROVINCE": "KALIMANTAN TENGAH",
+    "CITY_REGENCY": "PULANG PISAU",
+    "COUNT": 4
+  },
+  {
+    "PROVINCE": "KALIMANTAN TENGAH",
+    "CITY_REGENCY": "SERUYAN",
+    "COUNT": 5
+  },
+  {
+    "PROVINCE": "KALIMANTAN TENGAH",
+    "CITY_REGENCY": "SUKAMARA",
+    "COUNT": 1
+  },
+  {
+    "PROVINCE": "KALIMANTAN TIMUR",
+    "CITY_REGENCY": "BERAU",
+    "COUNT": 17
+  },
+  {
+    "PROVINCE": "KALIMANTAN TIMUR",
+    "CITY_REGENCY": "KOTA BALIKPAPAN",
+    "COUNT": 46
+  },
+  {
+    "PROVINCE": "KALIMANTAN TIMUR",
+    "CITY_REGENCY": "KOTA BONTANG",
+    "COUNT": 26
+  },
+  {
+    "PROVINCE": "KALIMANTAN TIMUR",
+    "CITY_REGENCY": "KOTA SAMARINDA",
+    "COUNT": 60
+  },
+  {
+    "PROVINCE": "KALIMANTAN TIMUR",
+    "CITY_REGENCY": "KUTAI BARAT",
+    "COUNT": 34
+  },
+  {
+    "PROVINCE": "KALIMANTAN TIMUR",
+    "CITY_REGENCY": "KUTAI KARTANEGARA",
+    "COUNT": 65
+  },
+  {
+    "PROVINCE": "KALIMANTAN TIMUR",
+    "CITY_REGENCY": "KUTAI TIMUR",
+    "COUNT": 40
+  },
+  {
+    "PROVINCE": "KALIMANTAN TIMUR",
+    "CITY_REGENCY": "MAHAKAM ULU",
+    "COUNT": 1
+  },
+  {
+    "PROVINCE": "KALIMANTAN TIMUR",
+    "CITY_REGENCY": "PASER",
+    "COUNT": 17
+  },
+  {
+    "PROVINCE": "KALIMANTAN TIMUR",
+    "CITY_REGENCY": "PENAJAM PASER UTARA",
+    "COUNT": 20
+  },
+  {
+    "PROVINCE": "KALIMANTAN UTARA",
+    "CITY_REGENCY": "BULUNGAN",
+    "COUNT": 16
+  },
+  {
+    "PROVINCE": "KALIMANTAN UTARA",
+    "CITY_REGENCY": "KOTA TARAKAN",
+    "COUNT": 24
+  },
+  {
+    "PROVINCE": "KALIMANTAN UTARA",
+    "CITY_REGENCY": "MALINAU",
+    "COUNT": 4
+  },
+  {
+    "PROVINCE": "KALIMANTAN UTARA",
+    "CITY_REGENCY": "NUNUKAN",
+    "COUNT": 23
+  },
+  {
+    "PROVINCE": "KALIMANTAN UTARA",
+    "CITY_REGENCY": "TANA TIDUNG",
+    "COUNT": 1
+  },
+  {
+    "PROVINCE": "KEPULAUAN BANGKA BELITUNG",
+    "CITY_REGENCY": "BANGKA",
+    "COUNT": 19
+  },
+  {
+    "PROVINCE": "KEPULAUAN BANGKA BELITUNG",
+    "CITY_REGENCY": "BANGKA BARAT",
+    "COUNT": 16
+  },
+  {
+    "PROVINCE": "KEPULAUAN BANGKA BELITUNG",
+    "CITY_REGENCY": "BANGKA SELATAN",
+    "COUNT": 11
+  },
+  {
+    "PROVINCE": "KEPULAUAN BANGKA BELITUNG",
+    "CITY_REGENCY": "BANGKA TENGAH",
+    "COUNT": 15
+  },
+  {
+    "PROVINCE": "KEPULAUAN BANGKA BELITUNG",
+    "CITY_REGENCY": "BELITUNG",
+    "COUNT": 15
+  },
+  {
+    "PROVINCE": "KEPULAUAN BANGKA BELITUNG",
+    "CITY_REGENCY": "BELITUNG TIMUR",
+    "COUNT": 11
+  },
+  {
+    "PROVINCE": "KEPULAUAN BANGKA BELITUNG",
+    "CITY_REGENCY": "KOTA PANGKAL PINANG",
+    "COUNT": 20
+  },
+  {
+    "PROVINCE": "KEPULAUAN RIAU",
+    "CITY_REGENCY": "BINTAN",
+    "COUNT": 19
+  },
+  {
+    "PROVINCE": "KEPULAUAN RIAU",
+    "CITY_REGENCY": "KARIMUN",
+    "COUNT": 33
+  },
+  {
+    "PROVINCE": "KEPULAUAN RIAU",
+    "CITY_REGENCY": "KEPULAUAN ANAMBAS",
+    "COUNT": 12
+  },
+  {
+    "PROVINCE": "KEPULAUAN RIAU",
+    "CITY_REGENCY": "KOTA BATAM",
+    "COUNT": 148
+  },
+  {
+    "PROVINCE": "KEPULAUAN RIAU",
+    "CITY_REGENCY": "KOTA TANJUNG PINANG",
+    "COUNT": 25
+  },
+  {
+    "PROVINCE": "KEPULAUAN RIAU",
+    "CITY_REGENCY": "LINGGA",
+    "COUNT": 8
+  },
+  {
+    "PROVINCE": "KEPULAUAN RIAU",
+    "CITY_REGENCY": "NATUNA",
+    "COUNT": 21
+  },
+  {
+    "PROVINCE": "LAMPUNG",
+    "CITY_REGENCY": "KOTA BANDAR LAMPUNG",
+    "COUNT": 151
+  },
+  {
+    "PROVINCE": "LAMPUNG",
+    "CITY_REGENCY": "KOTA METRO",
+    "COUNT": 37
+  },
+  {
+    "PROVINCE": "LAMPUNG",
+    "CITY_REGENCY": "LAMPUNG BARAT",
+    "COUNT": 34
+  },
+  {
+    "PROVINCE": "LAMPUNG",
+    "CITY_REGENCY": "LAMPUNG SELATAN",
+    "COUNT": 161
+  },
+  {
+    "PROVINCE": "LAMPUNG",
+    "CITY_REGENCY": "LAMPUNG TENGAH",
+    "COUNT": 177
+  },
+  {
+    "PROVINCE": "LAMPUNG",
+    "CITY_REGENCY": "LAMPUNG TIMUR",
+    "COUNT": 157
+  },
+  {
+    "PROVINCE": "LAMPUNG",
+    "CITY_REGENCY": "LAMPUNG UTARA",
+    "COUNT": 83
+  },
+  {
+    "PROVINCE": "LAMPUNG",
+    "CITY_REGENCY": "MESUJI",
+    "COUNT": 35
+  },
+  {
+    "PROVINCE": "LAMPUNG",
+    "CITY_REGENCY": "PESAWARAN",
+    "COUNT": 67
+  },
+  {
+    "PROVINCE": "LAMPUNG",
+    "CITY_REGENCY": "PESISIR BARAT",
+    "COUNT": 19
+  },
+  {
+    "PROVINCE": "LAMPUNG",
+    "CITY_REGENCY": "PRINGSEWU",
+    "COUNT": 65
+  },
+  {
+    "PROVINCE": "LAMPUNG",
+    "CITY_REGENCY": "TANGGAMUS",
+    "COUNT": 73
+  },
+  {
+    "PROVINCE": "LAMPUNG",
+    "CITY_REGENCY": "TULANG BAWANG",
+    "COUNT": 56
+  },
+  {
+    "PROVINCE": "LAMPUNG",
+    "CITY_REGENCY": "TULANG BAWANG BARAT",
+    "COUNT": 45
+  },
+  {
+    "PROVINCE": "LAMPUNG",
+    "CITY_REGENCY": "WAY KANAN",
+    "COUNT": 55
+  },
+  {
+    "PROVINCE": "MALUKU",
+    "CITY_REGENCY": "BURU",
+    "COUNT": 10
+  },
+  {
+    "PROVINCE": "MALUKU",
+    "CITY_REGENCY": "BURU SELATAN",
+    "COUNT": 3
+  },
+  {
+    "PROVINCE": "MALUKU",
+    "CITY_REGENCY": "KEPULAUAN ARU",
+    "COUNT": 10
+  },
+  {
+    "PROVINCE": "MALUKU",
+    "CITY_REGENCY": "KEPULAUAN TANIMBAR",
+    "COUNT": 2
+  },
+  {
+    "PROVINCE": "MALUKU",
+    "CITY_REGENCY": "KOTA AMBON",
+    "COUNT": 33
+  },
+  {
+    "PROVINCE": "MALUKU",
+    "CITY_REGENCY": "KOTA TUAL",
+    "COUNT": 6
+  },
+  {
+    "PROVINCE": "MALUKU",
+    "CITY_REGENCY": "MALUKU BARAT DAYA",
+    "COUNT": 3
+  },
+  {
+    "PROVINCE": "MALUKU",
+    "CITY_REGENCY": "MALUKU TENGAH",
+    "COUNT": 28
+  },
+  {
+    "PROVINCE": "MALUKU",
+    "CITY_REGENCY": "MALUKU TENGGARA",
+    "COUNT": 4
+  },
+  {
+    "PROVINCE": "MALUKU",
+    "CITY_REGENCY": "SERAM BAGIAN BARAT",
+    "COUNT": 18
+  },
+  {
+    "PROVINCE": "MALUKU",
+    "CITY_REGENCY": "SERAM BAGIAN TIMUR",
+    "COUNT": 7
+  },
+  {
+    "PROVINCE": "MALUKU UTARA",
+    "CITY_REGENCY": "HALMAHERA BARAT",
+    "COUNT": 12
+  },
+  {
+    "PROVINCE": "MALUKU UTARA",
+    "CITY_REGENCY": "HALMAHERA SELATAN",
+    "COUNT": 20
+  },
+  {
+    "PROVINCE": "MALUKU UTARA",
+    "CITY_REGENCY": "HALMAHERA TENGAH",
+    "COUNT": 1
+  },
+  {
+    "PROVINCE": "MALUKU UTARA",
+    "CITY_REGENCY": "HALMAHERA TIMUR",
+    "COUNT": 7
+  },
+  {
+    "PROVINCE": "MALUKU UTARA",
+    "CITY_REGENCY": "HALMAHERA UTARA",
+    "COUNT": 26
+  },
+  {
+    "PROVINCE": "MALUKU UTARA",
+    "CITY_REGENCY": "KEPULAUAN SULA",
+    "COUNT": 12
+  },
+  {
+    "PROVINCE": "MALUKU UTARA",
+    "CITY_REGENCY": "KOTA TERNATE",
+    "COUNT": 25
+  },
+  {
+    "PROVINCE": "MALUKU UTARA",
+    "CITY_REGENCY": "KOTA TIDORE KEPULAUAN",
+    "COUNT": 10
+  },
+  {
+    "PROVINCE": "MALUKU UTARA",
+    "CITY_REGENCY": "PULAU MOROTAI",
+    "COUNT": 4
+  },
+  {
+    "PROVINCE": "MALUKU UTARA",
+    "CITY_REGENCY": "PULAU TALIABU",
+    "COUNT": 8
+  },
+  {
+    "PROVINCE": "NUSA TENGGARA BARAT",
+    "CITY_REGENCY": "BIMA",
+    "COUNT": 83
+  },
+  {
+    "PROVINCE": "NUSA TENGGARA BARAT",
+    "CITY_REGENCY": "DOMPU",
+    "COUNT": 21
+  },
+  {
+    "PROVINCE": "NUSA TENGGARA BARAT",
+    "CITY_REGENCY": "KOTA BIMA",
+    "COUNT": 26
+  },
+  {
+    "PROVINCE": "NUSA TENGGARA BARAT",
+    "CITY_REGENCY": "KOTA MATARAM",
+    "COUNT": 68
+  },
+  {
+    "PROVINCE": "NUSA TENGGARA BARAT",
+    "CITY_REGENCY": "LOMBOK BARAT",
+    "COUNT": 134
+  },
+  {
+    "PROVINCE": "NUSA TENGGARA BARAT",
+    "CITY_REGENCY": "LOMBOK TENGAH",
+    "COUNT": 192
+  },
+  {
+    "PROVINCE": "NUSA TENGGARA BARAT",
+    "CITY_REGENCY": "LOMBOK TIMUR",
+    "COUNT": 264
+  },
+  {
+    "PROVINCE": "NUSA TENGGARA BARAT",
+    "CITY_REGENCY": "LOMBOK UTARA",
+    "COUNT": 41
+  },
+  {
+    "PROVINCE": "NUSA TENGGARA BARAT",
+    "CITY_REGENCY": "SUMBAWA",
+    "COUNT": 28
+  },
+  {
+    "PROVINCE": "NUSA TENGGARA BARAT",
+    "CITY_REGENCY": "SUMBAWA BARAT",
+    "COUNT": 15
+  },
+  {
+    "PROVINCE": "NUSA TENGGARA TIMUR",
+    "CITY_REGENCY": "ALOR",
+    "COUNT": 10
+  },
+  {
+    "PROVINCE": "NUSA TENGGARA TIMUR",
+    "CITY_REGENCY": "BELU",
+    "COUNT": 10
+  },
+  {
+    "PROVINCE": "NUSA TENGGARA TIMUR",
+    "CITY_REGENCY": "ENDE",
+    "COUNT": 31
+  },
+  {
+    "PROVINCE": "NUSA TENGGARA TIMUR",
+    "CITY_REGENCY": "FLORES TIMUR",
+    "COUNT": 10
+  },
+  {
+    "PROVINCE": "NUSA TENGGARA TIMUR",
+    "CITY_REGENCY": "KAB TIMOR TENGAH SELATAN",
+    "COUNT": 15
+  },
+  {
+    "PROVINCE": "NUSA TENGGARA TIMUR",
+    "CITY_REGENCY": "KOTA KUPANG",
+    "COUNT": 43
+  },
+  {
+    "PROVINCE": "NUSA TENGGARA TIMUR",
+    "CITY_REGENCY": "KUPANG",
+    "COUNT": 28
+  },
+  {
+    "PROVINCE": "NUSA TENGGARA TIMUR",
+    "CITY_REGENCY": "LEMBATA",
+    "COUNT": 11
+  },
+  {
+    "PROVINCE": "NUSA TENGGARA TIMUR",
+    "CITY_REGENCY": "MALAKA",
+    "COUNT": 13
+  },
+  {
+    "PROVINCE": "NUSA TENGGARA TIMUR",
+    "CITY_REGENCY": "MANGGARAI",
+    "COUNT": 41
+  },
+  {
+    "PROVINCE": "NUSA TENGGARA TIMUR",
+    "CITY_REGENCY": "MANGGARAI BARAT",
+    "COUNT": 19
+  },
+  {
+    "PROVINCE": "NUSA TENGGARA TIMUR",
+    "CITY_REGENCY": "MANGGARAI TIMUR",
+    "COUNT": 10
+  },
+  {
+    "PROVINCE": "NUSA TENGGARA TIMUR",
+    "CITY_REGENCY": "NAGEKEO",
+    "COUNT": 14
+  },
+  {
+    "PROVINCE": "NUSA TENGGARA TIMUR",
+    "CITY_REGENCY": "NGADA",
+    "COUNT": 16
+  },
+  {
+    "PROVINCE": "NUSA TENGGARA TIMUR",
+    "CITY_REGENCY": "ROTE NDAO",
+    "COUNT": 8
+  },
+  {
+    "PROVINCE": "NUSA TENGGARA TIMUR",
+    "CITY_REGENCY": "SABU RAIJUA",
+    "COUNT": 2
+  },
+  {
+    "PROVINCE": "NUSA TENGGARA TIMUR",
+    "CITY_REGENCY": "SIKKA",
+    "COUNT": 23
+  },
+  {
+    "PROVINCE": "NUSA TENGGARA TIMUR",
+    "CITY_REGENCY": "SUMBA BARAT",
+    "COUNT": 5
+  },
+  {
+    "PROVINCE": "NUSA TENGGARA TIMUR",
+    "CITY_REGENCY": "SUMBA BARAT DAYA",
+    "COUNT": 10
+  },
+  {
+    "PROVINCE": "NUSA TENGGARA TIMUR",
+    "CITY_REGENCY": "SUMBA TENGAH",
+    "COUNT": 1
+  },
+  {
+    "PROVINCE": "NUSA TENGGARA TIMUR",
+    "CITY_REGENCY": "SUMBA TIMUR",
+    "COUNT": 5
+  },
+  {
+    "PROVINCE": "NUSA TENGGARA TIMUR",
+    "CITY_REGENCY": "TIMOR TENGAH UTARA",
+    "COUNT": 14
+  },
+  {
+    "PROVINCE": "P A P U A",
+    "CITY_REGENCY": "BIAK NUMFOR",
+    "COUNT": 9
+  },
+  {
+    "PROVINCE": "P A P U A",
+    "CITY_REGENCY": "JAYAPURA",
+    "COUNT": 25
+  },
+  {
+    "PROVINCE": "P A P U A",
+    "CITY_REGENCY": "KEEROM",
+    "COUNT": 6
+  },
+  {
+    "PROVINCE": "P A P U A",
+    "CITY_REGENCY": "KEPULAUAN YAPEN",
+    "COUNT": 9
+  },
+  {
+    "PROVINCE": "P A P U A",
+    "CITY_REGENCY": "KOTA JAYAPURA",
+    "COUNT": 30
+  },
+  {
+    "PROVINCE": "P A P U A",
+    "CITY_REGENCY": "SARMI",
+    "COUNT": 10
+  },
+  {
+    "PROVINCE": "P A P U A",
+    "CITY_REGENCY": "SUPIORI",
+    "COUNT": 1
+  },
+  {
+    "PROVINCE": "P A P U A",
+    "CITY_REGENCY": "WAROPEN",
+    "COUNT": 2
+  },
+  {
+    "PROVINCE": "PAPUA BARAT",
+    "CITY_REGENCY": "FAK FAK",
+    "COUNT": 12
+  },
+  {
+    "PROVINCE": "PAPUA BARAT",
+    "CITY_REGENCY": "KAIMANA",
+    "COUNT": 8
+  },
+  {
+    "PROVINCE": "PAPUA BARAT",
+    "CITY_REGENCY": "MANOKWARI",
+    "COUNT": 26
+  },
+  {
+    "PROVINCE": "PAPUA BARAT",
+    "CITY_REGENCY": "MANOKWARI SELATAN",
+    "COUNT": 8
+  },
+  {
+    "PROVINCE": "PAPUA BARAT",
+    "CITY_REGENCY": "PEGUNUNGAN ARFAK",
+    "COUNT": 1
+  },
+  {
+    "PROVINCE": "PAPUA BARAT",
+    "CITY_REGENCY": "TELUK BINTUNI",
+    "COUNT": 6
+  },
+  {
+    "PROVINCE": "PAPUA BARAT",
+    "CITY_REGENCY": "TELUK WONDAMA",
+    "COUNT": 4
+  },
+  {
+    "PROVINCE": "PAPUA BARAT DAYA",
+    "CITY_REGENCY": "KOTA SORONG",
+    "COUNT": 17
+  },
+  {
+    "PROVINCE": "PAPUA BARAT DAYA",
+    "CITY_REGENCY": "RAJA AMPAT",
+    "COUNT": 17
+  },
+  {
+    "PROVINCE": "PAPUA BARAT DAYA",
+    "CITY_REGENCY": "SORONG",
+    "COUNT": 10
+  },
+  {
+    "PROVINCE": "PAPUA BARAT DAYA",
+    "CITY_REGENCY": "SORONG SELATAN",
+    "COUNT": 3
+  },
+  {
+    "PROVINCE": "PAPUA BARAT DAYA",
+    "CITY_REGENCY": "TAMBRAUW",
+    "COUNT": 1
+  },
+  {
+    "PROVINCE": "PAPUA PEGUNUNGAN",
+    "CITY_REGENCY": "JAYAWIJAYA",
+    "COUNT": 6
+  },
+  {
+    "PROVINCE": "PAPUA PEGUNUNGAN",
+    "CITY_REGENCY": "LANNY JAYA",
+    "COUNT": 6
+  },
+  {
+    "PROVINCE": "PAPUA PEGUNUNGAN",
+    "CITY_REGENCY": "YAHUKIMO",
+    "COUNT": 2
+  },
+  {
+    "PROVINCE": "PAPUA SELATAN",
+    "CITY_REGENCY": "ASMAT",
+    "COUNT": 4
+  },
+  {
+    "PROVINCE": "PAPUA SELATAN",
+    "CITY_REGENCY": "BOVEN DIGOEL",
+    "COUNT": 1
+  },
+  {
+    "PROVINCE": "PAPUA SELATAN",
+    "CITY_REGENCY": "MAPPI",
+    "COUNT": 1
+  },
+  {
+    "PROVINCE": "PAPUA SELATAN",
+    "CITY_REGENCY": "MERAUKE",
+    "COUNT": 14
+  },
+  {
+    "PROVINCE": "PAPUA TENGAH",
+    "CITY_REGENCY": "DEIYAI",
+    "COUNT": 1
+  },
+  {
+    "PROVINCE": "PAPUA TENGAH",
+    "CITY_REGENCY": "MIMIKA",
+    "COUNT": 21
+  },
+  {
+    "PROVINCE": "PAPUA TENGAH",
+    "CITY_REGENCY": "NABIRE",
+    "COUNT": 14
+  },
+  {
+    "PROVINCE": "RIAU",
+    "CITY_REGENCY": "BENGKALIS",
+    "COUNT": 98
+  },
+  {
+    "PROVINCE": "RIAU",
+    "CITY_REGENCY": "INDRAGIRI HILIR",
+    "COUNT": 47
+  },
+  {
+    "PROVINCE": "RIAU",
+    "CITY_REGENCY": "INDRAGIRI HULU",
+    "COUNT": 32
+  },
+  {
+    "PROVINCE": "RIAU",
+    "CITY_REGENCY": "KAMPAR",
+    "COUNT": 126
+  },
+  {
+    "PROVINCE": "RIAU",
+    "CITY_REGENCY": "KEPULAUAN MERANTI",
+    "COUNT": 31
+  },
+  {
+    "PROVINCE": "RIAU",
+    "CITY_REGENCY": "KOTA DUMAI",
+    "COUNT": 37
+  },
+  {
+    "PROVINCE": "RIAU",
+    "CITY_REGENCY": "KOTA PEKANBARU",
+    "COUNT": 145
+  },
+  {
+    "PROVINCE": "RIAU",
+    "CITY_REGENCY": "KUANTAN SINGINGI",
+    "COUNT": 35
+  },
+  {
+    "PROVINCE": "RIAU",
+    "CITY_REGENCY": "PELALAWAN",
+    "COUNT": 35
+  },
+  {
+    "PROVINCE": "RIAU",
+    "CITY_REGENCY": "ROKAN HILIR",
+    "COUNT": 81
+  },
+  {
+    "PROVINCE": "RIAU",
+    "CITY_REGENCY": "ROKAN HULU",
+    "COUNT": 59
+  },
+  {
+    "PROVINCE": "RIAU",
+    "CITY_REGENCY": "SIAK",
+    "COUNT": 59
+  },
+  {
+    "PROVINCE": "SULAWESI BARAT",
+    "CITY_REGENCY": "MAJENE",
+    "COUNT": 33
+  },
+  {
+    "PROVINCE": "SULAWESI BARAT",
+    "CITY_REGENCY": "MAMASA",
+    "COUNT": 32
+  },
+  {
+    "PROVINCE": "SULAWESI BARAT",
+    "CITY_REGENCY": "MAMUJU",
+    "COUNT": 41
+  },
+  {
+    "PROVINCE": "SULAWESI BARAT",
+    "CITY_REGENCY": "MAMUJU TENGAH",
+    "COUNT": 22
+  },
+  {
+    "PROVINCE": "SULAWESI BARAT",
+    "CITY_REGENCY": "PASANGKAYU",
+    "COUNT": 24
+  },
+  {
+    "PROVINCE": "SULAWESI BARAT",
+    "CITY_REGENCY": "POLEWALI MANDAR",
+    "COUNT": 73
+  },
+  {
+    "PROVINCE": "SULAWESI SELATAN",
+    "CITY_REGENCY": "BANTAENG",
+    "COUNT": 26
+  },
+  {
+    "PROVINCE": "SULAWESI SELATAN",
+    "CITY_REGENCY": "BARRU",
+    "COUNT": 23
+  },
+  {
+    "PROVINCE": "SULAWESI SELATAN",
+    "CITY_REGENCY": "BONE",
+    "COUNT": 51
+  },
+  {
+    "PROVINCE": "SULAWESI SELATAN",
+    "CITY_REGENCY": "BULUKUMBA",
+    "COUNT": 46
+  },
+  {
+    "PROVINCE": "SULAWESI SELATAN",
+    "CITY_REGENCY": "ENREKANG",
+    "COUNT": 16
+  },
+  {
+    "PROVINCE": "SULAWESI SELATAN",
+    "CITY_REGENCY": "GOWA",
+    "COUNT": 85
+  },
+  {
+    "PROVINCE": "SULAWESI SELATAN",
+    "CITY_REGENCY": "JENEPONTO",
+    "COUNT": 55
+  },
+  {
+    "PROVINCE": "SULAWESI SELATAN",
+    "CITY_REGENCY": "KEPULAUAN SELAYAR",
+    "COUNT": 29
+  },
+  {
+    "PROVINCE": "SULAWESI SELATAN",
+    "CITY_REGENCY": "KOTA MAKASSAR",
+    "COUNT": 135
+  },
+  {
+    "PROVINCE": "SULAWESI SELATAN",
+    "CITY_REGENCY": "KOTA PALOPO",
+    "COUNT": 20
+  },
+  {
+    "PROVINCE": "SULAWESI SELATAN",
+    "CITY_REGENCY": "KOTA PAREPARE",
+    "COUNT": 22
+  },
+  {
+    "PROVINCE": "SULAWESI SELATAN",
+    "CITY_REGENCY": "LUWU",
+    "COUNT": 22
+  },
+  {
+    "PROVINCE": "SULAWESI SELATAN",
+    "CITY_REGENCY": "LUWU TIMUR",
+    "COUNT": 19
+  },
+  {
+    "PROVINCE": "SULAWESI SELATAN",
+    "CITY_REGENCY": "LUWU UTARA",
+    "COUNT": 19
+  },
+  {
+    "PROVINCE": "SULAWESI SELATAN",
+    "CITY_REGENCY": "MAROS",
+    "COUNT": 44
+  },
+  {
+    "PROVINCE": "SULAWESI SELATAN",
+    "CITY_REGENCY": "PANGKAJENE DAN KEPULAUAN",
+    "COUNT": 34
+  },
+  {
+    "PROVINCE": "SULAWESI SELATAN",
+    "CITY_REGENCY": "PINRANG",
+    "COUNT": 50
+  },
+  {
+    "PROVINCE": "SULAWESI SELATAN",
+    "CITY_REGENCY": "SIDENRENG RAPPANG",
+    "COUNT": 28
+  },
+  {
+    "PROVINCE": "SULAWESI SELATAN",
+    "CITY_REGENCY": "SINJAI",
+    "COUNT": 28
+  },
+  {
+    "PROVINCE": "SULAWESI SELATAN",
+    "CITY_REGENCY": "SOPPENG",
+    "COUNT": 20
+  },
+  {
+    "PROVINCE": "SULAWESI SELATAN",
+    "CITY_REGENCY": "TAKALAR",
+    "COUNT": 44
+  },
+  {
+    "PROVINCE": "SULAWESI SELATAN",
+    "CITY_REGENCY": "TANA TORAJA",
+    "COUNT": 18
+  },
+  {
+    "PROVINCE": "SULAWESI SELATAN",
+    "CITY_REGENCY": "TORAJA UTARA",
+    "COUNT": 25
+  },
+  {
+    "PROVINCE": "SULAWESI SELATAN",
+    "CITY_REGENCY": "WAJO",
+    "COUNT": 40
+  },
+  {
+    "PROVINCE": "SULAWESI TENGAH",
+    "CITY_REGENCY": "BANGGAI",
+    "COUNT": 29
+  },
+  {
+    "PROVINCE": "SULAWESI TENGAH",
+    "CITY_REGENCY": "BANGGAI KEPULAUAN",
+    "COUNT": 12
+  },
+  {
+    "PROVINCE": "SULAWESI TENGAH",
+    "CITY_REGENCY": "BANGGAI LAUT",
+    "COUNT": 8
+  },
+  {
+    "PROVINCE": "SULAWESI TENGAH",
+    "CITY_REGENCY": "BUOL",
+    "COUNT": 9
+  },
+  {
+    "PROVINCE": "SULAWESI TENGAH",
+    "CITY_REGENCY": "DONGGALA",
+    "COUNT": 24
+  },
+  {
+    "PROVINCE": "SULAWESI TENGAH",
+    "CITY_REGENCY": "KOTA PALU",
+    "COUNT": 40
+  },
+  {
+    "PROVINCE": "SULAWESI TENGAH",
+    "CITY_REGENCY": "MOROWALI",
+    "COUNT": 12
+  },
+  {
+    "PROVINCE": "SULAWESI TENGAH",
+    "CITY_REGENCY": "MOROWALI UTARA",
+    "COUNT": 3
+  },
+  {
+    "PROVINCE": "SULAWESI TENGAH",
+    "CITY_REGENCY": "PARIGI MOUTONG",
+    "COUNT": 22
+  },
+  {
+    "PROVINCE": "SULAWESI TENGAH",
+    "CITY_REGENCY": "POSO",
+    "COUNT": 23
+  },
+  {
+    "PROVINCE": "SULAWESI TENGAH",
+    "CITY_REGENCY": "SIGI",
+    "COUNT": 21
+  },
+  {
+    "PROVINCE": "SULAWESI TENGAH",
+    "CITY_REGENCY": "TOJO UNA UNA",
+    "COUNT": 15
+  },
+  {
+    "PROVINCE": "SULAWESI TENGAH",
+    "CITY_REGENCY": "TOLI TOLI",
+    "COUNT": 21
+  },
+  {
+    "PROVINCE": "SULAWESI TENGGARA",
+    "CITY_REGENCY": "BOMBANA",
+    "COUNT": 20
+  },
+  {
+    "PROVINCE": "SULAWESI TENGGARA",
+    "CITY_REGENCY": "BUTON",
+    "COUNT": 11
+  },
+  {
+    "PROVINCE": "SULAWESI TENGGARA",
+    "CITY_REGENCY": "BUTON SELATAN",
+    "COUNT": 10
+  },
+  {
+    "PROVINCE": "SULAWESI TENGGARA",
+    "CITY_REGENCY": "BUTON TENGAH",
+    "COUNT": 20
+  },
+  {
+    "PROVINCE": "SULAWESI TENGGARA",
+    "CITY_REGENCY": "BUTON UTARA",
+    "COUNT": 5
+  },
+  {
+    "PROVINCE": "SULAWESI TENGGARA",
+    "CITY_REGENCY": "KOLAKA",
+    "COUNT": 29
+  },
+  {
+    "PROVINCE": "SULAWESI TENGGARA",
+    "CITY_REGENCY": "KOLAKA TIMUR",
+    "COUNT": 14
+  },
+  {
+    "PROVINCE": "SULAWESI TENGGARA",
+    "CITY_REGENCY": "KOLAKA UTARA",
+    "COUNT": 13
+  },
+  {
+    "PROVINCE": "SULAWESI TENGGARA",
+    "CITY_REGENCY": "KONAWE",
+    "COUNT": 30
+  },
+  {
+    "PROVINCE": "SULAWESI TENGGARA",
+    "CITY_REGENCY": "KONAWE KEPULAUAN",
+    "COUNT": 2
+  },
+  {
+    "PROVINCE": "SULAWESI TENGGARA",
+    "CITY_REGENCY": "KONAWE SELATAN",
+    "COUNT": 33
+  },
+  {
+    "PROVINCE": "SULAWESI TENGGARA",
+    "CITY_REGENCY": "KONAWE UTARA",
+    "COUNT": 8
+  },
+  {
+    "PROVINCE": "SULAWESI TENGGARA",
+    "CITY_REGENCY": "KOTA BAU BAU",
+    "COUNT": 21
+  },
+  {
+    "PROVINCE": "SULAWESI TENGGARA",
+    "CITY_REGENCY": "KOTA KENDARI",
+    "COUNT": 41
+  },
+  {
+    "PROVINCE": "SULAWESI TENGGARA",
+    "CITY_REGENCY": "MUNA",
+    "COUNT": 43
+  },
+  {
+    "PROVINCE": "SULAWESI TENGGARA",
+    "CITY_REGENCY": "MUNA BARAT",
+    "COUNT": 19
+  },
+  {
+    "PROVINCE": "SULAWESI TENGGARA",
+    "CITY_REGENCY": "WAKATOBI",
+    "COUNT": 9
+  },
+  {
+    "PROVINCE": "SULAWESI UTARA",
+    "CITY_REGENCY": "BOLAANG MONGONDOW",
+    "COUNT": 11
+  },
+  {
+    "PROVINCE": "SULAWESI UTARA",
+    "CITY_REGENCY": "BOLAANG MONGONDOW SELATAN",
+    "COUNT": 6
+  },
+  {
+    "PROVINCE": "SULAWESI UTARA",
+    "CITY_REGENCY": "BOLAANG MONGONDOW TIMUR",
+    "COUNT": 3
+  },
+  {
+    "PROVINCE": "SULAWESI UTARA",
+    "CITY_REGENCY": "BOLAANG MONGONDOW UTARA",
+    "COUNT": 2
+  },
+  {
+    "PROVINCE": "SULAWESI UTARA",
+    "CITY_REGENCY": "KEP. SIAU TAGULANDANG BIARO",
+    "COUNT": 19
+  },
+  {
+    "PROVINCE": "SULAWESI UTARA",
+    "CITY_REGENCY": "KEPULAUAN SANGIHE",
+    "COUNT": 9
+  },
+  {
+    "PROVINCE": "SULAWESI UTARA",
+    "CITY_REGENCY": "KEPULAUAN TALAUD",
+    "COUNT": 9
+  },
+  {
+    "PROVINCE": "SULAWESI UTARA",
+    "CITY_REGENCY": "KOTA BITUNG",
+    "COUNT": 10
+  },
+  {
+    "PROVINCE": "SULAWESI UTARA",
+    "CITY_REGENCY": "KOTA KOTAMOBAGU",
+    "COUNT": 9
+  },
+  {
+    "PROVINCE": "SULAWESI UTARA",
+    "CITY_REGENCY": "KOTA MANADO",
+    "COUNT": 48
+  },
+  {
+    "PROVINCE": "SULAWESI UTARA",
+    "CITY_REGENCY": "KOTA TOMOHON",
+    "COUNT": 11
+  },
+  {
+    "PROVINCE": "SULAWESI UTARA",
+    "CITY_REGENCY": "MINAHASA",
+    "COUNT": 30
+  },
+  {
+    "PROVINCE": "SULAWESI UTARA",
+    "CITY_REGENCY": "MINAHASA SELATAN",
+    "COUNT": 15
+  },
+  {
+    "PROVINCE": "SULAWESI UTARA",
+    "CITY_REGENCY": "MINAHASA TENGGARA",
+    "COUNT": 7
+  },
+  {
+    "PROVINCE": "SULAWESI UTARA",
+    "CITY_REGENCY": "MINAHASA UTARA",
+    "COUNT": 14
+  },
+  {
+    "PROVINCE": "SUMATERA BARAT",
+    "CITY_REGENCY": "AGAM",
+    "COUNT": 37
+  },
+  {
+    "PROVINCE": "SUMATERA BARAT",
+    "CITY_REGENCY": "DHARMASRAYA",
+    "COUNT": 18
+  },
+  {
+    "PROVINCE": "SUMATERA BARAT",
+    "CITY_REGENCY": "KEPULAUAN MENTAWAI",
+    "COUNT": 1
+  },
+  {
+    "PROVINCE": "SUMATERA BARAT",
+    "CITY_REGENCY": "KOTA BUKITTINGGI",
+    "COUNT": 15
+  },
+  {
+    "PROVINCE": "SUMATERA BARAT",
+    "CITY_REGENCY": "KOTA PADANG",
+    "COUNT": 76
+  },
+  {
+    "PROVINCE": "SUMATERA BARAT",
+    "CITY_REGENCY": "KOTA PADANG PANJANG",
+    "COUNT": 9
+  },
+  {
+    "PROVINCE": "SUMATERA BARAT",
+    "CITY_REGENCY": "KOTA PARIAMAN",
+    "COUNT": 6
+  },
+  {
+    "PROVINCE": "SUMATERA BARAT",
+    "CITY_REGENCY": "KOTA PAYAKUMBUH",
+    "COUNT": 24
+  },
+  {
+    "PROVINCE": "SUMATERA BARAT",
+    "CITY_REGENCY": "KOTA SAWAHLUNTO",
+    "COUNT": 5
+  },
+  {
+    "PROVINCE": "SUMATERA BARAT",
+    "CITY_REGENCY": "KOTA SOLOK",
+    "COUNT": 14
+  },
+  {
+    "PROVINCE": "SUMATERA BARAT",
+    "CITY_REGENCY": "LIMA PULUH KOTA",
+    "COUNT": 25
+  },
+  {
+    "PROVINCE": "SUMATERA BARAT",
+    "CITY_REGENCY": "PADANG PARIAMAN",
+    "COUNT": 26
+  },
+  {
+    "PROVINCE": "SUMATERA BARAT",
+    "CITY_REGENCY": "PASAMAN",
+    "COUNT": 28
+  },
+  {
+    "PROVINCE": "SUMATERA BARAT",
+    "CITY_REGENCY": "PASAMAN BARAT",
+    "COUNT": 15
+  },
+  {
+    "PROVINCE": "SUMATERA BARAT",
+    "CITY_REGENCY": "PESISIR SELATAN",
+    "COUNT": 40
+  },
+  {
+    "PROVINCE": "SUMATERA BARAT",
+    "CITY_REGENCY": "SIJUNJUNG",
+    "COUNT": 23
+  },
+  {
+    "PROVINCE": "SUMATERA BARAT",
+    "CITY_REGENCY": "SOLOK",
+    "COUNT": 39
+  },
+  {
+    "PROVINCE": "SUMATERA BARAT",
+    "CITY_REGENCY": "SOLOK SELATAN",
+    "COUNT": 16
+  },
+  {
+    "PROVINCE": "SUMATERA BARAT",
+    "CITY_REGENCY": "TANAH DATAR",
+    "COUNT": 32
+  },
+  {
+    "PROVINCE": "SUMATERA SELATAN",
+    "CITY_REGENCY": "BANYUASIN",
+    "COUNT": 83
+  },
+  {
+    "PROVINCE": "SUMATERA SELATAN",
+    "CITY_REGENCY": "EMPAT LAWANG",
+    "COUNT": 24
+  },
+  {
+    "PROVINCE": "SUMATERA SELATAN",
+    "CITY_REGENCY": "KOTA LUBUK LINGGAU",
+    "COUNT": 39
+  },
+  {
+    "PROVINCE": "SUMATERA SELATAN",
+    "CITY_REGENCY": "KOTA PAGAR ALAM",
+    "COUNT": 14
+  },
+  {
+    "PROVINCE": "SUMATERA SELATAN",
+    "CITY_REGENCY": "KOTA PALEMBANG",
+    "COUNT": 220
+  },
+  {
+    "PROVINCE": "SUMATERA SELATAN",
+    "CITY_REGENCY": "KOTA PRABUMULIH",
+    "COUNT": 16
+  },
+  {
+    "PROVINCE": "SUMATERA SELATAN",
+    "CITY_REGENCY": "LAHAT",
+    "COUNT": 21
+  },
+  {
+    "PROVINCE": "SUMATERA SELATAN",
+    "CITY_REGENCY": "MUARA ENIM",
+    "COUNT": 58
+  },
+  {
+    "PROVINCE": "SUMATERA SELATAN",
+    "CITY_REGENCY": "MUSI BANYUASIN",
+    "COUNT": 46
+  },
+  {
+    "PROVINCE": "SUMATERA SELATAN",
+    "CITY_REGENCY": "MUSI RAWAS",
+    "COUNT": 52
+  },
+  {
+    "PROVINCE": "SUMATERA SELATAN",
+    "CITY_REGENCY": "MUSI RAWAS UTARA",
+    "COUNT": 21
+  },
+  {
+    "PROVINCE": "SUMATERA SELATAN",
+    "CITY_REGENCY": "OGAN ILIR",
+    "COUNT": 54
+  },
+  {
+    "PROVINCE": "SUMATERA SELATAN",
+    "CITY_REGENCY": "OGAN KOMERING ILIR",
+    "COUNT": 90
+  },
+  {
+    "PROVINCE": "SUMATERA SELATAN",
+    "CITY_REGENCY": "OGAN KOMERING ULU",
+    "COUNT": 32
+  },
+  {
+    "PROVINCE": "SUMATERA SELATAN",
+    "CITY_REGENCY": "OGAN KOMERING ULU SELATAN",
+    "COUNT": 27
+  },
+  {
+    "PROVINCE": "SUMATERA SELATAN",
+    "CITY_REGENCY": "OGAN KOMERING ULU TIMUR",
+    "COUNT": 61
+  },
+  {
+    "PROVINCE": "SUMATERA SELATAN",
+    "CITY_REGENCY": "PENUKAL ABAB LEMATANG ILIR",
+    "COUNT": 17
+  },
+  {
+    "PROVINCE": "SUMATERA UTARA",
+    "CITY_REGENCY": "ASAHAN",
+    "COUNT": 89
+  },
+  {
+    "PROVINCE": "SUMATERA UTARA",
+    "CITY_REGENCY": "BATU BARA",
+    "COUNT": 44
+  },
+  {
+    "PROVINCE": "SUMATERA UTARA",
+    "CITY_REGENCY": "DAIRI",
+    "COUNT": 56
+  },
+  {
+    "PROVINCE": "SUMATERA UTARA",
+    "CITY_REGENCY": "DELI SERDANG",
+    "COUNT": 263
+  },
+  {
+    "PROVINCE": "SUMATERA UTARA",
+    "CITY_REGENCY": "HUMBANG HASUNDUTAN",
+    "COUNT": 24
+  },
+  {
+    "PROVINCE": "SUMATERA UTARA",
+    "CITY_REGENCY": "KARO",
+    "COUNT": 44
+  },
+  {
+    "PROVINCE": "SUMATERA UTARA",
+    "CITY_REGENCY": "KOTA BINJAI",
+    "COUNT": 43
+  },
+  {
+    "PROVINCE": "SUMATERA UTARA",
+    "CITY_REGENCY": "KOTA GUNUNGSITOLI",
+    "COUNT": 17
+  },
+  {
+    "PROVINCE": "SUMATERA UTARA",
+    "CITY_REGENCY": "KOTA MEDAN",
+    "COUNT": 238
+  },
+  {
+    "PROVINCE": "SUMATERA UTARA",
+    "CITY_REGENCY": "KOTA PADANG SIDEMPUAN",
+    "COUNT": 21
+  },
+  {
+    "PROVINCE": "SUMATERA UTARA",
+    "CITY_REGENCY": "KOTA PEMATANGSIANTAR",
+    "COUNT": 42
+  },
+  {
+    "PROVINCE": "SUMATERA UTARA",
+    "CITY_REGENCY": "KOTA SIBOLGA",
+    "COUNT": 12
+  },
+  {
+    "PROVINCE": "SUMATERA UTARA",
+    "CITY_REGENCY": "KOTA TANJUNG BALAI",
+    "COUNT": 22
+  },
+  {
+    "PROVINCE": "SUMATERA UTARA",
+    "CITY_REGENCY": "KOTA TEBING TINGGI",
+    "COUNT": 25
+  },
+  {
+    "PROVINCE": "SUMATERA UTARA",
+    "CITY_REGENCY": "LABUHANBATU",
+    "COUNT": 45
+  },
+  {
+    "PROVINCE": "SUMATERA UTARA",
+    "CITY_REGENCY": "LABUHANBATU SELATAN",
+    "COUNT": 27
+  },
+  {
+    "PROVINCE": "SUMATERA UTARA",
+    "CITY_REGENCY": "LABUHANBATU UTARA",
+    "COUNT": 48
+  },
+  {
+    "PROVINCE": "SUMATERA UTARA",
+    "CITY_REGENCY": "LANGKAT",
+    "COUNT": 102
+  },
+  {
+    "PROVINCE": "SUMATERA UTARA",
+    "CITY_REGENCY": "MANDAILING NATAL",
+    "COUNT": 33
+  },
+  {
+    "PROVINCE": "SUMATERA UTARA",
+    "CITY_REGENCY": "NIAS",
+    "COUNT": 15
+  },
+  {
+    "PROVINCE": "SUMATERA UTARA",
+    "CITY_REGENCY": "NIAS BARAT",
+    "COUNT": 8
+  },
+  {
+    "PROVINCE": "SUMATERA UTARA",
+    "CITY_REGENCY": "NIAS SELATAN",
+    "COUNT": 32
+  },
+  {
+    "PROVINCE": "SUMATERA UTARA",
+    "CITY_REGENCY": "NIAS UTARA",
+    "COUNT": 20
+  },
+  {
+    "PROVINCE": "SUMATERA UTARA",
+    "CITY_REGENCY": "PADANG LAWAS",
+    "COUNT": 20
+  },
+  {
+    "PROVINCE": "SUMATERA UTARA",
+    "CITY_REGENCY": "PADANG LAWAS UTARA",
+    "COUNT": 18
+  },
+  {
+    "PROVINCE": "SUMATERA UTARA",
+    "CITY_REGENCY": "PAKPAK BHARAT",
+    "COUNT": 4
+  },
+  {
+    "PROVINCE": "SUMATERA UTARA",
+    "CITY_REGENCY": "SAMOSIR",
+    "COUNT": 13
+  },
+  {
+    "PROVINCE": "SUMATERA UTARA",
+    "CITY_REGENCY": "SERDANG BEDAGAI",
+    "COUNT": 80
+  },
+  {
+    "PROVINCE": "SUMATERA UTARA",
+    "CITY_REGENCY": "SIMALUNGUN",
+    "COUNT": 79
+  },
+  {
+    "PROVINCE": "SUMATERA UTARA",
+    "CITY_REGENCY": "TAPANULI SELATAN",
+    "COUNT": 18
+  },
+  {
+    "PROVINCE": "SUMATERA UTARA",
+    "CITY_REGENCY": "TAPANULI TENGAH",
+    "COUNT": 33
+  },
+  {
+    "PROVINCE": "SUMATERA UTARA",
+    "CITY_REGENCY": "TAPANULI UTARA",
+    "COUNT": 35
+  },
+  {
+    "PROVINCE": "SUMATERA UTARA",
+    "CITY_REGENCY": "TOBA",
+    "COUNT": 24
+  }
+]

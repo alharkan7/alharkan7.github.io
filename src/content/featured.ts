@@ -42,6 +42,14 @@ const rawProjects = [
     coverImage: "https://ik.imagekit.io/raihankalla/research_section_cover/goodnews-garden.png",
   },
   {
+    title: "Sebaran SPPG se-Indonesia (Peta 3D)",
+    subtitle: "",
+    type: "visualization",
+    date: "2026-06-05",
+    url: "/sebaran-sppg",
+    coverImage: "https://ik.imagekit.io/raihankalla/research_section_cover/sebaran-lokasi-sppg.png",
+  },
+  {
     title: "Jakarta Job Market Analysis (19K+ Vacancies)",
     subtitle: "",
     type: "analysis",
