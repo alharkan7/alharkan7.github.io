@@ -345,34 +345,6 @@
         display: none;
       }
 
-      .home-link {
-        position: absolute;
-        bottom: 2rem;
-        left: 2rem;
-        z-index: 10;
-        color: #1e293b;
-        text-decoration: none;
-        background: rgba(255, 255, 255, 0.1);
-        padding: 0 1.5rem;
-        height: 48px;
-        border-radius: 8px;
-        border: 1px solid rgb(110, 110, 110, 0.5);
-        backdrop-filter: blur(10px);
-        transition: all 0.2s;
-        font-weight: 500;
-        display: inline-flex;
-        align-items: center;
-        gap: 0.5rem;
-        font-family: inherit;
-        font-size: 1rem;
-        box-sizing: border-box;
-      }
-      .home-link:hover {
-        background: rgba(255, 255, 255, 0.2);
-        border-color: #ea580c;
-        transform: translateY(-2px);
-      }
-
       .rotation-toggle-btn {
         position: absolute;
         bottom: 2rem;
@@ -380,15 +352,16 @@
         z-index: 10;
         color: #1e293b;
         background: rgba(255, 255, 255, 0.1);
-        padding: 0 1.5rem;
+        padding: 0;
+        width: 48px;
         height: 48px;
-        border-radius: 8px;
+        border-radius: 50%;
         border: 1px solid rgb(110, 110, 110, 0.5);
         backdrop-filter: blur(10px);
         transition: all 0.2s;
         display: inline-flex;
         align-items: center;
-        gap: 0.5rem;
+        justify-content: center;
         cursor: pointer;
         font-weight: 500;
         font-family: inherit;
@@ -686,17 +659,13 @@
           top: 1rem;
           right: 1rem;
         }
-        .home-link {
-          bottom: 2rem;
-          left: 1rem;
-          padding: 0 1rem;
-          height: 40px;
-        }
         .rotation-toggle-btn {
           bottom: 2rem;
           right: 1rem;
-          padding: 0 1rem;
-          height: 40px;
+          padding: 0;
+          width: 44px;
+          height: 44px;
+          border-radius: 50%;
         }
         .info-card {
           bottom: calc(2rem + 40px + 1rem);
@@ -824,13 +793,8 @@
       </div>
     </div>
 
-    <a href="/" class="home-link">
-      <span>←</span> Home
-    </a>
-
     <button id="rotation-toggle-btn" class="rotation-toggle-btn" title="Toggle Rotation (Space)">
       <i data-lucide="pause" aria-hidden="true" id="rotation-icon" style="width: 18px; height: 18px;"></i>
-      <span id="rotation-text">Pause</span>
     </button>
 
     <!-- Mobile Touch Mode Toolbar -->
@@ -1600,7 +1564,7 @@ async function initMap() {
     function updateRotationIcon() {
       const toggleBtn = document.getElementById('rotation-toggle-btn');
       if (toggleBtn) {
-        toggleBtn.innerHTML = `<i data-lucide="${isRotating ? 'pause' : 'play'}" aria-hidden="true" style="width: 18px; height: 18px;"></i><span id="rotation-text">${isRotating ? 'Pause' : 'Resume'}</span>`;
+        toggleBtn.innerHTML = `<i data-lucide="${isRotating ? 'pause' : 'play'}" aria-hidden="true" style="width: 18px; height: 18px;"></i>`;
         if (window.lucide && window.lucide.createIcons) window.lucide.createIcons();
       }
     }
