@@ -827,7 +827,7 @@
             <thead>
               <tr>
                 <th id="th-name" class="sortable" data-sort="name">Provinsi & Kota/Kab. <span class="sort-icon"></span></th>
-                <th id="th-count" class="sortable sort-active" data-sort="count">Total<span class="sort-icon"><i data-lucide="arrow-down" style="width:14px;height:14px;"></i></span></th>
+                <th id="th-count" class="sortable sort-active" data-sort="count"><span id="th-count-text">Total</span><span class="sort-icon"><i data-lucide="arrow-down" style="width:14px;height:14px;"></i></span></th>
               </tr>
             </thead>
             <tbody id="data-table-body">
@@ -1656,6 +1656,15 @@ async function initMap() {
       
       tbody.innerHTML = '';
       
+      const overallTotal = provincesBase.reduce((sum, p) => sum + p.total, 0) || 1;
+      
+      const thCountText = document.getElementById('th-count-text');
+      if (thCountText) {
+        // Find actual total (using 0 fallback if empty to avoid showing 1)
+        const actualTotal = provincesBase.reduce((sum, p) => sum + p.total, 0);
+        thCountText.textContent = `Total (${new Intl.NumberFormat('id-ID').format(actualTotal)})`;
+      }
+
       // Sort provinces
       provincesBase.sort((a, b) => {
         if (currentSortBy === 'name') {
@@ -1667,6 +1676,7 @@ async function initMap() {
 
       provincesBase.forEach((prov, pIndex) => {
         // Province row
+        const pPercent = ((prov.total / overallTotal) * 100).toFixed(1);
         const pRow = document.createElement('tr');
         pRow.className = 'row-province' + (allExpanded ? ' expanded' : '');
         pRow.dataset.provIndex = pIndex;
@@ -1678,7 +1688,7 @@ async function initMap() {
               <span class="prov-text">${prov.name}</span>
             </div>
           </td>
-          <td>${new Intl.NumberFormat('id-ID').format(prov.total)}</td>
+          <td>${new Intl.NumberFormat('id-ID').format(prov.total)} <span style="font-weight: 300; font-size: 0.85em; opacity: 0.7; margin-left: 4px;">(${pPercent}%)</span></td>
         `;
         tbody.appendChild(pRow);
 
@@ -1693,11 +1703,12 @@ async function initMap() {
 
         // City rows
         prov.cities.forEach(city => {
+          const cPercent = ((city.count / overallTotal) * 100).toFixed(1);
           const cRow = document.createElement('tr');
           cRow.className = `row-city prov-group-${pIndex}` + (allExpanded ? ' visible' : '');
           cRow.innerHTML = `
             <td class="city-name">${city.name}</td>
-            <td>${new Intl.NumberFormat('id-ID').format(city.count)}</td>
+            <td>${new Intl.NumberFormat('id-ID').format(city.count)} <span style="font-weight: 300; font-size: 0.85em; opacity: 0.7; margin-left: 4px;">(${cPercent}%)</span></td>
           `;
           tbody.appendChild(cRow);
         });
