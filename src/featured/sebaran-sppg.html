@@ -339,6 +339,15 @@
         border-color: #ea580c;
         color: #ea580c;
       }
+      .home-btn {
+        position: absolute;
+        bottom: 2rem;
+        left: 2rem;
+        z-index: 10;
+        width: 48px;
+        height: 48px;
+        border-radius: 50%;
+      }
       .show-info-btn.hidden {
         opacity: 0;
         pointer-events: none;
@@ -528,14 +537,27 @@
       th.sort-active .sort-icon {
         color: #1e293b;
       }
+      .row-island {
+        background: #f1f5f9;
+        cursor: pointer;
+        font-weight: 700;
+        transition: background 0.2s;
+      }
+      .row-island:hover {
+        background: #e2e8f0;
+      }
       .row-province {
         background: #fff;
         cursor: pointer;
         font-weight: 600;
+        display: none;
         transition: background 0.2s;
       }
+      .row-province.visible {
+        display: table-row;
+      }
       .row-province:hover {
-        background: #f1f5f9;
+        background: #f8fafc;
       }
       .row-city {
         background: #f8fafc;
@@ -544,8 +566,11 @@
       .row-city.visible {
         display: table-row;
       }
-      .city-name {
+      .prov-name-cell {
         padding-left: 2.5rem !important;
+      }
+      .city-name {
+        padding-left: 4.5rem !important;
         color: #475569;
         font-weight: 400;
         line-height: 1.5;
@@ -564,6 +589,7 @@
         flex: 1;
         line-height: 1.5;
       }
+      .row-island.expanded .prov-icon,
       .row-province.expanded .prov-icon {
         transform: rotate(90deg);
       }
@@ -667,6 +693,12 @@
           height: 44px;
           border-radius: 50%;
         }
+        .home-btn {
+          bottom: 2rem;
+          left: 1rem;
+          width: 44px;
+          height: 44px;
+        }
         .info-card {
           bottom: calc(2rem + 40px + 1rem);
           right: 1rem;
@@ -689,13 +721,14 @@
     <div id="chart-container"></div>
     
     <div class="top-left-actions">
-      <a href="/data" class="home-btn" aria-label="Back to Data" title="Back to Data">
-        <i data-lucide="home" aria-hidden="true" style="width: 18px; height: 18px;"></i>
-      </a>
       <button id="show-info" class="show-info-btn hidden" aria-label="Show info" title="Show info">
         <i data-lucide="info" aria-hidden="true" style="width: 18px; height: 18px;"></i>
       </button>
     </div>
+
+    <a href="/data" class="home-btn" aria-label="Back to Data" title="Back to Data">
+      <i data-lucide="home" aria-hidden="true" style="width: 18px; height: 18px;"></i>
+    </a>
 
     <button id="show-data-btn" class="show-data-btn" aria-label="Show Data Table" title="Show Data Table">
       <i data-lucide="table" aria-hidden="true" style="width: 18px; height: 18px;"></i>
@@ -1634,18 +1667,46 @@ async function initMap() {
     });
 
     // -- Data View Table Generation --
-    const provinceMap = new Map();
+    const islandsMapping = {
+      'Sumatera': ['ACEH', 'BENGKULU', 'JAMBI', 'KEPULAUAN BANGKA BELITUNG', 'KEPULAUAN RIAU', 'LAMPUNG', 'RIAU', 'SUMATERA BARAT', 'SUMATERA SELATAN', 'SUMATERA UTARA'],
+      'Jawa': ['BANTEN', 'DAERAH ISTIMEWA YOGYAKARTA', 'DKI JAKARTA', 'JAWA BARAT', 'JAWA TENGAH', 'JAWA TIMUR'],
+      'Kalimantan': ['KALIMANTAN BARAT', 'KALIMANTAN SELATAN', 'KALIMANTAN TENGAH', 'KALIMANTAN TIMUR', 'KALIMANTAN UTARA'],
+      'Sulawesi': ['GORONTALO', 'SULAWESI BARAT', 'SULAWESI SELATAN', 'SULAWESI TENGAH', 'SULAWESI TENGGARA', 'SULAWESI UTARA'],
+      'Bali & Nusa Tenggara': ['BALI', 'NUSA TENGGARA BARAT', 'NUSA TENGGARA TIMUR'],
+      'Maluku & Papua': ['MALUKU', 'MALUKU UTARA', 'P A P U A', 'PAPUA BARAT', 'PAPUA BARAT DAYA', 'PAPUA PEGUNUNGAN', 'PAPUA SELATAN', 'PAPUA TENGAH']
+    };
+
+    function getIsland(provName) {
+      for (const [island, provs] of Object.entries(islandsMapping)) {
+        if (provs.includes(provName.toUpperCase())) return island;
+      }
+      return 'Lainnya';
+    }
+
+    const islandMap = new Map();
     for (const item of sppgData) {
       const prov = item.PROVINCE || 'Unknown';
-      if (!provinceMap.has(prov)) {
-        provinceMap.set(prov, { name: prov, total: 0, cities: [] });
+      const islandName = getIsland(prov);
+
+      if (!islandMap.has(islandName)) {
+        islandMap.set(islandName, { name: islandName, total: 0, provinces: new Map() });
       }
-      const pData = provinceMap.get(prov);
+      const iData = islandMap.get(islandName);
+      iData.total += item.COUNT;
+
+      if (!iData.provinces.has(prov)) {
+        iData.provinces.set(prov, { name: prov, total: 0, cities: [] });
+      }
+      const pData = iData.provinces.get(prov);
       pData.total += item.COUNT;
       pData.cities.push({ name: item.CITY_REGENCY, count: item.COUNT });
     }
 
-    const provincesBase = Array.from(provinceMap.values());
+    const islandsBase = Array.from(islandMap.values());
+    islandsBase.forEach(island => {
+      island.provincesArray = Array.from(island.provinces.values());
+    });
+
     let currentSortBy = 'count';
     let currentSortOrder = 'desc';
     let allExpanded = false;
@@ -1656,17 +1717,17 @@ async function initMap() {
       
       tbody.innerHTML = '';
       
-      const overallTotal = provincesBase.reduce((sum, p) => sum + p.total, 0) || 1;
+      const overallTotal = islandsBase.reduce((sum, p) => sum + p.total, 0) || 1;
       
       const thCountText = document.getElementById('th-count-text');
       if (thCountText) {
         // Find actual total (using 0 fallback if empty to avoid showing 1)
-        const actualTotal = provincesBase.reduce((sum, p) => sum + p.total, 0);
+        const actualTotal = islandsBase.reduce((sum, p) => sum + p.total, 0);
         thCountText.textContent = `Total (${new Intl.NumberFormat('id-ID').format(actualTotal)})`;
       }
 
-      // Sort provinces
-      provincesBase.sort((a, b) => {
+      // Sort islands
+      islandsBase.sort((a, b) => {
         if (currentSortBy === 'name') {
           return currentSortOrder === 'asc' ? a.name.localeCompare(b.name) : b.name.localeCompare(a.name);
         } else {
@@ -1674,54 +1735,104 @@ async function initMap() {
         }
       });
 
-      provincesBase.forEach((prov, pIndex) => {
-        // Province row
-        const pPercent = ((prov.total / overallTotal) * 100).toFixed(1);
-        const pRow = document.createElement('tr');
-        pRow.className = 'row-province' + (allExpanded ? ' expanded' : '');
-        pRow.dataset.provIndex = pIndex;
+      islandsBase.forEach((island, iIndex) => {
+        // Island row
+        const iPercent = ((island.total / overallTotal) * 100).toFixed(1);
+        const iRow = document.createElement('tr');
+        iRow.className = 'row-island' + (allExpanded ? ' expanded' : '');
+        iRow.dataset.islandIndex = iIndex;
         
-        pRow.innerHTML = `
-          <td class="prov-name-cell">
+        iRow.innerHTML = `
+          <td class="island-name-cell">
             <div class="prov-name-inner">
               <span class="prov-icon"><i data-lucide="chevron-right" style="width:16px;height:16px;"></i></span>
-              <span class="prov-text">${prov.name}</span>
+              <span class="prov-text">${island.name}</span>
             </div>
           </td>
-          <td>${new Intl.NumberFormat('id-ID').format(prov.total)} <span style="font-weight: 300; font-size: 0.85em; opacity: 0.7; margin-left: 4px;">(${pPercent}%)</span></td>
+          <td>${new Intl.NumberFormat('id-ID').format(island.total)} <span style="font-weight: 300; font-size: 0.85em; opacity: 0.7; margin-left: 4px;">(${iPercent}%)</span></td>
         `;
-        tbody.appendChild(pRow);
+        tbody.appendChild(iRow);
 
-        // Sort cities
-        prov.cities.sort((a, b) => {
+        island.provincesArray.sort((a, b) => {
           if (currentSortBy === 'name') {
             return currentSortOrder === 'asc' ? a.name.localeCompare(b.name) : b.name.localeCompare(a.name);
           } else {
-            return currentSortOrder === 'asc' ? a.count - b.count : b.count - a.count;
+            return currentSortOrder === 'asc' ? a.total - b.total : b.total - a.total;
           }
         });
 
-        // City rows
-        prov.cities.forEach(city => {
-          const cPercent = ((city.count / overallTotal) * 100).toFixed(1);
-          const cRow = document.createElement('tr');
-          cRow.className = `row-city prov-group-${pIndex}` + (allExpanded ? ' visible' : '');
-          cRow.innerHTML = `
-            <td class="city-name">${city.name}</td>
-            <td>${new Intl.NumberFormat('id-ID').format(city.count)} <span style="font-weight: 300; font-size: 0.85em; opacity: 0.7; margin-left: 4px;">(${cPercent}%)</span></td>
+        const pRows = [];
+        const pRowsToCRows = new Map();
+
+        island.provincesArray.forEach((prov, pIndex) => {
+          // Province row
+          const pPercent = ((prov.total / overallTotal) * 100).toFixed(1);
+          const pRow = document.createElement('tr');
+          pRow.className = `row-province island-group-${iIndex}` + (allExpanded ? ' visible expanded' : '');
+          
+          pRow.innerHTML = `
+            <td class="prov-name-cell">
+              <div class="prov-name-inner">
+                <span class="prov-icon"><i data-lucide="chevron-right" style="width:16px;height:16px;"></i></span>
+                <span class="prov-text">${prov.name}</span>
+              </div>
+            </td>
+            <td>${new Intl.NumberFormat('id-ID').format(prov.total)} <span style="font-weight: 300; font-size: 0.85em; opacity: 0.7; margin-left: 4px;">(${pPercent}%)</span></td>
           `;
-          tbody.appendChild(cRow);
+          tbody.appendChild(pRow);
+          pRows.push(pRow);
+
+          // Sort cities
+          prov.cities.sort((a, b) => {
+            if (currentSortBy === 'name') {
+              return currentSortOrder === 'asc' ? a.name.localeCompare(b.name) : b.name.localeCompare(a.name);
+            } else {
+              return currentSortOrder === 'asc' ? a.count - b.count : b.count - a.count;
+            }
+          });
+
+          // City rows
+          const cRows = [];
+          prov.cities.forEach(city => {
+            const cPercent = ((city.count / overallTotal) * 100).toFixed(1);
+            const cRow = document.createElement('tr');
+            cRow.className = `row-city island-group-${iIndex} prov-group-${iIndex}-${pIndex}` + (allExpanded ? ' visible' : '');
+            cRow.innerHTML = `
+              <td class="city-name">${city.name}</td>
+              <td>${new Intl.NumberFormat('id-ID').format(city.count)} <span style="font-weight: 300; font-size: 0.85em; opacity: 0.7; margin-left: 4px;">(${cPercent}%)</span></td>
+            `;
+            tbody.appendChild(cRow);
+            cRows.push(cRow);
+          });
+          pRowsToCRows.set(pRow, cRows);
+
+          // Click handler to toggle cities
+          pRow.addEventListener('click', (e) => {
+            e.stopPropagation(); // prevent island click
+            const isExpanded = pRow.classList.toggle('expanded');
+            cRows.forEach(row => {
+              if (isExpanded) {
+                row.classList.add('visible');
+              } else {
+                row.classList.remove('visible');
+              }
+            });
+          });
         });
 
-        // Click handler to toggle cities
-        pRow.addEventListener('click', () => {
-          const isExpanded = pRow.classList.toggle('expanded');
-          const cityRows = document.querySelectorAll(`.prov-group-${pIndex}`);
-          cityRows.forEach(row => {
+        // Click handler to toggle provinces
+        iRow.addEventListener('click', () => {
+          const isExpanded = iRow.classList.toggle('expanded');
+          pRows.forEach(row => {
             if (isExpanded) {
               row.classList.add('visible');
             } else {
               row.classList.remove('visible');
+              row.classList.remove('expanded');
+              const cRows = pRowsToCRows.get(row);
+              if (cRows) {
+                cRows.forEach(c => c.classList.remove('visible'));
+              }
             }
           });
         });
