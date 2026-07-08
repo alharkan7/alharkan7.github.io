@@ -1683,6 +1683,41 @@ async function initMap() {
       return 'Lainnya';
     }
 
+    // Inject missing cities from GeoJSON (0 SPPG) so the table shows the complete list
+    const missingProvinceMap = {
+      'DOGIYAI': 'PAPUA TENGAH',
+      'FAKFAK': 'PAPUA BARAT',
+      'INTAN JAYA': 'PAPUA TENGAH',
+      'MAYBRAT': 'PAPUA BARAT DAYA',
+      'NDUGA': 'PAPUA PEGUNUNGAN',
+      'PANIAI': 'PAPUA TENGAH',
+      'PEGUNUNGAN BINTANG': 'PAPUA PEGUNUNGAN',
+      'PUNCAK': 'PAPUA TENGAH',
+      'PUNCAK JAYA': 'PAPUA TENGAH',
+      'TOLIKARA': 'PAPUA PEGUNUNGAN',
+      'YALIMO': 'PAPUA PEGUNUNGAN',
+      'MAMBERAMO RAYA': 'P A P U A',
+      'MAMBERAMO TENGAH': 'PAPUA PEGUNUNGAN'
+    };
+
+    const sppgSet = new Set(sppgData.map(d => normalizeCityName(d.CITY_REGENCY)));
+    
+    geoJson.features.forEach(feature => {
+      const rawName = feature.properties.shapeName;
+      const ignoreAnomalies = ['DANAU', 'DANAU TOBA', 'HUTAN', 'WADUK CIRATA', 'WADUNG KEDUNGOMBO'];
+      if (ignoreAnomalies.includes(rawName.toUpperCase())) return;
+      
+      const normName = normalizeCityName(rawName);
+      if (!sppgSet.has(normName)) {
+        sppgData.push({
+          PROVINCE: missingProvinceMap[normName] || 'P A P U A',
+          CITY_REGENCY: rawName.toUpperCase(),
+          COUNT: 0
+        });
+        sppgSet.add(normName);
+      }
+    });
+
     const islandMap = new Map();
     for (const item of sppgData) {
       const prov = item.PROVINCE || 'Unknown';
