@@ -57,14 +57,14 @@
         }
     </style>
 </head>
-<body class="min-h-screen flex flex-col select-none">
+<body class="min-h-[100dvh] flex flex-col select-none">
   <!-- Layout Wrapper -->
-  <div class="flex flex-col h-screen w-screen bg-slate-50 text-slate-900">
+  <div class="flex flex-col h-[100dvh] w-screen bg-slate-50 text-slate-900">
     
     <!-- Header -->
     <div class="sticky top-0 z-30 flex">
       <!-- Sidebar Header -->
-      <div id="sidebar-header" class="absolute left-0 bg-white border-b border-r border-slate-200 flex items-center justify-between transition-all duration-300 overflow-hidden z-40" style="width: 0; height: 64px; padding-left: 0; padding-right: 0; opacity: 0;">
+      <div id="sidebar-header" class="absolute left-0 bg-white border-b border-r border-slate-200 flex items-center justify-between transition-all duration-300 overflow-hidden z-40 h-[48px] sm:h-[64px]" style="width: 0; padding-left: 0; padding-right: 0; opacity: 0;">
         <h2 class="text-sm sm:text-base font-semibold text-slate-900 whitespace-nowrap">Timeline Data</h2>
         <div class="flex items-center gap-2">
           <div class="flex items-center space-x-1 text-[11px] bg-slate-100/50 p-1 rounded-md border border-slate-200">
@@ -85,8 +85,8 @@
         </div>
       </div>
 
-      <header id="main-header" class="flex-1 bg-white py-2 px-3 sm:px-4 md:px-6 border-b border-slate-200/50 shadow-sm transition-all duration-300 ml-0">
-        <div class="flex items-center justify-between min-h-[48px] max-w-full">
+      <header id="main-header" class="flex-1 bg-white py-1.5 sm:py-2 px-3 sm:px-4 md:px-6 border-b border-slate-200/50 shadow-sm transition-all duration-300 ml-0">
+        <div class="flex items-center justify-between min-h-[36px] sm:min-h-[48px] max-w-full">
           <div class="flex items-center gap-2 sm:gap-3">
             <button id="sidebar-toggle" class="flex items-center justify-center gap-1.5 px-2 h-8 text-xs sm:text-sm shrink-0 text-slate-500 hover:bg-slate-100 rounded transition-colors" title="Toggle Sidebar">
               <i id="sidebar-icon" data-lucide="menu" class="w-4 h-4"></i>
@@ -107,8 +107,8 @@
     </div>
 
     <!-- Sidebar Overlay & Content -->
-    <div id="sidebar-overlay" class="fixed inset-0 z-20 bg-transparent hidden" style="top: 64px;"></div>
-    <div id="sidebar" class="fixed left-0 bg-white border-r border-slate-200 text-slate-900 transition-all duration-300 overflow-hidden w-0" style="top: 64px; height: calc(100vh - 64px - 100px); z-index: 25;">
+    <div id="sidebar-overlay" class="fixed inset-0 z-20 bg-transparent hidden top-[48px] sm:top-[64px]"></div>
+    <div id="sidebar" class="fixed left-0 bg-white border-r border-slate-200 text-slate-900 transition-all duration-300 overflow-hidden w-0 top-[48px] sm:top-[64px]" style="height: calc(100dvh - 48px - 100px); z-index: 25;">
       <div class="h-full flex flex-col w-80 sm:w-96">
          <div class="flex-1 overflow-y-auto p-4 custom-scrollbar" id="sidebar-content"></div>
       </div>
@@ -725,7 +725,8 @@ function initUI() {
   const footerHeight = window.innerWidth < 640 ? 80 : window.innerWidth < 768 ? 100 : 120;
   footerHeightPx = footerHeight;
   document.getElementById('navigator-footer').style.height = `${footerHeight}px`;
-  document.getElementById('sidebar').style.height = `calc(100vh - 64px - ${footerHeight}px)`;
+  const headerHeight = window.innerWidth < 640 ? 48 : 64;
+  document.getElementById('sidebar').style.height = `calc(100dvh - ${headerHeight}px - ${footerHeight}px)`;
   height = container.clientHeight;
 
   const minYear = d3.min(periods, d => d.start_year) ?? -1600000;
