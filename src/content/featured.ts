@@ -38,7 +38,7 @@ const rawProjects = [
     subtitle: "",
     type: "visualization",
     date: "2026-02-08",
-    url: "https://alhrkn.vercel.app/goodnews-garden",
+    url: "/goodnews-garden",
     coverImage: "https://ik.imagekit.io/raihankalla/research_section_cover/goodnews-garden.png",
   },
   {
@@ -110,7 +110,7 @@ const rawProjects = [
     subtitle: "",
     type: "visualization",
     date: "2026-01-21",
-    url: "https://alhrkn.vercel.app/hoax-network",
+    url: "/hoax-network",
     coverImage: "https://ik.imagekit.io/raihankalla/research_section_cover/hoax-2025-network.png",
   },
   {

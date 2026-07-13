@@ -1,0 +1,1944 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Good News Garden Visualization</title>
+    
+    <!-- Dependencies -->
+    <script src="https://unpkg.com/three@0.158.0/build/three.min.js"></script>
+    <script src="https://unpkg.com/d3@7.8.5/dist/d3.min.js"></script>
+    <script src="https://unpkg.com/3d-force-graph@1.79.1/dist/3d-force-graph.min.js"></script>
+
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+    <style>
+/* ============================================
+   GoodNews Indonesia Network Visualization
+   🌸 Organic Garden Theme
+   Soft, whimsical, nature-inspired design
+   ============================================ */
+
+/* CSS Variables */
+:root {
+    /* Colors - Soft Garden Palette */
+    --bg-primary: #fdfcfa;
+    --bg-secondary: #fef9f3;
+    --bg-glass: rgba(255, 252, 248, 0.88);
+    --bg-glass-hover: rgba(255, 250, 245, 0.94);
+
+    --text-primary: #5d5347;
+    --text-secondary: #8a7e72;
+    --text-muted: #b8aa9c;
+    --text-light: #d4c8ba;
+
+    --accent-leaf: #9ec89e;
+    --accent-blossom: #e8b4b8;
+    --accent-sun: #f5d89a;
+    --accent-sky: #a8d4e6;
+    --accent-earth: #c9a66b;
+
+    --glow-soft: 0 4px 20px rgba(158, 200, 158, 0.15);
+    --glow-blossom: 0 4px 20px rgba(232, 180, 184, 0.2);
+
+    /* Spacing - Generous, airy */
+    --space-xs: 0.35rem;
+    --space-sm: 0.6rem;
+    --space-md: 1rem;
+    --space-lg: 1.25rem;
+    --space-xl: 1.75rem;
+
+    /* Border Radius - Very organic */
+    --radius-sm: 8px;
+    --radius-md: 14px;
+    --radius-lg: 20px;
+    --radius-xl: 28px;
+    --radius-full: 9999px;
+
+    /* Transitions - Gentle, natural */
+    --transition-fast: 180ms ease-out;
+    --transition-normal: 350ms cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-slow: 600ms cubic-bezier(0.25, 0.46, 0.45, 0.94);
+
+    /* Fonts - Softer, friendlier */
+    --font-primary: 'Inter', system-ui, -apple-system, sans-serif;
+    --font-display: 'Inter', system-ui, sans-serif;
+    --font-mono: 'JetBrains Mono', monospace;
+}
+
+/* Reset & Base */
+*,
+*::before,
+*::after {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html,
+body {
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    font-family: var(--font-primary);
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    font-size: 14px;
+    line-height: 1.5;
+    color-scheme: light;
+}
+
+/* ============================================
+   Loading Screen - Gentle Bloom
+   ============================================ */
+#loading-screen {
+    position: fixed;
+    inset: 0;
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(165deg, #fdfcfa 0%, #fef6ee 40%, #f6faf6 100%);
+    transition: opacity var(--transition-slow), visibility var(--transition-slow);
+}
+
+#loading-screen.hidden {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+}
+
+.loader-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-lg);
+}
+
+.loader-ring {
+    position: absolute;
+    border-radius: 50%;
+    border: 2px solid transparent;
+    animation: loader-spin 3s ease-in-out infinite;
+}
+
+.loader-ring:nth-child(1) {
+    width: 80px;
+    height: 80px;
+    border-top-color: var(--accent-leaf);
+    border-bottom-color: var(--accent-blossom);
+    animation-duration: 2.5s;
+}
+
+.loader-ring:nth-child(2) {
+    width: 60px;
+    height: 60px;
+    border-right-color: var(--accent-sun);
+    border-left-color: var(--accent-sky);
+    animation-duration: 3s;
+    animation-direction: reverse;
+}
+
+.loader-ring:nth-child(3) {
+    width: 40px;
+    height: 40px;
+    border-top-color: var(--accent-earth);
+    animation-duration: 3.5s;
+}
+
+@keyframes loader-spin {
+    0% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+.loader-text {
+    margin-top: 100px;
+    font-size: 1.1rem;
+    font-weight: 500;
+    color: var(--accent-leaf);
+    letter-spacing: 0.02em;
+}
+
+.loader-subtext {
+    color: var(--text-muted);
+    font-size: 0.8rem;
+    font-weight: 400;
+    animation: breathe 3s ease-in-out infinite;
+}
+
+@keyframes breathe {
+
+    0%,
+    100% {
+        opacity: 0.5;
+    }
+
+    50% {
+        opacity: 1;
+    }
+}
+
+/* ============================================
+   Graph Container
+   ============================================ */
+#graph-container {
+    position: fixed;
+    inset: 0;
+    z-index: 1;
+    background: radial-gradient(ellipse at 50% 30%, #fefefe 0%, #fcfaf6 50%, #f8faf8 100%);
+}
+
+/* ============================================
+   UI Overlay
+   ============================================ */
+#ui-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 100;
+    pointer-events: none;
+}
+
+#ui-overlay>* {
+    pointer-events: auto;
+}
+
+/* ============================================
+   Title Bar - Delicate Header
+   ============================================ */
+.title-bar {
+    position: absolute;
+    top: var(--space-md);
+    left: var(--space-md);
+    right: var(--space-md);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: var(--space-sm) var(--space-lg);
+    background: var(--bg-glass);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid rgba(158, 200, 158, 0.12);
+    border-radius: var(--radius-xl);
+    box-shadow: var(--glow-soft);
+}
+
+.title-content h1 {
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    letter-spacing: -0.01em;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.title-content h1::before {
+    content: "🌻";
+    font-size: 1.1rem;
+}
+
+.subtitle {
+    display: block;
+    font-size: 0.82rem;
+    color: var(--text-muted);
+    margin-top: 3px;
+    font-weight: 400;
+    letter-spacing: 0.01em;
+}
+
+.stats-container {
+    display: flex;
+    gap: var(--space-xl);
+}
+
+.stat-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1px;
+}
+
+.stat-value {
+    font-family: var(--font-mono);
+    font-size: 1.25rem;
+    font-weight: 500;
+    color: var(--accent-leaf);
+}
+
+.stat-label {
+    font-size: 0.7rem;
+    color: var(--text-muted);
+    letter-spacing: 0.04em;
+    font-weight: 400;
+}
+
+/* ============================================
+   Date Display - Compact Organic Card
+   ============================================ */
+.date-display {
+    position: absolute;
+    bottom: var(--space-md);
+    left: var(--space-md);
+    padding: var(--space-sm) var(--space-md);
+    background: var(--bg-glass);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid rgba(158, 200, 158, 0.1);
+    border-radius: var(--radius-lg);
+    min-width: 140px;
+    z-index: 20;
+    box-shadow: var(--glow-soft);
+}
+
+.date-label {
+    font-size: 0.7rem;
+    color: var(--text-light);
+    text-transform: lowercase;
+    letter-spacing: 0.08em;
+    margin-bottom: 2px;
+}
+
+.date-value {
+    font-family: var(--font-mono);
+    font-size: 1.1rem;
+    font-weight: 500;
+    color: var(--text-secondary);
+    margin-bottom: var(--space-xs);
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.date-value::before {
+    content: "🌱";
+    font-size: 0.9rem;
+}
+
+.date-progress {
+    height: 3px;
+    background: rgba(158, 200, 158, 0.15);
+    border-radius: var(--radius-full);
+    overflow: hidden;
+}
+
+.progress-bar {
+    height: 100%;
+    width: 0%;
+    background: linear-gradient(90deg, var(--accent-leaf), var(--accent-blossom));
+    border-radius: var(--radius-full);
+    transition: width var(--transition-normal);
+}
+
+/* ============================================
+   Credits - Minimal
+   ============================================ */
+.credits {
+    position: absolute;
+    bottom: var(--space-md);
+    left: 50%;
+    transform: translateX(-50%);
+    padding: var(--space-xs) var(--space-md);
+    font-size: 0.75rem;
+    color: var(--text-light);
+    white-space: nowrap;
+    z-index: 5;
+}
+
+.credits a {
+    color: var(--accent-leaf);
+    text-decoration: none;
+    font-weight: 500;
+    transition: color var(--transition-fast);
+}
+
+.credits a:hover {
+    color: var(--accent-blossom);
+}
+
+/* ============================================
+   Controls Panel - Floating Bubbles
+   ============================================ */
+.controls-panel {
+    position: absolute;
+    bottom: var(--space-md);
+    right: var(--space-md);
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+    padding: var(--space-xs) var(--space-md);
+    background: var(--bg-glass);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid rgba(158, 200, 158, 0.1);
+    border-radius: var(--radius-xl);
+    z-index: 20;
+    box-shadow: var(--glow-soft);
+}
+
+.control-group {
+    display: flex;
+    align-items: center;
+    gap: var(--space-xs);
+}
+
+.control-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 34px;
+    height: 34px;
+    background: rgba(158, 200, 158, 0.08);
+    border: 1px solid rgba(158, 200, 158, 0.15);
+    border-radius: var(--radius-md);
+    color: var(--text-secondary);
+    cursor: pointer;
+    transition: all var(--transition-fast);
+}
+
+.control-btn:hover {
+    background: rgba(158, 200, 158, 0.18);
+    border-color: var(--accent-leaf);
+    color: var(--accent-leaf);
+    transform: translateY(-1px);
+}
+
+.control-btn:active {
+    transform: translateY(0) scale(0.96);
+}
+
+.control-btn .icon {
+    width: 18px;
+    height: 18px;
+}
+
+.control-btn .hidden {
+    display: none;
+}
+
+/* Tooltips - Soft */
+.control-btn {
+    position: relative;
+}
+
+.control-btn[data-tooltip]:hover::after {
+    content: attr(data-tooltip);
+    position: absolute;
+    bottom: 110%;
+    left: 50%;
+    transform: translateX(-50%);
+    padding: 5px 10px;
+    background: var(--bg-secondary);
+    border: 1px solid rgba(158, 200, 158, 0.2);
+    color: var(--text-secondary);
+    font-size: 0.6rem;
+    font-weight: 500;
+    white-space: nowrap;
+    border-radius: var(--radius-sm);
+    opacity: 0;
+    animation: tooltip-fade 0.25s forwards;
+    box-shadow: var(--glow-soft);
+    z-index: 1000;
+}
+
+@keyframes tooltip-fade {
+    to {
+        opacity: 1;
+        transform: translateX(-50%) translateY(-4px);
+    }
+}
+
+.speed-control {
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    padding: var(--space-xs) var(--space-sm);
+}
+
+.speed-control label {
+    font-size: 0.65rem;
+    color: var(--text-light);
+    text-transform: lowercase;
+    letter-spacing: 0.03em;
+}
+
+.speed-control input[type="range"] {
+    width: 70px;
+    height: 4px;
+    -webkit-appearance: none;
+    appearance: none;
+    background: rgba(158, 200, 158, 0.2);
+    border-radius: var(--radius-full);
+    outline: none;
+}
+
+.speed-control input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 14px;
+    height: 14px;
+    background: var(--accent-leaf);
+    border-radius: 50%;
+    cursor: pointer;
+    transition: transform var(--transition-fast);
+}
+
+.speed-control input[type="range"]::-webkit-slider-thumb:hover {
+    transform: scale(1.2);
+}
+
+#speed-value {
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    color: var(--accent-leaf);
+    min-width: 28px;
+    text-align: center;
+}
+
+/* ============================================
+   Info Panel - Gentle Popup
+   ============================================ */
+.info-panel {
+    position: absolute;
+    top: 50%;
+    right: var(--space-md);
+    transform: translateY(-50%);
+    width: 280px;
+    max-height: 55vh;
+    padding: var(--space-md);
+    background: var(--bg-glass);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(158, 200, 158, 0.12);
+    border-radius: var(--radius-xl);
+    overflow-y: auto;
+    transition: all var(--transition-normal);
+    box-shadow: var(--glow-soft), 0 10px 40px rgba(0, 0, 0, 0.06);
+    z-index: 50;
+}
+
+.info-panel.hidden {
+    opacity: 0;
+    transform: translateY(-50%) translateX(20px) scale(0.96);
+    pointer-events: none;
+}
+
+.close-btn {
+    position: absolute;
+    top: var(--space-xs);
+    right: var(--space-xs);
+    width: 26px;
+    height: 26px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: transparent;
+    border: none;
+    color: var(--text-light);
+    font-size: 1.1rem;
+    cursor: pointer;
+    transition: all var(--transition-fast);
+    border-radius: var(--radius-sm);
+}
+
+.close-btn:hover {
+    background: rgba(232, 180, 184, 0.15);
+    color: var(--accent-blossom);
+}
+
+.info-category {
+    display: inline-block;
+    padding: 4px 12px;
+    font-size: 0.72rem;
+    font-weight: 600;
+    text-transform: lowercase;
+    letter-spacing: 0.04em;
+    background: linear-gradient(135deg, var(--accent-leaf), var(--accent-blossom));
+    color: white;
+    border-radius: var(--radius-full);
+    margin-bottom: var(--space-sm);
+}
+
+.info-title {
+    font-size: 1.02rem;
+    font-weight: 600;
+    line-height: 1.45;
+    margin-bottom: var(--space-xs);
+    color: var(--text-primary);
+}
+
+.info-date {
+    font-family: var(--font-mono);
+    font-size: 0.82rem;
+    color: var(--text-muted);
+    margin-bottom: var(--space-sm);
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.info-keywords {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+    margin-bottom: var(--space-sm);
+}
+
+.keyword-tag {
+    padding: 3px 10px;
+    font-size: 0.72rem;
+    font-weight: 500;
+    background: rgba(158, 200, 158, 0.12);
+    color: var(--accent-leaf);
+    border: 1px solid rgba(158, 200, 158, 0.2);
+    border-radius: var(--radius-full);
+}
+
+.info-preview {
+    font-size: 0.85rem;
+    line-height: 1.6;
+    color: var(--text-secondary);
+}
+
+/* ============================================
+   Legend Panel - Floating Seeds
+   ============================================ */
+.legend-panel {
+    position: absolute;
+    top: 50%;
+    left: var(--space-md);
+    transform: translateY(-50%);
+    padding: var(--space-sm) var(--space-md);
+    background: var(--bg-glass);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid rgba(158, 200, 158, 0.1);
+    border-radius: var(--radius-lg);
+    max-width: 140px;
+    box-shadow: var(--glow-soft);
+}
+
+.legend-panel h4 {
+    font-size: 0.7rem;
+    font-weight: 600;
+    color: var(--text-light);
+    letter-spacing: 0.08em;
+    margin-bottom: var(--space-sm);
+    padding-bottom: 4px;
+    border-bottom: 1px solid rgba(158, 200, 158, 0.1);
+}
+
+.legend-items {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+}
+
+.legend-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.78rem;
+    color: var(--text-secondary);
+    padding: 3px 5px;
+    border-radius: var(--radius-sm);
+    transition: all var(--transition-fast);
+}
+
+.legend-item:hover {
+    background: rgba(158, 200, 158, 0.08);
+}
+
+.legend-color {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    line-height: 1;
+}
+
+/* ============================================
+   Text Stream - Floating Petals
+   ============================================ */
+.text-stream {
+    position: absolute;
+    top: 50%;
+    right: var(--space-md);
+    transform: translateY(-50%);
+    pointer-events: none;
+    z-index: 15;
+}
+
+.text-stream.hidden {
+    display: none;
+}
+
+.stream-labels {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 4px;
+    max-height: 180px;
+    overflow: hidden;
+    padding: 6px;
+    mask-image: linear-gradient(to bottom, transparent, black 15%, black 85%, transparent);
+    -webkit-mask-image: linear-gradient(to bottom, transparent, black 15%, black 85%, transparent);
+}
+
+.stream-label {
+    font-family: var(--font-mono);
+    font-size: 0.92rem;
+    font-weight: 500;
+    color: var(--accent-leaf);
+    text-align: right;
+    padding: 3px 8px;
+    white-space: nowrap;
+    background: rgba(255, 255, 255, 0.5);
+    border-radius: var(--radius-sm);
+    transition: all 0.4s ease-out;
+    transform-origin: right center;
+}
+
+/* ============================================
+   Mobile Toggle Buttons
+   ============================================ */
+#stream-toggle {
+    position: absolute;
+    top: 50%;
+    right: var(--space-md);
+    transform: translateY(-50%);
+    z-index: 20;
+    display: none;
+}
+
+#stream-toggle .show-icon,
+#stream-toggle .hide-icon {
+    display: block;
+}
+
+#stream-toggle.active .show-icon {
+    display: none;
+}
+
+#stream-toggle.active .hide-icon {
+    display: block;
+}
+
+#stream-toggle:not(.active) .show-icon {
+    display: block;
+}
+
+#stream-toggle:not(.active) .hide-icon {
+    display: none;
+}
+
+#legend-toggle,
+.legend-close-btn {
+    display: none !important;
+}
+
+/* ============================================
+   Responsive Design - Mobile Garden
+   ============================================ */
+@media (max-width: 768px) {
+    :root {
+        font-size: 13px;
+    }
+
+    .title-bar {
+        padding: var(--space-xs) var(--space-md);
+        top: var(--space-sm);
+        left: var(--space-sm);
+        right: var(--space-sm);
+        border-radius: var(--radius-lg);
+    }
+
+    .title-content h1 {
+        font-size: 0.88rem;
+    }
+
+    .title-content h1::before {
+        font-size: 0.8rem;
+    }
+
+    .subtitle {
+        font-size: 0.62rem;
+        display: none;
+    }
+
+    .stats-container {
+        gap: var(--space-md);
+    }
+
+    .stat-value {
+        font-size: 0.9rem;
+    }
+
+    .stat-label {
+        font-size: 0.52rem;
+    }
+
+    .date-display {
+        left: var(--space-sm);
+        bottom: 65px;
+        padding: var(--space-xs) var(--space-sm);
+        min-width: 110px;
+    }
+
+    .date-value {
+        font-size: 0.8rem;
+    }
+
+    .date-value::before {
+        font-size: 0.65rem;
+    }
+
+    .controls-panel {
+        left: var(--space-sm);
+        right: var(--space-sm);
+        bottom: 20px;
+        justify-content: space-between;
+        padding: 4px 8px;
+    }
+
+    .control-btn {
+        width: 30px;
+        height: 30px;
+    }
+
+    .control-btn .icon {
+        width: 15px;
+        height: 15px;
+    }
+
+    .speed-control {
+        flex-direction: row;
+        align-items: center;
+        gap: 4px;
+        flex: 1;
+        margin: 0 6px;
+        padding: 0;
+    }
+
+    .speed-control label {
+        display: none;
+    }
+
+    .speed-control input[type="range"] {
+        width: 100%;
+        min-width: 40px;
+    }
+
+    #speed-value {
+        font-size: 0.58rem;
+        min-width: 18px;
+    }
+
+    .credits {
+        bottom: 4px;
+        font-size: 0.55rem;
+    }
+
+    .info-panel {
+        top: auto;
+        bottom: 105px;
+        left: var(--space-sm);
+        right: var(--space-sm);
+        width: auto;
+        max-height: 28vh;
+        transform: none;
+        padding: var(--space-sm);
+    }
+
+    .info-panel.hidden {
+        transform: translateY(15px) scale(0.96);
+    }
+
+    .info-title {
+        font-size: 0.85rem;
+    }
+
+    .legend-panel {
+        top: 70px;
+        left: var(--space-sm);
+        transform: none;
+        max-width: 160px;
+        z-index: 100;
+        max-height: 45vh;
+        overflow-y: auto;
+    }
+
+    
+
+    #legend-toggle {
+        display: flex !important;
+        position: absolute;
+        top: 75px;
+        left: var(--space-sm);
+        z-index: 50;
+    }
+
+    .legend-close-btn {
+        display: flex !important;
+    }
+
+    #stream-toggle {
+        display: flex;
+        top: 75px;
+        right: var(--space-sm);
+        transform: none;
+    }
+
+    .text-stream {
+        top: 115px;
+        right: var(--space-sm);
+        transform: none;
+        max-width: 40%;
+    }
+
+    .stream-label {
+        font-size: 0.72rem;
+        padding: 2px 6px;
+    }
+}
+
+/* ============================================
+   Scrollbar - Minimal
+   ============================================ */
+::-webkit-scrollbar {
+    width: 4px;
+}
+
+::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--accent-leaf);
+    border-radius: var(--radius-full);
+    opacity: 0.5;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: var(--accent-blossom);
+}
+
+/* ============================================
+   Accessibility
+   ============================================ */
+@media (prefers-reduced-motion: reduce) {
+
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+}
+
+/* Focus styles for keyboard navigation */
+.control-btn:focus-visible,
+.legend-item:focus-visible {
+    outline: 2px solid var(--accent-leaf);
+    outline-offset: 2px;
+}
+
+/* ============================================
+   3D Force Graph Tooltip Fix
+   ============================================ */
+/* Target any dynamically created tooltip container */
+#graph-container>div:not(:first-child),
+#graph-container>div>div[style*="position"],
+#graph-container>div>div[style*="absolute"],
+.scene-tooltip,
+.graph-tooltip,
+div[class*="tooltip"],
+div[class*="Tooltip"] {
+    background: transparent !important;
+    background-color: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+    padding: 0 !important;
+    color-scheme: light !important;
+}
+
+/* Super aggressive: any positioned div that could be a tooltip */
+#graph-container div[style*="position: absolute"]:not(#graph-container > div:first-child) {
+    background: transparent !important;
+    background-color: transparent !important;
+}
+
+/* Utility classes */
+.relative { position: relative; }
+.absolute { position: absolute; }
+.w-full { width: 100%; }
+.h-screen { height: 100vh; }
+.inset-0 { inset: 0; }
+.z-0 { z-index: 0; }
+.z-10 { z-index: 10; }
+.z-20 { z-index: 20; }
+.z-30 { z-index: 30; }
+.z-50 { z-index: 50; }
+.pointer-events-none { pointer-events: none; }
+.pointer-events-auto { pointer-events: auto; }
+.flex { display: flex; }
+.flex-col { display: flex; flex-direction: column; }
+.items-center { align-items: center; }
+.items-end { align-items: flex-end; }
+.justify-center { justify-content: center; }
+.gap-4 { gap: 1rem; }
+.hidden { display: none !important; }
+.mb-2 { margin-bottom: 0.5rem; }
+
+@media (min-width: 768px) {
+    .md\:block { display: block !important; }
+    .md\:flex { display: flex !important; }
+    .md\:hidden { display: none !important; }
+}
+    </style>
+</head>
+<body>
+
+<div class="relative w-full h-screen overflow-hidden light" data-theme="light" style="color-scheme: light; background-color: var(--bg-primary); color: var(--text-primary);">
+    <!-- Loading Screen -->
+    <div id="loading-screen">
+        <div class="loader-container">
+            <div class="loader-ring"></div>
+            <div class="loader-ring"></div>
+            <div class="loader-ring"></div>
+            <h2 class="loader-text">Growing the Garden</h2>
+            <p class="loader-subtext">Planting Seeds of Positive News...</p>
+        </div>
+    </div>
+
+    <!-- Graph Container -->
+    <div id="graph-container" class="absolute inset-0 z-0"></div>
+
+    <!-- UI Overlay -->
+    <div id="ui-overlay" class="absolute inset-0 z-10 pointer-events-none">
+        
+        <!-- Title Bar -->
+        <header class="title-bar pointer-events-auto">
+            <div class="flex items-center gap-4">
+                <a href="/data" class="control-btn" style="border: none; background: transparent; padding: 0" data-tooltip="Back to Home">
+                    <svg class="icon" viewBox="0 0 24 24" fill="currentColor" style="width: 20px; height: 20px;">
+                        <path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z" />
+                    </svg>
+                </a>
+                <div class="title-content">
+                    <h1>Good News Garden</h1>
+                    <span class="subtitle">Watch Positivity Bloom Over Time</span>
+                </div>
+            </div>
+            <div class="stats-container">
+                <div class="stat-item">
+                    <span id="stat-nodes" class="stat-value">0</span>
+                    <span class="stat-label">Blooms</span>
+                </div>
+                <div class="stat-item">
+                    <span id="stat-links" class="stat-value">0</span>
+                    <span class="stat-label">Vines</span>
+                </div>
+            </div>
+        </header>
+
+        <!-- Date Display -->
+        <div class="date-display pointer-events-auto">
+            <div id="date-value" class="date-value">planting...</div>
+            <div class="date-progress">
+                <div id="progress-bar" class="progress-bar" style="width: 0%"></div>
+            </div>
+        </div>
+
+        <!-- Controls -->
+        <div class="controls-panel pointer-events-auto">
+            <div class="control-group">
+                <button id="btn-play" class="control-btn" data-tooltip="Play / Pause">
+                    <svg id="icon-play" class="icon" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z" /></svg>
+                    <svg id="icon-pause" class="icon hidden" viewBox="0 0 24 24" fill="currentColor"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z" /></svg>
+                </button>
+                <button id="btn-reset" class="control-btn" data-tooltip="Reset">
+                    <svg class="icon" viewBox="0 0 24 24" fill="currentColor"><path d="M12 5V1L7 6l5 5V7c3.31 0 6 2.69 6 6s-2.69 6-6 6-6-2.69-6-6H4c0 4.42 3.58 8 8 8s8-3.58 8-8-3.58-8-8-8z" /></svg>
+                </button>
+            </div>
+            <div class="control-group speed-control">
+                <label>speed</label>
+                <input id="input-speed" type="range" min="0.5" max="5" step="0.5" value="1">
+                <span id="speed-value">1x</span>
+            </div>
+            <div class="control-group">
+                <button id="btn-orbit" class="control-btn active-control" data-tooltip="Toggle Auto-Orbit" style="border-color: var(--accent-leaf); color: var(--accent-leaf);">
+                    <svg class="icon" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z" /></svg>
+                </button>
+                <button id="btn-zoom" class="control-btn active-control" data-tooltip="Toggle Auto-Zoom" style="border-color: var(--accent-leaf); color: var(--accent-leaf);">
+                    <svg class="icon" viewBox="0 0 24 24" fill="currentColor"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z" /><path d="M12 10h-2v2H9v-2H7V9h2V7h1v2h2v1z" /></svg>
+                </button>
+                <button id="btn-fit" class="control-btn" data-tooltip="Center View">
+                    <svg class="icon" viewBox="0 0 24 24" fill="currentColor"><path d="M5 5h5v2H7v3H5V5zm9 0h5v5h-2V7h-3V5zm0 14h5v-5h-2v3h-3v2zM5 19h5v-2H7v-3H5v5z" /></svg>
+                </button>
+            </div>
+        </div>
+
+        <!-- Credits -->
+        <div class="credits pointer-events-auto">
+            &copy; <span id="year"></span> <a href="https://raihankalla.id" target="_blank" rel="noreferrer">@alhrkn</a>
+        </div>
+
+        <!-- Info Panel -->
+        <div id="info-panel" class="info-panel pointer-events-auto hidden">
+            <button id="info-close" class="close-btn">&times;</button>
+            <div id="info-category" class="info-category"></div>
+            <h3 id="info-title" class="info-title"></h3>
+            <div id="info-date" class="info-date"></div>
+            <div id="info-keywords" class="info-keywords"></div>
+            <div id="info-preview" class="info-preview"></div>
+        </div>
+
+        <!-- Legend Toggle (Mobile) -->
+        <button id="legend-toggle" class="control-btn pointer-events-auto md:hidden" data-tooltip="Show Legend">
+            <svg class="icon" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M4 15h16v-2H4v2zm0 4h16v-2H4v2zm0-8h16V9H4v2zm0-6v2h16V5H4z" />
+            </svg>
+        </button>
+
+        <!-- Legend Panel -->
+        <div id="legend-panel" class="legend-panel pointer-events-auto hidden md:block">
+            <button id="legend-close" class="close-btn legend-close-btn md:hidden" style="top: 3px; right: 3px; font-size: 1rem;">&times;</button>
+            <h4>Garden Guide</h4>
+            <div id="legend-items-container" class="legend-items"></div>
+        </div>
+
+        <!-- Stream Toggle (Mobile) -->
+        <button id="stream-toggle" class="control-btn md:hidden pointer-events-auto hidden" data-tooltip="Show Keywords">
+            <svg class="icon" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M4 15h16v-2H4v2zm0 4h16v-2H4v2zm0-8h16V9H4v2zm0-6v2h16V5H4z" />
+            </svg>
+        </button>
+
+        <!-- Vertical Text Stream -->
+        <div id="text-stream" class="text-stream pointer-events-none hidden md:flex">
+            <button id="stream-close-btn" class="pointer-events-auto md:hidden mb-2" style="color: rgba(93, 83, 71, 0.5); font-size: 1.5rem; line-height: 1; position: absolute; top: -30px; right: 0; z-index: 30; background: none; border: none; cursor: pointer;">&times;</button>
+            <div id="stream-labels" class="stream-labels"></div>
+        </div>
+
+    </div>
+</div>
+
+<script>
+    document.getElementById('year').textContent = new Date().getFullYear();
+
+    const CONFIG = {
+        dataUrl: '/components/goodnews-garden/goodnews-network.json',
+        animationSpeed: 1,
+        nodeAppearDuration: 1500,
+        dateDuration: 800,
+        labelDuration: 2000,
+        nodeBaseSize: 3,
+        nodeOpacityActive: 1,
+        nodeOpacityFaded: 0.8,
+        linkOpacity: 0.6,
+        linkWidth: 1.5,
+        cameraOrbitSpeed: 0.0005,
+        cameraDistance: 800,
+        cameraMinDistance: 50,
+        cameraMaxDistance: 10000,
+        glowIntensity: 2.5,
+        glowDuration: 2000,
+        defaultNodeColor: '#F8BBD9',
+        linkColor: 'rgba(129, 199, 132, 0.4)',
+        backgroundColor: '#fefefe',
+    };
+
+    const FLOWER_PALETTES = {
+        'Wisata': { petal: '#81D4FA', center: '#FFE082', glow: '#4FC3F7' },
+        'IPTEK & Pendidikan': { petal: '#A5D6A7', center: '#FFF59D', glow: '#66BB6A' },
+        'Nasional': { petal: '#EF9A9A', center: '#FFCC80', glow: '#E57373' },
+        'Humaniora': { petal: '#FFE082', center: '#FFAB91', glow: '#FFD54F' },
+        'Sosial Budaya': { petal: '#F8BBD9', center: '#FFECB3', glow: '#F48FB1' },
+        'Sejarah': { petal: '#CE93D8', center: '#F8BBD9', glow: '#BA68C8' },
+        'Opini': { petal: '#90CAF9', center: '#B3E5FC', glow: '#64B5F6' },
+        'Internasional': { petal: '#80DEEA', center: '#E0F7FA', glow: '#4DD0E1' },
+        'Ekonomi': { petal: '#FFAB91', center: '#FFE0B2', glow: '#FF8A65' },
+        'Olahraga': { petal: '#C5E1A5', center: '#F0F4C3', glow: '#9CCC65' },
+        'Legenda': { petal: '#E1BEE7', center: '#F3E5F5', glow: '#CE93D8' },
+        'Uncategorized': { petal: '#CFD8DC', center: '#ECEFF1', glow: '#B0BEC5' }
+    };
+
+    const CATEGORY_EMOJIS = {
+        'Wisata': '🌊',
+        'IPTEK & Pendidikan': '🌿',
+        'Nasional': '🌹',
+        'Humaniora': '🌻',
+        'Sosial Budaya': '🌸',
+        'Sejarah': '🍂',
+        'Opini': '💭',
+        'Internasional': '🌍',
+        'Ekonomi': '🌾',
+        'Olahraga': '🍀',
+        'Legenda': '✨',
+        'Uncategorized': '🌱'
+    };
+
+    function getCategoryEmoji(category) {
+        return CATEGORY_EMOJIS[category || ''] || CATEGORY_EMOJIS['Uncategorized'];
+    }
+
+    function getFlowerPalette(node) {
+        const category = node.category || 'Uncategorized';
+        return FLOWER_PALETTES[category] || FLOWER_PALETTES['Uncategorized'];
+    }
+
+    function easeOutBack(x) {
+        const c1 = 1.70158;
+        const c3 = c1 + 1;
+        return 1 + c3 * Math.pow(x - 1, 3) + c1 * Math.pow(x - 1, 2);
+    }
+
+    const state = {
+        data: null,
+        currentNodes: [],
+        currentLinks: [],
+        isPlaying: false,
+        currentDateIndex: 0,
+        uniqueDates: [],
+        nodesByDate: {},
+        nodesById: {},
+        autoOrbit: true,
+        autoZoom: true,
+        orbitAngle: 0,
+        userInteracting: false,
+        networkCenter: { x: 0, y: 0, z: 0 },
+        animationTimer: null,
+        interactionTimeout: null,
+        glowingNodes: new Map(),
+        floatingLabels: new Map(),
+        addedNodeIds: new Set(),
+        addedLinkIds: new Set(),
+        sharedGeometries: {},
+        emojiTextureCache: new Map(),
+        speed: 1,
+        highlightedCategory: null,
+        legendItems: [],
+        recentLabels: [],
+        selectedNode: null,
+        showLegend: false,
+        showCarousel: true
+    };
+
+    let graph = null;
+
+    // DOM Elements
+    const dom = {
+        loadingScreen: document.getElementById('loading-screen'),
+        statNodes: document.getElementById('stat-nodes'),
+        statLinks: document.getElementById('stat-links'),
+        dateValue: document.getElementById('date-value'),
+        progressBar: document.getElementById('progress-bar'),
+        btnPlay: document.getElementById('btn-play'),
+        iconPlay: document.getElementById('icon-play'),
+        iconPause: document.getElementById('icon-pause'),
+        btnReset: document.getElementById('btn-reset'),
+        inputSpeed: document.getElementById('input-speed'),
+        speedValue: document.getElementById('speed-value'),
+        btnOrbit: document.getElementById('btn-orbit'),
+        btnZoom: document.getElementById('btn-zoom'),
+        btnFit: document.getElementById('btn-fit'),
+        infoPanel: document.getElementById('info-panel'),
+        infoClose: document.getElementById('info-close'),
+        infoCategory: document.getElementById('info-category'),
+        infoTitle: document.getElementById('info-title'),
+        infoDate: document.getElementById('info-date'),
+        infoKeywords: document.getElementById('info-keywords'),
+        infoPreview: document.getElementById('info-preview'),
+        legendToggle: document.getElementById('legend-toggle'),
+        legendPanel: document.getElementById('legend-panel'),
+        legendClose: document.getElementById('legend-close'),
+        legendItemsContainer: document.getElementById('legend-items-container'),
+        textStream: document.getElementById('text-stream'),
+        streamLabels: document.getElementById('stream-labels'),
+        streamToggleBtn: document.getElementById('stream-toggle'),
+        streamCloseBtn: document.getElementById('stream-close-btn')
+    };
+
+    function formatDate(dateStr) {
+        if (!dateStr || dateStr === '—' || dateStr === 'planting...') return dateStr;
+        const parts = dateStr.split('/');
+        if (parts.length !== 3) return dateStr;
+        const [day, month, year] = parts;
+        const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+        return `${parseInt(day)} ${months[parseInt(month) - 1]} ${year}`;
+    }
+
+    function processDates() {
+        const { nodes } = state.data;
+        state.nodesByDate = {};
+        nodes.forEach(node => {
+            const dateStr = node.date;
+            if (!state.nodesByDate[dateStr]) state.nodesByDate[dateStr] = [];
+            state.nodesByDate[dateStr].push(node.id);
+        });
+
+        state.uniqueDates = Object.keys(state.nodesByDate).sort((a, b) => {
+            const [dayA, monthA, yearA] = a.split('/').map(Number);
+            const [dayB, monthB, yearB] = b.split('/').map(Number);
+            return new Date(yearA, monthA - 1, dayA).getTime() - new Date(yearB, monthB - 1, dayB).getTime();
+        });
+    }
+
+    function populateLegend() {
+        const topicCounts = {};
+        state.data.nodes.forEach(node => {
+            const topic = node.category || 'Uncategorized';
+            topicCounts[topic] = (topicCounts[topic] || 0) + 1;
+        });
+
+        const topTopics = Object.entries(topicCounts)
+            .sort((a, b) => b[1] - a[1])
+            .slice(0, 10);
+
+        state.legendItems = topTopics.map(([tag]) => {
+            const palette = FLOWER_PALETTES[tag] || FLOWER_PALETTES['Uncategorized'];
+            return {
+                tag,
+                color: palette.petal,
+                emoji: getCategoryEmoji(tag)
+            };
+        });
+
+        if (state.legendItems.length > 0) {
+            if (window.innerWidth >= 768) {
+                dom.legendPanel.classList.remove('hidden');
+                state.showLegend = true;
+            } else {
+                dom.legendPanel.classList.add('hidden');
+                state.showLegend = false;
+            }
+            renderLegend();
+        }
+    }
+
+    function renderLegend() {
+        dom.legendItemsContainer.innerHTML = '';
+        state.legendItems.forEach(item => {
+            const div = document.createElement('div');
+            div.className = 'legend-item';
+            div.style.opacity = (state.highlightedCategory && state.highlightedCategory !== item.tag) ? 0.3 : 1;
+            div.style.cursor = 'pointer';
+            
+            const centerColor = FLOWER_PALETTES[item.tag] ? FLOWER_PALETTES[item.tag].center : item.color;
+            div.innerHTML = `
+                <span class="legend-color" style="background: linear-gradient(135deg, ${item.color}, ${centerColor}); color: transparent; text-shadow: 0 0 0 white;">${item.emoji}</span>
+                <span>${item.tag}</span>
+            `;
+            div.onclick = () => {
+                state.highlightedCategory = state.highlightedCategory === item.tag ? null : item.tag;
+                renderLegend();
+                if (graph) {
+                    graph.nodeColor(graph.nodeColor());
+                    graph.linkColor(graph.linkColor());
+                    graph.nodeThreeObject(node => createFlowerObject(node));
+                }
+            };
+            dom.legendItemsContainer.appendChild(div);
+        });
+    }
+
+    function getNodeColor(node) {
+        const activeCategory = state.highlightedCategory;
+        if (activeCategory && node.category !== activeCategory) {
+            return 'rgba(200, 200, 200, 0.2)';
+        }
+        return getFlowerPalette(node).petal;
+    }
+
+    function getLinkColor(link) {
+        const sourceId = typeof link.source === 'object' ? link.source.id : link.source;
+        const targetId = typeof link.target === 'object' ? link.target.id : link.target;
+        const sourceNode = state.nodesById[sourceId];
+        const targetNode = state.nodesById[targetId];
+
+        const activeCategory = state.highlightedCategory;
+
+        if (activeCategory && sourceNode && targetNode) {
+            if (sourceNode.category !== activeCategory || targetNode.category !== activeCategory) {
+                return 'rgba(200, 200, 200, 0.1)';
+            }
+        }
+
+        if (sourceNode) {
+            const palette = getFlowerPalette(sourceNode);
+            const color = new THREE.Color(palette.petal);
+            const greenVine = new THREE.Color('#81C784');
+            color.lerp(greenVine, 0.6);
+            return `rgba(${Math.round(color.r * 255)}, ${Math.round(color.g * 255)}, ${Math.round(color.b * 255)}, 0.5)`;
+        }
+        return CONFIG.linkColor;
+    }
+
+    function getSharedGeometry(type, size) {
+        const key = `${type}_${size.toFixed(2)}`;
+        if (!state.sharedGeometries[key]) {
+            switch (type) {
+                case 'core': state.sharedGeometries[key] = new THREE.SphereGeometry(size, 12, 12); break;
+                case 'halo': state.sharedGeometries[key] = new THREE.SphereGeometry(size, 8, 8); break;
+                case 'glow': state.sharedGeometries[key] = new THREE.SphereGeometry(size, 6, 6); break;
+                default: state.sharedGeometries[key] = new THREE.SphereGeometry(size, 8, 8);
+            }
+        }
+        return state.sharedGeometries[key];
+    }
+
+    function getEmojiTexture(emoji) {
+        if (state.emojiTextureCache.has(emoji)) return state.emojiTextureCache.get(emoji);
+
+        const canvas = document.createElement('canvas');
+        const context = canvas.getContext('2d');
+        const resolution = 64;
+        canvas.width = resolution;
+        canvas.height = resolution;
+
+        context.font = `${resolution * 0.7}px serif`;
+        context.textAlign = 'center';
+        context.textBaseline = 'middle';
+        context.fillText(emoji, resolution / 2, resolution / 2);
+
+        const texture = new THREE.CanvasTexture(canvas);
+        texture.minFilter = THREE.LinearFilter;
+        texture.magFilter = THREE.LinearFilter;
+
+        state.emojiTextureCache.set(emoji, texture);
+        return texture;
+    }
+
+    function createEmojiSprite(emoji, size, opacityMultiplier = 1.0) {
+        const texture = getEmojiTexture(emoji);
+        const material = new THREE.SpriteMaterial({
+            map: texture, transparent: true, opacity: opacityMultiplier, depthTest: false, depthWrite: false
+        });
+        const sprite = new THREE.Sprite(material);
+        sprite.scale.set(size, size, 1);
+        return sprite;
+    }
+
+    function createBloomShape(group, scale, palette, isAnimating, opacityMultiplier = 1.0, emoji = '🌸') {
+        const haloGeometry = getSharedGeometry('halo', 1);
+        const haloMaterial = new THREE.MeshBasicMaterial({ color: palette.petal, transparent: true, opacity: 0.5 * opacityMultiplier });
+        const halo = new THREE.Mesh(haloGeometry, haloMaterial);
+        halo.scale.setScalar(scale * 1.3);
+        group.add(halo);
+
+        const petalGeometry = getSharedGeometry('core', 1);
+        const petalMaterial = new THREE.MeshBasicMaterial({ color: palette.petal, transparent: true, opacity: 0.85 * opacityMultiplier });
+        const petalSphere = new THREE.Mesh(petalGeometry, petalMaterial);
+        petalSphere.scale.setScalar(scale * 0.95);
+        group.add(petalSphere);
+
+        const emojiSprite = createEmojiSprite(emoji, scale * 1.8, opacityMultiplier);
+        group.add(emojiSprite);
+        return group;
+    }
+
+    function createFlowerObject(node) {
+        const isGlowing = state.glowingNodes.has(node.id);
+        const palette = getFlowerPalette(node);
+        const emoji = getCategoryEmoji(node.category);
+        const nodeSize = node.size || CONFIG.nodeBaseSize;
+        const baseScale = nodeSize;
+
+        const isFiltered = state.highlightedCategory && node.category !== state.highlightedCategory;
+        const opacityMultiplier = isFiltered ? 0.12 : 1.0;
+
+        const group = new THREE.Group();
+
+        if (isGlowing && !isFiltered) {
+            const startTime = state.glowingNodes.get(node.id);
+            const elapsed = Date.now() - startTime;
+            const progress = Math.min(elapsed / CONFIG.glowDuration, 1);
+            const bloomScale = easeOutBack(progress);
+
+            const glowSize = baseScale * (1.8 + (1 - progress) * 1.5);
+            const glowGeometry = getSharedGeometry('glow', 1);
+            const glowMaterial = new THREE.MeshBasicMaterial({ color: palette.glow, transparent: true, opacity: 0.4 * (1 - progress * 0.8) });
+            const glowMesh = new THREE.Mesh(glowGeometry, glowMaterial);
+            glowMesh.scale.setScalar(glowSize);
+            group.add(glowMesh);
+
+            createBloomShape(group, baseScale * bloomScale, palette, true, opacityMultiplier, emoji);
+        } else {
+            createBloomShape(group, baseScale, palette, false, opacityMultiplier, emoji);
+        }
+
+        return group;
+    }
+
+    function initGraph() {
+        graph = ForceGraph3D()(document.getElementById('graph-container'))
+            .backgroundColor(CONFIG.backgroundColor)
+            .showNavInfo(false)
+            .enableNavigationControls(true)
+            .enablePointerInteraction(true)
+            .nodeLabel(node => {
+                const palette = getFlowerPalette(node);
+                const emoji = getCategoryEmoji(node.category);
+                return `<div style="margin: 0px; padding: 0px; background: #fdfcfa;">
+                    <div style="padding: 12px; background: rgba(255, 255, 255, 0.98); box-shadow: 0 8px 32px rgba(0,0,0,0.08); border-radius: 14px; max-width: 280px; font-family: Inter, sans-serif; border: 1px solid ${palette.petal}40;">
+                        <div style="font-size: 11px; color: ${palette.petal}; margin-bottom: 6px; font-weight: 500;">${emoji} ${node.category}</div>
+                        <strong style="color: #4a4540; font-size: 13px; line-height: 1.4;">${node.title}</strong><br>
+                        <span style="color: #8a7e72; font-size: 11px;">${formatDate(node.date)}</span>
+                    </div>
+                </div>`;
+            })
+            .nodeColor(node => getNodeColor(node))
+            .nodeOpacity(0.95)
+            .nodeVal(node => node.size || CONFIG.nodeBaseSize)
+            .nodeRelSize(5)
+            .nodeThreeObject(node => createFlowerObject(node))
+            .nodeThreeObjectExtend(false)
+            .linkColor(link => getLinkColor(link))
+            .linkOpacity(CONFIG.linkOpacity)
+            .linkWidth(() => CONFIG.linkWidth)
+            .linkCurvature(0.25)
+            .linkCurveRotation(link => {
+                const sourceId = typeof link.source === 'object' ? link.source.id : link.source;
+                const hash = String(sourceId).split('').reduce((a, b) => (a * 31 + b.charCodeAt(0)) | 0, 0);
+                return (hash % 360) * Math.PI / 180;
+            })
+            .numDimensions(3)
+            .d3AlphaDecay(0.04)
+            .d3VelocityDecay(0.3)
+            .onNodeClick(node => {
+                if (node.x === undefined) return;
+                if (state.isPlaying) pauseAnimation();
+                selectNode(node);
+
+                const distance = 80;
+                graph.cameraPosition(
+                    { x: node.x + distance, y: node.y + distance * 0.4, z: node.z + distance },
+                    { x: node.x, y: node.y, z: node.z },
+                    1500
+                );
+                state.networkCenter = { x: node.x, y: node.y, z: node.z };
+                state.userInteracting = true;
+            })
+            .onBackgroundClick(() => {
+                selectNode(null);
+                state.userInteracting = false;
+            });
+
+        graph.d3Force('charge', d3.forceManyBody().strength(-50).distanceMax(250));
+        graph.d3Force('link', d3.forceLink().id(d => d.id).distance(50).strength(0.15));
+        graph.d3Force('center', d3.forceCenter(0, 0));
+        graph.d3Force('collision', d3.forceCollide().radius(node => (node.size || CONFIG.nodeBaseSize) * 2).iterations(1));
+
+        graph.cameraPosition({ x: 0, y: 0, z: CONFIG.cameraDistance });
+        graph.graphData({ nodes: [], links: [] });
+
+        const controls = graph.controls();
+        if (controls) {
+            controls.enableDamping = true;
+            controls.dampingFactor = 0.05;
+            controls.minDistance = CONFIG.cameraMinDistance;
+            controls.maxDistance = CONFIG.cameraMaxDistance;
+            controls.zoomSpeed = 2.0;
+            controls.addEventListener('start', () => {
+                state.userInteracting = true;
+                if (state.isPlaying) pauseAnimation();
+                if (state.interactionTimeout) clearTimeout(state.interactionTimeout);
+            });
+            controls.addEventListener('end', () => {
+                state.userInteracting = false;
+                if (state.interactionTimeout) {
+                    clearTimeout(state.interactionTimeout);
+                    state.interactionTimeout = null;
+                }
+            });
+        }
+    }
+
+    function selectNode(node) {
+        state.selectedNode = node;
+        if (node) {
+            const palette = getFlowerPalette(node);
+            dom.infoCategory.style.background = `linear-gradient(135deg, ${palette.petal}, ${palette.glow})`;
+            dom.infoCategory.textContent = `${getCategoryEmoji(node.category)} ${node.category || 'Article'}`;
+            dom.infoTitle.textContent = node.title;
+            dom.infoDate.textContent = formatDate(node.date);
+            
+            dom.infoKeywords.innerHTML = '';
+            if (node.keywords) {
+                node.keywords.forEach(kw => {
+                    const span = document.createElement('span');
+                    span.className = 'keyword-tag';
+                    span.textContent = kw;
+                    span.style.background = `${palette.petal}20`;
+                    span.style.borderColor = palette.petal;
+                    span.style.color = palette.glow;
+                    dom.infoKeywords.appendChild(span);
+                });
+            }
+
+            dom.infoPreview.innerHTML = '';
+            if (node.narasi_preview) {
+                let previewText = node.narasi_preview.length > 200 ? node.narasi_preview.substring(0, 200) + '...' : node.narasi_preview;
+                let html = `<span>${previewText}</span>`;
+                if (node.url && node.url !== '#') {
+                    html += ` <a href="${node.url}" target="_blank" rel="noopener noreferrer" style="color: ${palette.glow}; text-decoration: none; font-weight: bold; margin-left: 5px;">(Read more 🌱)</a>`;
+                }
+                dom.infoPreview.innerHTML = html;
+            } else {
+                dom.infoPreview.textContent = 'No preview available.';
+            }
+            dom.infoPanel.classList.remove('hidden');
+        } else {
+            dom.infoPanel.classList.add('hidden');
+        }
+    }
+
+    function updateCarousel() {
+        dom.streamLabels.innerHTML = '';
+        state.recentLabels.forEach((label, index) => {
+            const listLength = state.recentLabels.length;
+            const centerIndex = (listLength - 1) / 2;
+            const dist = Math.abs(index - centerIndex);
+            const opacity = Math.max(0.3, 1 - (dist * 0.25));
+            const scale = Math.max(0.85, 1 - (dist * 0.05));
+            const blur = dist > 1.5 ? 'blur(1px)' : 'none';
+            const textShadow = opacity > 0.8 ? '0 0 15px rgba(129, 199, 132, 0.6)' : 'none';
+
+            const div = document.createElement('div');
+            div.className = 'stream-label';
+            div.style.opacity = opacity;
+            div.style.transform = `scale(${scale})`;
+            div.style.filter = blur;
+            div.style.textShadow = textShadow;
+            div.textContent = label.text;
+            dom.streamLabels.appendChild(div);
+        });
+    }
+
+    function startAnimation() {
+        if (state.isPlaying) return;
+        state.isPlaying = true;
+        state.autoZoom = true;
+        updateControlsUI();
+        animationTick();
+    }
+
+    function pauseAnimation() {
+        state.isPlaying = false;
+        updateControlsUI();
+        if (state.animationTimer) {
+            clearTimeout(state.animationTimer);
+            state.animationTimer = null;
+        }
+    }
+
+    function resetAnimation() {
+        pauseAnimation();
+        state.currentDateIndex = 0;
+        state.currentNodes = [];
+        state.currentLinks = [];
+        state.addedNodeIds.clear();
+        state.addedLinkIds.clear();
+        state.glowingNodes.clear();
+        state.floatingLabels.clear();
+        state.recentLabels = [];
+        
+        if (graph) graph.graphData({ nodes: [], links: [] });
+        
+        dom.statNodes.textContent = '0';
+        dom.statLinks.textContent = '0';
+        dom.dateValue.textContent = 'planting...';
+        dom.progressBar.style.width = '0%';
+        updateCarousel();
+    }
+
+    function animationTick() {
+        if (!state.isPlaying) return;
+
+        if (state.currentDateIndex >= state.uniqueDates.length) {
+            pauseAnimation();
+            fitCameraToNetwork();
+            return;
+        }
+
+        const currentDateStr = state.uniqueDates[state.currentDateIndex];
+        dom.dateValue.innerHTML = `${formatDate(currentDateStr)}`;
+        dom.progressBar.style.width = `${((state.currentDateIndex + 1) / state.uniqueDates.length) * 100}%`;
+
+        const nodeIdsForDate = state.nodesByDate[currentDateStr] || [];
+        let nodesAdded = false;
+
+        nodeIdsForDate.forEach(nodeId => {
+            if (!state.addedNodeIds.has(nodeId)) {
+                const node = state.nodesById[nodeId];
+                if (node) {
+                    state.currentNodes.push(node);
+                    state.addedNodeIds.add(nodeId);
+                    state.glowingNodes.set(nodeId, Date.now());
+                    
+                    let labelText = '';
+                    if (node.keywords && node.keywords.length > 0) labelText = node.keywords[0];
+                    else if (node.title) labelText = node.title.split(' ').slice(0, 2).join(' ');
+                    else labelText = node.category || 'Article';
+
+                    state.floatingLabels.set(nodeId, { startTime: Date.now(), text: labelText });
+                    
+                    const newLabel = { id: nodeId, text: labelText, timestamp: Date.now() };
+                    state.recentLabels.push(newLabel);
+                    if (state.recentLabels.length > 7) state.recentLabels.shift();
+                    
+                    nodesAdded = true;
+                }
+            }
+        });
+
+        state.data.links.forEach(link => {
+            const sourceId = typeof link.source === 'object' ? link.source.id : link.source;
+            const targetId = typeof link.target === 'object' ? link.target.id : link.target;
+            const linkId = `${sourceId}-${targetId}`;
+
+            if (state.addedNodeIds.has(sourceId) && state.addedNodeIds.has(targetId) && !state.addedLinkIds.has(linkId)) {
+                state.currentLinks.push(link);
+                state.addedLinkIds.add(linkId);
+            }
+        });
+
+        if (nodesAdded && graph) {
+            graph.graphData({ nodes: [...state.currentNodes], links: [...state.currentLinks] });
+            dom.statNodes.textContent = state.currentNodes.length;
+            dom.statLinks.textContent = state.currentLinks.length;
+            updateCarousel();
+        }
+
+        state.currentDateIndex++;
+        const delay = CONFIG.dateDuration / state.speed;
+        state.animationTimer = setTimeout(animationTick, delay);
+    }
+
+    let lastGlowUpdate = 0;
+    const GLOW_UPDATE_INTERVAL = 100;
+
+    function startGlowAnimation() {
+        const animate = () => {
+            const now = Date.now();
+            if (now - lastGlowUpdate > GLOW_UPDATE_INTERVAL) {
+                lastGlowUpdate = now;
+                let hasGlowingNodes = false;
+                for (const [nodeId, startTime] of state.glowingNodes) {
+                    if (now - startTime > CONFIG.glowDuration) state.glowingNodes.delete(nodeId);
+                    else hasGlowingNodes = true;
+                }
+                if (hasGlowingNodes && graph) {
+                    graph.nodeThreeObject(node => createFlowerObject(node));
+                }
+            }
+            requestAnimationFrame(animate);
+        };
+        animate();
+    }
+
+    function startLabelAnimation() {
+        const animate = () => {
+            const now = Date.now();
+            for (const [nodeId, labelInfo] of state.floatingLabels) {
+                if (now - labelInfo.startTime > CONFIG.labelDuration) state.floatingLabels.delete(nodeId);
+            }
+            requestAnimationFrame(animate);
+        };
+        animate();
+    }
+
+    function startAutoOrbit() {
+        const animate = () => {
+            if (!graph) { requestAnimationFrame(animate); return; }
+            if (state.autoOrbit && !state.userInteracting && graph) {
+                const currentPos = graph.cameraPosition();
+                const controls = graph.controls();
+                const target = controls ? controls.target : new THREE.Vector3(state.networkCenter.x, state.networkCenter.y, state.networkCenter.z);
+                const offset = new THREE.Vector3(currentPos.x, currentPos.y, currentPos.z).sub(target);
+                const spherical = new THREE.Spherical().setFromVector3(offset);
+                spherical.theta += CONFIG.cameraOrbitSpeed * 0.5 * state.speed;
+                const newOffset = new THREE.Vector3().setFromSpherical(spherical);
+                const newPos = new THREE.Vector3().copy(target).add(newOffset);
+                graph.cameraPosition({ x: newPos.x, y: newPos.y, z: newPos.z }, { x: target.x, y: target.y, z: target.z }, 0);
+            }
+            requestAnimationFrame(animate);
+        }
+        animate();
+    }
+
+    function toggleAutoOrbit() {
+        state.autoOrbit = !state.autoOrbit;
+        updateControlsUI();
+        if (state.autoOrbit && graph) {
+            const camPos = graph.cameraPosition();
+            const center = state.networkCenter;
+            const dx = camPos.x - center.x;
+            const dz = camPos.z - center.z;
+            CONFIG.cameraDistance = Math.sqrt(dx * dx + dz * dz);
+            state.orbitAngle = Math.atan2(dx, dz);
+        }
+    }
+
+    function toggleAutoZoom() {
+        state.autoZoom = !state.autoZoom;
+        updateControlsUI();
+    }
+
+    function calculateNetworkCenter() {
+        if (state.currentNodes.length === 0) return { x: 0, y: 0, z: 0 };
+        let sumX = 0, sumY = 0, sumZ = 0, count = 0;
+        state.currentNodes.forEach(node => {
+            if (node.x !== undefined) { sumX += node.x; sumY += node.y; sumZ += node.z; count++; }
+        });
+        return count > 0 ? { x: sumX / count, y: sumY / count, z: sumZ / count } : { x: 0, y: 0, z: 0 };
+    }
+
+    function calculateAverageDistance(center) {
+        let sum = 0, count = 0;
+        state.currentNodes.forEach(node => {
+            if (node.x !== undefined) {
+                sum += Math.sqrt((node.x - center.x)**2 + (node.y - center.y)**2 + (node.z - center.z)**2);
+                count++;
+            }
+        });
+        return count > 0 ? sum / count : 100;
+    }
+
+    function fitCameraToNetwork(animate = true) {
+        const center = calculateNetworkCenter();
+        const avgRadius = calculateAverageDistance(center);
+        const distance = Math.max(avgRadius * 2.8, 400);
+
+        state.networkCenter = center;
+        CONFIG.cameraDistance = distance;
+
+        const pos = { x: center.x + distance * 0.7, y: center.y + distance * 0.3, z: center.z + distance * 0.7 };
+        if (graph) {
+            graph.cameraPosition(pos, center, animate ? 1500 : 0);
+            const dx = pos.x - center.x;
+            const dz = pos.z - center.z;
+            state.orbitAngle = Math.atan2(dx, dz);
+        }
+    }
+
+    function updateControlsUI() {
+        if (state.isPlaying) {
+            dom.iconPlay.classList.add('hidden');
+            dom.iconPause.classList.remove('hidden');
+        } else {
+            dom.iconPlay.classList.remove('hidden');
+            dom.iconPause.classList.add('hidden');
+        }
+        
+        if (state.autoOrbit) {
+            dom.btnOrbit.style.borderColor = 'var(--accent-leaf)';
+            dom.btnOrbit.style.color = 'var(--accent-leaf)';
+        } else {
+            dom.btnOrbit.style.borderColor = '';
+            dom.btnOrbit.style.color = '';
+        }
+        
+        if (state.autoZoom) {
+            dom.btnZoom.style.borderColor = 'var(--accent-leaf)';
+            dom.btnZoom.style.color = 'var(--accent-leaf)';
+        } else {
+            dom.btnZoom.style.borderColor = '';
+            dom.btnZoom.style.color = '';
+        }
+    }
+
+    // Event Listeners
+    dom.btnPlay.addEventListener('click', () => state.isPlaying ? pauseAnimation() : startAnimation());
+    dom.btnReset.addEventListener('click', resetAnimation);
+    dom.inputSpeed.addEventListener('input', e => {
+        state.speed = parseFloat(e.target.value);
+        dom.speedValue.textContent = state.speed + 'x';
+    });
+    dom.btnOrbit.addEventListener('click', toggleAutoOrbit);
+    dom.btnZoom.addEventListener('click', toggleAutoZoom);
+    dom.btnFit.addEventListener('click', () => fitCameraToNetwork(true));
+    dom.infoClose.addEventListener('click', () => { selectNode(null); fitCameraToNetwork(true); });
+    
+    dom.legendToggle.addEventListener('click', () => {
+        state.showLegend = !state.showLegend;
+        if (state.showLegend) dom.legendPanel.classList.remove('hidden');
+        else dom.legendPanel.classList.add('hidden');
+    });
+    dom.legendClose.addEventListener('click', () => {
+        state.showLegend = false;
+        dom.legendPanel.classList.add('hidden');
+    });
+    
+    dom.streamToggleBtn.addEventListener('click', () => {
+        state.showCarousel = true;
+        dom.textStream.classList.remove('hidden');
+        dom.streamToggleBtn.classList.add('hidden');
+    });
+    dom.streamCloseBtn.addEventListener('click', () => {
+        state.showCarousel = false;
+        dom.textStream.classList.add('hidden');
+        dom.streamToggleBtn.classList.remove('hidden');
+    });
+
+    window.addEventListener('keydown', e => {
+        if (e.key === ' ') { e.preventDefault(); state.isPlaying ? pauseAnimation() : startAnimation(); }
+        else if (e.key.toLowerCase() === 'r') resetAnimation();
+        else if (e.key.toLowerCase() === 'o') toggleAutoOrbit();
+        else if (e.key.toLowerCase() === 'f') fitCameraToNetwork(true);
+        else if (e.key === 'Escape') selectNode(null);
+    });
+
+    // Init
+    async function init() {
+        try {
+            const response = await fetch(CONFIG.dataUrl);
+            if (!response.ok) throw new Error('Failed to load data');
+            const data = await response.json();
+            
+            if (data.categoryColors) {
+                Object.keys(FLOWER_PALETTES).forEach(cat => {
+                    if (FLOWER_PALETTES[cat]) data.categoryColors[cat] = FLOWER_PALETTES[cat].petal;
+                });
+            }
+            if (data.titleTagColors) {
+                Object.keys(FLOWER_PALETTES).forEach(cat => {
+                    if (FLOWER_PALETTES[cat]) data.titleTagColors[cat] = FLOWER_PALETTES[cat].petal;
+                });
+            }
+
+            state.data = data;
+            state.nodesById = {};
+            state.data.nodes.forEach(node => state.nodesById[node.id] = node);
+            
+            processDates();
+            populateLegend();
+            initGraph();
+            
+            dom.loadingScreen.classList.add('hidden');
+            startAutoOrbit();
+            startGlowAnimation();
+            startLabelAnimation();
+            
+            setTimeout(() => startAnimation(), 1000);
+        } catch (err) {
+            console.error('Init error:', err);
+            dom.loadingScreen.innerHTML = '<h2 class="loader-text" style="color: #e57373;">Error Loading Garden Data</h2>';
+        }
+    }
+
+    init();
+</script>
+</body>
+</html>

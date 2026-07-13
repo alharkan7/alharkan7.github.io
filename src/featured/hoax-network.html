@@ -1,0 +1,1550 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="description" content="Interactive 3D network visualization of hoax texts." />
+    <link rel="apple-touch-icon" sizes="180x180" href="/assets/logo.png" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/assets/logo.png" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Hoax Text Network Visualization</title>
+
+    <link rel="canonical" href="https://raihankalla.id/hoax-network" />
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Hoax Text Network Visualization" />
+    <meta property="og:description" content="Interactive 3D network visualization of hoax texts." />
+    <meta property="og:image" content="https://ik.imagekit.io/raihankalla/research_section_cover/hoax-network.png" />
+    <meta property="og:image:alt" content="Hoax Text Network Visualization" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:secure_url" content="https://ik.imagekit.io/raihankalla/research_section_cover/hoax-network.png" />
+    <meta property="og:site_name" content="al Harkan's Blog" />
+    <meta property="og:url" content="https://raihankalla.id/hoax-network" />
+    <meta property="og:locale" content="en_US" />
+    <meta property="og:logo" content="https://www.raihankalla.id/assets/logo.png" />
+
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:url" content="https://raihankalla.id/hoax-network" />
+    <meta name="twitter:title" content="Hoax Text Network Visualization" />
+    <meta name="twitter:description" content="Interactive 3D network visualization of hoax texts." />
+    <meta name="twitter:image" content="https://ik.imagekit.io/raihankalla/research_section_cover/hoax-network.png" />
+    
+    <!-- Dependencies -->
+    <script src="https://unpkg.com/three@0.158.0/build/three.min.js"></script>
+    <script src="https://unpkg.com/d3@7.8.5/dist/d3.min.js"></script>
+    <script src="https://unpkg.com/3d-force-graph@1.79.1/dist/3d-force-graph.min.js"></script>
+
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+
+    <style>
+        /* ============================================
+           TurnBackHoax Network Visualization
+           Premium Dark Theme with Glassmorphism
+           ============================================ */
+        
+        /* CSS Variables */
+        :root {
+            /* Colors */
+            --bg-primary: #05050a;
+            --bg-secondary: #0a0a14;
+            --bg-glass: rgba(10, 10, 20, 0.8);
+            --bg-glass-hover: rgba(20, 20, 35, 0.9);
+        
+            --text-primary: #ffffff;
+            --text-secondary: #a0a0b0;
+            --text-muted: #505060;
+        
+            --accent-primary: #00f2ff;
+            --accent-secondary: #0066ff;
+            --accent-tertiary: #ffffff;
+        
+            --glow-cyan: 0 0 20px rgba(0, 242, 255, 0.3);
+            --glow-blue: 0 0 20px rgba(0, 102, 255, 0.3);
+        
+            /* Spacing */
+            --space-xs: 0.25rem;
+            --space-sm: 0.5rem;
+            --space-md: 1rem;
+            --space-lg: 1.5rem;
+            --space-xl: 2rem;
+        
+            /* Border Radius */
+            --radius-sm: 4px;
+            --radius-md: 8px;
+            --radius-lg: 12px;
+            --radius-xl: 20px;
+        
+            /* Transitions */
+            --transition-fast: 150ms ease;
+            --transition-normal: 300ms ease;
+            --transition-slow: 500ms ease;
+        
+            /* Fonts */
+            --font-primary: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            --font-mono: 'JetBrains Mono', monospace;
+        }
+        
+        /* Reset & Base */
+        *, *::before, *::after {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        html, body {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            font-family: var(--font-primary);
+            background: var(--bg-primary);
+            color: var(--text-primary);
+        }
+
+        .relative { position: relative; }
+        .absolute { position: absolute; }
+        .w-full { width: 100%; }
+        .h-screen { height: 100vh; }
+        .inset-0 { inset: 0; }
+        .z-0 { z-index: 0; }
+        .z-10 { z-index: 10; }
+        .z-20 { z-index: 20; }
+        .z-30 { z-index: 30; }
+        .z-50 { z-index: 50; }
+        .pointer-events-none { pointer-events: none; }
+        .pointer-events-auto { pointer-events: auto; }
+        .flex { display: flex; }
+        .flex-col { display: flex; flex-direction: column; }
+        .items-center { align-items: center; }
+        .items-end { align-items: flex-end; }
+        .justify-center { justify-content: center; }
+        .gap-1 { gap: 0.25rem; }
+        .gap-4 { gap: 1rem; }
+        .hidden { display: none !important; }
+        .mb-2 { margin-bottom: 0.5rem; }
+        
+        /* ============================================
+           Loading Screen
+           ============================================ */
+        #loading-screen {
+            position: fixed;
+            inset: 0;
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--bg-primary);
+            transition: opacity var(--transition-slow), visibility var(--transition-slow);
+        }
+        
+        #loading-screen.hidden {
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+        }
+        
+        .loader-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: var(--space-lg);
+        }
+        
+        .loader-ring {
+            position: absolute;
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            border: 3px solid transparent;
+            animation: loader-spin 1.5s linear infinite;
+        }
+        
+        .loader-ring:nth-child(1) {
+            border-top-color: var(--accent-primary);
+            animation-duration: 1.5s;
+        }
+        
+        .loader-ring:nth-child(2) {
+            width: 100px;
+            height: 100px;
+            border-right-color: var(--accent-secondary);
+            animation-duration: 2s;
+            animation-direction: reverse;
+        }
+        
+        .loader-ring:nth-child(3) {
+            width: 80px;
+            height: 80px;
+            border-bottom-color: var(--accent-tertiary);
+            animation-duration: 2.5s;
+        }
+        
+        @keyframes loader-spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .loader-text {
+            margin-top: 140px;
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--accent-primary);
+            text-shadow: 0 0 10px rgba(0, 242, 255, 0.3);
+        }
+        
+        .loader-subtext {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            animation: pulse 2s ease-in-out infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 0.6; }
+            50% { opacity: 1; }
+        }
+        
+        /* ============================================
+           Graph Container
+           ============================================ */
+        #graph-container {
+            position: fixed;
+            inset: 0;
+            z-index: 1;
+            background: var(--bg-primary);
+        }
+        
+        /* ============================================
+           UI Overlay
+           ============================================ */
+        #ui-overlay {
+            position: fixed;
+            inset: 0;
+            z-index: 100;
+            pointer-events: none;
+        }
+        
+        #ui-overlay > * {
+            pointer-events: auto;
+        }
+        
+        /* ============================================
+           Title Bar
+           ============================================ */
+        .title-bar {
+            position: absolute;
+            top: var(--space-lg);
+            left: var(--space-lg);
+            right: var(--space-lg);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: var(--space-md) var(--space-lg);
+            background: var(--bg-glass);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: var(--radius-lg);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+        
+        .title-content h1 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            letter-spacing: -0.02em;
+        }
+        
+        .subtitle {
+            display: block;
+            font-size: 0.82rem;
+            color: var(--text-secondary);
+            margin-top: var(--space-xs);
+        }
+        
+        .stats-container {
+            display: flex;
+            gap: var(--space-xl);
+        }
+        
+        .stat-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        .stat-value {
+            font-family: var(--font-mono);
+            font-size: 1.75rem;
+            font-weight: 600;
+            color: var(--accent-primary);
+            text-shadow: var(--glow-cyan);
+        }
+        
+        .stat-label {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+        
+        /* ============================================
+           Date Display
+           ============================================ */
+        .date-display {
+            position: absolute;
+            bottom: var(--space-lg);
+            left: var(--space-lg);
+            padding: var(--space-lg);
+            background: var(--bg-glass);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: var(--radius-lg);
+            min-width: 200px;
+            z-index: 20;
+        }
+        
+        .date-label {
+            font-size: 0.7rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            margin-bottom: var(--space-xs);
+        }
+        
+        .date-value {
+            font-family: var(--font-mono);
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: var(--space-md);
+        }
+        
+        .date-progress {
+            height: 4px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 2px;
+            overflow: hidden;
+        }
+        
+        .progress-bar {
+            height: 100%;
+            width: 0%;
+            background: var(--accent-primary);
+            border-radius: 2px;
+            transition: width var(--transition-normal);
+            box-shadow: 0 0 10px rgba(0, 242, 255, 0.3);
+        }
+        
+        /* ============================================
+           Credits
+           ============================================ */
+        .credits {
+            position: absolute;
+            bottom: var(--space-lg);
+            left: 50%;
+            transform: translateX(-50%);
+            padding: var(--space-sm) var(--space-lg);
+            background: var(--bg-glass);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-radius: var(--radius-lg);
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            white-space: nowrap;
+            z-index: 5;
+        }
+        
+        .credits a {
+            color: var(--accent-primary);
+            text-decoration: none;
+            font-weight: 600;
+            transition: color var(--transition-fast);
+        }
+        
+        .credits a:hover {
+            color: var(--accent-secondary);
+            text-shadow: var(--glow-blue);
+        }
+        
+        /* ============================================
+           Controls Panel
+           ============================================ */
+        .controls-panel {
+            position: absolute;
+            bottom: var(--space-lg);
+            right: var(--space-lg);
+            display: flex;
+            align-items: center;
+            gap: var(--space-md);
+            padding: var(--space-md) var(--space-lg);
+            background: var(--bg-glass);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: var(--radius-lg);
+            z-index: 20;
+        }
+        
+        .control-group {
+            display: flex;
+            align-items: center;
+            gap: var(--space-sm);
+        }
+        
+        .control-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 44px;
+            height: 44px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: var(--radius-md);
+            color: var(--text-primary);
+            cursor: pointer;
+            transition: all var(--transition-fast);
+            padding: 0;
+        }
+        
+        .control-btn.active-control {
+            border-color: var(--accent-primary);
+            color: var(--accent-primary);
+        }
+        
+        .control-btn:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: var(--accent-primary);
+            box-shadow: var(--glow-cyan);
+        }
+        
+        .control-btn:active {
+            transform: scale(0.95);
+        }
+        
+        .control-btn .icon {
+            width: 24px;
+            height: 24px;
+        }
+        
+        .control-btn[data-tooltip]:hover::after {
+            content: attr(data-tooltip);
+            position: absolute;
+            bottom: 110%;
+            left: 50%;
+            transform: translateX(-50%);
+            padding: 6px 10px;
+            background: rgba(10, 10, 20, 0.95);
+            border: 1px solid rgba(0, 242, 255, 0.3);
+            color: var(--accent-primary);
+            font-size: 0.7rem;
+            font-weight: 500;
+            white-space: nowrap;
+            border-radius: 4px;
+            pointer-events: none;
+            opacity: 0;
+            animation: tooltip-fade 0.2s forwards;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+        }
+        
+        @keyframes tooltip-fade {
+            to { opacity: 1; transform: translateX(-50%) translateY(-5px); }
+        }
+        
+        .speed-control {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: var(--space-xs);
+        }
+        
+        .speed-control input[type="range"] {
+            width: 100px;
+            height: 4px;
+            -webkit-appearance: none;
+            appearance: none;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 2px;
+            outline: none;
+        }
+        
+        .speed-control input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 16px;
+            height: 16px;
+            background: var(--accent-primary);
+            border-radius: 50%;
+            cursor: pointer;
+            box-shadow: var(--glow-cyan);
+            transition: transform var(--transition-fast);
+        }
+        
+        .speed-control input[type="range"]::-webkit-slider-thumb:hover {
+            transform: scale(1.2);
+        }
+        
+        #speed-value {
+            font-family: var(--font-mono);
+            font-size: 0.85rem;
+            color: var(--accent-primary);
+            min-width: 30px;
+            text-align: center;
+        }
+        
+        /* ============================================
+           Info Panel
+           ============================================ */
+        .info-panel {
+            position: absolute;
+            top: 50%;
+            z-index: 50;
+            right: var(--space-lg);
+            transform: translateY(-50%);
+            width: 320px;
+            max-height: 60vh;
+            padding: var(--space-lg);
+            background: var(--bg-glass);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: var(--radius-lg);
+            overflow-y: auto;
+            transition: all var(--transition-normal);
+        }
+        
+        .info-panel.hidden {
+            opacity: 0;
+            transform: translateY(-50%) translateX(20px);
+            pointer-events: none;
+            display: none;
+        }
+        
+        .close-btn {
+            position: absolute;
+            top: var(--space-sm);
+            right: var(--space-sm);
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: transparent;
+            border: none;
+            color: var(--text-muted);
+            font-size: 1.5rem;
+            cursor: pointer;
+            transition: color var(--transition-fast);
+        }
+        
+        .close-btn:hover { color: var(--text-primary); }
+        
+        .info-category {
+            display: inline-block;
+            padding: var(--space-xs) var(--space-sm);
+            font-size: 0.7rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            background: var(--accent-secondary);
+            color: white;
+            border-radius: var(--radius-sm);
+            margin-bottom: var(--space-sm);
+        }
+        
+        .info-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            line-height: 1.4;
+            margin-bottom: var(--space-sm);
+        }
+        
+        .info-date {
+            font-family: var(--font-mono);
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            margin-bottom: var(--space-md);
+        }
+        
+        .info-keywords {
+            display: flex;
+            flex-wrap: wrap;
+            gap: var(--space-xs);
+            margin-bottom: var(--space-md);
+        }
+        
+        .keyword-tag {
+            padding: var(--space-xs) var(--space-sm);
+            font-size: 0.75rem;
+            background: rgba(0, 242, 255, 0.15);
+            color: var(--accent-primary);
+            border: 1px solid rgba(0, 242, 255, 0.3);
+            border-radius: var(--radius-sm);
+        }
+        
+        .info-preview {
+            font-size: 0.85rem;
+            line-height: 1.6;
+            color: var(--text-secondary);
+        }
+        
+        /* ============================================
+           Legend Panel
+           ============================================ */
+        .legend-panel {
+            position: absolute;
+            top: 50%;
+            left: var(--space-lg);
+            transform: translateY(-50%);
+            padding: var(--space-md);
+            background: var(--bg-glass);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: var(--radius-md);
+            max-width: 160px;
+        }
+        
+        .legend-panel.hidden {
+            display: none;
+        }
+        
+        .legend-panel h4 {
+            font-size: 0.7rem;
+            font-weight: 600;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            margin-bottom: var(--space-sm);
+        }
+        
+        .legend-items {
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-xs);
+        }
+        
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: var(--space-sm);
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: opacity 0.2s;
+        }
+        
+        .legend-color {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            box-shadow: 0 0 8px currentColor;
+        }
+        
+        /* Carousel Container */
+        .carousel-container {
+            position: absolute;
+            right: 2rem;
+            top: 50%;
+            transform: translateY(-50%);
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            gap: 0.25rem;
+            pointer-events: none;
+            z-index: 10;
+        }
+        
+        .carousel-mask {
+            max-height: 200px;
+            overflow: hidden;
+            mask-image: linear-gradient(to bottom, transparent, black 15%, black 85%, transparent);
+            -webkit-mask-image: linear-gradient(to bottom, transparent, black 15%, black 85%, transparent);
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            justify-content: center;
+            width: 100%;
+        }
+
+        @media (min-width: 768px) {
+            .md\:block { display: block !important; }
+            .md\:flex { display: flex !important; }
+            .md\:hidden { display: none !important; }
+        }
+
+        /* Responsive Design Rules */
+        #legend-toggle,
+        .legend-close-btn { display: none !important; }
+        
+        @media (max-width: 768px) {
+            .title-bar {
+                padding: var(--space-sm) var(--space-md);
+                top: var(--space-sm); left: var(--space-sm); right: var(--space-sm);
+            }
+            .title-content h1 { font-size: 1rem; }
+            .subtitle { font-size: 0.7rem; }
+            .stats-container { gap: var(--space-md); }
+            .stat-value { font-size: 1rem; }
+            .stat-label { font-size: 0.6rem; }
+            
+            .date-display {
+                left: var(--space-sm); bottom: 72px; right: auto;
+                padding: var(--space-xs) var(--space-md); min-width: 120px;
+            }
+            .date-value { font-size: 0.9rem; margin-bottom: 2px; }
+            .date-label { font-size: 0.6rem; margin-bottom: 2px; }
+            
+            .controls-panel {
+                left: var(--space-sm); right: var(--space-sm); bottom: 25px;
+                justify-content: space-between; padding: 4px 8px; flex-wrap: nowrap;
+            }
+            .control-btn { width: 32px; height: 32px; }
+            .control-btn .icon { width: 18px; height: 18px; }
+            .speed-control { flex-direction: row; align-items: center; gap: 4px; flex: 1; margin: 0 8px; }
+            .speed-control input[type="range"] { width: 100%; min-width: 50px; }
+            #speed-value { font-size: 0.7rem; min-width: 20px; }
+            
+            .credits {
+                bottom: 5px; font-size: 0.6rem; padding: 2px 8px;
+                background: transparent; border: none; backdrop-filter: none;
+            }
+            
+            .info-panel {
+                top: auto; bottom: 125px; left: var(--space-sm); right: var(--space-sm);
+                width: auto; max-height: 30vh; transform: none;
+            }
+            
+            .legend-panel {
+                top: 80px; right: auto; left: var(--space-sm); bottom: auto;
+                transform: none; max-width: 200px; z-index: 100; max-height: 50vh; overflow-y: auto;
+            }
+            #legend-toggle {
+                display: flex !important; position: absolute; top: 90px; left: 1rem; z-index: 50;
+            }
+            .legend-close-btn { display: flex !important; }
+            
+            .carousel-container {
+                right: 1rem; top: 90px; transform: none;
+            }
+        }
+        
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.2); border-radius: 3px; }
+    </style>
+</head>
+<body>
+
+<div class="relative w-full h-screen bg-primary text-white overflow-hidden">
+    <!-- Loading Screen -->
+    <div id="loading-screen">
+        <div class="loader-container">
+            <div class="loader-ring"></div>
+            <div class="loader-ring"></div>
+            <div class="loader-ring"></div>
+            <h2 class="loader-text">Loading Network Data</h2>
+            <p class="loader-subtext">Preparing visualization...</p>
+        </div>
+    </div>
+
+    <!-- Graph Container -->
+    <div id="graph-container" class="absolute inset-0 z-0"></div>
+
+    <!-- UI Overlay -->
+    <div id="ui-overlay" class="absolute inset-0 z-10 pointer-events-none">
+        
+        <!-- Title Bar -->
+        <header class="title-bar pointer-events-auto">
+            <div class="flex items-center gap-4">
+                <a href="/data" class="control-btn" style="border: none; background: transparent; padding: 0" data-tooltip="Back to Home">
+                    <svg class="icon" viewBox="0 0 24 24" fill="currentColor" style="width: 24px; height: 24px;">
+                        <path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z" />
+                    </svg>
+                </a>
+                <div class="title-content">
+                    <h1>Hoax Text Network</h1>
+                    <span class="subtitle">TurnBackHoax.id Dataset of 2025</span>
+                </div>
+            </div>
+            <div class="stats-container">
+                <div class="stat-item">
+                    <span id="stat-nodes" class="stat-value">0</span>
+                    <span class="stat-label">Articles</span>
+                </div>
+                <div class="stat-item">
+                    <span id="stat-links" class="stat-value">0</span>
+                    <span class="stat-label">Connections</span>
+                </div>
+            </div>
+        </header>
+
+        <!-- Date Display -->
+        <div class="date-display pointer-events-auto">
+            <div class="date-label">Date</div>
+            <div id="date-value" class="date-value">Loading...</div>
+            <div class="date-progress">
+                <div id="progress-bar" class="progress-bar" style="width: 0%"></div>
+            </div>
+        </div>
+
+        <!-- Controls -->
+        <div class="controls-panel pointer-events-auto">
+            <div class="control-group">
+                <button id="btn-play" class="control-btn" data-tooltip="Play / Pause">
+                    <svg id="icon-play" class="icon" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z" /></svg>
+                    <svg id="icon-pause" class="icon hidden" viewBox="0 0 24 24" fill="currentColor"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z" /></svg>
+                </button>
+                <button id="btn-reset" class="control-btn" data-tooltip="Reset">
+                    <svg class="icon" viewBox="0 0 24 24" fill="currentColor"><path d="M12 5V1L7 6l5 5V7c3.31 0 6 2.69 6 6s-2.69 6-6 6-6-2.69-6-6H4c0 4.42 3.58 8 8 8s8-3.58 8-8-3.58-8-8-8z" /></svg>
+                </button>
+            </div>
+            <div class="control-group speed-control">
+                <input id="input-speed" type="range" min="0.5" max="5" step="0.5" value="1">
+                <span id="speed-value">1x</span>
+            </div>
+            <div class="control-group">
+                <button id="btn-orbit" class="control-btn active-control" data-tooltip="Toggle Auto-Orbit">
+                    <svg class="icon" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z" /></svg>
+                </button>
+                <button id="btn-zoom" class="control-btn active-control" data-tooltip="Toggle Auto-Zoom">
+                    <svg class="icon" viewBox="0 0 24 24" fill="currentColor"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z" /><path d="M12 10h-2v2H9v-2H7V9h2V7h1v2h2v1z" /></svg>
+                </button>
+                <button id="btn-fit" class="control-btn" data-tooltip="Fit Camera">
+                    <svg class="icon" viewBox="0 0 24 24" fill="currentColor"><path d="M5 5h5v2H7v3H5V5zm9 0h5v5h-2V7h-3V5zm0 14h5v-5h-2v3h-3v2zM5 19h5v-2H7v-3H5v5z" /></svg>
+                </button>
+            </div>
+        </div>
+
+        <!-- Credits -->
+        <div class="credits pointer-events-auto">
+            &copy; <span id="year"></span> <a href="https://raihankalla.id" target="_blank" rel="noreferrer">@alhrkn</a>
+        </div>
+
+        <!-- Info Panel -->
+        <div id="info-panel" class="info-panel pointer-events-auto hidden">
+            <button id="info-close" class="close-btn">&times;</button>
+            <div id="info-category" class="info-category"></div>
+            <h3 id="info-title" class="info-title"></h3>
+            <div id="info-date" class="info-date"></div>
+            <div id="info-keywords" class="info-keywords"></div>
+            <div id="info-preview" class="info-preview"></div>
+        </div>
+
+        <!-- Legend Toggle (Mobile) -->
+        <button id="legend-toggle" class="control-btn pointer-events-auto" data-tooltip="Show Legend">
+            <svg class="icon" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M4 15h16v-2H4v2zm0 4h16v-2H4v2zm0-8h16V9H4v2zm0-6v2h16V5H4z" />
+            </svg>
+        </button>
+
+        <!-- Legend Panel -->
+        <div id="legend-panel" class="legend-panel pointer-events-auto hidden">
+            <button id="legend-close" class="close-btn legend-close-btn" style="top: 0.5rem; right: 0.5rem; font-size: 1.2rem;">&times;</button>
+            <h4>Categories</h4>
+            <div id="legend-items-container" class="legend-items"></div>
+        </div>
+
+        <!-- Carousel Show Toggle (Mobile) -->
+        <button id="carousel-show-btn" class="control-btn md:hidden pointer-events-auto" style="position: absolute; right: 1rem; top: 90px; z-index: 20" data-tooltip="Show Text Stream">
+            <svg class="icon" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M4 15h16v-2H4v2zm0 4h16v-2H4v2zm0-8h16V9H4v2zm0-6v2h16V5H4z" />
+            </svg>
+        </button>
+
+        <!-- Vertical Text Carousel -->
+        <div id="carousel-container" class="carousel-container md:flex hidden">
+            <button id="carousel-close-btn" class="pointer-events-auto md:hidden mb-2" style="color: rgba(255,255,255,0.5); font-size: 1.5rem; line-height: 1; z-index: 30; background: none; border: none; cursor: pointer;">&times;</button>
+            <div id="carousel-mask" class="carousel-mask"></div>
+        </div>
+
+    </div>
+</div>
+
+<script>
+    document.getElementById('year').textContent = new Date().getFullYear();
+
+    const CONFIG = {
+        dataUrl: '/components/hoax-network/hoax-network-data.json',
+        animationSpeed: 1,
+        nodeAppearDuration: 1500,
+        dateDuration: 800,
+        labelDuration: 2000,
+        nodeBaseSize: 3,
+        nodeOpacityActive: 1,
+        nodeOpacityFaded: 0.8,
+        linkOpacity: 0.3,
+        linkWidth: 0.8,
+        cameraOrbitSpeed: 0.001,
+        cameraDistance: 800,
+        cameraMinDistance: 50,
+        cameraMaxDistance: 10000,
+        glowIntensity: 2,
+        glowDuration: 1500,
+        defaultNodeColor: '#00f2ff',
+        linkColor: 'rgba(0, 242, 255, 0.15)',
+        backgroundColor: '#05050a',
+    };
+
+    const state = {
+        data: null,
+        currentNodes: [],
+        currentLinks: [],
+        isPlaying: false,
+        currentDateIndex: 0,
+        uniqueDates: [],
+        nodesByDate: {},
+        nodesById: {},
+        autoOrbit: true,
+        autoZoom: true,
+        orbitAngle: 0,
+        userInteracting: false,
+        networkCenter: { x: 0, y: 0, z: 0 },
+        animationTimer: null,
+        interactionTimeout: null,
+        glowingNodes: new Map(),
+        floatingLabels: new Map(),
+        addedNodeIds: new Set(),
+        addedLinkIds: new Set(),
+        sharedNodeGeometry: null,
+        speed: 1,
+        highlightedCategory: null,
+        legendItems: [],
+        recentLabels: [],
+        selectedNode: null,
+        showLegend: false,
+        showCarousel: true
+    };
+
+    let graph = null;
+
+    // DOM Elements
+    const dom = {
+        loadingScreen: document.getElementById('loading-screen'),
+        statNodes: document.getElementById('stat-nodes'),
+        statLinks: document.getElementById('stat-links'),
+        dateValue: document.getElementById('date-value'),
+        progressBar: document.getElementById('progress-bar'),
+        btnPlay: document.getElementById('btn-play'),
+        iconPlay: document.getElementById('icon-play'),
+        iconPause: document.getElementById('icon-pause'),
+        btnReset: document.getElementById('btn-reset'),
+        inputSpeed: document.getElementById('input-speed'),
+        speedValue: document.getElementById('speed-value'),
+        btnOrbit: document.getElementById('btn-orbit'),
+        btnZoom: document.getElementById('btn-zoom'),
+        btnFit: document.getElementById('btn-fit'),
+        infoPanel: document.getElementById('info-panel'),
+        infoClose: document.getElementById('info-close'),
+        infoCategory: document.getElementById('info-category'),
+        infoTitle: document.getElementById('info-title'),
+        infoDate: document.getElementById('info-date'),
+        infoKeywords: document.getElementById('info-keywords'),
+        infoPreview: document.getElementById('info-preview'),
+        legendToggle: document.getElementById('legend-toggle'),
+        legendPanel: document.getElementById('legend-panel'),
+        legendClose: document.getElementById('legend-close'),
+        legendItemsContainer: document.getElementById('legend-items-container'),
+        carouselContainer: document.getElementById('carousel-container'),
+        carouselMask: document.getElementById('carousel-mask'),
+        carouselShowBtn: document.getElementById('carousel-show-btn'),
+        carouselCloseBtn: document.getElementById('carousel-close-btn')
+    };
+
+    function formatDate(dateStr) {
+        if (!dateStr || dateStr === '—') return dateStr;
+        const parts = dateStr.split('/');
+        if (parts.length !== 3) return dateStr;
+        const [day, month, year] = parts;
+        const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+        return `${parseInt(day)} ${months[parseInt(month) - 1]} ${year}`;
+    }
+
+    function processDates() {
+        const { nodes } = state.data;
+        state.nodesByDate = {};
+        nodes.forEach(node => {
+            const dateStr = node.date;
+            if (!state.nodesByDate[dateStr]) state.nodesByDate[dateStr] = [];
+            state.nodesByDate[dateStr].push(node.id);
+        });
+
+        state.uniqueDates = Object.keys(state.nodesByDate).sort((a, b) => {
+            const [dayA, monthA, yearA] = a.split('/').map(Number);
+            const [dayB, monthB, yearB] = b.split('/').map(Number);
+            return new Date(yearA, monthA - 1, dayA).getTime() - new Date(yearB, monthB - 1, dayB).getTime();
+        });
+    }
+
+    function populateLegend() {
+        const { titleTagColors, categoryColors } = state.data;
+        const colors = titleTagColors || categoryColors || {};
+        const tagCounts = {};
+
+        state.data.nodes.forEach(node => {
+            const tag = node.titleTag || node.category;
+            if (tag) tagCounts[tag] = (tagCounts[tag] || 0) + 1;
+        });
+
+        const topTags = Object.entries(tagCounts)
+            .sort((a, b) => b[1] - a[1])
+            .slice(0, 8);
+
+        state.legendItems = topTags.map(([tag]) => ({
+            tag,
+            color: colors[tag] || CONFIG.defaultNodeColor
+        }));
+
+        if (state.legendItems.length > 0) {
+            if (window.innerWidth >= 768) {
+                dom.legendPanel.classList.remove('hidden');
+                state.showLegend = true;
+            } else {
+                dom.legendPanel.classList.add('hidden');
+                state.showLegend = false;
+            }
+            renderLegend();
+        }
+    }
+
+    function renderLegend() {
+        dom.legendItemsContainer.innerHTML = '';
+        state.legendItems.forEach(item => {
+            const div = document.createElement('div');
+            div.className = 'legend-item';
+            div.style.opacity = (state.highlightedCategory && state.highlightedCategory !== item.tag) ? 0.3 : 1;
+            div.innerHTML = `
+                <span class="legend-color" style="background: ${item.color}; color: ${item.color};"></span>
+                <span>${item.tag}</span>
+            `;
+            div.onclick = () => {
+                state.highlightedCategory = state.highlightedCategory === item.tag ? null : item.tag;
+                renderLegend();
+                if (graph) {
+                    graph.nodeColor(graph.nodeColor());
+                    graph.linkColor(graph.linkColor());
+                }
+            };
+            dom.legendItemsContainer.appendChild(div);
+        });
+    }
+
+    function getNodeColor(node) {
+        const { categoryColors, titleTagColors } = state.data;
+        const activeCategory = state.highlightedCategory;
+
+        if (activeCategory) {
+            const nodeCategory = node.titleTag || node.category;
+            if (nodeCategory !== activeCategory) {
+                return 'rgba(255, 255, 255, 0.1)';
+            }
+        }
+
+        if (node.titleTag && titleTagColors && titleTagColors[node.titleTag]) {
+            return titleTagColors[node.titleTag];
+        }
+        if (node.category && categoryColors && categoryColors[node.category]) {
+            return categoryColors[node.category];
+        }
+        return CONFIG.defaultNodeColor;
+    }
+
+    function getLinkColor(link) {
+        const sourceId = typeof link.source === 'object' ? link.source.id : link.source;
+        const targetId = typeof link.target === 'object' ? link.target.id : link.target;
+        const sourceNode = state.nodesById[sourceId];
+        const targetNode = state.nodesById[targetId];
+
+        const activeCategory = state.highlightedCategory;
+
+        if (activeCategory && sourceNode && targetNode) {
+            const sourceCat = sourceNode.titleTag || sourceNode.category;
+            const targetCat = targetNode.titleTag || targetNode.category;
+            if (sourceCat !== activeCategory || targetCat !== activeCategory) {
+                return 'rgba(255, 255, 255, 0.05)';
+            }
+        }
+
+        if (sourceNode) return getNodeColor(sourceNode);
+        return CONFIG.linkColor;
+    }
+
+    function createTextSprite(text, colorHex) {
+        const canvas = document.createElement('canvas');
+        const context = canvas.getContext('2d');
+        if (!context) return new THREE.Object3D();
+
+        canvas.width = 400;
+        canvas.height = 100;
+        context.font = 'bold 28px Inter, Arial, sans-serif';
+        context.textAlign = 'center';
+        context.textBaseline = 'middle';
+        context.fillStyle = '#ffffff';
+        context.fillText(text.toUpperCase().substring(0, 20), canvas.width / 2, canvas.height / 2);
+
+        const texture = new THREE.CanvasTexture(canvas);
+        const material = new THREE.SpriteMaterial({ map: texture, transparent: true, opacity: 1 });
+        const sprite = new THREE.Sprite(material);
+        sprite.scale.set(30, 7.5, 1);
+        return sprite;
+    }
+
+    function createNodeObject(node) {
+        const isGlowing = state.glowingNodes.has(node.id);
+        const colorVal = getNodeColor(node);
+        const color = new THREE.Color(colorVal);
+        const nodeSize = node.size || CONFIG.nodeBaseSize;
+
+        const group = new THREE.Group();
+
+        if (isGlowing) {
+            const startTime = state.glowingNodes.get(node.id);
+            const elapsed = Date.now() - startTime;
+            const progress = Math.min(elapsed / CONFIG.glowDuration, 1);
+
+            const glowSize = nodeSize * (3.5 - progress * 2);
+            const glowGeometry = new THREE.SphereGeometry(glowSize, 16, 16);
+            const glowMaterial = new THREE.MeshBasicMaterial({ color: color, transparent: true, opacity: 0.4 * (1 - progress) });
+            const glowMesh = new THREE.Mesh(glowGeometry, glowMaterial);
+            glowMesh.scale.setScalar(1 + 0.2 * Math.sin(elapsed * 0.008));
+            group.add(glowMesh);
+
+            const coreGeometry = new THREE.SphereGeometry(nodeSize * 1.2, 12, 12);
+            const coreMaterial = new THREE.MeshBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.6 * (1 - progress) });
+            const coreMesh = new THREE.Mesh(coreGeometry, coreMaterial);
+            group.add(coreMesh);
+        }
+
+        if (state.floatingLabels.has(node.id)) {
+            const labelInfo = state.floatingLabels.get(node.id);
+            const elapsed = Date.now() - labelInfo.startTime;
+            const progress = Math.min(elapsed / CONFIG.labelDuration, 1);
+
+            if (progress < 1) {
+                const sprite = createTextSprite(labelInfo.text, colorVal);
+                sprite.position.set(0, 15 + progress * 25, 0);
+                if (progress > 0.5) {
+                    sprite.material.opacity = 1 - ((progress - 0.5) / 0.5);
+                }
+                group.add(sprite);
+            }
+        }
+
+        return group;
+    }
+
+    function initGraph() {
+        if (!state.sharedNodeGeometry) state.sharedNodeGeometry = new THREE.SphereGeometry(1, 16, 16);
+
+        graph = ForceGraph3D()(document.getElementById('graph-container'))
+            .backgroundColor(CONFIG.backgroundColor)
+            .showNavInfo(false)
+            .nodeLabel(node => {
+                const color = getNodeColor(node);
+                return `<div style="padding: 10px; background: rgba(0,0,0,0.9); border-radius: 10px; max-width: 300px; font-family: Inter, sans-serif; border: 1px solid ${color};">
+                    <div style="font-size: 11px; color: ${color}; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 4px;">${node.titleTag || node.category || 'HOAX'}</div>
+                    <strong style="color: #fff; font-size: 14px;">${node.title}</strong><br>
+                    <span style="color: #888; font-size: 12px;">${formatDate(node.date)}</span>
+                </div>`;
+            })
+            .nodeColor(node => getNodeColor(node))
+            .nodeOpacity(0.95)
+            .nodeVal(node => node.size || CONFIG.nodeBaseSize)
+            .nodeRelSize(4)
+            .nodeThreeObject(node => {
+                const material = new THREE.MeshLambertMaterial({ color: getNodeColor(node), transparent: true, opacity: 0.9 });
+                const mesh = new THREE.Mesh(state.sharedNodeGeometry, material);
+                mesh.scale.setScalar(node.size || CONFIG.nodeBaseSize);
+                return mesh;
+            })
+            .nodeThreeObjectExtend(true)
+            .linkColor(link => getLinkColor(link))
+            .linkOpacity(CONFIG.linkOpacity)
+            .linkWidth(CONFIG.linkWidth)
+            .d3AlphaDecay(0.04)
+            .d3VelocityDecay(0.3)
+            .onNodeClick(node => {
+                if (node.x === undefined) return;
+                if (state.isPlaying) pauseAnimation();
+                selectNode(node);
+
+                const distance = 40;
+                const distRatio = 1 + distance / Math.hypot(node.x, node.y, node.z);
+                graph.cameraPosition(
+                    { x: node.x * distRatio, y: node.y * distRatio, z: node.z * distRatio },
+                    { x: node.x, y: node.y, z: node.z },
+                    3000
+                );
+            })
+            .onBackgroundClick(() => selectNode(null));
+
+        graph.d3Force('charge', d3.forceManyBody().strength(-40).distanceMax(200));
+        graph.d3Force('link', d3.forceLink().id(d => d.id).distance(40).strength(0.2));
+        graph.d3Force('collision', d3.forceCollide().radius(node => (node.size || CONFIG.nodeBaseSize) * 1.5).iterations(1));
+
+        graph.cameraPosition({ x: 0, y: 0, z: CONFIG.cameraDistance });
+        graph.graphData({ nodes: [], links: [] });
+
+        const controls = graph.controls();
+        if (controls) {
+            controls.enableDamping = true;
+            controls.dampingFactor = 0.05;
+            controls.minDistance = CONFIG.cameraMinDistance;
+            controls.maxDistance = CONFIG.cameraMaxDistance;
+            controls.zoomSpeed = 2.0;
+            controls.addEventListener('start', () => {
+                state.userInteracting = true;
+                if (state.isPlaying) pauseAnimation();
+                if (state.interactionTimeout) clearTimeout(state.interactionTimeout);
+            });
+            controls.addEventListener('end', () => {
+                state.userInteracting = false;
+                if (state.interactionTimeout) {
+                    clearTimeout(state.interactionTimeout);
+                    state.interactionTimeout = null;
+                }
+            });
+        }
+    }
+
+    function selectNode(node) {
+        state.selectedNode = node;
+        if (node) {
+            dom.infoCategory.style.backgroundColor = getNodeColor(node);
+            dom.infoCategory.textContent = node.titleTag || node.category || 'HOAX';
+            dom.infoTitle.textContent = node.title;
+            dom.infoDate.textContent = formatDate(node.date);
+            
+            dom.infoKeywords.innerHTML = '';
+            if (node.keywords) {
+                node.keywords.forEach(kw => {
+                    const span = document.createElement('span');
+                    span.className = 'keyword-tag';
+                    span.textContent = kw;
+                    dom.infoKeywords.appendChild(span);
+                });
+            }
+
+            dom.infoPreview.innerHTML = '';
+            if (node.narasi_preview) {
+                let previewText = node.narasi_preview.length > 200 ? node.narasi_preview.substring(0, 200) + '...' : node.narasi_preview;
+                let html = `<span>${previewText}</span>`;
+                if (node.url && node.url !== '#') {
+                    html += ` <a href="${node.url}" target="_blank" rel="noopener noreferrer" style="color: var(--accent-secondary); text-decoration: none; font-weight: bold;">(Read more)</a>`;
+                }
+                dom.infoPreview.innerHTML = html;
+            } else {
+                dom.infoPreview.textContent = 'No preview available.';
+            }
+            dom.infoPanel.classList.remove('hidden');
+        } else {
+            dom.infoPanel.classList.add('hidden');
+        }
+    }
+
+    function updateCarousel() {
+        dom.carouselMask.innerHTML = '';
+        state.recentLabels.forEach((label, index) => {
+            const listLength = state.recentLabels.length;
+            const centerIndex = (listLength - 1) / 2;
+            const dist = Math.abs(index - centerIndex);
+            const opacity = Math.max(0.3, 1 - (dist * 0.25));
+            const scale = Math.max(0.85, 1 - (dist * 0.05));
+            const blur = dist > 1.5 ? 'blur(1px)' : 'none';
+
+            const div = document.createElement('div');
+            div.style.cssText = `
+                text-align: right; font-weight: bold; color: var(--accent-primary);
+                text-shadow: ${opacity > 0.8 ? '0 0 12px rgba(0, 242, 255, 0.6)' : 'none'};
+                font-size: 1.2rem; height: 30px; display: flex; align-items: center; justify-content: flex-end;
+                opacity: ${opacity}; transform: scale(${scale}); filter: ${blur};
+                transform-origin: right center; transition: all 0.4s ease-out;
+                white-space: nowrap; width: 100%;
+            `;
+            div.textContent = label.text;
+            dom.carouselMask.appendChild(div);
+        });
+    }
+
+    function startAnimation() {
+        if (state.isPlaying) return;
+        state.isPlaying = true;
+        state.autoZoom = true;
+        updateControlsUI();
+        animationTick();
+    }
+
+    function pauseAnimation() {
+        state.isPlaying = false;
+        updateControlsUI();
+        if (state.animationTimer) {
+            clearTimeout(state.animationTimer);
+            state.animationTimer = null;
+        }
+    }
+
+    function resetAnimation() {
+        pauseAnimation();
+        state.currentDateIndex = 0;
+        state.currentNodes = [];
+        state.currentLinks = [];
+        state.addedNodeIds.clear();
+        state.addedLinkIds.clear();
+        state.glowingNodes.clear();
+        state.floatingLabels.clear();
+        state.recentLabels = [];
+        
+        if (graph) graph.graphData({ nodes: [], links: [] });
+        
+        dom.statNodes.textContent = '0';
+        dom.statLinks.textContent = '0';
+        dom.dateValue.textContent = formatDate(state.uniqueDates[0]);
+        dom.progressBar.style.width = '0%';
+        updateCarousel();
+    }
+
+    function animationTick() {
+        if (!state.isPlaying) return;
+
+        if (state.currentDateIndex >= state.uniqueDates.length) {
+            pauseAnimation();
+            fitCameraToNetwork();
+            return;
+        }
+
+        const currentDateStr = state.uniqueDates[state.currentDateIndex];
+        dom.dateValue.textContent = formatDate(currentDateStr);
+        dom.progressBar.style.width = `${((state.currentDateIndex + 1) / state.uniqueDates.length) * 100}%`;
+
+        const nodeIdsForDate = state.nodesByDate[currentDateStr] || [];
+        let nodesAdded = false;
+
+        nodeIdsForDate.forEach(nodeId => {
+            if (!state.addedNodeIds.has(nodeId)) {
+                const node = state.nodesById[nodeId];
+                if (node) {
+                    state.currentNodes.push(node);
+                    state.addedNodeIds.add(nodeId);
+                    state.glowingNodes.set(nodeId, Date.now());
+                    
+                    let labelText = '';
+                    if (node.keywords && node.keywords.length > 0) labelText = node.keywords[0];
+                    else if (node.title) labelText = node.title.split(' ').slice(0, 2).join(' ');
+                    else labelText = node.titleTag || node.category || 'HOAX';
+
+                    state.floatingLabels.set(nodeId, { startTime: Date.now(), text: labelText });
+                    
+                    const newLabel = { id: nodeId, text: labelText, timestamp: Date.now() };
+                    state.recentLabels.push(newLabel);
+                    if (state.recentLabels.length > 7) state.recentLabels.shift();
+                    
+                    nodesAdded = true;
+                }
+            }
+        });
+
+        state.data.links.forEach(link => {
+            const sourceId = typeof link.source === 'object' ? link.source.id : link.source;
+            const targetId = typeof link.target === 'object' ? link.target.id : link.target;
+            const linkId = `${sourceId}-${targetId}`;
+
+            if (state.addedNodeIds.has(sourceId) && state.addedNodeIds.has(targetId) && !state.addedLinkIds.has(linkId)) {
+                state.currentLinks.push(link);
+                state.addedLinkIds.add(linkId);
+            }
+        });
+
+        if (nodesAdded && graph) {
+            graph.graphData({ nodes: [...state.currentNodes], links: [...state.currentLinks] });
+            dom.statNodes.textContent = state.currentNodes.length;
+            dom.statLinks.textContent = state.currentLinks.length;
+            updateCarousel();
+        }
+
+        state.currentDateIndex++;
+        const delay = CONFIG.dateDuration / state.speed;
+        state.animationTimer = setTimeout(animationTick, delay);
+    }
+
+    function startGlowAnimation() {
+        const animate = () => {
+            const now = Date.now();
+            for (const [nodeId, startTime] of state.glowingNodes) {
+                if (now - startTime > CONFIG.glowDuration) state.glowingNodes.delete(nodeId);
+            }
+            if ((state.glowingNodes.size > 0 || state.floatingLabels.size > 0) && graph) {
+                graph.nodeThreeObject(node => createNodeObject(node));
+            }
+            requestAnimationFrame(animate);
+        };
+        animate();
+    }
+
+    function startLabelAnimation() {
+        const animate = () => {
+            const now = Date.now();
+            for (const [nodeId, labelInfo] of state.floatingLabels) {
+                if (now - labelInfo.startTime > CONFIG.labelDuration) state.floatingLabels.delete(nodeId);
+            }
+            requestAnimationFrame(animate);
+        };
+        animate();
+    }
+
+    function startAutoOrbit() {
+        const animate = () => {
+            if (!graph) { requestAnimationFrame(animate); return; }
+            if (state.autoOrbit && !state.userInteracting && graph) {
+                const currentPos = graph.cameraPosition();
+                const controls = graph.controls();
+                const target = controls ? controls.target : new THREE.Vector3(state.networkCenter.x, state.networkCenter.y, state.networkCenter.z);
+                const offset = new THREE.Vector3(currentPos.x, currentPos.y, currentPos.z).sub(target);
+                const spherical = new THREE.Spherical().setFromVector3(offset);
+                spherical.theta += CONFIG.cameraOrbitSpeed * 0.5 * state.speed;
+                const newOffset = new THREE.Vector3().setFromSpherical(spherical);
+                const newPos = new THREE.Vector3().copy(target).add(newOffset);
+                graph.cameraPosition({ x: newPos.x, y: newPos.y, z: newPos.z }, { x: target.x, y: target.y, z: target.z }, 0);
+            }
+            requestAnimationFrame(animate);
+        }
+        animate();
+    }
+
+    function toggleAutoOrbit() {
+        state.autoOrbit = !state.autoOrbit;
+        updateControlsUI();
+        if (state.autoOrbit && graph) {
+            const camPos = graph.cameraPosition();
+            const center = state.networkCenter;
+            const dx = camPos.x - center.x;
+            const dz = camPos.z - center.z;
+            CONFIG.cameraDistance = Math.sqrt(dx * dx + dz * dz);
+            state.orbitAngle = Math.atan2(dx, dz);
+        }
+    }
+
+    function toggleAutoZoom() {
+        state.autoZoom = !state.autoZoom;
+        updateControlsUI();
+    }
+
+    function fitCameraToNetwork(animate = true) {
+        if (state.currentNodes.length === 0) return;
+        let sumX = 0, sumY = 0, sumZ = 0, count = 0;
+        state.currentNodes.forEach(node => {
+            if (node.x !== undefined) { sumX += node.x; sumY += node.y; sumZ += node.z; count++; }
+        });
+        const center = count > 0 ? { x: sumX / count, y: sumY / count, z: sumZ / count } : { x: 0, y: 0, z: 0 };
+        
+        let sumDist = 0;
+        state.currentNodes.forEach(node => {
+            if (node.x !== undefined) {
+                sumDist += Math.sqrt((node.x - center.x)**2 + (node.y - center.y)**2 + (node.z - center.z)**2);
+            }
+        });
+        const avgRadius = count > 0 ? sumDist / count : 100;
+        const distance = Math.max(avgRadius * 2.8, 400);
+
+        state.networkCenter = center;
+        CONFIG.cameraDistance = distance;
+
+        const pos = { x: center.x + distance * 0.7, y: center.y + distance * 0.3, z: center.z + distance * 0.7 };
+        if (graph) {
+            graph.cameraPosition(pos, center, animate ? 1500 : 0);
+            const dx = pos.x - center.x;
+            const dz = pos.z - center.z;
+            state.orbitAngle = Math.atan2(dx, dz);
+        }
+    }
+
+    function updateControlsUI() {
+        if (state.isPlaying) {
+            dom.iconPlay.classList.add('hidden');
+            dom.iconPause.classList.remove('hidden');
+        } else {
+            dom.iconPlay.classList.remove('hidden');
+            dom.iconPause.classList.add('hidden');
+        }
+        
+        if (state.autoOrbit) dom.btnOrbit.classList.add('active-control');
+        else dom.btnOrbit.classList.remove('active-control');
+        
+        if (state.autoZoom) dom.btnZoom.classList.add('active-control');
+        else dom.btnZoom.classList.remove('active-control');
+    }
+
+    // Event Listeners
+    dom.btnPlay.addEventListener('click', () => state.isPlaying ? pauseAnimation() : startAnimation());
+    dom.btnReset.addEventListener('click', resetAnimation);
+    dom.inputSpeed.addEventListener('input', e => {
+        state.speed = parseFloat(e.target.value);
+        dom.speedValue.textContent = state.speed + 'x';
+    });
+    dom.btnOrbit.addEventListener('click', toggleAutoOrbit);
+    dom.btnZoom.addEventListener('click', toggleAutoZoom);
+    dom.btnFit.addEventListener('click', () => fitCameraToNetwork(true));
+    dom.infoClose.addEventListener('click', () => { selectNode(null); fitCameraToNetwork(true); });
+    
+    dom.legendToggle.addEventListener('click', () => {
+        state.showLegend = !state.showLegend;
+        if (state.showLegend) dom.legendPanel.classList.remove('hidden');
+        else dom.legendPanel.classList.add('hidden');
+    });
+    dom.legendClose.addEventListener('click', () => {
+        state.showLegend = false;
+        dom.legendPanel.classList.add('hidden');
+    });
+    
+    dom.carouselShowBtn.addEventListener('click', () => {
+        state.showCarousel = true;
+        dom.carouselContainer.classList.remove('hidden');
+        dom.carouselContainer.classList.add('flex');
+        dom.carouselShowBtn.classList.add('hidden');
+    });
+    dom.carouselCloseBtn.addEventListener('click', () => {
+        state.showCarousel = false;
+        dom.carouselContainer.classList.add('hidden');
+        dom.carouselContainer.classList.remove('flex');
+        dom.carouselShowBtn.classList.remove('hidden');
+    });
+
+    window.addEventListener('keydown', e => {
+        if (e.key === ' ') { e.preventDefault(); state.isPlaying ? pauseAnimation() : startAnimation(); }
+        else if (e.key.toLowerCase() === 'r') resetAnimation();
+        else if (e.key.toLowerCase() === 'o') toggleAutoOrbit();
+        else if (e.key.toLowerCase() === 'f') fitCameraToNetwork(true);
+        else if (e.key === 'Escape') selectNode(null);
+    });
+
+    // Init
+    async function init() {
+        try {
+            const response = await fetch(CONFIG.dataUrl);
+            if (!response.ok) throw new Error('Failed to load data');
+            state.data = await response.json();
+            
+            state.nodesById = {};
+            state.data.nodes.forEach(node => state.nodesById[node.id] = node);
+            
+            processDates();
+            populateLegend();
+            initGraph();
+            
+            dom.loadingScreen.classList.add('hidden');
+            startAutoOrbit();
+            startGlowAnimation();
+            startLabelAnimation();
+            
+            setTimeout(() => startAnimation(), 1000);
+        } catch (err) {
+            console.error('Init error:', err);
+            dom.loadingScreen.innerHTML = '<h2 class="loader-text" style="color: #ff3333;">Error Loading Data</h2>';
+        }
+    }
+
+    init();
+</script>
+</body>
+</html>
