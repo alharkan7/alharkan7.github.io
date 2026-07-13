@@ -1,0 +1,1309 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="description" content="Interactive timeline visualization of Nusantara history." />
+    <link rel="apple-touch-icon" sizes="180x180" href="/assets/logo.png" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/assets/logo.png" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Nusantara Timeline</title>
+
+    <link rel="canonical" href="https://raihankalla.id/vast-timeline" />
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Nusantara Timeline" />
+    <meta property="og:description" content="Interactive timeline visualization of Nusantara history." />
+    <meta property="og:image" content="https://ik.imagekit.io/raihankalla/research_section_cover/vast-timeline.png" />
+    <meta property="og:image:alt" content="Nusantara Timeline" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:secure_url" content="https://ik.imagekit.io/raihankalla/research_section_cover/vast-timeline.png" />
+    <meta property="og:site_name" content="al Harkan's Blog" />
+    <meta property="og:url" content="https://raihankalla.id/vast-timeline" />
+    <meta property="og:locale" content="en_US" />
+    <meta property="og:logo" content="https://www.raihankalla.id/assets/logo.png" />
+
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:url" content="https://raihankalla.id/vast-timeline" />
+    <meta name="twitter:title" content="Nusantara Timeline" />
+    <meta name="twitter:description" content="Interactive timeline visualization of Nusantara history." />
+    <meta name="twitter:image" content="https://ik.imagekit.io/raihankalla/research_section_cover/vast-timeline.png" />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        .custom-scrollbar::-webkit-scrollbar { height: 6px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background-color: #cbd5e1; border-radius: 3px; }
+        body { margin: 0; overflow: hidden; background: #f8fafc; color: #0f172a; font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji"; }
+        
+        .label-card {
+            border-width: 1px;
+            --tw-ring-offset-shadow: 0 0 #0000;
+            --tw-ring-shadow: 0 0 #0000;
+            --tw-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+            box-shadow: var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow), 0 0 #0000;
+        }
+        .label-card-active {
+            --tw-ring-offset-width: 2px;
+            --tw-ring-offset-color: #fff;
+            --tw-ring-color: #3b82f6;
+            --tw-ring-offset-shadow: var(--tw-ring-inset) 0 0 0 var(--tw-ring-offset-width) var(--tw-ring-offset-color);
+            --tw-ring-shadow: var(--tw-ring-inset) 0 0 0 calc(2px + var(--tw-ring-offset-width)) var(--tw-ring-color);
+            box-shadow: var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow), 0 0 #0000;
+            transform: scale(1.1);
+            z-index: 50;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col select-none">
+  <!-- Layout Wrapper -->
+  <div class="flex flex-col h-screen w-screen bg-slate-50 text-slate-900">
+    
+    <!-- Header -->
+    <div class="sticky top-0 z-30 flex">
+      <!-- Sidebar Header -->
+      <div id="sidebar-header" class="absolute left-0 bg-white border-b border-r border-slate-200 flex items-center justify-between transition-all duration-300 overflow-hidden z-40" style="width: 0; height: 64px; padding-left: 0; padding-right: 0; opacity: 0;">
+        <h2 class="text-sm sm:text-base font-semibold text-slate-900 whitespace-nowrap">Timeline Data</h2>
+        <div class="flex items-center gap-2">
+          <div class="flex items-center space-x-1 text-[11px] bg-slate-100/50 p-1 rounded-md border border-slate-200">
+            <label id="view-mode-table-lbl" class="flex items-center cursor-pointer px-2 py-0.5 rounded-sm transition-colors bg-blue-600 text-white">
+               <input type="radio" name="viewMode" value="table" class="sr-only" checked />
+               Table
+            </label>
+            <label id="view-mode-json-lbl" class="flex items-center cursor-pointer px-2 py-0.5 rounded-sm transition-colors text-slate-500 hover:text-slate-900 hover:bg-slate-200">
+               <input type="radio" name="viewMode" value="json" class="sr-only" />
+               JSON
+            </label>
+          </div>
+          <div class="flex items-center gap-1.5 shrink-0" id="sidebar-actions">
+             <button id="btn-edit-start" class="flex items-center justify-center gap-1.5 h-7 px-2 bg-white hover:bg-slate-100 border border-slate-200 text-slate-700 shrink-0 rounded"><i data-lucide="edit" class="w-3.5 h-3.5"></i></button>
+             <button id="btn-edit-cancel" class="hidden items-center justify-center gap-1.5 h-7 px-2 bg-white hover:bg-slate-100 border border-slate-200 text-slate-700 rounded"><i data-lucide="x" class="w-3.5 h-3.5"></i></button>
+             <button id="btn-edit-save" class="hidden items-center justify-center gap-1.5 h-7 px-2 bg-blue-600 hover:bg-blue-700 text-white rounded"><i data-lucide="save" class="w-3.5 h-3.5"></i></button>
+          </div>
+        </div>
+      </div>
+
+      <header id="main-header" class="flex-1 bg-white py-2 px-3 sm:px-4 md:px-6 border-b border-slate-200/50 shadow-sm transition-all duration-300 ml-0">
+        <div class="flex items-center justify-between min-h-[48px] max-w-full">
+          <div class="flex items-center gap-2 sm:gap-3">
+            <button id="sidebar-toggle" class="flex items-center justify-center gap-1.5 px-2 h-8 text-xs sm:text-sm shrink-0 text-slate-500 hover:bg-slate-100 rounded transition-colors" title="Toggle Sidebar">
+              <i id="sidebar-icon" data-lucide="menu" class="w-4 h-4"></i>
+            </button>
+            <a href="/data" class="flex items-center justify-center gap-1.5 px-2 h-8 text-xs sm:text-sm shrink-0 text-slate-500 hover:bg-slate-100 rounded transition-colors" title="Home">
+              <i data-lucide="home" class="w-4 h-4"></i>
+            </a>
+            <div class="text-lg sm:text-xl font-semibold truncate" id="page-title">Timeline</div>
+          </div>
+          <div class="flex items-center gap-2">
+             <button id="present-btn" class="flex items-center justify-center gap-1.5 px-2 sm:px-3 h-8 text-xs sm:text-sm shrink-0 transition-all border border-slate-200 hover:border-indigo-400 hover:text-indigo-600 rounded bg-white" title="Enter Presentation Mode">
+               <i data-lucide="play" class="w-3.5 h-3.5" id="present-icon"></i>
+               <span class="hidden sm:inline" id="present-text">Present</span>
+             </button>
+          </div>
+        </div>
+      </header>
+    </div>
+
+    <!-- Sidebar Overlay & Content -->
+    <div id="sidebar-overlay" class="fixed inset-0 z-20 bg-transparent hidden" style="top: 64px;"></div>
+    <div id="sidebar" class="fixed left-0 bg-white border-r border-slate-200 text-slate-900 transition-all duration-300 overflow-hidden w-0" style="top: 64px; height: calc(100vh - 64px - 100px); z-index: 25;">
+      <div class="h-full flex flex-col w-80 sm:w-96">
+         <div class="flex-1 overflow-y-auto p-4 custom-scrollbar" id="sidebar-content"></div>
+      </div>
+    </div>
+
+    <!-- Main Timeline -->
+    <main class="flex-1 relative overflow-hidden transition-all duration-300" id="main-area">
+      <!-- Period Filter Button & Popover -->
+      <div id="filter-container" class="absolute top-2 sm:top-4 left-2 sm:left-4 z-40">
+         <button id="filter-btn" class="bg-white p-2 sm:p-2.5 rounded-full shadow-md border border-slate-200 hover:bg-slate-50 text-slate-600 hover:text-slate-900 transition-all group touch-manipulation" title="Filter Periods">
+            <i data-lucide="filter" class="w-4 h-4 sm:w-5 sm:h-5 group-hover:scale-110 transition-transform duration-500"></i>
+         </button>
+         <div id="filter-popover" class="hidden absolute top-full left-0 mt-2 w-80 p-3 bg-white border border-slate-200 rounded-md shadow-lg select-none">
+            <div class="text-sm font-semibold text-slate-700 mb-3">Timeline Periods</div>
+            <div class="text-xs text-slate-500 mb-3">You can hide earlier periods sequentially from top to bottom</div>
+            <div id="filter-list" class="space-y-2 max-h-96 overflow-y-auto"></div>
+         </div>
+      </div>
+
+      <!-- Presentation Mode Progress Bar -->
+      <div id="presentation-progress" class="absolute top-0 left-0 right-0 h-0.5 z-30 bg-slate-200 overflow-hidden hidden">
+        <div id="presentation-bar" class="h-full bg-indigo-500 transition-all duration-500 ease-out" style="width: 0%"></div>
+      </div>
+
+      <!-- D3 SVG container -->
+      <div id="timeline-container" class="relative overflow-hidden border-b border-slate-200 shadow-inner w-full h-full">
+         <svg id="timeline-svg" class="w-full h-full cursor-grab active:cursor-grabbing"></svg>
+         
+         <!-- Helper text -->
+         <div class="absolute bottom-2 sm:bottom-4 left-2 sm:left-4 pointer-events-none opacity-40 sm:opacity-50">
+            <p class="text-[10px] sm:text-xs font-mono text-slate-500 leading-tight text-left">
+              <span class="hidden sm:inline">Scroll/Pinch to Zoom • Drag to Pan</span>
+              <span class="sm:hidden">Pinch/Scroll to Zoom<br />Drag to Pan</span>
+            </p>
+         </div>
+
+         <!-- Data source -->
+         <div id="data-source-container" class="absolute bottom-2 sm:bottom-4 right-2 sm:right-4 pointer-events-none opacity-40 sm:opacity-50 hidden">
+            <a href="#" id="data-source-link" target="_blank" class="text-[10px] sm:text-xs font-mono text-blue-600 hover:underline pointer-events-auto">
+              Data Source
+            </a>
+         </div>
+
+         <!-- Popover Container -->
+         <div id="popover-container" class="absolute z-50 pointer-events-none hidden" style="width: 200px; height: 150px; transform: translate(-50%, 0);">
+           <div class="flex flex-col items-center justify-center w-full h-full">
+             <div class="bg-white/95 backdrop-blur-sm border border-slate-300 shadow-lg rounded-lg p-1.5 sm:p-2 max-w-full transform -translate-y-2 relative">
+               <div class="w-full aspect-video bg-slate-100 rounded border border-slate-200 overflow-hidden mb-1.5 sm:mb-2">
+                 <img id="popover-img" src="" alt="" class="w-full h-full object-cover" />
+               </div>
+               <div id="popover-desc" class="text-[9px] sm:text-[10px] text-slate-500 text-center font-mono leading-tight"></div>
+               <!-- Arrow Top -->
+               <div id="popover-arrow-top" class="absolute bottom-[-6px] left-1/2 transform -translate-x-1/2 hidden">
+                 <div class="w-0 h-0 border-l-[6px] border-r-[6px] border-t-[6px] border-l-transparent border-r-transparent border-t-white drop-shadow-sm"></div>
+               </div>
+               <!-- Arrow Bottom -->
+               <div id="popover-arrow-bottom" class="absolute top-[-6px] left-1/2 transform -translate-x-1/2 hidden">
+                 <div class="w-0 h-0 border-l-[6px] border-r-[6px] border-b-[6px] border-l-transparent border-r-transparent border-b-white drop-shadow-sm"></div>
+               </div>
+             </div>
+           </div>
+         </div>
+
+         <!-- Scale Indicator -->
+         <div id="scale-indicator" class="absolute top-2 sm:top-4 left-16 sm:left-20 md:left-1/2 md:-translate-x-1/2 flex flex-col items-start md:items-center pointer-events-none opacity-80 z-20 transition-all duration-300 hidden">
+            <div id="scale-label" class="text-[10px] sm:text-xs font-mono text-slate-500 mb-0.5 sm:mb-1 font-bold tracking-tight bg-slate-50/80 px-1 rounded"></div>
+            <div class="flex items-center" id="scale-bar" style="width: 100px;">
+              <div class="h-2 sm:h-3 w-px scale-color-bg"></div>
+              <div class="h-0.5 flex-1 scale-color-bg"></div>
+              <div class="h-2 sm:h-3 w-px scale-color-bg"></div>
+            </div>
+         </div>
+
+         <button id="reset-zoom" class="absolute top-2 sm:top-4 right-2 sm:right-4 bg-white p-2 sm:p-2.5 rounded-full shadow-md border border-slate-200 hover:bg-slate-50 text-slate-600 hover:text-slate-900 transition-all z-20 group">
+           <i data-lucide="scan" class="w-4 h-4 group-hover:scale-110 transition-transform duration-500"></i>
+         </button>
+         
+         <!-- Presentation Controls Overlay -->
+         <div id="presentation-controls" class="absolute bottom-4 sm:bottom-6 left-1/2 -translate-x-1/2 z-40 flex flex-col items-center gap-1.5 select-none hidden">
+             <div class="flex items-center gap-1 bg-white/95 backdrop-blur-md border border-slate-200 rounded-2xl px-2 py-1.5 shadow-xl">
+                 <button id="pres-prev" class="p-1.5 rounded-xl text-slate-600 hover:text-slate-900 hover:bg-slate-100 disabled:opacity-30 disabled:cursor-not-allowed transition-all" title="Next older event (← arrow)">
+                    <i data-lucide="chevron-left" class="w-4 h-4"></i>
+                 </button>
+                 <div class="text-center px-2 min-w-[160px] sm:min-w-[220px]">
+                     <div id="pres-title" class="text-[10px] sm:text-xs font-bold truncate"></div>
+                     <div class="text-[9px] sm:text-[10px] text-slate-500 font-mono mt-0.5">Use Arrow Keys <span class="mx-1 opacity-50">·</span></div>
+                 </div>
+                 <button id="pres-next" class="p-1.5 rounded-xl text-slate-600 hover:text-slate-900 hover:bg-slate-100 disabled:opacity-30 disabled:cursor-not-allowed transition-all" title="Go back to newer event (→ arrow)">
+                    <i data-lucide="chevron-right" class="w-4 h-4"></i>
+                 </button>
+                 <div class="w-px h-5 bg-slate-200 mx-0.5"></div>
+                 <button id="pres-exit" class="p-1.5 rounded-xl text-slate-500 hover:text-slate-900 hover:bg-slate-100 transition-all" title="Exit Presentation (Esc)">
+                    <i data-lucide="x" class="w-4 h-4"></i>
+                 </button>
+             </div>
+         </div>
+
+      </div>
+    </main>
+
+    <!-- Footer Navigator -->
+    <footer class="shrink-0 z-30 bg-white border-t border-slate-200" id="navigator-footer">
+      <div class="h-full w-full flex flex-col">
+        <div class="flex-1 overflow-x-auto overflow-y-hidden custom-scrollbar" id="navigator-scroll">
+          <div class="flex items-center h-full px-2 sm:px-3 md:px-4 space-x-1 sm:space-x-1.5 min-w-max" id="navigator-container">
+          </div>
+        </div>
+      </div>
+    </footer>
+  </div>
+
+<script>
+lucide.createIcons();
+
+const EVENT_COLORS = [
+  '#ef4444', '#f97316', '#f59e0b', '#84cc16', '#10b981', '#06b6d4', 
+  '#3b82f6', '#6366f1', '#8b5cf6', '#d946ef', '#f43f5e', '#ec4899'
+];
+
+const TIME_UNITS = [
+  { label: '1 Million Years', value: 1000000 },
+  { label: '100 Millennia', value: 100000 },
+  { label: '10 Millennia', value: 10000 },
+  { label: '1 Millennium', value: 1000 },
+  { label: '1 Century', value: 100 },
+  { label: '1 Decade', value: 10 },
+  { label: '1 Year', value: 1 },
+];
+
+function getScaleColor(label) {
+  const map = {
+    '1 Million Years': EVENT_COLORS[0],
+    '100 Millennia': EVENT_COLORS[1],
+    '10 Millennia': EVENT_COLORS[2],
+    '1 Millennium': EVENT_COLORS[3],
+    '1 Century': EVENT_COLORS[4],
+    '1 Decade': EVENT_COLORS[5],
+    '1 Year': EVENT_COLORS[6],
+  };
+  return map[label] || EVENT_COLORS[0];
+}
+
+let periods = [];
+let allEvents = [];
+let rawDataStore = null;
+let width = 0, height = 0;
+let initialScale, currentScale, zoomBehavior, transformState = d3.zoomIdentity;
+let svg, g;
+let highlightedEvent = null;
+let isSidebarOpen = false;
+let viewMode = 'table';
+let isEditing = false;
+let footerHeightPx = 100;
+let visiblePeriodIndices = new Set();
+let isFilterOpen = false;
+
+const BAR_HEIGHT = 40;
+const EVENT_LABEL_WIDTH = 140;
+
+async function loadData() {
+  try {
+     const res = await fetch('/components/vast-timeline/history-data.json');
+     if (!res.ok) throw new Error('Not ok');
+     const rawData = await res.json();
+     rawDataStore = rawData;
+     
+     document.getElementById('page-title').innerText = rawData.title || 'Timeline';
+     if(rawData.dataSourceUrl) {
+       const ds = document.getElementById('data-source-container');
+       ds.classList.remove('hidden');
+       document.getElementById('data-source-link').href = rawData.dataSourceUrl;
+     }
+
+     periods = rawData.rawData.map((p, i, arr) => {
+       const nextStart = arr[i+1]?.start_year;
+       let vEnd = p.end_year;
+       if (nextStart !== undefined) vEnd = Math.max(vEnd, nextStart);
+       const c = EVENT_COLORS[i % EVENT_COLORS.length];
+       return {
+         ...p, visual_end_year: vEnd, color: c,
+         events: p.events.map(e => ({ ...e, periodColor: c, periodIndex: i, illustrations: e.illustrations || `https://picsum.photos/seed/${Math.abs(e.year)}/400/300` }))
+       };
+     });
+     allEvents = periods.flatMap(p => p.events).sort((a,b) => a.year - b.year);
+     
+     // Reset visible periods to all on data load
+     visiblePeriodIndices = new Set(periods.map((_, i) => i));
+  } catch(e) {
+     console.error('Failed to fetch data', e);
+  }
+}
+
+function handleJsonUpdate(newData) {
+    rawDataStore = newData;
+    document.getElementById('page-title').innerText = rawDataStore.title || 'Timeline';
+    
+    periods = rawDataStore.rawData.map((p, i, arr) => {
+       const nextStart = arr[i+1]?.start_year;
+       let vEnd = p.end_year;
+       if (nextStart !== undefined) vEnd = Math.max(vEnd, nextStart);
+       const c = EVENT_COLORS[i % EVENT_COLORS.length];
+       return {
+         ...p, visual_end_year: vEnd, color: c,
+         events: p.events.map(e => ({ ...e, periodColor: c, periodIndex: i, illustrations: e.illustrations || `https://picsum.photos/seed/${Math.abs(e.year)}/400/300` }))
+       };
+    });
+    allEvents = periods.flatMap(p => p.events).sort((a,b) => a.year - b.year);
+    
+    // Reset visible periods to all on data load
+    visiblePeriodIndices = new Set(periods.map((_, i) => i));
+    
+    renderSidebar();
+    
+    // Recalculate domain but keep existing zoom viewState
+    const minYear = d3.min(periods, d => d.start_year) ?? -1600000;
+    const maxYear = d3.max(periods, d => d.visual_end_year) ?? 2024;
+    const padding = Math.abs(maxYear - minYear) * 0.05;
+    initialScale = d3.scaleLinear().domain([minYear, maxYear + padding]).range([0, width]);
+    currentScale = transformState.rescaleX(initialScale);
+    
+    renderTimeline();
+    renderNavigator();
+    updateScaleIndicator();
+}
+
+function getCellHtml(value, type, pIndex, field, eIndex = null) {
+    const val = value || '';
+    const emptyClass = !val ? 'text-slate-400 italic' : '';
+    const displayVal = val || '...';
+    // Clean string for html embedding safely
+    const safeDisplay = displayVal.toString().replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    return `<div data-editable="true" data-type="${type}" data-pindex="${pIndex}" data-field="${field}" data-eindex="${eIndex}" class="cursor-text hover:bg-slate-200/50 rounded transition-colors -mx-1 px-1 min-h-[1.5rem] ${emptyClass}" title="Double click to edit">${safeDisplay}</div>`;
+}
+
+function renderSidebar() {
+    const content = document.getElementById('sidebar-content');
+    if(viewMode === 'json') {
+        if(isEditing) {
+            content.innerHTML = `<textarea id="json-editor" class="w-full h-full min-h-[500px] bg-white border border-slate-200 text-slate-900 p-3 rounded font-mono text-xs resize-none focus:outline-none focus:ring-2 focus:ring-blue-500" spellcheck="false" autofocus>${JSON.stringify(rawDataStore, null, 2)}</textarea>`;
+        } else {
+            content.innerHTML = `<pre class="text-xs overflow-x-auto bg-slate-100 p-3 rounded text-slate-700 cursor-pointer hover:bg-slate-200 transition-colors" onclick="startEditingJson()" title="Click to edit JSON">${JSON.stringify(rawDataStore, null, 2)}</pre>`;
+        }
+    } else {
+        if(!rawDataStore || !rawDataStore.rawData) {
+            content.innerHTML = `<div class="text-sm text-slate-400 p-3 border border-slate-700 rounded border-dashed">No data</div>`;
+            return;
+        }
+        let html = `
+          <div class="overflow-x-auto rounded border border-slate-200 bg-slate-50 flex flex-col h-max relative">
+             <table class="w-full text-left text-xs border-collapse min-w-[500px]">
+                <thead>
+                   <tr class="bg-slate-100/80 text-slate-700 border-b border-slate-200 select-none">
+                       <th class="p-3 border-r border-slate-200 font-semibold whitespace-nowrap w-[140px] group relative">
+                           Period
+                           <button onclick="window.directAddPeriod()" class="absolute right-2 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 text-blue-600 hover:bg-blue-100 rounded-full w-5 h-5 flex items-center justify-center font-bold transition-all" title="Add Period">+</button>
+                       </th>
+                       <th class="p-3 border-r border-slate-200 font-semibold whitespace-nowrap w-[100px]">Date</th>
+                       <th class="p-3 font-semibold group relative">
+                           Event
+                           <button onclick="window.directAddEvent()" class="absolute right-2 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 text-blue-600 hover:bg-blue-100 rounded-full w-5 h-5 flex items-center justify-center font-bold transition-all" title="Add Event (to first period)">+</button>
+                       </th>
+                   </tr>
+                </thead>
+                <tbody>
+        `;
+        
+        rawDataStore.rawData.forEach((period, pIndex) => {
+            const rowSpan = Math.max(1, period.events ? period.events.length : 1);
+            const events = period.events || [];
+            
+            const periodCell = `
+                <td class="p-3 border-r border-slate-200 align-top bg-slate-50/40 group relative" rowspan="${rowSpan}">
+                    <div class="font-semibold text-slate-900 text-[13px] mb-1.5">${getCellHtml(period.period_title, 'text', pIndex, 'period_title')}</div>
+                    <div class="flex items-center gap-1 text-[10px] text-slate-500">
+                        <div class="w-12 text-center">${getCellHtml(period.start_year, 'number', pIndex, 'start_year')}</div>
+                        <span>to</span>
+                        <div class="w-12 text-center">${getCellHtml(period.end_year, 'number', pIndex, 'end_year')}</div>
+                    </div>
+                    <div class="absolute bottom-2 right-2 opacity-0 group-hover:opacity-100 flex gap-1">
+                        <button onclick="window.directDeletePeriod(${pIndex})" class="text-[10px] bg-red-100 hover:bg-red-200 text-red-600 px-1.5 py-0.5 rounded transition-all" title="Delete this period">Delete</button>
+                        <button onclick="window.directAddPeriodEvent(${pIndex})" class="text-[10px] bg-slate-200 hover:bg-slate-300 text-slate-600 px-1.5 py-0.5 rounded transition-all" title="Add event to this period">+ Event</button>
+                    </div>
+                </td>
+            `;
+            
+            if (events.length === 0) {
+                html += `<tr class="border-b border-slate-200">${periodCell}<td class="p-3 text-slate-400 italic" colspan="2">No events</td></tr>`;
+            } else {
+                events.forEach((event, eIndex) => {
+                    html += `<tr class="border-b border-slate-200 hover:bg-slate-50/50 transition-colors">`;
+                    if (eIndex === 0) html += periodCell;
+                    html += `
+                        <td class="p-3 border-r border-slate-200 align-top whitespace-nowrap text-slate-700 bg-white/20">
+                            <div class="font-medium text-[11px] mb-1">${getCellHtml(event.date_display, 'text', pIndex, 'date_display', eIndex)}</div>
+                            <div class="flex items-center gap-1 text-[9px] text-slate-400 mt-0.5">
+                                <span>Yr:</span>
+                                <div class="w-12">${getCellHtml(event.year, 'number', pIndex, 'year', eIndex)}</div>
+                            </div>
+                        </td>
+                        <td class="p-3 align-top group/event relative">
+                            <div class="font-semibold text-slate-900 text-[13px] mb-1">${getCellHtml(event.title, 'text', pIndex, 'title', eIndex)}</div>
+                            <div class="text-slate-600 mt-1.5 leading-relaxed text-[11px]">${getCellHtml(event.description, 'multiline', pIndex, 'description', eIndex)}</div>
+                            <button onclick="window.directDeleteEvent(${pIndex}, ${eIndex})" class="absolute top-2 right-2 opacity-0 group-hover/event:opacity-100 text-[10px] text-red-500 hover:text-red-700 bg-red-50 hover:bg-red-100 px-1.5 py-0.5 rounded transition-all" title="Delete Event">Delete</button>
+                        </td>
+                    </tr>`;
+                });
+            }
+        });
+        
+        html += `</tbody></table></div>`;
+        content.innerHTML = html;
+    }
+}
+
+function toggleSidebar() {
+    isSidebarOpen = !isSidebarOpen;
+    const sidebarWidth = window.innerWidth < 640 ? 320 : 384;
+    
+    // Animate Header
+    const sbHeader = document.getElementById('sidebar-header');
+    sbHeader.style.width = isSidebarOpen ? `${sidebarWidth}px` : '0';
+    sbHeader.style.paddingLeft = isSidebarOpen ? (window.innerWidth < 640 ? '12px' : '16px') : '0';
+    sbHeader.style.paddingRight = isSidebarOpen ? (window.innerWidth < 640 ? '12px' : '16px') : '0';
+    sbHeader.style.opacity = isSidebarOpen ? '1' : '0';
+
+    const mHeader = document.getElementById('main-header');
+    mHeader.style.marginLeft = isSidebarOpen ? `${sidebarWidth}px` : '0';
+
+    // Animate Main Area
+    const mainArea = document.getElementById('main-area');
+    mainArea.style.marginLeft = isSidebarOpen ? `${sidebarWidth}px` : '0';
+    
+    // Animate Sidebar
+    const sidebar = document.getElementById('sidebar');
+    sidebar.style.width = isSidebarOpen ? `${sidebarWidth}px` : '0';
+    
+    const overlay = document.getElementById('sidebar-overlay');
+    if (isSidebarOpen) {
+        overlay.classList.remove('hidden');
+        renderSidebar();
+    } else {
+        overlay.classList.add('hidden');
+    }
+    
+    const icon = document.getElementById('sidebar-icon');
+    icon.setAttribute('data-lucide', isSidebarOpen ? 'x' : 'menu');
+    lucide.createIcons();
+    
+    // Re-adjust SVG width
+    setTimeout(() => {
+        const container = document.getElementById('timeline-container');
+        width = container.clientWidth;
+        d3.select('#chart-area rect').attr('width', width+300);
+        d3.select('#grid-bg').attr('width', width+300);
+    }, 300);
+}
+
+// Inline Table Editing Behavior
+document.addEventListener('dblclick', (e) => {
+    const el = e.target.closest('[data-editable="true"]');
+    if(!el || el.querySelector('input, textarea')) return;
+    
+    const type = el.getAttribute('data-type') || 'text';
+    const pIndex = el.getAttribute('data-pindex');
+    const eIndex = el.getAttribute('data-eindex');
+    const field = el.getAttribute('data-field');
+    const val = el.innerText === '...' ? '' : el.innerText;
+    
+    const input = document.createElement(type === 'multiline' ? 'textarea' : 'input');
+    input.value = val;
+    input.className = type === 'multiline' 
+       ? 'w-full text-xs border border-blue-400 rounded px-1 py-0.5 min-h-[60px] text-slate-900 focus:outline-none focus:ring-1 focus:ring-blue-500'
+       : 'w-full border border-blue-400 rounded px-1 py-0.5 text-slate-900 focus:outline-none focus:ring-1 focus:ring-blue-500 text-xs';
+       
+    el.innerHTML = '';
+    el.appendChild(input);
+    input.focus();
+    
+    const save = () => {
+        let newVal = input.value;
+        if(type === 'number') { newVal = parseInt(newVal, 10) || 0; }
+        
+        if (eIndex === 'null' || !eIndex) {
+            rawDataStore.rawData[pIndex][field] = newVal;
+        } else {
+            rawDataStore.rawData[pIndex].events[eIndex][field] = newVal;
+        }
+        handleJsonUpdate(rawDataStore);
+    };
+    
+    input.addEventListener('blur', save);
+    input.addEventListener('keydown', (ev) => {
+        if(ev.key === 'Enter' && type !== 'text') { ev.stopPropagation(); }
+        if(ev.key === 'Enter' && type !== 'multiline') { input.blur(); }
+    });
+});
+
+window.directAddPeriod = () => {
+    rawDataStore.rawData.push({ period_title: "New Period", start_year: 0, end_year: 0, description: "", events: [] });
+    handleJsonUpdate(rawDataStore);
+};
+window.directAddEvent = () => {
+    if(rawDataStore.rawData.length === 0) { window.directAddPeriod(); return; }
+    rawDataStore.rawData[0].events.unshift({ title: "New Event", description: "", year: rawDataStore.rawData[0].start_year || 0, date_display: "Unknown Date", illustrations: "" });
+    handleJsonUpdate(rawDataStore);
+};
+window.directAddPeriodEvent = (pIndex) => {
+    rawDataStore.rawData[pIndex].events.unshift({ title: "New Event", description: "", year: rawDataStore.rawData[pIndex].start_year || 0, date_display: "", illustrations: "" });
+    handleJsonUpdate(rawDataStore);
+};
+window.directDeletePeriod = (pIndex) => {
+    rawDataStore.rawData.splice(pIndex, 1);
+    handleJsonUpdate(rawDataStore);
+};
+window.directDeleteEvent = (pIndex, eIndex) => {
+    rawDataStore.rawData[pIndex].events.splice(eIndex, 1);
+    handleJsonUpdate(rawDataStore);
+};
+
+// JSON Editing Mode Behavior
+function startEditingJson() {
+    isEditing = true;
+    viewMode = 'json';
+    updateSidebarActions();
+    renderSidebar();
+}
+
+function updateSidebarActions() {
+    const btnStart = document.getElementById('btn-edit-start');
+    const btnCancel = document.getElementById('btn-edit-cancel');
+    const btnSave = document.getElementById('btn-edit-save');
+    
+    if(isEditing) {
+        btnStart.classList.add('hidden'); btnStart.classList.remove('flex');
+        btnCancel.classList.remove('hidden'); btnCancel.classList.add('flex');
+        btnSave.classList.remove('hidden'); btnSave.classList.add('flex');
+    } else {
+        btnStart.classList.remove('hidden'); btnStart.classList.add('flex');
+        btnCancel.classList.add('hidden'); btnCancel.classList.remove('flex');
+        btnSave.classList.add('hidden'); btnSave.classList.remove('flex');
+    }
+}
+
+document.getElementById('btn-edit-start').addEventListener('click', () => {
+    isEditing = true;
+    updateSidebarActions();
+    renderSidebar();
+});
+document.getElementById('btn-edit-cancel').addEventListener('click', () => {
+    isEditing = false;
+    updateSidebarActions();
+    renderSidebar();
+});
+document.getElementById('btn-edit-save').addEventListener('click', () => {
+    if(viewMode === 'json') {
+       try {
+           const editor = document.getElementById('json-editor');
+           if (editor) {
+               const newData = JSON.parse(editor.value);
+               handleJsonUpdate(newData);
+           }
+       } catch(e) {
+           alert('Invalid JSON format. Please check your syntax.');
+           return;
+       }
+    }
+    isEditing = false;
+    updateSidebarActions();
+    renderSidebar();
+});
+
+document.getElementById('sidebar-toggle').addEventListener('click', toggleSidebar);
+document.getElementById('sidebar-overlay').addEventListener('click', () => isSidebarOpen && toggleSidebar());
+
+document.getElementById('view-mode-table-lbl').addEventListener('click', () => {
+    viewMode = 'table';
+    isEditing = false;
+    updateSidebarActions();
+    document.getElementById('view-mode-table-lbl').classList.replace('text-slate-500', 'text-white');
+    document.getElementById('view-mode-table-lbl').classList.replace('hover:bg-slate-200', 'bg-blue-600');
+    document.getElementById('view-mode-table-lbl').classList.remove('hover:text-slate-900');
+    
+    document.getElementById('view-mode-json-lbl').classList.replace('text-white', 'text-slate-500');
+    document.getElementById('view-mode-json-lbl').classList.replace('bg-blue-600', 'hover:bg-slate-200');
+    document.getElementById('view-mode-json-lbl').classList.add('hover:text-slate-900');
+    
+    renderSidebar();
+});
+document.getElementById('view-mode-json-lbl').addEventListener('click', () => {
+    viewMode = 'json';
+    document.getElementById('view-mode-json-lbl').classList.replace('text-slate-500', 'text-white');
+    document.getElementById('view-mode-json-lbl').classList.replace('hover:bg-slate-200', 'bg-blue-600');
+    document.getElementById('view-mode-json-lbl').classList.remove('hover:text-slate-900');
+    
+    document.getElementById('view-mode-table-lbl').classList.replace('text-white', 'text-slate-500');
+    document.getElementById('view-mode-table-lbl').classList.replace('bg-blue-600', 'hover:bg-slate-200');
+    document.getElementById('view-mode-table-lbl').classList.add('hover:text-slate-900');
+    
+    renderSidebar();
+});
+
+// Filter Popover Logic
+function renderFilterList() {
+    const list = document.getElementById('filter-list');
+    if(!list) return;
+    
+    let firstVisibleIndex = -1;
+    for(let i=0; i<periods.length; i++) {
+        if(visiblePeriodIndices.has(i)) { firstVisibleIndex = i; break; }
+    }
+    
+    let html = '';
+    periods.forEach((period, index) => {
+        const isVisible = visiblePeriodIndices.has(index);
+        let canToggle = false;
+        
+        if (isVisible) {
+            canToggle = visiblePeriodIndices.size > 1 && index === firstVisibleIndex;
+        } else {
+            canToggle = index === firstVisibleIndex - 1;
+        }
+        
+        const opacityClass = !isVisible ? 'opacity-70' : '';
+        const cursorClass = canToggle ? 'cursor-pointer' : 'cursor-not-allowed opacity-50';
+        
+        html += `
+            <div class="flex items-center space-x-2 p-2 rounded border transition-all hover:bg-slate-50 cursor-pointer ${opacityClass}" onclick="window.focusPeriod(${index})">
+                <div class="flex items-center" onclick="event.stopPropagation()">
+                    <input type="checkbox" ${isVisible ? 'checked' : ''} ${!canToggle ? 'disabled' : ''} onchange="window.togglePeriodFilter(${index})" class="${cursorClass}">
+                </div>
+                <div class="w-4 h-4 rounded shrink-0" style="background-color: ${period.color}"></div>
+                <div class="flex-1 min-w-0 pointer-events-none">
+                    <div class="text-xs font-medium text-slate-700 leading-tight">${period.period_title}</div>
+                    <div class="text-[10px] text-slate-500 font-mono">
+                        ${period.start_year < 0 ? Math.abs(period.start_year).toLocaleString() + ' BCE' : period.start_year + ' CE'}
+                        &rarr;
+                        ${period.end_year < 0 ? Math.abs(period.end_year).toLocaleString() + ' BCE' : period.end_year + ' CE'}
+                    </div>
+                </div>
+            </div>
+        `;
+    });
+    list.innerHTML = html;
+}
+
+window.togglePeriodFilter = (index) => {
+    let firstVisibleIndex = -1;
+    for(let i=0; i<periods.length; i++) {
+        if(visiblePeriodIndices.has(i)) { firstVisibleIndex = i; break; }
+    }
+    
+    const isVisible = visiblePeriodIndices.has(index);
+    if(isVisible) {
+        if(visiblePeriodIndices.size === 1) return;
+        if(index !== firstVisibleIndex) return;
+        visiblePeriodIndices.delete(index);
+    } else {
+        if(index !== firstVisibleIndex - 1) return;
+        visiblePeriodIndices.add(index);
+    }
+    
+    renderFilterList();
+    renderTimeline();
+    
+    // Zoom to fit active periods smoothly
+    const activePeriods = periods.filter((_, i) => visiblePeriodIndices.has(i));
+    if (activePeriods.length > 0) {
+        const vMinYear = d3.min(activePeriods, d => d.start_year) ?? -1600000;
+        const vMaxYear = d3.max(activePeriods, d => d.visual_end_year) ?? 2024;
+        const vPadding = Math.abs(vMaxYear - vMinYear) * 0.05;
+        const targetMin = vMinYear;
+        const targetMax = vMaxYear + vPadding;
+        
+        const startPx = initialScale(targetMin);
+        const endPx = initialScale(targetMax);
+        const spanPx = Math.max(endPx - startPx, 1);
+        
+        const k = width / spanPx;
+        const x = -startPx * k;
+        
+        setTimeout(() => {
+            svg.transition().duration(750).call(zoomBehavior.transform, d3.zoomIdentity.translate(x, 0).scale(k));
+        }, 50);
+    }
+};
+
+window.focusPeriod = (index) => {
+    if(visiblePeriodIndices.has(index)) {
+        jumpToPeriod(periods[index]);
+    }
+};
+
+document.getElementById('filter-btn').addEventListener('click', (e) => {
+    e.stopPropagation();
+    isFilterOpen = !isFilterOpen;
+    if(isFilterOpen) {
+        document.getElementById('filter-popover').classList.remove('hidden');
+        renderFilterList();
+    } else {
+        document.getElementById('filter-popover').classList.add('hidden');
+    }
+});
+document.addEventListener('click', (e) => {
+    if(isFilterOpen && !document.getElementById('filter-container').contains(e.target)) {
+        isFilterOpen = false;
+        document.getElementById('filter-popover').classList.add('hidden');
+    }
+});
+
+function initUI() {
+  const container = document.getElementById('timeline-container');
+  width = container.clientWidth;
+  
+  const footerHeight = window.innerWidth < 640 ? 80 : window.innerWidth < 768 ? 100 : 120;
+  footerHeightPx = footerHeight;
+  document.getElementById('navigator-footer').style.height = `${footerHeight}px`;
+  document.getElementById('sidebar').style.height = `calc(100vh - 64px - ${footerHeight}px)`;
+  height = container.clientHeight;
+
+  const minYear = d3.min(periods, d => d.start_year) ?? -1600000;
+  const maxYear = d3.max(periods, d => d.visual_end_year) ?? 2024;
+  const padding = Math.abs(maxYear - minYear) * 0.05;
+
+  initialScale = d3.scaleLinear().domain([minYear, maxYear + padding]).range([0, width]);
+  currentScale = initialScale;
+
+  svg = d3.select('#timeline-svg');
+  svg.selectAll('*').remove();
+
+  const defs = svg.append('defs');
+  defs.append('clipPath').attr('id', 'chart-area')
+      .append('rect').attr('x', -150).attr('y', 0).attr('width', width+300).attr('height', height);
+
+  defs.append('pattern').attr('id', 'grid-pattern')
+      .attr('patternUnits', 'userSpaceOnUse')
+      .append('rect').attr('id', 'grid-pattern-rect')
+      .attr('fill', 'none')
+      .attr('stroke-width', 0.5);
+
+  svg.append('rect').attr('id', 'grid-bg')
+      .attr('x', -150).attr('y', 0).attr('width', width + 300).attr('height', height)
+      .attr('fill', 'url(#grid-pattern)');
+
+  g = svg.append('g').attr('clip-path', 'url(#chart-area)');
+
+  zoomBehavior = d3.zoom()
+    .scaleExtent([1, 100000000])
+    .on('zoom', (event) => {
+      const FIXED_PADDING_PX = 150;
+      let k = event.transform.k;
+      let x = event.transform.x;
+      const minX = width - FIXED_PADDING_PX - width * k;
+      const maxX = FIXED_PADDING_PX;
+      let clampedX = Math.max(minX, Math.min(maxX, x));
+      
+      transformState = d3.zoomIdentity.translate(clampedX, event.transform.y).scale(k);
+      if (clampedX !== x) {
+        svg.property('__zoom', transformState);
+      }
+      currentScale = transformState.rescaleX(initialScale);
+      renderTimeline();
+      updateScaleIndicator();
+    });
+
+  svg.call(zoomBehavior);
+
+  document.getElementById('reset-zoom').addEventListener('click', (e) => {
+    e.stopPropagation();
+    svg.transition().duration(750).call(zoomBehavior.transform, d3.zoomIdentity);
+  });
+
+  svg.on('click', () => {
+    if(isPresentationMode) return;
+    highlightedEvent = null;
+    renderTimeline();
+    renderNavigator();
+  });
+
+  renderNavigator();
+  renderTimeline();
+  updateScaleIndicator();
+}
+
+function getLayoutCoords(lane, lineY) {
+  const isTop = lane >= 0;
+  const absLane = Math.abs(lane);
+  const baseOffset = 30;
+  const rowHeight = 45;
+  let foY = 0, lineY2 = 0;
+
+  if (isTop) {
+    foY = lineY - baseOffset - (absLane * rowHeight) - 10;
+    lineY2 = foY + 40;
+  } else {
+    foY = lineY + baseOffset + (absLane * rowHeight) - 20;
+    lineY2 = foY + 10;
+  }
+  return { foY, lineY2, isTop };
+}
+
+function renderTimeline() {
+  const LINE_Y = height / 2;
+  const BAR_Y_START = LINE_Y - 20;
+
+  // 1. Periods
+  const periodSel = g.selectAll('.period').data(periods, d => d.period_title);
+  const pEnter = periodSel.enter().append('g').attr('class', 'period');
+  pEnter.append('rect')
+    .attr('fill', d => d.color)
+    .attr('opacity', (d, i) => {
+        if(isPresentationMode) {
+            return presentationVisiblePeriods.has(i) ? 0.9 : 0.5;
+        }
+        return 0.9;
+    })
+    .attr('stroke', 'white')
+    .attr('stroke-width', 1)
+    .attr('y', BAR_Y_START)
+    .attr('height', BAR_HEIGHT);
+    
+  pEnter.append('text')
+    .attr('fill', d => d.color)
+    .attr('font-weight', 'bold')
+    .attr('font-size', '10px')
+    .attr('text-anchor', 'middle')
+    .attr('class', 'uppercase tracking-widest pointer-events-none')
+    .attr('y', BAR_Y_START + BAR_HEIGHT + 15);
+
+  const pUpdate = periodSel.merge(pEnter);
+  pUpdate.style('display', (d, i) => {
+      if(isPresentationMode) return 'block';
+      return visiblePeriodIndices.has(i) ? 'block' : 'none';
+  });
+  
+  pUpdate.select('rect')
+    .attr('x', d => currentScale(d.start_year))
+    .attr('width', d => Math.max(0, currentScale(d.visual_end_year) - currentScale(d.start_year)))
+    .attr('opacity', (d, i) => {
+        if(isPresentationMode) {
+            return presentationVisiblePeriods.has(i) ? 0.9 : 0.5;
+        }
+        return 0.9;
+    });
+  
+  pUpdate.select('text')
+    .attr('opacity', (d, i) => {
+        if(isPresentationMode) {
+            return presentationVisiblePeriods.has(i) ? 0.8 : 0;
+        }
+        return 0.8;
+    })
+    .attr('x', d => {
+        const startX = currentScale(d.start_year);
+        const w = Math.max(0, currentScale(d.visual_end_year) - currentScale(d.start_year));
+        return startX + w/2;
+    })
+    .text(d => {
+        const w = Math.max(0, currentScale(d.visual_end_year) - currentScale(d.start_year));
+        const charWidth = 6.5;
+        const fullTextWidth = d.period_title.length * charWidth;
+        if (w > fullTextWidth + 24) return d.period_title;
+        return '';
+    });
+
+  // Events Layout
+  const ALLOWED_LANES = [0, -1, 1, -2, 2];
+  const lanes = new Map();
+  const visibleEvents = [];
+
+  const activeEvents = allEvents.filter(evt => {
+      if(isPresentationMode) return true; // Handled dynamically in presentation mode loop
+      return visiblePeriodIndices.has(evt.periodIndex);
+  });
+
+  activeEvents.forEach(evt => {
+    const x = currentScale(evt.year);
+    if (x < -200 || x > width + 200) return;
+    
+    let assignedLane = 0;
+    let placed = false;
+    const isHighlighted = highlightedEvent && evt.title === highlightedEvent.title;
+
+    for (const lane of ALLOWED_LANES) {
+      const lastEnd = lanes.get(lane) ?? -9999;
+      if (x > lastEnd + 10) {
+        assignedLane = lane;
+        lanes.set(lane, x + EVENT_LABEL_WIDTH);
+        placed = true;
+        break;
+      }
+    }
+
+    if (isHighlighted && !placed) {
+      assignedLane = 0;
+      placed = true;
+    }
+    
+    if (isPresentationMode && isHighlighted) {
+      assignedLane = 0;
+      placed = true;
+    }
+
+    if (placed) {
+      visibleEvents.push({ event: evt, x, lane: assignedLane });
+    }
+  });
+
+  // 2. Lines
+  const lineSel = g.selectAll('.conn-line').data(visibleEvents, d => d.event.title);
+  lineSel.enter().append('line').attr('class', 'conn-line')
+    .attr('stroke', d => d.event.periodColor)
+    .attr('stroke-width', 1)
+    .attr('stroke-dasharray', '2,2')
+    .merge(lineSel)
+    .attr('opacity', d => {
+        const isHighlighted = highlightedEvent && d.event.title === highlightedEvent.title;
+        if(isPresentationMode && !isHighlighted) return 0;
+        return 0.5;
+    })
+    .attr('x1', d => d.x).attr('y1', LINE_Y)
+    .attr('x2', d => d.x).attr('y2', d => getLayoutCoords(d.lane, LINE_Y).lineY2);
+  lineSel.exit().remove();
+
+  // 3. Dots
+  const dotSel = g.selectAll('.event-dot').data(visibleEvents, d => d.event.title);
+  dotSel.enter().append('circle').attr('class', 'event-dot cursor-pointer transition-transform hover:scale-150')
+    .attr('fill', 'white')
+    .attr('stroke-width', 2)
+    .attr('r', 3)
+    .on('click', (e, d) => handleEventClick(e, d.event))
+    .merge(dotSel)
+    .attr('stroke', d => d.event.periodColor)
+    .attr('cx', d => d.x).attr('cy', LINE_Y);
+  dotSel.exit().remove();
+
+  // 4. Labels
+  const labelSel = g.selectAll('.event-label').data(visibleEvents, d => d.event.title);
+  const labelEnter = labelSel.enter().append('foreignObject').attr('class', 'event-label')
+    .attr('width', EVENT_LABEL_WIDTH).attr('height', 50)
+    .style('pointer-events', 'none').style('overflow', 'visible');
+  
+  labelEnter.append('xhtml:div')
+    .attr('class', 'flex flex-col items-center justify-center w-full h-full p-1')
+    .html(d => `
+      <div class="label-card bg-white/90 backdrop-blur-[2px] rounded px-2 py-1 max-w-full hover:bg-white transition-all duration-200 pointer-events-auto cursor-pointer"
+           style="border-color: ${d.event.periodColor}">
+         <div class="title-text text-[9px] font-bold text-slate-700 leading-tight text-center line-clamp-2 w-full break-words whitespace-normal"></div>
+         <div class="date-text text-[8px] text-slate-500 text-center font-mono mt-0.5 truncate"></div>
+      </div>
+    `);
+
+  const labelUpdate = labelSel.merge(labelEnter);
+  
+  // hide logic
+  labelUpdate.attr('opacity', d => {
+      const isHighlighted = highlightedEvent && d.event.title === highlightedEvent.title;
+      if(isPresentationMode && !isHighlighted) return 0;
+      return 1;
+  });
+
+  labelUpdate
+    .attr('x', d => d.x - EVENT_LABEL_WIDTH / 2)
+    .attr('y', d => getLayoutCoords(d.lane, LINE_Y).foY);
+  
+  labelUpdate.select('.title-text').text(d => d.event.title);
+  labelUpdate.select('.date-text').text(d => d.event.date_display);
+
+  labelUpdate.select('.label-card')
+    .attr('class', d => {
+       const isHighlighted = highlightedEvent && d.event.title === highlightedEvent.title;
+       return `label-card bg-white/90 backdrop-blur-[2px] border rounded px-2 py-1 max-w-full hover:bg-white transition-all duration-200 pointer-events-auto cursor-pointer ${isHighlighted ? 'label-card-active' : 'border-slate-200'}`
+    })
+    .style('border-color', d => (highlightedEvent && d.event.title === highlightedEvent.title) ? d.event.periodColor : undefined)
+    .style('--tw-ring-color', d => d.event.periodColor)
+    .on('click', (e, d) => handleEventClick(e, d.event));
+    
+  labelSel.exit().remove();
+
+  updatePopover(visibleEvents, LINE_Y);
+}
+
+function updateScaleIndicator() {
+  const domain = currentScale.domain();
+  const range = currentScale.range();
+  const rangeWidth = Math.abs(range[1] - range[0]);
+  const domainWidth = Math.abs(domain[1] - domain[0]);
+  if (domainWidth === 0) return;
+  
+  const pxPerYear = rangeWidth / domainWidth;
+  let bestUnit = TIME_UNITS.find(u => {
+    const w = u.value * pxPerYear;
+    return w >= 60 && w <= 200;
+  });
+  if (!bestUnit) {
+      let minDiff = Infinity;
+      TIME_UNITS.forEach(u => {
+        const w = u.value * pxPerYear;
+        const diff = Math.abs(w - 100);
+        if (diff < minDiff) {
+          minDiff = diff;
+          bestUnit = u;
+        }
+      });
+  }
+  if (!bestUnit) bestUnit = TIME_UNITS[0];
+
+  const scaleWidth = bestUnit.value * pxPerYear;
+  const color = getScaleColor(bestUnit.label);
+
+  const ind = document.getElementById('scale-indicator');
+  ind.classList.remove('hidden');
+  document.getElementById('scale-label').innerText = bestUnit.label;
+  document.getElementById('scale-bar').style.width = Math.max(scaleWidth, 40) + 'px';
+  document.querySelectorAll('.scale-color-bg').forEach(el => el.style.backgroundColor = color);
+
+  // update grid
+  const r = parseInt(color.slice(1, 3), 16);
+  const gb = parseInt(color.slice(3, 5), 16);
+  const b = parseInt(color.slice(5, 7), 16);
+  const gridColor = `rgba(${r}, ${gb}, ${b}, 0.3)`;
+
+  d3.select('#grid-pattern')
+    .attr('width', scaleWidth)
+    .attr('height', scaleWidth)
+    .attr('patternTransform', `translate(${transformState.x}, 0)`);
+    
+  d3.select('#grid-pattern-rect')
+    .attr('width', scaleWidth)
+    .attr('height', scaleWidth)
+    .attr('stroke', gridColor);
+}
+
+function updatePopover(visibleEvents, LINE_Y) {
+  const popover = document.getElementById('popover-container');
+  if (!highlightedEvent) {
+    popover.classList.add('hidden');
+    return;
+  }
+  
+  const hEvt = visibleEvents.find(v => v.event.title === highlightedEvent.title);
+  if (!hEvt) {
+    popover.classList.add('hidden');
+    return;
+  }
+
+  popover.classList.remove('hidden');
+  const { foY, isTop } = getLayoutCoords(hEvt.lane, LINE_Y);
+  const popoverHeight = window.innerWidth < 640 ? 120 : 150;
+  const labelHeight = 50;
+  const arrowHeight = 10;
+  
+  let popoverY;
+  if (isTop) {
+    popoverY = foY - popoverHeight - arrowHeight - 10;
+    document.getElementById('popover-arrow-top').classList.remove('hidden');
+    document.getElementById('popover-arrow-bottom').classList.add('hidden');
+  } else {
+    popoverY = foY + labelHeight + 20;
+    document.getElementById('popover-arrow-top').classList.add('hidden');
+    document.getElementById('popover-arrow-bottom').classList.remove('hidden');
+  }
+
+  popover.style.left = hEvt.x + 'px'; // translated -50% in css
+  popover.style.top = popoverY + 'px';
+
+  document.getElementById('popover-img').src = highlightedEvent.illustrations;
+  document.getElementById('popover-desc').innerText = highlightedEvent.description;
+}
+
+function handleEventClick(e, event) {
+  e.stopPropagation();
+  if(isPresentationMode) return;
+  highlightedEvent = event;
+  jumpToEvent(event);
+  renderTimeline();
+  renderNavigator();
+}
+
+function jumpToEvent(event) {
+  const minYear = d3.min(periods, d => d.start_year) ?? -1600000;
+  const maxYear = d3.max(periods, d => d.visual_end_year) ?? 2024;
+  const padding = Math.abs(maxYear - minYear) * 0.05;
+  const domainStart = minYear;
+  const domainEnd = maxYear + padding;
+
+  let viewWindow = 200;
+  if (Math.abs(event.year) > 10000) viewWindow = 5000;
+  if (Math.abs(event.year) > 100000) viewWindow = 50000;
+  if (Math.abs(event.year) > 1000000) viewWindow = 500000;
+
+  const domainWidth = domainEnd - domainStart;
+  const k = domainWidth / viewWindow;
+
+  const eventPixelPosUnzoomed = initialScale(event.year);
+  const x = (width / 2) - (eventPixelPosUnzoomed * k);
+
+  svg.transition().duration(750)
+     .call(zoomBehavior.transform, d3.zoomIdentity.translate(x, 0).scale(k));
+}
+
+function jumpToPeriod(period, eventToHighlight) {
+  const minYear = d3.min(periods, d => d.start_year) ?? -1600000;
+  const maxYear = d3.max(periods, d => d.visual_end_year) ?? 2024;
+  const domainPadding = Math.abs(maxYear - minYear) * 0.05;
+  const domainStart = minYear;
+  const domainEnd = maxYear + domainPadding;
+  const domainWidth = domainEnd - domainStart;
+
+  const viewSpan = Math.abs(maxYear - period.start_year);
+  const viewWindow = Math.max(viewSpan * 1.1, 1);
+  const k = domainWidth / viewWindow;
+  const viewCenter = (period.start_year + maxYear) / 2;
+  const viewCenterPx = initialScale(viewCenter);
+  const x = (width / 2) - (viewCenterPx * k);
+
+  svg.transition().duration(750)
+     .call(zoomBehavior.transform, d3.zoomIdentity.translate(x, 0).scale(k));
+     
+  if(eventToHighlight) {
+      highlightedEvent = eventToHighlight;
+  }
+}
+
+function renderNavigator() {
+  const container = document.getElementById('navigator-container');
+  container.innerHTML = '';
+
+  allEvents.forEach((event, idx) => {
+    const isSelected = highlightedEvent && highlightedEvent.title === event.title;
+    
+    const btn = document.createElement('button');
+    btn.className = `group relative flex flex-col items-center justify-center h-[60px] sm:h-[70px] md:h-[90px] min-w-[70px] sm:min-w-[80px] max-w-[120px] sm:max-w-[140px] px-1.5 sm:px-2 rounded transition-all duration-200 touch-manipulation flex-shrink-0 ${isSelected ? 'bg-slate-100 ring-1 ring-slate-900/10 shadow-sm' : 'hover:bg-slate-50 active:bg-slate-100'}`;
+    
+    btn.innerHTML = `
+      <div class="w-full h-1 sm:h-1.5 rounded-full mb-1.5 sm:mb-2 transition-all ${isSelected ? 'scale-100' : 'scale-75 opacity-70 group-hover:scale-95 group-hover:opacity-100'}" style="background-color: ${event.periodColor || '#ccc'}"></div>
+      <span class="text-[10px] sm:text-xs font-medium truncate w-full text-center leading-tight ${isSelected ? 'text-slate-900' : 'text-slate-500 group-hover:text-slate-900'}">${event.title}</span>
+      <span class="text-[8px] sm:text-[10px] font-mono truncate w-full text-center leading-tight ${isSelected ? 'text-slate-700' : 'text-slate-400 group-hover:text-slate-600'}">${event.date_display}</span>
+    `;
+
+    btn.onclick = (e) => {
+      e.stopPropagation();
+      if(isPresentationMode) return;
+      handleEventClick(e, event);
+      btn.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+    };
+
+    container.appendChild(btn);
+  });
+}
+
+// Presentation Mode
+let isPresentationMode = false;
+let presentingPeriodIdx = 0;
+let presentingEventIdx = 0;
+let presentationVisiblePeriods = new Set();
+let presentationSortedEvents = [];
+
+const presentBtn = document.getElementById('present-btn');
+presentBtn.addEventListener('click', () => {
+    if(isPresentationMode) exitPresentationMode();
+    else enterPresentationMode();
+});
+
+document.getElementById('pres-exit').addEventListener('click', exitPresentationMode);
+document.getElementById('pres-next').addEventListener('click', presentationPrev);
+document.getElementById('pres-prev').addEventListener('click', presentationNext);
+
+function updatePresentationState() {
+    if(!isPresentationMode) return;
+    
+    presentationVisiblePeriods = new Set(Array.from({length: periods.length - presentingPeriodIdx}, (_, i) => presentingPeriodIdx + i));
+    presentationSortedEvents = [...periods[presentingPeriodIdx].events].sort((a,b) => b.year - a.year);
+    const evt = presentationSortedEvents[presentingEventIdx];
+    
+    highlightedEvent = evt;
+    jumpToPeriod(periods[presentingPeriodIdx], evt);
+    
+    document.getElementById('pres-title').innerText = periods[presentingPeriodIdx].period_title;
+    document.getElementById('pres-title').style.color = periods[presentingPeriodIdx].color;
+    
+    // buttons state
+    const isAtStart = presentingPeriodIdx === periods.length - 1 && presentingEventIdx === 0;
+    const isAtEnd = presentingPeriodIdx === 0 && presentingEventIdx === [...periods[0].events].sort((a,b) => b.year - a.year).length - 1;
+    
+    document.getElementById('pres-prev').disabled = isAtEnd;
+    document.getElementById('pres-next').disabled = isAtStart;
+    
+    // progress
+    const stepsDone = periods.slice(presentingPeriodIdx + 1).reduce((sum, p) => sum + p.events.length, 0) + presentingEventIdx;
+    const totalSteps = periods.reduce((sum, p) => sum + p.events.length, 0);
+    const progress = totalSteps > 0 ? Math.round((stepsDone / totalSteps) * 100) : 0;
+    document.getElementById('presentation-bar').style.width = `${progress}%`;
+    
+    renderTimeline();
+    renderNavigator();
+}
+
+function enterPresentationMode() {
+    isPresentationMode = true;
+    presentingPeriodIdx = periods.length - 1;
+    presentingEventIdx = 0;
+    
+    if(isSidebarOpen) toggleSidebar();
+
+    document.getElementById('present-btn').classList.replace('bg-white', 'bg-indigo-600');
+    document.getElementById('present-btn').classList.replace('hover:text-indigo-600', 'hover:bg-indigo-700');
+    document.getElementById('present-btn').classList.replace('hover:border-indigo-400', 'border-indigo-600');
+    document.getElementById('present-btn').classList.add('text-white');
+    document.getElementById('present-icon').setAttribute('data-lucide', 'square');
+    document.getElementById('present-text').innerText = 'Exit';
+    document.getElementById('presentation-controls').classList.remove('hidden');
+    document.getElementById('presentation-progress').classList.remove('hidden');
+    document.getElementById('filter-container').classList.add('hidden');
+    lucide.createIcons();
+    
+    updatePresentationState();
+}
+
+function exitPresentationMode() {
+    isPresentationMode = false;
+    highlightedEvent = null;
+    
+    document.getElementById('present-btn').classList.replace('bg-indigo-600', 'bg-white');
+    document.getElementById('present-btn').classList.replace('hover:bg-indigo-700', 'hover:text-indigo-600');
+    document.getElementById('present-btn').classList.replace('border-indigo-600', 'hover:border-indigo-400');
+    document.getElementById('present-btn').classList.remove('text-white');
+    document.getElementById('present-icon').setAttribute('data-lucide', 'play');
+    document.getElementById('present-text').innerText = 'Present';
+    document.getElementById('presentation-controls').classList.add('hidden');
+    document.getElementById('presentation-progress').classList.add('hidden');
+    document.getElementById('filter-container').classList.remove('hidden');
+    lucide.createIcons();
+    
+    svg.transition().duration(750).call(zoomBehavior.transform, d3.zoomIdentity);
+    renderTimeline();
+    renderNavigator();
+}
+
+function presentationNext() {
+    // Moves back in time (older)
+    const sorted = [...periods[presentingPeriodIdx].events].sort((a,b) => b.year - a.year);
+    if (presentingEventIdx < sorted.length - 1) {
+        presentingEventIdx++;
+    } else if (presentingPeriodIdx > 0) {
+        presentingPeriodIdx--;
+        presentingEventIdx = 0;
+    }
+    updatePresentationState();
+}
+
+function presentationPrev() {
+    // Moves forward in time (newer)
+    if (presentingEventIdx > 0) {
+        presentingEventIdx--;
+    } else if (presentingPeriodIdx < periods.length - 1) {
+        const prevSorted = [...periods[presentingPeriodIdx + 1].events].sort((a,b) => b.year - a.year);
+        presentingPeriodIdx++;
+        presentingEventIdx = prevSorted.length - 1;
+    }
+    updatePresentationState();
+}
+
+window.addEventListener('keydown', (e) => {
+    if(!isPresentationMode) return;
+    if(e.key === 'ArrowLeft') { e.preventDefault(); presentationNext(); }
+    else if(e.key === 'ArrowRight') { e.preventDefault(); presentationPrev(); }
+    else if(e.key === 'ArrowUp') { 
+        e.preventDefault(); 
+        if (presentingPeriodIdx > 0) {
+            presentingPeriodIdx--;
+            presentingEventIdx = 0;
+            updatePresentationState();
+        }
+    }
+    else if(e.key === 'ArrowDown') { 
+        e.preventDefault(); 
+        if (presentingPeriodIdx < periods.length - 1) {
+            const prevSorted = [...periods[presentingPeriodIdx + 1].events].sort((a,b) => b.year - a.year);
+            presentingPeriodIdx++;
+            presentingEventIdx = prevSorted.length - 1;
+            updatePresentationState();
+        }
+    }
+    else if(e.key === 'Escape') { e.preventDefault(); exitPresentationMode(); }
+});
+
+window.addEventListener('resize', () => {
+  if (!svg) return;
+  initUI();
+});
+
+// Boot
+loadData().then(() => {
+  initUI();
+});
+</script>
+</body>
+</html>

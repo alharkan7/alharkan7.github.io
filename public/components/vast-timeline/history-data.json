@@ -1,0 +1,386 @@
+{
+  "title": "Nusantara Timeline",
+  "dataSourceUrl": "https://docs.google.com/document/d/1NITH_ivLDyahZX8uWphV3sbH5vCrgnDBGvmqjxjqxQY/",
+  "rawData": [
+    {
+      "period_title": "Geological Foundations and the Paleolithic Era",
+      "start_year": -1600000,
+      "end_year": -10000,
+      "description": "The epoch of archaic hominids and early human migration, characterized by geological volatility and land bridges connecting the archipelago to mainland Asia.",
+      "illustrations": "https://factsanddetails.com/archives/007/202512/52e2f93ba1790f5561801f041f0056fbd88067904392a81d20493d767c827d20.jpg",
+      "events": [
+        {
+          "date_display": "c. 1.6 - 1.3 MYA",
+          "year": -1600000,
+          "title": "Arrival of Homo erectus",
+          "description": "Hominids migrate into the archipelago via Sunda Shelf land bridges. Fossils at Sangiran challenge 'Out of Africa' timelines.",
+          "illustrations": "https://factsanddetails.com/media/2/20120202-Java_Man.jpg"
+        },
+        {
+          "date_display": "c. 1,000,000 BP",
+          "year": -1000000,
+          "title": "The Sangiran Flourishing",
+          "description": "Dense population of Homo erectus utilizing simple stone tools (flake industry) in a volcanic woodland environment.",
+          "illustrations": "https://factsanddetails.com/media/2/20120202-Sangiran_17-02.JPG"
+        },
+        {
+          "date_display": "c. 117,000 BP",
+          "year": -117000,
+          "title": "The Ngandong Survivors",
+          "description": "Last known survival of Homo erectus (Solo Man) along the Solo River, coexisting chronologically with other Asian hominids.",
+          "illustrations": "https://factsanddetails.com/archives/007/202404/38412b7a5984fd986f15b8bfc27354089a0b3d8442a99fb7b52f721299f50dbb.jpg"
+        },
+        {
+          "date_display": "c. 60,000 BP",
+          "year": -60000,
+          "title": "Homo floresiensis (The Hobbit)",
+          "description": "Survival of a distinct, small-statured hominid species on the isolated island of Flores.",
+          "illustrations": "https://factsanddetails.com/archives/007/202404/50373946a1da359d8980c259fea7e5884024fb51dcd9c7a3639852b57eeeef5a.jpg"
+        },
+        {
+          "date_display": "c. 43,900 BP",
+          "year": -43900,
+          "title": "Earliest Cave Art",
+          "description": "Cave paintings in Sulawesi depicting therianthropes hunting pigs, among the oldest figurative art in the world.",
+          "illustrations": "https://factsanddetails.com/archives/007/202512/dc65107a94f588b0ba91ebc526168683182a08c1da5480d86cb69a6a5d4803a5.jpg"
+        }
+      ]
+    },
+    {
+      "period_title": "Austronesian Expansion and the Metal Age",
+      "start_year": -3000,
+      "end_year": 100,
+      "description": "The migration of Austronesian speakers bringing maritime technology, agriculture, and eventually metallurgy, forming the demographic foundation of modern Indonesia.",
+      "illustrations": "https://factsanddetails.com/archives/007/202512/c24aa8c4daa1846bad54995783b2ad536ef593814e04d090383ca432880c9be0.jpg",
+      "events": [
+        {
+          "date_display": "c. 3000 BCE",
+          "year": -3000,
+          "title": "Departure from Taiwan",
+          "description": "Austronesian groups move south into the Philippines with advanced maritime technology like crab-claw sails.",
+          "illustrations": "https://upload.wikimedia.org/wikipedia/commons/2/21/Hokule%27aSailing2009.jpg"
+        },
+        {
+          "date_display": "c. 2000 BCE",
+          "year": -2000,
+          "title": "Settlement of the Archipelago",
+          "description": "Migration into Borneo, Sulawesi, and Java, introducing rice cultivation (sawah) and pottery.",
+          "illustrations": "https://factsanddetails.com/archives/007/202512/44a85bd3d085d61a9af9fc06c7a4eedd7bd338b5b2803166c08a7d5d53c142ba.jpg"
+        },
+        {
+          "date_display": "c. 500 BCE",
+          "year": -500,
+          "title": "Introduction of Metallurgy",
+          "description": "Bronze casting arrives from Dong Son culture (Vietnam), typified by large ceremonial bronze drums.",
+          "illustrations": "https://images.metmuseum.org/CRDImages/as/mobile-large/2001_433_94_O1.jpg"
+        }
+      ]
+    },
+    {
+      "period_title": "The Classical Era: Hindu-Buddhist Kingdoms",
+      "start_year": 100,
+      "end_year": 1292,
+      "description": "The rise of 'Indianized' states adopting Hindu-Buddhist kingship, producing great empires like Srivijaya and Mataram.",
+      "illustrations": "https://factsanddetails.com/archives/007/202512/303d354538aaf295d87087267b865518f8fdeb13be018a19e3b09380179bd971.jpg",
+      "events": [
+        {
+          "date_display": "c. 400 CE",
+          "year": 400,
+          "title": "Kutai Inscriptions (Yupa)",
+          "description": "Oldest written records in Indonesia; stone pillars in East Kalimantan celebrating King Mulavarman.",
+          "illustrations": "https://factsanddetails.com/archives/007/202512/a6dd8b90d094f709432d76d479feeda5e4bc6e67fcbe567305463e2e70c86c5c.jpg"
+        },
+        {
+          "date_display": "c. 450 CE",
+          "year": 450,
+          "title": "Tarumanagara Engineering",
+          "description": "King Purnawarman organizes the excavation of the Gomati river (11km) for flood control and irrigation.",
+          "illustrations": "https://factsanddetails.com/archives/007/202512/b685e1cfbfde88b704f29bfc0a374f4fd4264c287a32cd4b0df175f4240fb80f.jpg"
+        },
+        {
+          "date_display": "671 CE",
+          "year": 671,
+          "title": "Srivijaya as Buddhist Center",
+          "description": "Chinese monk I-Tsing documents Srivijaya (Palembang) as a major center of learning with over 1,000 monks.",
+          "illustrations": "https://factsanddetails.com/archives/007/202512/3849039460b29712e05542d0e2ea7fd7a822259849a93599516c0a84385dc0e3.jpg"
+        },
+        {
+          "date_display": "c. 824 CE",
+          "year": 824,
+          "title": "Construction of Borobudur",
+          "description": "Completion of the massive Mahayana Buddhist stupa by the Sailendra dynasty in Central Java.",
+          "illustrations": "https://factsanddetails.com/archives/007/202512/303d354538aaf295d87087267b865518f8fdeb13be018a19e3b09380179bd971.jpg"
+        },
+        {
+          "date_display": "856 CE",
+          "year": 856,
+          "title": "Construction of Prambanan",
+          "description": "The Sanjaya dynasty builds a grand Hindu temple complex dedicated to the Trimurti.",
+          "illustrations": "https://factsanddetails.com/archives/007/202512/eeab93ad4fcc13d9fd7c3d13a4a49180cf1a51f7d08896f03b0bb028e04d4e61.jpg"
+        },
+        {
+          "date_display": "1025 CE",
+          "year": 1025,
+          "title": "Chola Raids",
+          "description": "Indian Chola Empire attacks Srivijaya, capturing the Maharaja and shattering the empire's hegemony.",
+          "illustrations": "https://factsanddetails.com/archives/007/202512/3c77c709915e3e1506180d491cc5baaa026b931c2996a1803fb5306140812567.jpg"
+        },
+        {
+          "date_display": "1222 CE",
+          "year": 1222,
+          "title": "Rise of Singhasari",
+          "description": "Ken Arok defeats Kediri and establishes the Singhasari dynasty, marking a new era of Javanese power.",
+          "illustrations": "https://factsanddetails.com/archives/007/202512/ce3892896722618c5af8ecde92fdd84deba55fcf1c01abf4e58acfc875391211.jpg"
+        }
+      ]
+    },
+    {
+      "period_title": "The Majapahit Empire and the Rise of Islam",
+      "start_year": 1293,
+      "end_year": 1527,
+      "description": "The zenith of the classical era under Majapahit and the concurrent spread of Islam via coastal trade routes.",
+      "illustrations": "https://factsanddetails.com/archives/007/202512/bce6515b6bad532ff7c2633f7c98a904872460de098e3fd2354e8d74bd850e14.jpg",
+      "events": [
+        {
+          "date_display": "1293 CE",
+          "year": 1293,
+          "title": "Founding of Majapahit",
+          "description": "Raden Wijaya defeats invading Mongol forces and establishes the Majapahit empire in East Java.",
+          "illustrations": "https://factsanddetails.com/archives/007/202512/bce6515b6bad532ff7c2633f7c98a904872460de098e3fd2354e8d74bd850e14.jpg"
+        },
+        {
+          "date_display": "1336 CE",
+          "year": 1336,
+          "title": "The Palapa Oath",
+          "description": "Prime Minister Gajah Mada vows to unify the entire Nusantara archipelago under Majapahit rule.",
+          "illustrations": "https://factsanddetails.com/archives/007/202512/0afbaeb0bd3ede8e8af3ccc10e95eac10e1d0e4a6681cc596d6bf96a622244cd.jpg"
+        },
+        {
+          "date_display": "1350 CE",
+          "year": 1350,
+          "title": "Golden Age of Hayam Wuruk",
+          "description": "Majapahit reaches peak influence; the Nagarakretagama is written, detailing the empire's structure.",
+          "illustrations": "https://factsanddetails.com/archives/007/202512/3f9927db0d0022ecf3883c05fe28764c9e7c510e0815c7fca6a23f20e10e54bc.jpg"
+        },
+        {
+          "date_display": "1475 CE",
+          "year": 1475,
+          "title": "Rise of Demak",
+          "description": "Raden Patah founds the Demak Sultanate, the first Islamic power in Java.",
+          "illustrations": "https://factsanddetails.com/archives/007/202512/7382469c9725f1ea6c208e8dba746223a7164957a2b0737ad229600fc30b3db4.jpg"
+        },
+        {
+          "date_display": "1527 CE",
+          "year": 1527,
+          "title": "Fall of Majapahit",
+          "description": "The Islamic Sultanate of Demak conquers the Majapahit rump state, ending the Hindu-Buddhist imperial era in Java.",
+          "illustrations": "https://factsanddetails.com/archives/007/202512/7382469c9725f1ea6c208e8dba746223a7164957a2b0737ad229600fc30b3db4.jpg"
+        }
+      ]
+    },
+    {
+      "period_title": "The Age of Commerce and Colonial Intrusion",
+      "start_year": 1511,
+      "end_year": 1800,
+      "description": "A triangular struggle for control of the spice trade between indigenous Sultanates, Portuguese/Spanish explorers, and the Dutch VOC.",
+      "illustrations": "https://factsanddetails.com/archives/007/202512/451e528ebbc99563da8b98a3c06b0398ab09d6d22f800359aa8b0fc3196f2ff6.jpg",
+      "events": [
+        {
+          "date_display": "1511 CE",
+          "year": 1511,
+          "title": "Fall of Malacca",
+          "description": "The Portuguese capture Malacca, disrupting Asian trade and dispersing merchants to other regional ports.",
+          "illustrations": "https://factsanddetails.com/archives/007/202512/ef1f57af9a498f475fd98230c13713c953d8192c61456625c9c0a22e8a31f9fd.jpg"
+        },
+        {
+          "date_display": "1575 CE",
+          "year": 1575,
+          "title": "Rise of Ternate",
+          "description": "Sultan Baabullah expels the Portuguese and expands Ternate's influence over 72 islands.",
+          "illustrations": "https://factsanddetails.com/archives/007/202512/28e2c95e06b5b5c94477ce6df4cb247e412ecd9330be21490aa4f8bfe85a6ac3.jpg"
+        },
+        {
+          "date_display": "1602 CE",
+          "year": 1602,
+          "title": "Founding of the VOC",
+          "description": "The Dutch East India Company is chartered as the world's first multinational corporation with sovereign rights.",
+          "illustrations": "https://factsanddetails.com/archives/007/202512/451e528ebbc99563da8b98a3c06b0398ab09d6d22f800359aa8b0fc3196f2ff6.jpg"
+        },
+        {
+          "date_display": "1619 CE",
+          "year": 1619,
+          "title": "Founding of Batavia",
+          "description": "Jan Pieterszoon Coen razes Jayakarta and builds Batavia (Jakarta) as the VOC Asian headquarters.",
+          "illustrations": "https://factsanddetails.com/archives/007/202512/5870dd7e436fe1bc28feb787d88b5cab02c5d91d66aad794c0f680ed17bd551a.jpg"
+        },
+        {
+          "date_display": "1621 CE",
+          "year": 1621,
+          "title": "Banda Islands Genocide",
+          "description": "VOC massacres the population of the Banda Islands to enforce a nutmeg monopoly.",
+          "illustrations": "https://factsanddetails.com/archives/007/202512/3314f4d0a683346c88af7ecdc6be313ddab88222fa650326b389af215a3b0016.jpg"
+        },
+        {
+          "date_display": "1628 CE",
+          "year": 1628,
+          "title": "Siege of Batavia",
+          "description": "Sultan Agung of Mataram attacks Batavia but fails due to Dutch naval power and logistics.",
+          "illustrations": "https://factsanddetails.com/archives/007/202512/07752a446ecd641268e1f6c4b029f92e7378b924883950668045390b8b9b58a5.jpg"
+        },
+        {
+          "date_display": "1755 CE",
+          "year": 1755,
+          "title": "Treaty of Giyanti",
+          "description": "Mataram is split into Surakarta and Yogyakarta, permanently fracturing Javanese political power.",
+          "illustrations": "https://factsanddetails.com/archives/007/202512/57d90fc34ac9de6e97beca5aaf6ade1b17b978683803bb5147e64ea7c8e99409.jpg"
+        }
+      ]
+    },
+    {
+      "period_title": "The Colonial State and the Seeds of Nationalism",
+      "start_year": 1800,
+      "end_year": 1942,
+      "description": "Transformation from a trading network to a centralized colonial state, followed by the rise of modern Indonesian nationalism.",
+      "illustrations": "https://factsanddetails.com/archives/007/202512/48baf692d3eb40d8f36eee15d85944bea10f48a9356bc55bda6cfd287bc71947.jpg",
+      "events": [
+        {
+          "date_display": "1808 CE",
+          "year": 1808,
+          "title": "Daendels Era / Great Post Road",
+          "description": "Daendels constructs the 1,000km Great Post Road across Java using forced labor.",
+          "illustrations": "https://factsanddetails.com/archives/007/202512/951eb03630955d23770e6413af23ed18546b9ea3d9bfc14f1448996addf9a2ac.jpg"
+        },
+        {
+          "date_display": "1825 CE",
+          "year": 1825,
+          "title": "The Java War",
+          "description": "Prince Diponegoro leads a massive rebellion against the Dutch, devastating Central Java.",
+          "illustrations": "https://factsanddetails.com/archives/007/202512/8b2587d8d5799ef647137eb76bf05516d1b3114394a5f51ba68ce5312968b75c.jpg"
+        },
+        {
+          "date_display": "1830 CE",
+          "year": 1830,
+          "title": "Cultivation System Implemented",
+          "description": "Forced cultivation of export crops (Cultuurstelsel) restores Dutch finances but causes famine in Java.",
+          "illustrations": "https://factsanddetails.com/media/2/20120512-North%20sumatra%202.jpg"
+        },
+        {
+          "date_display": "1901 CE",
+          "year": 1901,
+          "title": "The Ethical Policy",
+          "description": "Dutch policy shift towards Irrigation, Emigration, and Education, inadvertently creating a nationalist elite.",
+          "illustrations": "https://factsanddetails.com/archives/007/202512/f20f92e9807104175f98cf9aa500ffedf4076ec2f1ed216f5da6dd8722a01045.jpg"
+        },
+        {
+          "date_display": "1908 CE",
+          "year": 1908,
+          "title": "Budi Utomo Founded",
+          "description": "Establishment of the first modern indigenous organization, celebrated as National Awakening Day.",
+          "illustrations": "https://factsanddetails.com/archives/007/202512/38559aaf521d673ee2eb6444061b464ae8084bc95091d062f0babca6b625cb30.jpg"
+        },
+        {
+          "date_display": "1928 CE",
+          "year": 1928,
+          "title": "The Youth Pledge",
+          "description": "Young nationalists declare the trinity of 'One Motherland, One Nation, One Language'.",
+          "illustrations": "https://factsanddetails.com/archives/007/202512/161f635af8861cd05cd82199511928088b9e771e8268814f25d865cccec05b30.jpg"
+        }
+      ]
+    },
+    {
+      "period_title": "The Crucible of Independence",
+      "start_year": 1942,
+      "end_year": 1949,
+      "description": "The collapse of Dutch rule during WWII, the Japanese occupation, and the violent revolution for sovereignty.",
+      "illustrations": "https://factsanddetails.com/archives/007/202512/c64137ac794feb1d06a052da66804c5d1689c2fb9a1e7665da92e9f0afcf3e19.jpg",
+      "events": [
+        {
+          "date_display": "1942 CE",
+          "year": 1942,
+          "title": "Dutch Surrender / Japanese Occupation",
+          "description": "Dutch surrender to Japan; beginning of harsh occupation but also military training for Indonesians (PETA).",
+          "illustrations": "https://factsanddetails.com/archives/007/202512/161f635af8861cd05cd82199511928088b9e771e8268814f25d865cccec05b30.jpg"
+        },
+        {
+          "date_display": "1945 CE (June)",
+          "year": 1945,
+          "title": "Birth of Pancasila",
+          "description": "Sukarno outlines the five principles of state ideology.",
+          "illustrations": "https://factsanddetails.com/archives/007/202512/c64137ac794feb1d06a052da66804c5d1689c2fb9a1e7665da92e9f0afcf3e19.jpg"
+        },
+        {
+          "date_display": "1945 CE (Aug 17)",
+          "year": 1945,
+          "title": "Proclamation of Independence",
+          "description": "Sukarno and Hatta declare independence in Jakarta.",
+          "illustrations": "https://factsanddetails.com/archives/007/202512/81293646aee3a563734af35a81efef56c0b990ed96b57a3c5e962ff3fad73f3c.jpg"
+        },
+        {
+          "date_display": "1945 CE (Nov 10)",
+          "year": 1945,
+          "title": "Battle of Surabaya",
+          "description": "Fierce resistance against British forces; recognized as Heroes' Day.",
+          "illustrations": "https://factsanddetails.com/archives/007/202512/bfbadbd08b29deacb7312ca4bbfa25b40546800d7fd04eaf721f2af36cf085f5.jpg"
+        },
+        {
+          "date_display": "1949 CE",
+          "year": 1949,
+          "title": "Transfer of Sovereignty",
+          "description": "Dutch recognize Indonesian sovereignty following the Round Table Conference.",
+          "illustrations": "https://factsanddetails.com/archives/007/202512/b00b87cefc36b15ad6a886fba8646f87457470730ba5a9b1270a66c70aef9955.jpg"
+        }
+      ]
+    },
+    {
+      "period_title": "The Independent Republic",
+      "start_year": 1950,
+      "end_year": 2025,
+      "description": "The evolution of the modern nation-state through the Old Order, New Order, and the democratic Reformasi era.",
+      "illustrations": "https://factsanddetails.com/archives/007/202512/fd9d3604c4f89b211302e6ed283fcd782b17acf01da0678f47198adc99030f3c.jpg",
+      "events": [
+        {
+          "date_display": "1955 CE",
+          "year": 1955,
+          "title": "First General Election",
+          "description": "First free democratic election; rise of PKI alarms the military and Islamic groups.",
+          "illustrations": "https://factsanddetails.com/archives/007/202512/b221dac73a2ff514eb1ce732d88edbb60cbd7f09e135fc1a750898de3584e305.jpg"
+        },
+        {
+          "date_display": "1965 CE",
+          "year": 1965,
+          "title": "G30S/PKI Movement",
+          "description": "Failed coup attempt leads to anti-communist purge and the rise of Suharto.",
+          "illustrations": "https://factsanddetails.com/archives/007/202512/84ea38cbad8ee37cb0a495261fd90b9536e33f37845ad094f7ebaf22c7adbfa8.jpg"
+        },
+        {
+          "date_display": "1966 CE",
+          "year": 1966,
+          "title": "Supersemar / New Order",
+          "description": "Power transfer to Suharto, beginning 32 years of authoritarian 'New Order' rule.",
+          "illustrations": "https://factsanddetails.com/archives/007/202512/b00b87cefc36b15ad6a886fba8646f87457470730ba5a9b1270a66c70aef9955.jpg"
+        },
+        {
+          "date_display": "1998 CE",
+          "year": 1998,
+          "title": "Fall of Suharto",
+          "description": "Asian Financial Crisis and student protests force Suharto's resignation, beginning Reformasi.",
+          "illustrations": "https://upload.wikimedia.org/wikipedia/commons/1/14/Suharto_resigns.jpg"
+        },
+        {
+          "date_display": "2024 CE",
+          "year": 2024,
+          "title": "Prabowo Presidency",
+          "description": "Prabowo Subianto elected President, representing policy continuity from the Jokowi era.",
+          "illustrations": "https://factsanddetails.com/archives/007/202512/fd9d3604c4f89b211302e6ed283fcd782b17acf01da0678f47198adc99030f3c.jpg"
+        },
+        {
+          "date_display": "2025 CE (Jan 6)",
+          "year": 2025,
+          "title": "Makan Bergizi Gratis (MBG)",
+          "description": "President Prabowo officially launches the Free Nutritious Meal (MBG) flagship program targeting school children across Indonesia.",
+          "illustrations": "https://upload.wikimedia.org/wikipedia/commons/thumb/8/8c/MBG_Smakenza.jpg/500px-MBG_Smakenza.jpg"
+        }
+      ]
+    }
+  ]
+}

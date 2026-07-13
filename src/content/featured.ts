@@ -14,7 +14,7 @@ const rawProjects = [
     subtitle: "",
     type: "visualization",
     date: "2026-01-16",
-    url: "https://alhrkn.vercel.app/vast-timeline",
+    url: "/vast-timeline",
     coverImage: "https://ik.imagekit.io/raihankalla/research_section_cover/linimasa-nusantara.png",
   },
   {
