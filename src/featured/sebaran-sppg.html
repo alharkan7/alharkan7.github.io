@@ -566,14 +566,32 @@
       .row-city.visible {
         display: table-row;
       }
+      .row-city.has-children {
+        cursor: pointer;
+        transition: background 0.2s;
+      }
+      .row-city.has-children:hover {
+        background: #e2e8f0;
+      }
+      .row-sppg {
+        background: #ffffff;
+        display: none;
+      }
+      .row-sppg.visible {
+        display: table-row;
+      }
+      .row-sppg:hover {
+        background: #f8fafc;
+      }
       .prov-name-cell {
         padding-left: 2.5rem !important;
       }
-      .city-name {
-        padding-left: 4.5rem !important;
-        color: #475569;
-        font-weight: 400;
-        line-height: 1.5;
+      .city-name-cell {
+        padding-left: 3.5rem !important;
+      }
+      .sppg-name-cell {
+        padding-left: 5.5rem !important;
+        text-align: left !important;
       }
       .prov-name-inner {
         display: flex;
@@ -590,7 +608,8 @@
         line-height: 1.5;
       }
       .row-island.expanded .prov-icon,
-      .row-province.expanded .prov-icon {
+      .row-province.expanded .prov-icon,
+      .row-city.expanded .prov-icon {
         transform: rotate(90deg);
       }
 
@@ -998,11 +1017,24 @@ async function initMap() {
     });
 
     // Fetch SPPG data
-    const sppgResponse = await fetch('/components/sebaran-sppg/data-sppg.json');
-    if (!sppgResponse.ok) {
+    const [sppgResponse, rawSppgResponse] = await Promise.all([
+      fetch('/components/sebaran-sppg/data-sppg.json'),
+      fetch('/components/sebaran-sppg/data-sppg-raw.json')
+    ]);
+    if (!sppgResponse.ok || !rawSppgResponse.ok) {
       throw new Error('Failed to load SPPG data');
     }
     const sppgData = await sppgResponse.json();
+    const rawSppgData = await rawSppgResponse.json();
+
+    const rawCityGroup = new Map();
+    for (const raw of rawSppgData) {
+      const city = (raw.kab_kota || '').toUpperCase();
+      if (!rawCityGroup.has(city)) {
+        rawCityGroup.set(city, []);
+      }
+      rawCityGroup.get(city).push(raw);
+    }
 
     // Create a map of normalized city names to their data
     const sppgDataMap = new Map();
@@ -1734,7 +1766,11 @@ async function initMap() {
       }
       const pData = iData.provinces.get(prov);
       pData.total += item.COUNT;
-      pData.cities.push({ name: item.CITY_REGENCY, count: item.COUNT });
+      pData.cities.push({ 
+        name: item.CITY_REGENCY, 
+        count: item.COUNT,
+        items: rawCityGroup.get(item.CITY_REGENCY) || []
+      });
     }
 
     const islandsBase = Array.from(islandMap.values());
@@ -1828,18 +1864,59 @@ async function initMap() {
 
           // City rows
           const cRows = [];
+          const cRowsToSppgRows = new Map();
+
           prov.cities.forEach(city => {
             const cPercent = ((city.count / overallTotal) * 100).toFixed(1);
             const cRow = document.createElement('tr');
-            cRow.className = `row-city island-group-${iIndex} prov-group-${iIndex}-${pIndex}` + (allExpanded ? ' visible' : '');
+            cRow.className = `row-city island-group-${iIndex} prov-group-${iIndex}-${pIndex}` + (allExpanded ? ' visible expanded' : '');
+            
+            const hasItems = city.items && city.items.length > 0;
+            if (hasItems) cRow.classList.add('has-children');
+
             cRow.innerHTML = `
-              <td class="city-name">${city.name}</td>
+              <td class="city-name-cell">
+                <div class="prov-name-inner" style="color: #475569;">
+                  ${hasItems ? '<span class="prov-icon"><i data-lucide="chevron-right" style="width:14px;height:14px;"></i></span>' : '<span style="width:14px; display:inline-block; margin-right:4px;"></span>'}
+                  <span class="prov-text">${city.name}</span>
+                </div>
+              </td>
               <td>${new Intl.NumberFormat('id-ID').format(city.count)} <span style="font-weight: 300; font-size: 0.85em; opacity: 0.7; margin-left: 4px;">(${cPercent}%)</span></td>
             `;
             tbody.appendChild(cRow);
             cRows.push(cRow);
+
+            if (hasItems) {
+               const sRows = [];
+               city.items.sort((a, b) => (a.nama_sppg || '').localeCompare(b.nama_sppg || ''));
+               city.items.forEach(sppg => {
+                 const sRow = document.createElement('tr');
+                 sRow.className = `row-sppg island-group-${iIndex} prov-group-${iIndex}-${pIndex}` + (allExpanded ? ' visible' : '');
+                 sRow.innerHTML = `
+                   <td class="sppg-name-cell" colspan="2">
+                     <div style="font-weight: 500; color: #334155;">${sppg.nama_sppg || 'Unknown SPPG'}</div>
+                     <div style="font-size: 0.85em; color: #64748b; margin-top: 2px;">Kec. ${sppg.kecamatan || '-'}, Desa ${sppg.kelurahan_desa || '-'}</div>
+                   </td>
+                 `;
+                 tbody.appendChild(sRow);
+                 sRows.push(sRow);
+               });
+               cRowsToSppgRows.set(cRow, sRows);
+
+               cRow.addEventListener('click', (e) => {
+                 e.stopPropagation();
+                 const isExpanded = cRow.classList.toggle('expanded');
+                 sRows.forEach(row => {
+                   if (isExpanded) {
+                     row.classList.add('visible');
+                   } else {
+                     row.classList.remove('visible');
+                   }
+                 });
+               });
+            }
           });
-          pRowsToCRows.set(pRow, cRows);
+          pRowsToCRows.set(pRow, { cRows, cRowsToSppgRows });
 
           // Click handler to toggle cities
           pRow.addEventListener('click', (e) => {
@@ -1850,6 +1927,11 @@ async function initMap() {
                 row.classList.add('visible');
               } else {
                 row.classList.remove('visible');
+                row.classList.remove('expanded');
+                const sRows = cRowsToSppgRows.get(row);
+                if (sRows) {
+                  sRows.forEach(s => s.classList.remove('visible'));
+                }
               }
             });
           });
@@ -1864,9 +1946,15 @@ async function initMap() {
             } else {
               row.classList.remove('visible');
               row.classList.remove('expanded');
-              const cRows = pRowsToCRows.get(row);
-              if (cRows) {
-                cRows.forEach(c => c.classList.remove('visible'));
+              const data = pRowsToCRows.get(row);
+              if (data) {
+                data.cRows.forEach(c => {
+                  c.classList.remove('visible');
+                  c.classList.remove('expanded');
+                });
+                for (const sRows of data.cRowsToSppgRows.values()) {
+                  sRows.forEach(s => s.classList.remove('visible'));
+                }
               }
             }
           });
