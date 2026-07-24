@@ -144,6 +144,12 @@ const { current = "" } = Astro.props;
     display: inline-block;
   }
 
+  @media screen and (max-width: 768px) {
+    .dropdown-container.desktop-only {
+      display: none;
+    }
+  }
+
   .dropdown-container:has(.dropdown-content.show) {
     position: static;
   }
@@ -262,7 +268,7 @@ const { current = "" } = Astro.props;
       </div>
     </div>
 
-    <div class="dropdown-container">
+    <div class="dropdown-container desktop-only">
       <a
         class={current === "links" ? "selected" : ""}
         data-dropdown-toggle
