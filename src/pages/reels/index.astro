@@ -78,8 +78,39 @@ const permalink = `${Astro.site?.href}reels`;
     placeholders.forEach(el => observer.observe(el));
   }
 
-  document.addEventListener('DOMContentLoaded', initInstagramLazyLoad);
-  document.addEventListener('astro:page-load', initInstagramLazyLoad);
+  function initTikTokLazyLoad() {
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          const el = entry.target;
+          observer.unobserve(el);
+          
+          el.classList.remove('tiktok-embed-placeholder');
+          el.classList.add('tiktok-embed');
+          
+          if (!document.querySelector('#tiktok-embed-script')) {
+            const script = document.createElement('script');
+            script.id = 'tiktok-embed-script';
+            script.src = "https://www.tiktok.com/embed.js";
+            script.async = true;
+            document.body.appendChild(script);
+          }
+        }
+      });
+    }, { rootMargin: '200px' });
+
+    const placeholders = document.querySelectorAll('.tiktok-embed-placeholder');
+    placeholders.forEach(el => observer.observe(el));
+  }
+
+  document.addEventListener('DOMContentLoaded', () => {
+    initInstagramLazyLoad();
+    initTikTokLazyLoad();
+  });
+  document.addEventListener('astro:page-load', () => {
+    initInstagramLazyLoad();
+    initTikTokLazyLoad();
+  });
 </script>
 
 <style>
