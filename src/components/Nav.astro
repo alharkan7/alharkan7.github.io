@@ -1,5 +1,6 @@
 ---
 import ThemeToggleButton from "./ThemeToggleButton.svelte";
+import { Icon } from "astro-icon/components";
 const { current = "" } = Astro.props;
 ---
 
@@ -179,6 +180,19 @@ const { current = "" } = Astro.props;
     background-color: var(--background-body, #f5f5f5);
   }
 
+  .contact-link {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .contact-icon {
+    display: flex;
+    width: 14px;
+    height: 14px;
+    flex-shrink: 0;
+  }
+
   .dropdown-container:hover .dropdown-content {
     display: block;
   }
@@ -242,35 +256,9 @@ const { current = "" } = Astro.props;
       </div>
     </div>
 
-    <div class="dropdown-container">
-      <a
-        class={current === "stories" ||
-        current === "reels" ||
-        current === "misc" ||
-        current === "search" ||
-        current === "uncategorized" ||
-        current === "ptm" ||
-        current === "bio"
-          ? "selected"
-          : ""}
-        data-dropdown-toggle
-        role="button"
-        tabindex="0"
-        class="dropdown-button">Others</a
-      >
-      <div class="dropdown-content">
-        <a href="/bio">Profile</a>
-        <a href="/reels">Reels</a>
-        <a href="/ptm">Theories</a>
-        <a href="/stories">Stories</a>
-        <a href="/misc">Misc.</a>
-        <!-- <a href="/uncategorized">Uncategorized</a> -->
-      </div>
-    </div>
-
     <div class="dropdown-container desktop-only">
       <a
-        class={current === "links" ? "selected" : ""}
+        class={`highlight-link ${current === "links" ? "selected" : ""}`}
         data-dropdown-toggle
         role="button"
         tabindex="0"
@@ -297,6 +285,84 @@ const { current = "" } = Astro.props;
           target="_blank"
           rel="noopener noreferrer">All Apps ↗</a
         >
+      </div>
+    </div>
+
+    <div class="dropdown-container">
+      <a
+        class={`highlight-link ${current === "contact" ? "selected" : ""}`}
+        data-dropdown-toggle
+        role="button"
+        tabindex="0"
+        class="dropdown-button">Contact</a
+      >
+      <div class="dropdown-content">
+        <a href="/bio" class="contact-link">
+          <Icon name="lucide:user" class="contact-icon" />
+          <span>Profile</span>
+        </a>
+        <a href="mailto:alharkan7@gmail.com" class="contact-link">
+          <Icon name="lucide:mail" class="contact-icon" />
+          <span>Email</span>
+        </a>
+        <a
+          href="https://github.com/alharkan7"
+          target="_blank"
+          rel="noopener noreferrer"
+          class="contact-link">
+          <Icon name="simple-icons:github" class="contact-icon" />
+          <span>GitHub</span>
+        </a>
+        <a
+          href="https://linkedin.com/in/alharkan"
+          target="_blank"
+          rel="noopener noreferrer"
+          class="contact-link">
+          <Icon name="simple-icons:linkedin" class="contact-icon" />
+          <span>LinkedIn</span>
+        </a>
+        <a
+          href="https://x.com/alhrkn"
+          target="_blank"
+          rel="noopener noreferrer"
+          class="contact-link">
+          <Icon name="simple-icons:x" class="contact-icon" />
+          <span>Twitter</span>
+        </a>
+        <a
+          href="https://instagram.com/alhrkn"
+          target="_blank"
+          rel="noopener noreferrer"
+          class="contact-link">
+          <Icon name="simple-icons:instagram" class="contact-icon" />
+          <span>Instagram</span>
+        </a>
+      </div>
+    </div>
+
+    <div class="dropdown-container">
+      <a
+        class={current === "stories" ||
+        current === "reels" ||
+        current === "misc" ||
+        current === "search" ||
+        current === "uncategorized" ||
+        current === "ptm" ||
+        current === "bio"
+          ? "selected"
+          : ""}
+        data-dropdown-toggle
+        role="button"
+        tabindex="0"
+        class="dropdown-button">Others</a
+      >
+      <div class="dropdown-content">
+        <!-- <a href="/bio">Profile</a> -->
+        <a href="/reels">Reels</a>
+        <a href="/ptm">Theories</a>
+        <a href="/stories">Stories</a>
+        <a href="/misc">Misc.</a>
+        <!-- <a href="/uncategorized">Uncategorized</a> -->
       </div>
     </div>
   </nav>

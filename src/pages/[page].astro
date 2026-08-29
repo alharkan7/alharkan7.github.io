@@ -1,7 +1,6 @@
 ---
 import type { GetStaticPaths, Page } from "astro";
 import BaseLayout from "../layouts/BaseLayout.astro";
-import QuickLinks from "../components/QuickLinks.astro";
 
 export const prerender = true;
 
@@ -53,7 +52,6 @@ const permalink = Astro?.site?.href;
     <div class="container">
         <h1>{title}</h1>
         <!-- <p><b>{description}</b></p> -->
-        <QuickLinks />
         <hr />
         {
             page.data.map((post: BlogPost, index: number) => {

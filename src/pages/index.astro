@@ -1,7 +1,6 @@
 ---
 export const prerender = true;
 import BaseLayout from "../layouts/BaseLayout.astro";
-import QuickLinks from "../components/QuickLinks.astro";
 import FeaturedSection from "../components/FeaturedSection.astro";
 import { featuredProjects } from "../content/featured";
 
@@ -46,20 +45,14 @@ const paginatedPosts = sortedPosts.slice(0, postsPerPage);
   current=""
 >
   <div class="container">
-    <h1>{title}</h1>
-    <!-- <p><b>{description}</b></p> -->
-    <QuickLinks />
-    <hr />
-    <FeaturedSection
-      sectionTitle="Visual Pages"
-      items={featuredProjects.slice(0, 6)}
-    />
-    <!-- sectionSubtitle="This is a list of special pages showcasing some research projects that don't fit the blog formatting." -->
-    <div class="see-more-container">
-      <a href="/data" class="see-more-link">See More →</a>
+    <div class="section-header">
+      <h2 class="section-title">Visual Pages</h2>
     </div>
-    <h1><b>Blog Posts</b></h1>
-    <hr />
+    <FeaturedSection items={featuredProjects.slice(0, 6)} />
+    <div class="see-more-container">
+      <a href="/data" class="see-more-link">More →</a>
+    </div>
+    <hr class="featured-end" />
     {
       paginatedPosts.map((post: Post, index: number) => {
         const href = `/${post.file.split("/blog/").pop()?.split(".").shift() ?? ""}`;
@@ -94,10 +87,6 @@ const paginatedPosts = sortedPosts.slice(0, postsPerPage);
   </div>
 
   <style>
-    h1 {
-      margin-bottom: 0.5rem;
-    }
-
     h2 {
       font-family: var(--font-family-serif);
       font-weight: 600;
@@ -119,10 +108,28 @@ const paginatedPosts = sortedPosts.slice(0, postsPerPage);
       margin: 20px auto 60px auto;
     }
 
+    .featured-end {
+      margin-top: 1.5rem;
+    }
+
+    .section-header {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 1rem;
+      margin-bottom: 2rem;
+    }
+
+    .section-title {
+      font-family: var(--font-family-serif);
+      font-weight: 600;
+      margin: 0;
+    }
+
     .see-more-container {
       display: flex;
       justify-content: flex-end;
-      margin-bottom: 3rem;
+      margin-top: 1.5rem;
     }
 
     .see-more-link {
