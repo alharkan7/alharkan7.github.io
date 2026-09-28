@@ -9,7 +9,7 @@ const description = "On Media, Technology, and Everything in Between";
 const permalink = Astro?.site?.href;
 
 const postsPerPage = 10;
-const allPostsGlob = import.meta.glob("../posts/blog/*.{md,mdx}", {
+const allPostsGlob = (import.meta as any).glob("../posts/blog/*.{md,mdx}", {
   eager: true,
 });
 
@@ -47,6 +47,7 @@ const paginatedPosts = sortedPosts.slice(0, postsPerPage);
   <div class="container">
     <div class="section-header">
       <h2 class="section-title">Visual Pages</h2>
+      <a href="https://beeblio.raihankalla.id" target="_blank" rel="noopener noreferrer" class="beeblio-link">Beeblio ↗</a>
     </div>
     <FeaturedSection items={featuredProjects.slice(0, 6)} />
     <div class="see-more-container">
@@ -114,7 +115,7 @@ const paginatedPosts = sortedPosts.slice(0, postsPerPage);
 
     .section-header {
       display: flex;
-      align-items: baseline;
+      align-items: center;
       justify-content: space-between;
       gap: 1rem;
       margin-bottom: 2rem;
@@ -124,6 +125,21 @@ const paginatedPosts = sortedPosts.slice(0, postsPerPage);
       font-family: var(--font-family-serif);
       font-weight: 600;
       margin: 0;
+    }
+
+    .beeblio-link {
+      color: var(--primary-color);
+      transition: all 0.2s ease;
+      font-family: var(--font-family-sans);
+      font-size: 1.1em;
+      font-weight: 700;
+      text-decoration: none;
+      box-shadow: inset 0 -0.12em 0 var(--primary-color);
+    }
+
+    .beeblio-link:hover {
+      box-shadow: inset 0 -1.5em 0 var(--primary-color);
+      color: #fff;
     }
 
     .see-more-container {
